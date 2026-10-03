@@ -147,3 +147,29 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# ---------------------------------------------------------------------------
+# Project-specific rules (browser-mmo)
+# ---------------------------------------------------------------------------
+
+# Local database / runtime state
+*.sqlite
+.pgdata/
+
+# Playwright / screenshots from local verification
+test-results/
+playwright-report/
+/screenshots/
+
+# Art pipeline: caches, temp renders and intermediate exports.
+# Source assets (assets/concepts, assets/models, assets/textures, assets/icons, assets/audio)
+# are committed. Everything below is regenerable and must never be committed.
+assets/**/.cache/
+assets/**/_tmp/
+assets/**/*.blend1
+assets/**/*.blend2
+assets/generated/_staging/
+assets/generated/_renders/
+assets/generated/_exports/
+*.tmp.glb
+*.tmp.png

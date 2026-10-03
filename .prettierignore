@@ -1,0 +1,8 @@
+pnpm-lock.yaml
+dist
+coverage
+.turbo
+node_modules
+packages/db/migrations/meta
+assets/**/*.glb
+assets/**/*.gltf

@@ -1,0 +1,39 @@
+{
+  "name": "browser-mmo",
+  "private": true,
+  "description": "Persistent browser-first fantasy MMORPG (monorepo root).",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.13.0",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=@mmo/api --filter=@mmo/realtime --filter=@mmo/game-web --filter=@mmo/admin",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "turbo run test",
+    "test:integration": "turbo run test:integration --concurrency=1",
+    "db:generate": "pnpm --filter @mmo/db db:generate",
+    "db:migrate": "pnpm --filter @mmo/db db:migrate",
+    "db:seed": "pnpm --filter @mmo/db db:seed",
+    "db:reset": "pnpm --filter @mmo/db db:reset",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
+    "turbo": "^2.11.7",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  }
+}

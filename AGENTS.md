@@ -6,11 +6,11 @@ This project is **one persistent browser-first MMORPG intended to grow for years
 
 ## Project memory files
 
-| File | Purpose |
-| --- | --- |
-| `docs/MASTER_PLAN.md` | Authoritative long-term specification for the game |
-| `docs/PROGRESS.md` | Authoritative checklist of what is genuinely done, current work, known issues, next task |
-| `docs/DECISIONS.md` | Architecture decision log |
+| File                  | Purpose                                                                                  |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| `docs/MASTER_PLAN.md` | Authoritative long-term specification for the game                                       |
+| `docs/PROGRESS.md`    | Authoritative checklist of what is genuinely done, current work, known issues, next task |
+| `docs/DECISIONS.md`   | Architecture decision log                                                                |
 
 ## Hard rules
 

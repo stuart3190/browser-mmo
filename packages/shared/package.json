@@ -1,0 +1,14 @@
+{
+  "name": "@mmo/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Isomorphic primitives shared by every client and service: IDs, error codes, permissions.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
+  }
+}

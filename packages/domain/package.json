@@ -1,0 +1,27 @@
+{
+  "name": "@mmo/domain",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Server-authoritative domain services (items, storage, equipment, currency, marketplace, auth, characters). Transport-agnostic: used by both the HTTP API and the realtime service.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test:integration": "vitest run",
+    "db:seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "@mmo/config": "workspace:*",
+    "@mmo/db": "workspace:*",
+    "@mmo/game-data": "workspace:*",
+    "@mmo/schemas": "workspace:*",
+    "@mmo/shared": "workspace:*",
+    "drizzle-orm": "^0.45.3",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
+  }
+}

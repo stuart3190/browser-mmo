@@ -1,0 +1,18 @@
+{
+  "name": "@mmo/schemas",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Zod schemas and inferred TypeScript types for every shared domain model and API DTO.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mmo/shared": "workspace:*",
+    "zod": "^4.6.5"
+  }
+}

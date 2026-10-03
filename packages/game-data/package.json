@@ -1,0 +1,19 @@
+{
+  "name": "@mmo/game-data",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Authored, schema-validated game content (rarities, slots, classes, items, world) and pure rule functions.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mmo/schemas": "workspace:*",
+    "@mmo/shared": "workspace:*",
+    "zod": "^4.6.5"
+  }
+}

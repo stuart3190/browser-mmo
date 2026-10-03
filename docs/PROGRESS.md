@@ -21,6 +21,7 @@ Completed items should carry proof notes in this form:
 Status at creation (2026-10-03): the repository contained only `README.md` and `.gitignore`, so every item below starts unchecked.
 
 # Foundation
+
 - [ ] Monorepo configured
 - [ ] Package manager configured
 - [ ] TypeScript configured
@@ -29,6 +30,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] CI foundation
 
 # Browser Game
+
 - [ ] 3D engine selected
 - [ ] Game shell boots
 - [ ] Basic world renders
@@ -40,6 +42,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] HUD foundation
 
 # Backend
+
 - [ ] API service
 - [ ] Auth foundation
 - [ ] Character persistence
@@ -49,6 +52,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Vault persistence
 
 # Database
+
 - [ ] Migrations
 - [ ] Accounts
 - [ ] Characters
@@ -61,6 +65,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Item history
 
 # Realtime Multiplayer
+
 - [ ] WebSocket connection
 - [ ] Authentication
 - [ ] Presence
@@ -71,6 +76,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Chat protocol
 
 # Characters / Classes
+
 - [ ] Character model
 - [ ] Class architecture
 - [ ] Specialisation architecture
@@ -80,6 +86,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Abilities
 
 # Combat
+
 - [ ] Melee combat
 - [ ] Ranged combat
 - [ ] Magic combat
@@ -88,6 +95,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Damage validation
 
 # Items
+
 - [ ] Item templates
 - [ ] Item instances
 - [ ] Unique IDs
@@ -99,6 +107,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Provenance/history
 
 # Equipment
+
 - [ ] Equipment slots
 - [ ] Equip
 - [ ] Unequip
@@ -106,6 +115,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Stat application
 
 # Inventory
+
 - [ ] Backpack
 - [ ] Material pouch
 - [ ] Stacking
@@ -116,22 +126,26 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Junk marking
 
 # Storage
+
 - [ ] Character vault
 - [ ] Account vault
 - [ ] Guild vault
 
 # Economy
+
 - [ ] Currency model
 - [ ] Currency transactions
 - [ ] Audit trail
 
 # Trading
+
 - [ ] Player trade
 - [ ] Trade validation
 - [ ] Atomic exchange
 - [ ] Exploit protection
 
 # Marketplace
+
 - [ ] Listings
 - [ ] Buy
 - [ ] Sell
@@ -142,6 +156,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Duplication protection
 
 # World
+
 - [ ] Region model
 - [ ] Zone model
 - [ ] Chunk model
@@ -152,22 +167,26 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Dynamic events
 
 # Quests
+
 - [ ] Quest model
 - [ ] Quest states
 - [ ] Rewards
 
 # Dungeons
+
 - [ ] Dungeon architecture
 - [ ] Instance architecture
 - [ ] Boss encounters
 
 # Crafting / Gathering
+
 - [ ] Materials
 - [ ] Gathering
 - [ ] Recipes
 - [ ] Crafting
 
 # Social
+
 - [ ] Friends
 - [ ] Parties
 - [ ] Guilds
@@ -176,6 +195,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Guild chat
 
 # Mobile Companion App
+
 - [ ] App foundation
 - [ ] Login
 - [ ] Inventory
@@ -188,6 +208,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Notifications
 
 # Art Pipeline
+
 - [ ] Naming conventions
 - [ ] Concepts folder
 - [ ] Models folder
@@ -199,6 +220,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Blender automation
 
 # Security
+
 - [ ] Threat model
 - [ ] Item duplication protection
 - [ ] Currency protection
@@ -208,6 +230,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Admin permissions
 
 # Testing
+
 - [ ] Unit tests
 - [ ] Integration tests
 - [ ] Item ownership tests
@@ -217,6 +240,7 @@ Status at creation (2026-10-03): the repository contained only `README.md` and `
 - [ ] Realtime protocol tests
 
 # Deployment
+
 - [ ] Development deployment
 - [ ] Production strategy
 - [ ] Health endpoints
