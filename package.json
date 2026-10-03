@@ -20,8 +20,8 @@
     "test:integration": "turbo run test:integration --concurrency=1",
     "db:generate": "pnpm --filter @mmo/db db:generate",
     "db:migrate": "pnpm --filter @mmo/db db:migrate",
-    "db:seed": "pnpm --filter @mmo/db db:seed",
-    "db:reset": "pnpm --filter @mmo/db db:reset",
+    "db:seed": "pnpm --filter @mmo/domain db:seed",
+    "db:reset": "pnpm --filter @mmo/db db:reset && pnpm --filter @mmo/domain db:seed",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build"
   },
   "devDependencies": {

@@ -1,0 +1,35 @@
+{
+  "name": "@mmo/realtime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "WebSocket gateway: authenticates connections, hosts zone simulations (@mmo/world), relays typed protocol messages, persists pickups via @mmo/domain.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/main.ts",
+    "start": "node dist/main.js",
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json",
+    "test:integration": "vitest run"
+  },
+  "dependencies": {
+    "@mmo/config": "workspace:*",
+    "@mmo/db": "workspace:*",
+    "@mmo/domain": "workspace:*",
+    "@mmo/game-data": "workspace:*",
+    "@mmo/networking": "workspace:*",
+    "@mmo/schemas": "workspace:*",
+    "@mmo/server-kit": "workspace:*",
+    "@mmo/shared": "workspace:*",
+    "@mmo/world": "workspace:*",
+    "drizzle-orm": "^0.45.3",
+    "pg": "^8.23.1",
+    "pino": "^10.4.0",
+    "ws": "^8.22.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/ws": "^8.18.2",
+    "tsup": "^8.5.1"
+  }
+}

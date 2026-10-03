@@ -1,0 +1,19 @@
+{
+  "name": "@mmo/networking",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Typed, versioned realtime (WebSocket) protocol: message schemas, codec and a browser/mobile client.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mmo/schemas": "workspace:*",
+    "@mmo/shared": "workspace:*",
+    "zod": "^4.6.5"
+  }
+}

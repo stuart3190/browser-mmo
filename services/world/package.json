@@ -1,0 +1,23 @@
+{
+  "name": "@mmo/world",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Authoritative zone simulation: entities, spawns, movement validation, interest management, pickups. Hosted in-process by @mmo/realtime today; designed to be split into its own process later.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mmo/game-data": "workspace:*",
+    "@mmo/networking": "workspace:*",
+    "@mmo/schemas": "workspace:*",
+    "@mmo/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5"
+  }
+}

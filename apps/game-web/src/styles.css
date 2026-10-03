@@ -1,0 +1,82 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #111;
+  font-family: system-ui, sans-serif;
+  color: #eee;
+}
+#game {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  outline: none;
+}
+#ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.panel {
+  pointer-events: auto;
+  background: rgba(20, 20, 24, 0.88);
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 12px;
+}
+.login {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 300px;
+}
+.login input,
+.login select,
+.login button {
+  display: block;
+  width: 100%;
+  margin: 6px 0;
+  padding: 6px;
+  box-sizing: border-box;
+}
+.hud-inventory {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 280px;
+  max-height: 50vh;
+  overflow: auto;
+  font-size: 13px;
+}
+.hud-inventory h3 {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #aaa;
+}
+.hud-status {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 13px;
+}
+.hud-prompt {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 15px;
+}
+.hud-log {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  width: 360px;
+  max-height: 30vh;
+  overflow: auto;
+  font-size: 12px;
+}
+.error {
+  color: #ff7070;
+}
