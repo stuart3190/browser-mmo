@@ -129,16 +129,158 @@ Storing items only as template ID plus quantity per container.
 **Consequences**
 The instance table must scale to millions of rows. Each instance needs a single authoritative location, and moves between locations must be transactional. Stackable items (materials, consumables) need a defined approach within this model, which is not yet decided.
 
+## 2026-10-03 — Monorepo tooling: pnpm workspaces + Turborepo, strict TypeScript 6
+
+**Decision**
+One repository with pnpm workspaces (`apps/*`, `services/*`, `packages/*`), Turborepo task orchestration, strict TypeScript 6 (`noUncheckedIndexedAccess`), one root ESLint flat config, Prettier, Vitest. Turborepo `agentGuidance` is disabled so the tool does not inject text into `AGENTS.md`. Full record: `docs/adr/0001-monorepo-pnpm-turborepo.md`.
+
+**Reason**
+Shared schemas/content/protocol across browser, servers, admin and future mobile app; strict pnpm dependency isolation; cacheable tasks.
+
+**Alternatives considered**
+npm/yarn workspaces, Nx, polyrepo. TypeScript 7 (not yet supported by typescript-eslint).
+
+**Consequences**
+Each package declares its own dependencies. Internal packages ship TS source and services are bundled with tsup (`docs/adr/0012-source-packages-bundled-services.md`).
+
+## 2026-10-03 — Browser 3D engine: Babylon.js
+
+**Decision**
+Babylon.js (`@babylonjs/core`, deep ES imports). WebGL2 is the default; WebGPU is wired behind `?renderer=webgpu` with fallback. Full comparison with Three.js: `docs/adr/0002-babylonjs-client-engine.md`.
+
+**Reason**
+Full game engine (scene graph, cameras, input, collisions, asset containers, LOD, instancing, inspector), first-class WebGPU with the same API as WebGL, written in TypeScript, strong backwards-compatibility policy — important for a multi-year project.
+
+**Alternatives considered**
+Three.js (smaller, huge ecosystem, but a rendering library needing more DIY game systems and with more frequent breaking changes), PlayCanvas, a custom renderer.
+
+**Consequences**
+Gameplay code depends on `AbstractEngine` only. The engine chunk is ~1.9 MB minified. WebGPU path is not yet verified on real GPU hardware.
+
+## 2026-10-03 — Database layer: PostgreSQL + Drizzle ORM
+
+**Decision**
+PostgreSQL 16+ with Drizzle ORM (`pg` driver). drizzle-kit generates SQL migrations that are reviewed, committed and applied by `pnpm db:migrate`. `docs/adr/0003-postgresql-drizzle.md`.
+
+**Reason**
+The economy needs CHECK constraints, partial unique indexes and `SELECT ... FOR UPDATE` expressed directly; Drizzle is SQL-first with plain-SQL migrations and no generated client/engine binary. Prisma would need raw SQL for row locks and partial indexes.
+
+**Alternatives considered**
+Prisma, Kysely, raw `pg`.
+
+**Consequences**
+Contributors need SQL knowledge. Applied migrations are never edited.
+
+## 2026-10-03 — Modular monolith with a shared domain package
+
+**Decision**
+Business rules live in `@mmo/domain` (DB-backed) and `@mmo/game-data` (pure). `services/api` (Fastify) and `services/realtime` (ws) are thin hosts. `services/world` is the zone-simulation library, hosted in-process by realtime. `docs/adr/0004-modular-monolith.md`, `docs/adr/0010-fastify-http.md`.
+
+**Reason**
+Avoid premature microservices while keeping a clean split path; one implementation of every rule for HTTP and WebSocket callers.
+
+**Alternatives considered**
+Microservices now; one process for everything.
+
+**Consequences**
+Only one realtime process may host a given zone until a zone registry exists.
+
+## 2026-10-03 — Realtime: WebSockets with a typed, versioned JSON protocol
+
+**Decision**
+`ws` WebSocket server at `/ws`; envelope `{v,t,seq,ack,d}` validated by Zod on both ends; protocol version 1; session token in the first `auth.hello` frame; strictly increasing `seq` for replay protection; client sends intent only. `docs/adr/0005-realtime-websocket-protocol.md`, `docs/architecture/realtime.md`.
+
+**Reason**
+Universal browser/mobile support, simple operations, typed contracts shared by all clients.
+
+**Alternatives considered**
+WebTransport, Socket.IO, uWebSockets.js, a binary codec now.
+
+**Consequences**
+JSON bandwidth cost; binary encoding is a candidate for protocol v2. Tick 20 Hz, chunk-based interest management.
+
+## 2026-10-03 — Item location stored on the item instance row
+
+**Decision**
+An item's single authoritative location is a set of columns on its `item_instances` row (`location_kind` + kind-specific columns), enforced by CHECK and partial unique constraints. All slot stores (backpack, material pouch, character vault, account vault, guild vault) are rows of one `containers` table. Equipment is a location kind, not a table. Item rows are never deleted. `docs/adr/0006-item-location-invariant.md`.
+
+**Reason**
+Makes "an item can never be in two places" structurally true; separate inventory/equipment/vault tables cannot enforce cross-table uniqueness.
+
+**Alternatives considered**
+Separate `inventory_slots`/`equipment`/`vault_items` tables; an `item_locations` side table.
+
+**Consequences**
+The requested `inventories`, `inventory_slots`, `equipment`, `vaults`, `vault_items` tables are represented by `containers` + location columns (mapping in `docs/architecture/database.md`). Equip swaps use a transaction-local scratch slot.
+
+## 2026-10-03 — Stackable items are instances with a quantity
+
+**Decision**
+Resolves the open question on stackables. A stack is one item instance with `quantity`. Every acquisition inserts its own row; if it is fully merged into existing stacks, that row is stored as `destroyed / stack_merged` with history. `docs/adr/0007-stackable-items.md`.
+
+**Reason**
+Keeps template/instance separation, per-acquisition provenance, and uniform `source_ref` dedupe.
+
+**Alternatives considered**
+Template + count per container; never merging.
+
+**Consequences**
+Extra rows for high-volume materials; archiving of destroyed rows will be needed later.
+
+## 2026-10-03 — Authentication: provider abstraction + opaque database sessions
+
+**Decision**
+`AuthProvider` interface with one `DevAuthProvider` (username only; refused in production). `auth_identities` table for linked logins. Opaque 256-bit bearer tokens, SHA-256 hashed at rest, with client kind, expiry and revocation. The realtime service validates the same token. `docs/adr/0008-auth-sessions.md`.
+
+**Reason**
+Revocable sessions (bans, compromise) and a clean path to email/password and OAuth.
+
+**Alternatives considered**
+JWTs; a hosted auth provider now.
+
+**Consequences**
+Session lookup per request (cache later).
+
+## 2026-10-03 — UUIDv7 identifiers
+
+**Decision**
+All persistent entity IDs (including item instance IDs) are application-generated UUIDv7. Content uses stable slugs. `docs/adr/0009-uuidv7-ids.md`.
+
+**Reason**
+Time-ordered keys keep very large tables (item instances, history) index-friendly.
+
+**Alternatives considered**
+UUIDv4, bigserial.
+
+**Consequences**
+IDs reveal creation time. Clients never mint authoritative IDs.
+
+## 2026-10-03 — Redis deferred
+
+**Decision**
+Redis is not used yet. It will be introduced with the first feature that needs it (cross-process pub/sub, zone registry, session cache, global rate limits, job queues). `docs/adr/0011-redis-deferred.md`.
+
+**Reason**
+Nothing in the current foundation needs it; keeps local setup to Node + PostgreSQL.
+
+**Alternatives considered**
+Adding Redis now for sessions/presence.
+
+**Consequences**
+Single realtime process per zone; API→game inventory push notifications are not possible yet.
+
 ---
 
 ## Open questions
 
 These are not yet decided. Record a dated entry above when one is.
 
-- Browser 3D engine: Babylon.js or Three.js.
-- ORM: Prisma or Drizzle.
-- Realtime server design on top of WebSockets (library, tick model, zone/shard model).
-- Authentication approach.
-- How stackable items are represented relative to item instances.
+- Game HUD/UI framework for the browser client (plain DOM today; React/Solid/Babylon GUI undecided).
+- Large binary asset storage (Git LFS vs external asset store/CDN).
+- Realtime horizontal scaling: zone registry and routing design.
+- Movement model: input-based server simulation vs validated client positions (current).
+- Mobile companion app framework.
 
-The preferred technical direction (TypeScript, Node.js, pnpm workspace monorepo, PostgreSQL, Redis where useful, WebSockets, Zod or equivalent, Vitest or equivalent, ESLint, Prettier) is listed in `docs/MASTER_PLAN.md` as a preference. Record each choice here once it is actually adopted in the repository.
+Resolved on 2026-10-03 (see entries above): browser 3D engine (Babylon.js), ORM (Drizzle), realtime server design (ws + versioned JSON protocol, in-process zone simulations), authentication approach (provider abstraction + opaque sessions), stackable items (instances with quantity).
+
+The preferred technical direction (TypeScript, Node.js, pnpm workspace monorepo, PostgreSQL, Redis where useful, WebSockets, Zod or equivalent, Vitest or equivalent, ESLint, Prettier) is listed in `docs/MASTER_PLAN.md` as a preference. All of these except Redis were adopted on 2026-10-03.
