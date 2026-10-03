@@ -11,3 +11,4 @@ export * from './auth';
 export * from './admin';
 export * from './world';
 export * from './stats';
+export * from './combat';

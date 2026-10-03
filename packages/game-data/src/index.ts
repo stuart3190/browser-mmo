@@ -1,4 +1,5 @@
 import { abilities, classes, skills, specialisations } from './content/classes';
+import { combatRules } from './content/combat';
 import { currencies, experienceCurve, marketplaceRules } from './content/economy';
 import { equipmentSlots, equipmentTypes } from './content/equipment';
 import { itemModifiers, itemTemplates } from './content/items';
@@ -19,6 +20,7 @@ export * from './rules/xp';
 export * from './rules/random';
 export * from './rules/marketplace';
 export * from './rules/world';
+export * from './rules/combat';
 
 /** The raw authored content bundle. */
 export const rawGameData: RawGameData = {
@@ -28,6 +30,7 @@ export const rawGameData: RawGameData = {
   currencies,
   marketplaceRules,
   experienceCurve,
+  combatRules,
   abilities,
   specialisations,
   classes,

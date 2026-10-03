@@ -4,7 +4,18 @@ import { uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from './zone-simulation';
 
 const gd = getGameData();
-const player = (name: string) => ({ characterId: uuidv7(), name, maxSpeed: 6 });
+const player = (name: string) => ({
+  characterId: uuidv7(),
+  name,
+  maxSpeed: 6,
+  combat: {
+    level: 1,
+    stats: { strength: 12 },
+    maxHealth: 144,
+    health: 144,
+    weapon: { min: 1, max: 3, attackSpeedMs: 2000 },
+  },
+});
 
 function sim() {
   return new ZoneSimulation(gd, DEMO_ZONE_ID);
@@ -20,7 +31,7 @@ describe('ZoneSimulation', () => {
     expect(snap).toBeDefined();
     if (snap?.t === 'zone.snapshot') {
       const kinds = snap.d.entities.map((e) => e.kind).sort();
-      expect(kinds).toEqual(['npc', 'pickup', 'pickup', 'player']);
+      expect(kinds).toEqual(['enemy', 'npc', 'pickup', 'pickup', 'player']);
     }
   });
 

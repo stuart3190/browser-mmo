@@ -79,12 +79,31 @@ export const ChatSendMsg = clientMsg(
 
 export const PingMsg = clientMsg('ping', z.object({ clientTime: z.number() }));
 
+/** Select (or clear, with null) the current target. The server validates it exists and is visible. */
+export const TargetSetMsg = clientMsg(
+  'target.set',
+  z.object({ entityId: EntityIdSchema.nullable() }),
+);
+
+/**
+ * Start/stop auto-attacking the current target. Starting is validated (hostile, alive, in range,
+ * attacker alive). Swing timing and every outcome are decided by the server tick; repeated starts
+ * never reset or shorten the swing timer.
+ */
+export const CombatAttackMsg = clientMsg('combat.attack', z.object({ start: z.boolean() }));
+
+/** Ask to respawn after death. Granted only once the server-side respawn delay has passed. */
+export const CombatRespawnMsg = clientMsg('combat.respawn', z.object({}));
+
 export const ClientMessageSchema = z.discriminatedUnion('t', [
   AuthHelloMsg,
   MoveInputMsg,
   PickupRequestMsg,
   ChatSendMsg,
   PingMsg,
+  TargetSetMsg,
+  CombatAttackMsg,
+  CombatRespawnMsg,
 ]);
 export type ClientMessage = z.infer<typeof ClientMessageSchema>;
 export type ClientMessageType = ClientMessage['t'];
@@ -216,6 +235,99 @@ export const TradeUpdateMsg = serverMsg(
   z.object({ tradeId: UuidSchema, status: z.string(), revision: z.number().int() }),
 );
 
+// ---- Combat (protocol v1 additions, 2026-10-03) -------------------------------------------
+
+/** The player's own targeting/auto-attack state (sent on every change). */
+export const CombatStateMsg = serverMsg(
+  'combat.state',
+  z.object({
+    targetId: EntityIdSchema.nullable(),
+    attacking: z.boolean(),
+    reason: z.enum([
+      'target_set',
+      'target_cleared',
+      'started',
+      'stopped',
+      'target_dead',
+      'target_lost',
+      'out_of_range',
+      'you_died',
+      'respawned',
+    ]),
+  }),
+);
+
+/** One resolved swing, sent to everyone who can see the target. */
+export const CombatDamageMsg = serverMsg(
+  'combat.damage',
+  z.object({
+    sourceId: EntityIdSchema,
+    targetId: EntityIdSchema,
+    outcome: z.enum(['hit', 'crit', 'miss']),
+    amount: z.number().int().nonnegative(),
+    targetHealth: z.number().int().nonnegative(),
+    targetMaxHealth: z.number().int().positive(),
+  }),
+);
+
+/** Health change not caused by a swing (regen, respawn, evade reset, level-up, gear change). */
+export const EntityHealthMsg = serverMsg(
+  'entity.health',
+  z.object({
+    entityId: EntityIdSchema,
+    health: z.number().int().nonnegative(),
+    maxHealth: z.number().int().positive(),
+    dead: z.boolean(),
+  }),
+);
+
+export const CombatDeathMsg = serverMsg(
+  'combat.death',
+  z.object({
+    entityId: EntityIdSchema,
+    kind: z.enum(['player', 'enemy']),
+    killerId: EntityIdSchema.nullable(),
+  }),
+);
+
+/** The player's own vitals. `respawnAvailableAt` is server epoch ms (display only). */
+export const PlayerVitalsMsg = serverMsg(
+  'player.vitals',
+  z.object({
+    health: z.number().int().nonnegative(),
+    maxHealth: z.number().int().positive(),
+    dead: z.boolean(),
+    inCombat: z.boolean(),
+    respawnAvailableAt: z.number().nullable(),
+  }),
+);
+
+/** XP/level after a server-side award (or on join, with xpGained 0). */
+export const CharacterProgressMsg = serverMsg(
+  'character.progress',
+  z.object({
+    level: z.number().int().min(1),
+    xp: z.number().int().nonnegative(),
+    xpToNext: z.number().int().nonnegative(),
+    xpGained: z.number().int().nonnegative(),
+    levelsGained: z.number().int().nonnegative(),
+  }),
+);
+
+/** Loot notification for one kill. Items also arrive through inventory.updated. */
+export const CombatLootMsg = serverMsg(
+  'combat.loot',
+  z.object({
+    killId: UuidSchema,
+    enemyName: z.string(),
+    items: z.array(ItemSchema),
+    gold: z.number().int().nonnegative(),
+    lostItems: z.array(
+      z.object({ itemTemplateId: z.string(), quantity: z.number().int().positive() }),
+    ),
+  }),
+);
+
 export const PongMsg = serverMsg(
   'pong',
   z.object({ clientTime: z.number(), serverTime: z.number() }),
@@ -238,6 +350,13 @@ export const ServerMessageSchema = z.discriminatedUnion('t', [
   PartyUpdateMsg,
   TradeUpdateMsg,
   PongMsg,
+  CombatStateMsg,
+  CombatDamageMsg,
+  EntityHealthMsg,
+  CombatDeathMsg,
+  PlayerVitalsMsg,
+  CharacterProgressMsg,
+  CombatLootMsg,
 ]);
 export type ServerMessage = z.infer<typeof ServerMessageSchema>;
 export type ServerMessageType = ServerMessage['t'];

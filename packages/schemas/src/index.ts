@@ -6,5 +6,6 @@ export * from './storage';
 export * from './economy';
 export * from './content';
 export * from './social';
+export * from './combat';
 export * from './world';
 export * from './api';

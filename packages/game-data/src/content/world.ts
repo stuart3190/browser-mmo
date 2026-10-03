@@ -181,7 +181,18 @@ export const chunks: WorldChunk[] = [
         modelId: null,
       },
     ],
-    spawnPoints: [],
+    spawnPoints: [
+      {
+        id: 'spawn.greenvale.wolf_1',
+        kind: 'enemy',
+        position: { x: 2, y: 0, z: 14 },
+        rotationY: Math.PI,
+        refId: 'enemy.greenvale.grey_wolf',
+        quantity: 1,
+        respawnMs: 8_000,
+        interactRadius: 3,
+      },
+    ],
   },
 ];
 
@@ -204,13 +215,23 @@ export const enemies: EnemyDefinition[] = [
     id: 'enemy.greenvale.grey_wolf',
     name: 'Grey Wolf',
     level: 2,
-    maxHealth: 60,
+    maxHealth: 80,
     family: 'beast',
     lootTableId: 'loot.greenvale.wolf',
     xpReward: 45,
     modelId: null,
     isBoss: false,
     isWorldBoss: false,
+    combat: {
+      damage: { min: 4, max: 7 },
+      attackSpeedMs: 2000,
+      attackRange: 2.5,
+      aggroRange: 8,
+      leashRange: 30,
+      moveSpeed: 5,
+      armor: 10,
+      corpseMs: 3000,
+    },
   },
 ];
 

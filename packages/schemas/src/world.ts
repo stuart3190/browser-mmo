@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ContentIdSchema, LocalizedNameSchema, UuidSchema, Vec3Schema } from './common';
+import { EnemyCombatSchema } from './combat';
 
 /**
  * World structure (see docs/world/world-architecture.md)
@@ -138,6 +139,8 @@ export const EnemyDefinitionSchema = z.object({
   modelId: z.string().max(200).nullable(),
   isBoss: z.boolean().default(false),
   isWorldBoss: z.boolean().default(false),
+  /** Combat behaviour; null = not a combatant (decorative/unsimulated). */
+  combat: EnemyCombatSchema.nullable().default(null),
 });
 export type EnemyDefinition = z.infer<typeof EnemyDefinitionSchema>;
 
@@ -163,6 +166,12 @@ export const WorldEntitySchema = z.object({
   /** Definition reference: NPC/enemy id, or item template id for pickups/loot. */
   refId: z.string().max(96).nullable(),
   characterId: UuidSchema.nullable(),
+  /** Combatants only (players, enemies). Optional so non-combat entities stay compact. */
+  level: z.number().int().min(1).optional(),
+  health: z.number().int().nonnegative().optional(),
+  maxHealth: z.number().int().positive().optional(),
+  dead: z.boolean().optional(),
+  hostile: z.boolean().optional(),
 });
 export type WorldEntity = z.infer<typeof WorldEntitySchema>;
 

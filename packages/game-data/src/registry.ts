@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   AbilityDefinitionSchema,
+  CombatRulesSchema,
   CharacterClassSchema,
   CharacterSpecialisationSchema,
   CurrencyDefinitionSchema,
@@ -46,6 +47,7 @@ export const RawGameDataSchema = z.object({
   currencies: z.array(CurrencyDefinitionSchema),
   marketplaceRules: MarketplaceRulesSchema,
   experienceCurve: ExperienceCurveSchema,
+  combatRules: CombatRulesSchema,
   abilities: z.array(AbilityDefinitionSchema),
   specialisations: z.array(CharacterSpecialisationSchema),
   classes: z.array(CharacterClassSchema),
@@ -221,6 +223,11 @@ export class GameData {
     const c = this.classes.get(id);
     if (!c) throw new Error(`Unknown class ${id}`);
     return c;
+  }
+  enemy(id: string): EnemyDefinition {
+    const e = this.enemies.get(id);
+    if (!e) throw new Error(`Unknown enemy ${id}`);
+    return e;
   }
   zone(id: string): WorldZone {
     const z = this.zones.get(id);

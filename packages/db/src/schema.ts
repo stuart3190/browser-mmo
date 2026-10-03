@@ -17,6 +17,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -129,6 +130,8 @@ export const characters = pgTable(
     posY: doublePrecision('pos_y').notNull().default(0),
     posZ: doublePrecision('pos_z').notNull().default(0),
     rotationY: doublePrecision('rotation_y').notNull().default(0),
+    /** Last persisted health; NULL = full. 0 = dead (must respawn on next login). */
+    currentHealth: integer('current_health'),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -138,6 +141,7 @@ export const characters = pgTable(
     index('characters_account_idx').on(t.accountId),
     check('characters_level_ck', sql`${t.level} >= 1`),
     check('characters_xp_ck', sql`${t.xp} >= 0`),
+    check('characters_health_ck', sql`${t.currentHealth} IS NULL OR ${t.currentHealth} >= 0`),
   ],
 );
 
@@ -445,6 +449,38 @@ export const marketplaceTransactions = pgTable(
     uniqueIndex('marketplace_transactions_listing_uq').on(t.listingId),
     index('marketplace_transactions_buyer_idx').on(t.buyerAccountId, t.occurredAt),
     index('marketplace_transactions_seller_idx').on(t.sellerAccountId, t.occurredAt),
+  ],
+);
+
+// ===========================================================================
+// Combat rewards
+// ===========================================================================
+
+/**
+ * One row per (enemy death, rewarded character). The primary key makes XP/gold/loot for a single
+ * kill exactly-once: a duplicate reward attempt violates it and the whole transaction rolls back.
+ * Loot item instances additionally carry source_ref `kill:<killId>:<characterId>:<n>`.
+ */
+export const killRewards = pgTable(
+  'kill_rewards',
+  {
+    killId: uuid('kill_id').notNull(),
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    enemyId: text('enemy_id').notNull(),
+    zoneId: text('zone_id').notNull(),
+    xp: integer('xp').notNull(),
+    levelBefore: integer('level_before').notNull(),
+    levelAfter: integer('level_after').notNull(),
+    gold: bigint('gold', { mode: 'number' }).notNull().default(0),
+    itemCount: integer('item_count').notNull().default(0),
+    lostItemCount: integer('lost_item_count').notNull().default(0),
+    occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.killId, t.characterId] }),
+    index('kill_rewards_character_idx').on(t.characterId, t.occurredAt),
   ],
 );
 

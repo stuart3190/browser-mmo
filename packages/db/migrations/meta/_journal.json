@@ -15,6 +15,13 @@
       "when": 1791066961816,
       "tag": "0001_change_feed_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791069634144,
+      "tag": "0002_combat_foundation",
+      "breakpoints": true
     }
   ]
 }
