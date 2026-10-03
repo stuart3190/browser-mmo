@@ -22,8 +22,14 @@ export class EntityViews {
 
   constructor(
     private readonly scene: Scene,
-    private readonly localEntityId: string,
+    private localEntityId: string,
   ) {}
+
+  /** Drops every remote entity (used after a reconnect, before the new zone snapshot). */
+  reset(localEntityId: string): void {
+    for (const id of [...this.views.keys()]) this.remove(id);
+    this.localEntityId = localEntityId;
+  }
 
   upsert(entity: WorldEntity): void {
     if (entity.id === this.localEntityId) return; // local player is rendered by PlayerController

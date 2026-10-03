@@ -34,6 +34,8 @@
   persists pickups through `@mmo/domain`, persists positions periodically and on disconnect.
 - **World** (`@mmo/world`): pure in-memory zone simulation — entities, spawns, movement
   validation, chunk-based interest management, two-phase pickups.
+- **Change feed**: PostgreSQL LISTEN/NOTIFY triggers announce item/wallet commits; the realtime
+  service pushes them to clients ([ADR 0014](../adr/0014-postgres-change-feed.md)).
 - **Redis**: not used yet ([ADR 0011](../adr/0011-redis-deferred.md)).
 
 ## Package dependency graph

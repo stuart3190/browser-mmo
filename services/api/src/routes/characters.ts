@@ -4,6 +4,7 @@ import {
   createCharacter,
   getBalances,
   getCharacterItems,
+  getCharacterStats,
   listCharacters,
   moveItem,
   requireOwnedCharacter,
@@ -54,6 +55,14 @@ export const characterRoutes =
       const { characterId } = parse(CharacterParams, req.params);
       await requireOwnedCharacter(ctx.db, s.account.id, characterId);
       return { balances: await getBalances(ctx.db, s.account.id, characterId) };
+    });
+
+    /** Authoritative effective stats: class base at level + equipped items. */
+    app.get('/characters/:characterId/stats', async (req) => {
+      const s = requireSession(req);
+      const { characterId } = parse(CharacterParams, req.params);
+      await requireOwnedCharacter(ctx.db, s.account.id, characterId);
+      return { stats: await getCharacterStats(ctx.db, ctx, characterId) };
     });
 
     /** Move / equip / unequip. Used by the game client and (later) the companion app. */

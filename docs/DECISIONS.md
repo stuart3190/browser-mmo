@@ -269,18 +269,59 @@ Adding Redis now for sessions/presence.
 **Consequences**
 Single realtime process per zone; API→game inventory push notifications are not possible yet.
 
+## 2026-10-03 — In-game UI: React rendered as a DOM overlay
+
+**Decision**
+The browser game's UI (inventory, character/equipment, bank, tooltips, HUD) is React 19 rendered into a DOM overlay above the Babylon canvas, subscribed to a plain client state store. Framework-free item logic (version-aware reconciliation, equip targeting, comparisons, requirements) lives in `@mmo/ui`. Layout is responsive: floating windows on desktop, bottom sheets with large touch targets on narrow/touch screens. `docs/adr/0013-react-game-ui.md`.
+
+**Reason**
+Real MMO windows/tooltips need a component model; React is already used by the admin app and is the likely basis for the companion app; DOM UI is easier to style, localise and make accessible than canvas UI.
+
+**Alternatives considered**
+Babylon GUI, plain DOM, Preact, Solid.
+
+**Consequences**
+Resolves the "Game HUD/UI framework" open question. Main game chunk grew from ~44 KB to ~181 KB gzip (measured; not yet analysed). Every item action must be reachable by tap (hover is an enhancement only).
+
+## 2026-10-03 — Realtime pushes via a PostgreSQL LISTEN/NOTIFY change feed
+
+**Decision**
+Triggers on `item_instances` and `currency_balances` publish ID-only notifications on channel `mmo_changes` (migration 0001). The realtime service listens, re-reads authoritative rows and pushes `inventory.updated` (with `removed` tombstones), `character.stats` and `wallet.updated` to affected connections; after every listener reconnect it resends full snapshots. Clients reconcile by item `version`. `docs/adr/0014-postgres-change-feed.md`.
+
+**Reason**
+Changes made through the HTTP API, admin tools or jobs must reach connected clients. NOTIFY is transactional (no phantom pushes for rolled-back writes), needs no new infrastructure, and triggers cannot be forgotten by new write paths.
+
+**Alternatives considered**
+Redis pub/sub (ADR 0011's plan; not transactional without an outbox), explicit notify calls in domain code, transactional outbox + poller.
+
+**Consequences**
+Partially addresses ADR 0011: Redis is still not used. NOTIFY is not durable, so correctness relies on resync-on-reconnect. The listener needs a direct (non-PgBouncer-transaction-mode) connection. Revisit when write volume or multi-region needs demand a durable stream.
+
+## 2026-10-03 — Realtime client reconnect and close-code policy
+
+**Decision**
+`RealtimeClient` reconnects automatically with exponential backoff after unexpected drops and re-sends `auth.hello`; every `auth.ok` is followed by fresh snapshots and the client rebuilds its view from them. Close codes ≥ 4000 are deliberate server decisions (invalid session, session replaced, protocol error) and are never retried. The server pings every 30 s and terminates connections that miss a pong. Protocol v1 gained backwards-compatible additions: `inventory.updated.removed`, reason `sync`, and the `character.stats` and `wallet.updated` messages.
+
+**Reason**
+Dropped connections must recover without a page reload, without two tabs fighting over one character, and without stale state.
+
+**Alternatives considered**
+Session-resume with server-side replay buffers (more complex; snapshots are cheap at current state sizes).
+
+**Consequences**
+Reconnect cost is a full snapshot. Old clients that do not know the new message types ignore them (`parseServerMessage` drops unknown types); the new `sync` reason would be rejected by a client built before it, which is acceptable while only one client exists.
+
 ---
 
 ## Open questions
 
 These are not yet decided. Record a dated entry above when one is.
 
-- Game HUD/UI framework for the browser client (plain DOM today; React/Solid/Babylon GUI undecided).
 - Large binary asset storage (Git LFS vs external asset store/CDN).
 - Realtime horizontal scaling: zone registry and routing design.
 - Movement model: input-based server simulation vs validated client positions (current).
 - Mobile companion app framework.
 
-Resolved on 2026-10-03 (see entries above): browser 3D engine (Babylon.js), ORM (Drizzle), realtime server design (ws + versioned JSON protocol, in-process zone simulations), authentication approach (provider abstraction + opaque sessions), stackable items (instances with quantity).
+Resolved on 2026-10-03 (see entries above): in-game UI framework (React DOM overlay), browser 3D engine (Babylon.js), ORM (Drizzle), realtime server design (ws + versioned JSON protocol, in-process zone simulations), authentication approach (provider abstraction + opaque sessions), stackable items (instances with quantity).
 
 The preferred technical direction (TypeScript, Node.js, pnpm workspace monorepo, PostgreSQL, Redis where useful, WebSockets, Zod or equivalent, Vitest or equivalent, ESLint, Prettier) is listed in `docs/MASTER_PLAN.md` as a preference. All of these except Redis were adopted on 2026-10-03.

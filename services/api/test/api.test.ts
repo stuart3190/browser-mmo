@@ -97,6 +97,12 @@ describe('API', () => {
       'material_pouch',
     ]);
 
+    const stats = await app.inject({
+      url: `/v1/characters/${characterId}/stats`,
+      headers: auth(token),
+    });
+    expect(stats.json()).toMatchObject({ stats: { total: { strength: 12 }, fromEquipment: {} } });
+
     const gold = await app.inject({
       url: `/v1/characters/${characterId}/currencies`,
       headers: auth(token),

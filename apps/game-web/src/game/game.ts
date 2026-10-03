@@ -7,7 +7,9 @@ import { RealtimeClient } from '@mmo/networking';
 import type { PlayerCharacter } from '@mmo/schemas';
 import type { ApiClient } from '../api';
 import { config } from '../config';
-import { Hud } from '../hud/hud';
+import { GameState } from '../state/game-state';
+import { ItemActions } from '../state/item-actions';
+import { mountGameUi } from '../ui/GameUI';
 import { EntityViews } from './entity-view';
 import { PlayerController } from './player-controller';
 import { createEngine } from './renderer';
@@ -16,10 +18,12 @@ import { WorldView } from './world-view';
 const INTERACT_RANGE = 3;
 
 /**
- * Wires the 3D scene to the realtime connection. Flow for the technical proof:
- *  1. connect + auth.hello  -> auth.ok, zone.snapshot, inventory.snapshot
- *  2. WASD                  -> move.input (server validates; may send move.correction)
- *  3. E near a pickup       -> interact.pickup -> server validates range + claim -> DB -> inventory.updated
+ * Wires the 3D scene, the realtime connection and the React UI.
+ *  - connect + auth.hello      -> auth.ok, inventory/stats/wallet snapshots, zone.snapshot
+ *  - WASD                      -> move.input (server validates; may send move.correction)
+ *  - E near a pickup           -> interact.pickup -> DB -> inventory.updated
+ *  - UI item actions           -> HTTP API -> DB -> change feed -> inventory.updated + character.stats
+ *  - dropped socket            -> automatic reconnect; every auth.ok rebuilds the view from snapshots
  */
 export async function startGame(args: {
   canvas: HTMLCanvasElement;
@@ -33,98 +37,152 @@ export async function startGame(args: {
   const scene = new Scene(engine);
   const light = new HemisphericLight('sun', new Vector3(0.3, 1, 0.2), scene);
   light.groundColor = new Color3(0.3, 0.3, 0.35);
-  const hud = new Hud(args.ui, gameData);
+
+  const state = new GameState(args.character);
+  state.renderer = kind;
+  const actions = new ItemActions(args.api, state, gameData);
+  mountGameUi(args.ui, { state, actions, gameData });
+
   const net = new RealtimeClient(config.realtimeUrl);
+  exposeDebug(state, net);
 
-  // Expose minimal state for automated browser checks (dev builds only).
-  const debug = { connected: false, entityId: '', inventoryCount: 0, lastError: '' };
-  if (import.meta.env.DEV) (window as unknown as { __mmo: typeof debug }).__mmo = debug;
-
-  const authOk = new Promise<{ entityId: string; character: PlayerCharacter; zoneId: string }>(
-    (resolve) => {
-      net.on('auth.ok', (m) => resolve(m.d));
-    },
-  );
-  net.on('error', (m) => {
-    debug.lastError = m.d.code;
-    hud.addLog(`${m.d.code}: ${m.d.message}`, true);
+  net.onStatus((status, info) => {
+    state.update((s) => {
+      s.connection = status;
+      s.reconnects = net.reconnects;
+    });
+    if (status === 'reconnecting')
+      state.addLog(`Connection lost (${info.code ?? '?'}); retrying…`, 'error');
+    if (status === 'closed' && info.code !== undefined && info.code !== 1000)
+      state.addLog(`Disconnected: ${info.reason || info.code}`, 'error');
   });
-  net.onClose = (code, reason) => {
-    debug.connected = false;
-    hud.addLog(`Disconnected (${code} ${reason})`, true);
-  };
-  await net.connect({ token: args.token, characterId: args.character.id, client: 'game_web' });
-  const joined = await authOk;
-  debug.connected = true;
-  debug.entityId = joined.entityId;
+  net.on('error', (m) => {
+    state.addLog(`${m.d.code}: ${m.d.message}`, 'error');
+    if (m.ack !== undefined) state.toast(m.d.message, 'error');
+  });
 
-  new WorldView(scene, gameData).loadZone(joined.zoneId);
-  const entities = new EntityViews(scene, joined.entityId);
-  const speed = gameData.characterClass(joined.character.classId).baseStats.movement_speed ?? 6;
-  const player = new PlayerController(
-    scene,
-    args.canvas,
-    joined.character.position,
-    speed,
-    (position, rotationY) => net.send('move.input', { position, rotationY }),
-  );
+  let entities: EntityViews | undefined;
+  let player: PlayerController | undefined;
+  let firstJoin: ((v: void) => void) | undefined;
+  const joined = new Promise<void>((r) => (firstJoin = r));
 
-  net.on('zone.snapshot', (m) => m.d.entities.forEach((e) => entities.upsert(e)));
-  net.on('entity.spawn', (m) => entities.upsert(m.d.entity));
-  net.on('entity.despawn', (m) => entities.remove(m.d.entityId));
+  net.on('auth.ok', (m) => {
+    state.update((s) => {
+      s.character = m.d.character;
+      s.zoneName = gameData.zone(m.d.zoneId).name;
+    });
+    if (!entities) {
+      new WorldView(scene, gameData).loadZone(m.d.zoneId);
+      entities = new EntityViews(scene, m.d.entityId);
+      const speed = gameData.characterClass(m.d.character.classId).baseStats.movement_speed ?? 6;
+      player = new PlayerController(
+        scene,
+        args.canvas,
+        m.d.character.position,
+        speed,
+        (position, rotationY) => net.send('move.input', { position, rotationY }),
+      );
+      firstJoin?.();
+    } else {
+      // Reconnected: the server sends fresh snapshots; drop everything we knew about the world.
+      entities.reset(m.d.entityId);
+      player?.correct(m.d.character.position, 0);
+      state.addLog('Reconnected');
+    }
+  });
+  net.on('zone.snapshot', (m) => m.d.entities.forEach((e) => entities?.upsert(e)));
+  net.on('entity.spawn', (m) => entities?.upsert(m.d.entity));
+  net.on('entity.despawn', (m) => entities?.remove(m.d.entityId));
   net.on('world.moves', (m) =>
-    m.d.moves.forEach(([id, x, y, z, r]) => entities.move(id, x, y, z, r)),
+    m.d.moves.forEach(([id, x, y, z, r]) => entities?.move(id, x, y, z, r)),
   );
   net.on('move.correction', (m) => {
-    player.correct(m.d.position, m.d.rotationY);
-    hud.addLog(`Position corrected by server (${m.d.reason})`, true);
+    player?.correct(m.d.position, m.d.rotationY);
+    state.addLog(`Position corrected by server (${m.d.reason})`, 'error');
   });
-  net.on('presence.update', (m) => hud.addLog(`${m.d.name} ${m.d.event} the zone`));
-  net.on('chat.message', (m) => hud.addLog(`[${m.d.channel}] ${m.d.from.name}: ${m.d.text}`));
-  net.on('inventory.snapshot', (m) => {
-    hud.setInventory(m.d.items);
-    debug.inventoryCount = m.d.items.containers.reduce((n, c) => n + c.items.length, 0);
-  });
+  net.on('presence.update', (m) => state.addLog(`${m.d.name} ${m.d.event} the zone`));
+  net.on('chat.message', (m) => state.addLog(`[${m.d.channel}] ${m.d.from.name}: ${m.d.text}`));
+  net.on('inventory.snapshot', (m) => state.items.replaceAll(m.d.items));
   net.on('inventory.updated', (m) => {
-    hud.applyUpdate(m.d.items);
-    debug.inventoryCount += m.d.items.filter((i) => i.instance.version === 0).length;
+    const before = new Set(state.items.all().map((i) => i.instance.id));
+    state.items.apply(m.d.items, m.d.removed);
     for (const i of m.d.items)
-      hud.addLog(`Received ${i.template.name} (id ${i.instance.id.slice(0, 8)}…)`);
+      if (!before.has(i.instance.id)) state.addLog(`Received ${i.template.name}`);
   });
+  net.on(
+    'character.stats',
+    (m) => m.d.characterId === state.character.id && state.setStats(m.d.stats),
+  );
+  net.on('wallet.updated', (m) => state.update((s) => (s.balances = m.d.balances)));
+
+  await net.connect({ token: args.token, characterId: args.character.id, client: 'game_web' });
+  await joined;
 
   window.addEventListener('keydown', (e) => {
-    if (e.code !== 'KeyE') return;
+    if (e.code !== 'KeyE' || !entities || !player) return;
     const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
     if (pickup) {
       net.send('interact.pickup', { entityId: pickup.id });
       return;
     }
     const npc = entities.nearest('npc', player.position, INTERACT_RANGE + 1);
-    if (npc?.refId) {
-      const def = gameData.npcs.get(npc.refId);
-      if (def)
-        hud.addLog(
-          `${def.name}: “${def.dialogue[Math.floor(Math.random() * def.dialogue.length)]}”`,
-        );
-    }
+    const def = npc?.refId ? gameData.npcs.get(npc.refId) : undefined;
+    if (def)
+      state.addLog(
+        `${def.name}: “${def.dialogue[Math.floor(Math.random() * def.dialogue.length)]}”`,
+      );
   });
 
-  hud.setStatus(
-    `<strong>${args.character.name}</strong> · ${gameData.characterClass(args.character.classId).name} · ${gameData.zone(joined.zoneId).name}<br/>` +
-      `Renderer: ${kind} · WASD move · drag to look · wheel zoom · E interact`,
-  );
-
+  let lastPrompt: string | null = null;
   engine.runRenderLoop(() => {
     const dt = engine.getDeltaTime() / 1000;
+    if (!player || !entities) return;
     player.update(dt);
     entities.update(dt);
     const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
     const npc = pickup ? undefined : entities.nearest('npc', player.position, INTERACT_RANGE + 1);
-    hud.setPrompt(
-      pickup ? `Press E to pick up ${pickup.name}` : npc ? `Press E to talk to ${npc.name}` : null,
-    );
+    const prompt = pickup
+      ? `Press E to pick up ${pickup.name}`
+      : npc
+        ? `Press E to talk to ${npc.name}`
+        : null;
+    if (prompt !== lastPrompt) state.update((s) => (s.prompt = lastPrompt = prompt));
     scene.render();
   });
   window.addEventListener('resize', () => engine.resize());
   setInterval(() => net.send('ping', { clientTime: performance.now() }), 15_000);
+}
+
+/** Read-only debug view for automated browser checks (dev builds only). */
+function exposeDebug(state: GameState, net: RealtimeClient) {
+  if (!import.meta.env.DEV) return;
+  (window as unknown as { __mmo: unknown }).__mmo = {
+    get connected() {
+      return state.connection === 'open';
+    },
+    get status() {
+      return state.connection;
+    },
+    get reconnects() {
+      return net.reconnects;
+    },
+    get characterId() {
+      return state.character.id;
+    },
+    get stats() {
+      return state.stats?.total ?? null;
+    },
+    get items() {
+      return state.items.all().map((i) => ({
+        id: i.instance.id,
+        templateId: i.template.id,
+        version: i.instance.version,
+        location: i.instance.location,
+      }));
+    },
+    get inventoryCount() {
+      return state.items.all().length;
+    },
+    dropConnection: () => net.simulateDrop(),
+  };
 }

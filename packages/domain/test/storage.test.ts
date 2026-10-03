@@ -4,6 +4,7 @@ import type { Item } from '@mmo/schemas';
 import {
   claimWorldPickup,
   getCharacterItems,
+  getCharacterStats,
   getItemHistory,
   grantItemInTx,
   inTransaction,
@@ -219,5 +220,24 @@ describe('equipment transfers', () => {
       spawnInstanceId: uuidv7(),
     });
     await expectCode(move(b, sword!, { kind: 'equipped', slotId: 'main_hand' }), 'ITEM_NOT_OWNED');
+  });
+});
+
+describe('effective character stats', () => {
+  it('reflects equipped items and reverts on unequip', async () => {
+    const p = await makePlayer(ctx, 'class.warrior');
+    const base = await getCharacterStats(ctx.db, ctx, p.characterId);
+    const plate = await give(p, 'armor.plate.recruit_breastplate');
+    const armor = plate.instance.stats.armor!;
+    const [equipped] = await move(p, plate, { kind: 'equipped', slotId: 'chest' });
+    const geared = await getCharacterStats(ctx.db, ctx, p.characterId);
+    expect(geared.fromEquipment.armor).toBe(armor);
+    expect(geared.total.armor).toBe((base.total.armor ?? 0) + armor);
+    expect(geared.total.stamina).toBe(base.total.stamina! + plate.instance.stats.stamina!);
+    await move(p, equipped!, {
+      kind: 'container',
+      containerId: await containerId(ctx, p, 'backpack'),
+    });
+    expect(await getCharacterStats(ctx.db, ctx, p.characterId)).toEqual(base);
   });
 });

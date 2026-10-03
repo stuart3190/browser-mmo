@@ -3,6 +3,8 @@ import { ItemTemplateSchema } from '@mmo/schemas';
 import {
   GameData,
   applyExperience,
+  computeCharacterStats,
+  itemTotalStats,
   bindingOnAcquire,
   canPlaceInContainerKind,
   checkCanEquip,
@@ -188,5 +190,25 @@ describe('progression and fees', () => {
     expect(listingFee(rules, 100)).toBe(10); // min fee
     expect(listingFee(rules, 100_000)).toBe(1_000);
     expect(saleFee(rules, 1_000)).toBe(50);
+  });
+});
+
+describe('character stats', () => {
+  const gd = getGameData();
+  it('adds class base, per-level growth and equipped item stats/modifiers/enchantments', () => {
+    const warrior = gd.characterClass('class.warrior');
+    const sword = itemTotalStats({
+      stats: { strength: 3, attack_power: 8 },
+      modifiers: [{ modifierId: 'mod.of_the_bear', stat: 'stamina', value: 2 }],
+      enchantments: [{ stats: { strength: 1 } }],
+    });
+    expect(sword).toEqual({ strength: 4, attack_power: 8, stamina: 2 });
+    const lvl1 = computeCharacterStats(warrior, 1, []);
+    expect(lvl1.total.strength).toBe(12);
+    const geared = computeCharacterStats(warrior, 3, [sword]);
+    expect(geared.base.strength).toBe(12 + 2 * 2);
+    expect(geared.fromEquipment).toEqual(sword);
+    expect(geared.total.strength).toBe(16 + 4);
+    expect(geared.total.stamina).toBe(12 + 2 * 2 + 2);
   });
 });

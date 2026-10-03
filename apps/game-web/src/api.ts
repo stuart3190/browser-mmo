@@ -1,4 +1,11 @@
-import type { CharacterItems, PlayerCharacter, SessionResponse } from '@mmo/schemas';
+import type {
+  CharacterItems,
+  CharacterStats,
+  Item,
+  MoveItemRequest,
+  PlayerCharacter,
+  SessionResponse,
+} from '@mmo/schemas';
 import { config } from './config';
 
 export class ApiError extends Error {
@@ -46,6 +53,17 @@ export class ApiClient {
       name,
       classId,
     });
+  }
+  /** Server-authoritative move/equip/unequip. Returns every item whose state changed. */
+  moveItem(characterId: string, request: MoveItemRequest) {
+    return this.request<{ items: Item[] }>(
+      'POST',
+      `/v1/characters/${characterId}/items/move`,
+      request,
+    );
+  }
+  characterStats(characterId: string) {
+    return this.request<{ stats: CharacterStats }>('GET', `/v1/characters/${characterId}/stats`);
   }
   characterItems(characterId: string) {
     return this.request<{ items: CharacterItems }>('GET', `/v1/characters/${characterId}/items`);

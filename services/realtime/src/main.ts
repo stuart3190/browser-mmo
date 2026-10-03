@@ -18,6 +18,7 @@ const server = createRealtimeServer({
   ctx,
   // TTL is irrelevant here: the realtime service only resolves sessions created by the API.
   sessions: new SessionService(1),
+  changeFeedUrl: env.DATABASE_URL,
   logger,
   metrics: new Metrics(),
   zoneIds: splitList(env.REALTIME_ZONES),

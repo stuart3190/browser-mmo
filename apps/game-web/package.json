@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@babylonjs/core": "^9.29.0",
@@ -16,9 +17,15 @@
     "@mmo/networking": "workspace:*",
     "@mmo/schemas": "workspace:*",
     "@mmo/shared": "workspace:*",
-    "@mmo/ui": "workspace:*"
+    "@mmo/ui": "workspace:*",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "vite": "^8.3.2"
+    "vite": "^8.3.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "vitest": "^5.0.3"
   }
 }

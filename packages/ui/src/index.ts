@@ -57,3 +57,6 @@ export function filterItems(
       (!q.onlyJunk || i.instance.flags.junk),
   );
 }
+
+export * from './item-store';
+export * from './item-presentation';

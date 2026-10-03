@@ -14,5 +14,8 @@
   "dependencies": {
     "@mmo/game-data": "workspace:*",
     "@mmo/schemas": "workspace:*"
+  },
+  "devDependencies": {
+    "@mmo/shared": "workspace:*"
   }
 }

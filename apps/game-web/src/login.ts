@@ -9,7 +9,7 @@ export function showLogin(
 ): Promise<{ token: string; character: PlayerCharacter }> {
   const classes = [...getGameData().classes.values()];
   const panel = document.createElement('div');
-  panel.className = 'panel login';
+  panel.className = 'login';
   panel.innerHTML = `
     <h2 style="margin-top:0">Greenvale (dev)</h2>
     <form id="login-form">

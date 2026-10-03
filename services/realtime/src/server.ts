@@ -7,10 +7,10 @@ import type { DomainContext, SessionService } from '@mmo/domain';
 import {
   characterFromRow,
   claimWorldPickup,
-  getCharacterItems,
   requireOwnedCharacter,
   saveCharacterPosition,
 } from '@mmo/domain';
+import { ChangeFeedListener } from '@mmo/db';
 import type { ClientMessage } from '@mmo/networking';
 import {
   SequenceGuard,
@@ -23,6 +23,8 @@ import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
 import type { OutMessage } from '@mmo/world';
 import { TokenBucket } from './rate-limit';
+import { AccountSync, loadContainerIds, sendFullState } from './sync';
+import type { SyncTarget } from './sync';
 
 export interface RealtimeDeps {
   ctx: DomainContext;
@@ -35,6 +37,13 @@ export interface RealtimeDeps {
   /** How often dirty positions are flushed to the database. */
   positionSaveIntervalMs?: number;
   authTimeoutMs?: number;
+  /**
+   * PostgreSQL URL for the LISTEN/NOTIFY change feed (ADR 0014). When set, item and wallet
+   * changes made by ANY process (API, admin, jobs) are pushed to connected clients.
+   */
+  changeFeedUrl?: string;
+  /** WebSocket ping interval; connections that miss a pong are terminated. */
+  heartbeatMs?: number;
 }
 
 interface Connection {
@@ -46,7 +55,14 @@ interface Connection {
   rateViolations: number;
   authTimer: NodeJS.Timeout | undefined;
   /** Set once authenticated. */
-  player?: { accountId: string; characterId: string; zone: ZoneSimulation };
+  player?: {
+    accountId: string;
+    characterId: string;
+    zone: ZoneSimulation;
+    containerIds: Set<string>;
+  };
+  /** Heartbeat: cleared on ping, set on pong. */
+  alive: boolean;
   /** Serialises auth so a client cannot race two hellos. */
   authenticating: boolean;
 }
@@ -82,6 +98,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             status: 'ok',
             zones: [...zones.keys()],
             players: byCharacter.size,
+            changeFeed: changeFeed ? (changeFeed.connected ? 'ok' : 'reconnecting') : 'disabled',
           });
         } catch {
           return json(res, 503, { status: 'unavailable' });
@@ -139,6 +156,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       rateViolations: 0,
       authTimer: undefined,
       authenticating: false,
+      alive: true,
     };
     conn.log = logger.child({ connectionId: conn.id });
     connections.add(conn);
@@ -159,6 +177,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         );
       void handleFrame(conn, data.toString());
     });
+    ws.on('pong', () => (conn.alive = true));
     ws.on('close', () => void onClose(conn));
     ws.on('error', (err) => conn.log.warn({ err }, 'socket error'));
   }
@@ -233,7 +252,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     const cls = ctx.gameData.characterClass(row.classId);
     const maxSpeed = cls.baseStats.movement_speed ?? 6;
     const now = Date.now();
-    conn.player = { accountId: session.account.id, characterId: row.id, zone };
+    const containerIds = await loadContainerIds(ctx, session.account.id, row.id);
+    if (conn.ws.readyState !== conn.ws.OPEN) return;
+    conn.player = { accountId: session.account.id, characterId: row.id, zone, containerIds };
     conn.log = conn.log.child({ accountId: session.account.id, characterId: row.id });
     byCharacter.set(row.id, conn);
 
@@ -259,10 +280,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       },
       msg.seq,
     );
-    send(conn, {
-      t: 'inventory.snapshot',
-      d: { items: await getCharacterItems(ctx.db, ctx, session.account.id, row.id) },
-    });
+    await sendFullState(ctx, syncTarget(conn));
     broadcastZone(zone, {
       t: 'presence.update',
       d: { event: 'joined', characterId: row.id, name: row.name, zoneId: zone.zone.id },
@@ -295,7 +313,11 @@ export function createRealtimeServer(deps: RealtimeDeps) {
           });
           player.zone.commitPickup(reservation.entityId, Date.now());
           pickups.inc({ result: 'ok' });
-          send(conn, { t: 'inventory.updated', d: { reason: 'pickup', items } }, msg.seq);
+          send(
+            conn,
+            { t: 'inventory.updated', d: { reason: 'pickup', items, removed: [] } },
+            msg.seq,
+          );
           conn.log.info(
             { templateId: reservation.templateId, items: items.map((i) => i.instance.id) },
             'pickup persisted',
@@ -367,7 +389,42 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     }
   }
 
+  function syncTarget(conn: Connection): SyncTarget {
+    const p = conn.player!;
+    return {
+      accountId: p.accountId,
+      characterId: p.characterId,
+      containerIds: p.containerIds,
+      send: (m) => send(conn, m),
+    };
+  }
+
+  const sync = new AccountSync(
+    ctx,
+    (accountId) =>
+      [...byCharacter.values()].filter((c) => c.player?.accountId === accountId).map(syncTarget),
+    (err) => logger.error({ err }, 'change-feed fan-out failed'),
+  );
+  const changeFeed = deps.changeFeedUrl
+    ? new ChangeFeedListener({
+        url: deps.changeFeedUrl,
+        onEvent: (e) => sync.push(e),
+        onResync: () => {
+          // NOTIFY is not durable: after (re)connecting, rebuild every client's view from the DB.
+          for (const conn of byCharacter.values()) {
+            if (conn.player)
+              void sendFullState(ctx, syncTarget(conn)).catch((err: unknown) =>
+                conn.log.error({ err }, 'resync failed'),
+              );
+          }
+          logger.info({ connections: byCharacter.size }, 'change feed connected; clients resynced');
+        },
+        onError: (err) => logger.warn({ err }, 'change feed error'),
+      })
+    : undefined;
+
   let tickTimer: NodeJS.Timeout | undefined;
+  let heartbeatTimer: NodeJS.Timeout | undefined;
   let saveTimer: NodeJS.Timeout | undefined;
 
   async function savePositions() {
@@ -387,7 +444,22 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   return {
     http,
     zones,
-    start(host: string, port: number): Promise<void> {
+    sync,
+    /** Number of authenticated connections (tests/health). */
+    playerCount: () => byCharacter.size,
+    async start(host: string, port: number): Promise<void> {
+      await changeFeed?.start();
+      heartbeatTimer = setInterval(() => {
+        for (const conn of connections) {
+          if (!conn.alive) {
+            conn.log.info('heartbeat missed; terminating');
+            conn.ws.terminate();
+            continue;
+          }
+          conn.alive = false;
+          conn.ws.ping();
+        }
+      }, deps.heartbeatMs ?? 30_000);
       tickTimer = setInterval(
         () => {
           const t0 = performance.now();
@@ -406,6 +478,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     async stop(): Promise<void> {
       clearInterval(tickTimer);
       clearInterval(saveTimer);
+      clearInterval(heartbeatTimer);
+      await changeFeed?.stop();
       for (const conn of [...connections]) {
         conn.ws.close(1001, 'server shutting down');
         await onClose(conn);

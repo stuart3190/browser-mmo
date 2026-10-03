@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import {
   CharacterItemsSchema,
+  CharacterStatsSchema,
+  CurrencyBalanceSchema,
   ChatChannelKindSchema,
   ChatMessageTextSchema,
   ClientKindSchema,
@@ -159,13 +161,34 @@ export const InventorySnapshotMsg = serverMsg(
   z.object({ items: CharacterItemsSchema }),
 );
 
-/** Items whose state changed (created, moved, stacked). Clients upsert by instance id. */
+/**
+ * Items whose state changed. Clients upsert `items` by instance id and drop `removed` ids
+ * (items that left this character's view: sold, listed, moved to another character, destroyed).
+ * Both carry the item `version`; clients must ignore anything older than what they hold, because
+ * HTTP responses and pushes can arrive in either order.
+ * `reason: 'sync'` = pushed from the database change feed (any server write path).
+ */
 export const InventoryUpdatedMsg = serverMsg(
   'inventory.updated',
   z.object({
-    reason: z.enum(['pickup', 'move', 'loot', 'trade', 'marketplace', 'admin']),
+    reason: z.enum(['pickup', 'move', 'loot', 'trade', 'marketplace', 'admin', 'sync']),
     items: z.array(ItemSchema),
+    removed: z
+      .array(z.object({ id: UuidSchema, version: z.number().int().nonnegative() }))
+      .default([]),
   }),
+);
+
+/** Authoritative effective stats (class base + equipment). Sent on join and after equipment changes. */
+export const CharacterStatsMsg = serverMsg(
+  'character.stats',
+  z.object({ characterId: UuidSchema, stats: CharacterStatsSchema }),
+);
+
+/** Wallet balances visible to the character. Sent on join and whenever a balance changes. */
+export const WalletUpdatedMsg = serverMsg(
+  'wallet.updated',
+  z.object({ balances: z.array(CurrencyBalanceSchema) }),
 );
 
 export const ChatMessageMsg = serverMsg(
@@ -209,6 +232,8 @@ export const ServerMessageSchema = z.discriminatedUnion('t', [
   PresenceMsg,
   InventorySnapshotMsg,
   InventoryUpdatedMsg,
+  CharacterStatsMsg,
+  WalletUpdatedMsg,
   ChatMessageMsg,
   PartyUpdateMsg,
   TradeUpdateMsg,

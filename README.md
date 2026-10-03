@@ -2,8 +2,9 @@
 
 Foundation for **one persistent, browser-first fantasy MMORPG** intended to grow for years.
 
-> Status (2026-10-03): architecture foundation + a tiny technical proof. There is **no gameplay**
-> beyond walking around a placeholder field and picking up items. See
+> Status (2026-10-03): architecture foundation + a playable inventory/equipment loop. There is
+> **no combat or other gameplay** beyond walking around a placeholder field, picking up items, and
+> managing them (bag, equipment, stats, bank). See
 > [`docs/PROGRESS.md`](docs/PROGRESS.md) for exactly what is verified.
 
 **Agents: read [`AGENTS.md`](AGENTS.md) first**, then `docs/MASTER_PLAN.md`, `docs/PROGRESS.md`,
@@ -23,6 +24,9 @@ browser (Babylon.js) ──HTTP──▶ services/api (Fastify) ──┐
 3. Walk (WASD) — the server validates speed/bounds and replicates movement to other players.
 4. Press **E** at a glowing box — the server checks range, reserves the pickup, mints a uniquely
    identified item instance in PostgreSQL in one transaction, and pushes `inventory.updated`.
+5. **B** bag, **C** character, **V** bank: equip/unequip, compare, deposit/retrieve. Every action is
+   an authoritative API call; changes from any server process are pushed back over the WebSocket
+   (PostgreSQL change feed), and dropped connections reconnect automatically.
 
 ## Quick start
 

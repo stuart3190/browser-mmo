@@ -75,6 +75,13 @@ Every item mutation also bumps `version` (optimistic concurrency for clients:
 - JSONB holds rolled stats/modifiers/sockets/enchantments (read with the row, rarely queried).
   If marketplace search needs stat filters, add generated columns or a search index.
 
+## Change feed triggers
+
+Migration `0001_change_feed_triggers.sql` adds AFTER INSERT/UPDATE triggers on `item_instances`
+and `currency_balances` that `pg_notify('mmo_changes', …)` ID-only payloads on commit
+([ADR 0014](../adr/0014-postgres-change-feed.md)). Do not remove them; the realtime service relies
+on them to push changes made by any process.
+
 ## Seed data
 
 `pnpm db:seed` (`packages/domain/scripts/seed.ts`) is idempotent: syncs templates and creates the
