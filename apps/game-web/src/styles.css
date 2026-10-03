@@ -111,7 +111,7 @@ button.secondary {
 }
 .banner {
   position: absolute;
-  top: 12px;
+  top: 150px;
   left: 50%;
   transform: translateX(-50%);
   font-weight: 600;
@@ -145,7 +145,7 @@ button.secondary {
 }
 .toasts {
   position: absolute;
-  top: 56px;
+  top: 120px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -194,7 +194,7 @@ kbd {
 /* Windows */
 .windows {
   position: absolute;
-  top: 56px;
+  top: 110px;
   right: 12px;
   bottom: 68px;
   display: flex;
@@ -446,7 +446,7 @@ kbd {
 .details {
   position: absolute;
   left: 12px;
-  top: 56px;
+  top: 120px;
   width: 280px;
   background: rgba(10, 10, 14, 0.97);
   border: 1px solid var(--accent);
@@ -461,6 +461,117 @@ kbd {
   gap: 6px;
   margin-top: 10px;
   align-items: center;
+}
+
+/* Combat HUD */
+.frame {
+  position: absolute;
+  top: 12px;
+  width: 280px;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+.player-frame {
+  left: 12px;
+}
+.target-frame {
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: #6b3a35;
+}
+.target-frame.is-dead {
+  opacity: 0.8;
+}
+.frame-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.frame-title .icon-button {
+  margin-left: auto;
+  min-height: 24px;
+}
+.tag {
+  font-size: 10px;
+  padding: 0 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+.combat-tag {
+  color: #ffb347;
+  border-color: #ffb347;
+}
+.dead-tag {
+  color: var(--down);
+  border-color: var(--down);
+}
+.bar {
+  position: relative;
+  height: 16px;
+  background: #2a1a1a;
+  border: 1px solid #000;
+  border-radius: 3px;
+  margin: 3px 0;
+  overflow: hidden;
+}
+.bar-xp {
+  height: 10px;
+  background: #1a1a2a;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(#3fbf4f, #2a8f37);
+  transition: width 0.15s linear;
+}
+.bar-xp .bar-fill {
+  background: linear-gradient(#8a6fe0, #5b47b0);
+}
+.target-frame .bar-hp .bar-fill {
+  background: linear-gradient(#e0544a, #a8352d);
+}
+.bar-text {
+  position: absolute;
+  inset: 0;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  text-shadow: 0 0 2px #000;
+}
+.bar-xp .bar-text {
+  line-height: 10px;
+  font-size: 8px;
+}
+.attack-toggle {
+  width: 100%;
+  margin-top: 4px;
+}
+.attack-toggle.active,
+.action.attack.active {
+  border-color: var(--down);
+  color: var(--down);
+}
+.combat-line {
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--muted);
+}
+.combat-line.error {
+  color: #ff8a80;
+}
+.death-overlay {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  border-color: var(--down);
+  min-width: 240px;
+}
+.death-overlay h2 {
+  margin: 0 0 4px;
+  color: var(--down);
 }
 
 /* Narrow and touch screens: sheets instead of floating windows, larger targets. */
@@ -509,5 +620,31 @@ kbd {
   }
   .action {
     flex: 1;
+    min-width: 0;
+  }
+  .frame {
+    top: 6px;
+    width: calc(50% - 12px);
+    font-size: 11px;
+  }
+  .player-frame {
+    left: 6px;
+  }
+  .player-frame .muted.small,
+  .action kbd,
+  .attack-toggle kbd {
+    display: none;
+  }
+  .target-frame {
+    left: auto;
+    right: 6px;
+    transform: none;
+  }
+  .attack-toggle {
+    min-height: 44px;
+  }
+  .toasts {
+    top: 110px;
+    width: calc(100% - 16px);
   }
 }

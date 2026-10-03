@@ -67,6 +67,9 @@ client                                   server
 | S→C       | `inventory.snapshot`, `inventory.updated` (`items` + `removed` tombstones, reason `sync` for change-feed pushes) | implemented                                               |
 | S→C       | `character.stats` (authoritative effective stats)                                                                | implemented                                               |
 | S→C       | `wallet.updated`                                                                                                 | implemented                                               |
+| C→S       | `target.set`, `combat.attack {start}`, `combat.respawn`                                                          | implemented (see docs/gameplay/combat.md)                 |
+| S→C       | `combat.state`, `combat.damage`, `entity.health`, `combat.death`, `player.vitals`                                | implemented                                               |
+| S→C       | `character.progress`, `combat.loot`                                                                              | implemented                                               |
 | S→C       | `chat.message`                                                                                                   | implemented                                               |
 | S→C       | `party.update`, `trade.update`                                                                                   | **schema reserved, never emitted yet**                    |
 
@@ -92,6 +95,10 @@ response and the push can arrive in either order. After the listener (re)connect
 gets a full snapshot because NOTIFY is not durable.
 
 ## Reconnect
+
+- **Linger:** a closed connection leaves the character in its zone for 10 s; a reconnect within
+  that window re-attaches to the same entity (combat state, health and target survive) instead of
+  re-spawning it. After 10 s the character leaves and its position and health are persisted.
 
 - `RealtimeClient` reconnects automatically with exponential backoff (0.5 s doubling, max 10 s),
   re-sending `auth.hello` with the same session token. The sequence counter restarts per socket.

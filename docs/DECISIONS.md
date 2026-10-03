@@ -311,6 +311,20 @@ Session-resume with server-side replay buffers (more complex; snapshots are chea
 **Consequences**
 Reconnect cost is a full snapshot. Old clients that do not know the new message types ignore them (`parseServerMessage` drops unknown types); the new `sync` reason would be rejected by a client built before it, which is acceptable while only one client exists.
 
+## 2026-10-03 — Server-authoritative combat in the zone tick, exactly-once rewards, reconnect linger
+
+**Decision**
+Combat (targeting, melee auto-attack swing timers, enemy AI, death, respawn, regen) runs inside the existing 20 Hz `ZoneSimulation` tick with no per-entity timers; formulas are pure, data-driven functions in `@mmo/game-data`. Clients may only send `target.set`, `combat.attack` and `combat.respawn`. Kills are credited to the first character that damaged the enemy and persisted by the gateway with `awardKill` in one transaction (XP/level, loot via `grantItemInTx`, gold via the ledger), made exactly-once by the `kill_rewards (kill_id, character_id)` primary key. Item changes refresh the in-world combat profile. A closed connection leaves its character in the world for 10 s; reconnecting re-attaches to it. `docs/adr/0015-server-authoritative-combat.md`, `docs/gameplay/combat.md`.
+
+**Reason**
+Keeps every outcome server-side and testable, reuses the existing tick and item pipeline, makes duplicate rewards structurally impossible, and prevents escaping fights by disconnecting.
+
+**Alternatives considered**
+Client-timed attacks, per-entity timers, rewards inside the simulation, immediate removal on disconnect.
+
+**Consequences**
+Kill events are in memory until persisted (a crash in that window loses the reward). Per-tick cost grows with entities × players. A disconnected character stays vulnerable for 10 s.
+
 ---
 
 ## Open questions

@@ -307,9 +307,7 @@ export class ZoneSimulation {
   }
 
   /** Read-only enemy state (tests, admin/debug). */
-  getEnemy(
-    entityId: string,
-  ):
+  getEnemy(entityId: string):
     | Readonly<{
         mode: EnemyMode;
         health: number;

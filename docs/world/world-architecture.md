@@ -20,13 +20,22 @@ World
   a separate simulation per group (dungeons/instances — not implemented).
 - `ZoneTransition` (trigger volume → target zone/position) models region transitions; not yet used.
 - `environment.dayNightCycle` / `weatherProfileId` are hooks for later.
-- Dynamic events, world bosses: `EnemyDefinition.isWorldBoss` exists; no event system yet.
+- Dynamic events, world bosses: `EnemyDefinition.isWorldBoss` exists; no event system yet. Basic enemies are simulated (see Enemies).
 
 ## Demo content
 
 One region, one zone, 2×2 chunks (128 m square): an NPC (Elder Maren), two pickup spawn points
 (Iron Longsword, respawn 20 s; Copper Ore ×3, respawn 15 s), placeholder trees/rocks/building/fence.
 Cross-validation guarantees spawn points lie inside their chunk and reference existing content.
+
+## Enemies
+
+Enemy spawn points (`kind: 'enemy'`) spawn combatants defined by `EnemyDefinition.combat`
+(damage, attack speed/range, aggro/leash ranges, move speed, armour, corpse time). The zone
+simulation runs a small per-enemy state machine each tick: **idle** (aggro on proximity) →
+**engaged** (chase in a straight line, attack on a server swing timer) → **returning** (evade:
+walk home, reset health) or **dead** (corpse, then the spawn point respawns a new entity after
+`respawnMs`). Demo: one Grey Wolf at (2, 0, 14). See [combat](../gameplay/combat.md).
 
 ## Streaming (client)
 

@@ -9,6 +9,12 @@ import type { ApiClient } from '../api';
 import { config } from '../config';
 import { GameState } from '../state/game-state';
 import { ItemActions } from '../state/item-actions';
+import { CombatActions } from '../state/combat-actions';
+import type { EntityInfo } from '../state/game-state';
+// Side-effect import: enables scene picking (tree-shaken out of deep imports otherwise).
+import '@babylonjs/core/Culling/ray';
+import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents';
+import type { WorldEntity } from '@mmo/schemas';
 import { mountGameUi } from '../ui/GameUI';
 import { EntityViews } from './entity-view';
 import { PlayerController } from './player-controller';
@@ -41,10 +47,31 @@ export async function startGame(args: {
   const state = new GameState(args.character);
   state.renderer = kind;
   const actions = new ItemActions(args.api, state, gameData);
-  mountGameUi(args.ui, { state, actions, gameData });
-
   const net = new RealtimeClient(config.realtimeUrl);
-  exposeDebug(state, net);
+  const combat = new CombatActions(net, state);
+  mountGameUi(args.ui, { state, actions, combat, gameData });
+  exposeDebug(state, net, (id) => entities?.screenPosition(id, scene) ?? null);
+
+  const info = (e: WorldEntity): EntityInfo => ({
+    id: e.id,
+    kind: e.kind,
+    name: e.name,
+    level: e.level,
+    health: e.health,
+    maxHealth: e.maxHealth,
+    dead: e.dead,
+    hostile: e.hostile,
+  });
+  const patchEntity = (id: string, patch: Partial<EntityInfo>) => {
+    const cur = state.world.get(id);
+    if (cur) state.world.set(id, { ...cur, ...patch });
+    if (patch.dead !== undefined) entities?.setDead(id, patch.dead);
+    state.emit();
+  };
+  const combatLine = (text: string, kind: 'info' | 'error' = 'info') => {
+    state.combatLine = { text, kind };
+    state.addLog(text, kind);
+  };
 
   net.onStatus((status, info) => {
     state.update((s) => {
@@ -70,6 +97,10 @@ export async function startGame(args: {
     state.update((s) => {
       s.character = m.d.character;
       s.zoneName = gameData.zone(m.d.zoneId).name;
+      s.myEntityId = m.d.entityId;
+      s.serverOffsetMs = m.d.serverTime - Date.now();
+      s.world.clear();
+      s.target = { id: null, attacking: false };
     });
     if (!entities) {
       new WorldView(scene, gameData).loadZone(m.d.zoneId);
@@ -90,9 +121,83 @@ export async function startGame(args: {
       state.addLog('Reconnected');
     }
   });
-  net.on('zone.snapshot', (m) => m.d.entities.forEach((e) => entities?.upsert(e)));
-  net.on('entity.spawn', (m) => entities?.upsert(m.d.entity));
-  net.on('entity.despawn', (m) => entities?.remove(m.d.entityId));
+  net.on('zone.snapshot', (m) => {
+    for (const e of m.d.entities) {
+      entities?.upsert(e);
+      state.world.set(e.id, info(e));
+    }
+    state.emit();
+  });
+  net.on('entity.spawn', (m) => {
+    entities?.upsert(m.d.entity);
+    state.world.set(m.d.entity.id, info(m.d.entity));
+    state.emit();
+  });
+  net.on('entity.despawn', (m) => {
+    entities?.remove(m.d.entityId);
+    state.world.delete(m.d.entityId);
+    state.emit();
+  });
+  // ---- combat (server results only) ----
+  net.on('combat.state', (m) => {
+    state.update((s) => (s.target = { id: m.d.targetId, attacking: m.d.attacking }));
+    entities?.setTarget(m.d.targetId);
+    if (m.d.reason === 'out_of_range') combatLine('Target out of range', 'error');
+    if (m.d.reason === 'target_dead') combatLine('Target is dead');
+  });
+  net.on('combat.damage', (m) => {
+    patchEntity(m.d.targetId, { health: m.d.targetHealth, maxHealth: m.d.targetMaxHealth });
+    const src = state.nameOf(m.d.sourceId);
+    const dst = state.nameOf(m.d.targetId);
+    const mine = m.d.sourceId === state.myEntityId || m.d.targetId === state.myEntityId;
+    if (!mine) return;
+    const verb =
+      m.d.sourceId === state.myEntityId
+        ? m.d.outcome === 'crit'
+          ? 'critically hit'
+          : 'hit'
+        : m.d.outcome === 'crit'
+          ? 'critically hits'
+          : 'hits';
+    combatLine(
+      m.d.outcome === 'miss'
+        ? `${src} ${m.d.sourceId === state.myEntityId ? 'miss' : 'misses'} ${dst === 'You' ? 'you' : dst}`
+        : `${src} ${verb} ${dst === 'You' ? 'you' : dst} for ${m.d.amount}`,
+      m.d.targetId === state.myEntityId ? 'error' : 'info',
+    );
+  });
+  net.on('entity.health', (m) =>
+    patchEntity(m.d.entityId, { health: m.d.health, maxHealth: m.d.maxHealth, dead: m.d.dead }),
+  );
+  net.on('combat.death', (m) => {
+    patchEntity(m.d.entityId, { dead: true, health: 0 });
+    if (m.d.entityId === state.myEntityId) combatLine('You died', 'error');
+    else if (m.d.killerId === state.myEntityId)
+      combatLine(`You killed ${state.nameOf(m.d.entityId)}`);
+  });
+  net.on('player.vitals', (m) => {
+    state.update((s) => (s.vitals = m.d));
+    player?.setEnabled(!m.d.dead);
+  });
+  net.on('character.progress', (m) => {
+    state.update((s) => {
+      s.progress = { level: m.d.level, xp: m.d.xp, xpToNext: m.d.xpToNext };
+      s.character = { ...s.character, level: m.d.level };
+    });
+    if (m.d.xpGained > 0) state.addLog(`You gain ${m.d.xpGained} experience`);
+    if (m.d.levelsGained > 0) state.toast(`Level up! You are now level ${m.d.level}`);
+  });
+  net.on('combat.loot', (m) => {
+    const parts = m.d.items.map((i) =>
+      i.instance.quantity > 1 ? `${i.template.name} ×${i.instance.quantity}` : i.template.name,
+    );
+    const gold = gameData.currencies.get('gold');
+    if (m.d.gold > 0 && gold) parts.push(`${m.d.gold}c`);
+    if (parts.length) state.toast(`Loot from ${m.d.enemyName}: ${parts.join(', ')}`);
+    if (m.d.lostItems.length)
+      state.toast(`Your bags are full — ${m.d.lostItems.length} item(s) lost`, 'error');
+    state.addLog(`Looted ${parts.join(', ') || 'nothing'}`);
+  });
   net.on('world.moves', (m) =>
     m.d.moves.forEach(([id, x, y, z, r]) => entities?.move(id, x, y, z, r)),
   );
@@ -118,7 +223,27 @@ export async function startGame(args: {
   await net.connect({ token: args.token, characterId: args.character.id, client: 'game_web' });
   await joined;
 
+  // Tap/click targeting (Babylon POINTERTAP fires for taps and clicks, not camera drags).
+  scene.onPointerObservable.add((pi) => {
+    if (pi.type !== PointerEventTypes.POINTERTAP || !entities) return;
+    const picked = pi.pickInfo?.pickedMesh ? entities.entityIdOfMesh(pi.pickInfo.pickedMesh) : null;
+    if (picked) combat.target(picked);
+    else if (state.target.id && !state.target.attacking) combat.target(null);
+  });
+
   window.addEventListener('keydown', (e) => {
+    if (e.code === 'Tab' && entities && player) {
+      e.preventDefault();
+      const enemy =
+        entities.nearest(
+          'enemy',
+          player.position,
+          40,
+          (x) => !x.dead && x.id !== state.target.id,
+        ) ?? entities.nearest('enemy', player.position, 40, (x) => !x.dead);
+      if (enemy) combat.target(enemy.id);
+      return;
+    }
     if (e.code !== 'KeyE' || !entities || !player) return;
     const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
     if (pickup) {
@@ -154,7 +279,11 @@ export async function startGame(args: {
 }
 
 /** Read-only debug view for automated browser checks (dev builds only). */
-function exposeDebug(state: GameState, net: RealtimeClient) {
+function exposeDebug(
+  state: GameState,
+  net: RealtimeClient,
+  screenPos: (entityId: string) => { x: number; y: number } | null,
+) {
   if (!import.meta.env.DEV) return;
   (window as unknown as { __mmo: unknown }).__mmo = {
     get connected() {
@@ -184,5 +313,23 @@ function exposeDebug(state: GameState, net: RealtimeClient) {
       return state.items.all().length;
     },
     dropConnection: () => net.simulateDrop(),
+    get myEntityId() {
+      return state.myEntityId;
+    },
+    get vitals() {
+      return state.vitals;
+    },
+    get progress() {
+      return state.progress;
+    },
+    get target() {
+      return state.target;
+    },
+    /** Live enemies/corpses as the client sees them. */
+    get enemies() {
+      return [...state.world.values()].filter((e) => e.kind === 'enemy');
+    },
+    /** CSS-pixel screen position of an entity (for automated taps on the canvas). */
+    screenPos: screenPos,
   };
 }

@@ -1,11 +1,13 @@
 import { createContext, useContext, useSyncExternalStore } from 'react';
 import type { GameData } from '@mmo/game-data';
 import type { GameState } from '../state/game-state';
+import type { CombatActions } from '../state/combat-actions';
 import type { ItemActions } from '../state/item-actions';
 
 export interface UiDeps {
   state: GameState;
   actions: ItemActions;
+  combat: CombatActions;
   gameData: GameData;
 }
 

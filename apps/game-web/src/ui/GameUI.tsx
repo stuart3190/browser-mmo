@@ -2,6 +2,7 @@ import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { WindowId } from '../state/game-state';
 import { BankWindow } from './BankWindow';
+import { DeathOverlay, PlayerFrame, TargetFrame } from './CombatHud';
 import { CharacterWindow } from './CharacterWindow';
 import { UiContext, useGame } from './context';
 import type { UiDeps } from './context';
@@ -26,15 +27,23 @@ export function mountGameUi(root: HTMLElement, deps: UiDeps): void {
 }
 
 function GameUI() {
-  const { state } = useGame();
+  const { state, combat } = useGame();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.repeat) return;
       if (e.code === 'Escape') {
+        if (!state.selectedItemId && state.open.size === 0 && state.target.id) {
+          combat.target(null);
+          return;
+        }
         state.update((s) => {
           if (s.selectedItemId) s.selectedItemId = null;
           else s.open = new Set();
         });
+        return;
+      }
+      if (e.code === 'KeyF') {
+        combat.toggleAttack();
         return;
       }
       const w = SHORTCUTS[e.code];
@@ -42,12 +51,14 @@ function GameUI() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [state]);
+  }, [state, combat]);
 
   return (
     <div className="ui-root">
-      <StatusPanel />
+      <PlayerFrame />
+      <TargetFrame />
       <ConnectionBanner />
+      <DeathOverlay />
       {state.prompt && <div className="panel prompt">{state.prompt}</div>}
       <LogPanel />
       <Toasts />
@@ -59,20 +70,6 @@ function GameUI() {
       <ItemDetails />
       <HoverTooltip />
       <ActionBar />
-    </div>
-  );
-}
-
-function StatusPanel() {
-  const { state, gameData } = useGame();
-  const c = state.character;
-  return (
-    <div className="panel status" data-testid="status">
-      <strong>{c.name}</strong> · {gameData.characterClass(c.classId).name} {c.level} ·{' '}
-      {state.zoneName}
-      <div className="muted small">
-        {state.renderer} · WASD move · drag look · E interact · B bag · C character · V bank
-      </div>
     </div>
   );
 }
@@ -146,7 +143,8 @@ function HoverTooltip() {
 }
 
 function ActionBar() {
-  const { state } = useGame();
+  const { state, combat } = useGame();
+  const t = state.targetInfo();
   const btn = (id: WindowId, label: string, key: string) => (
     <button
       className={state.open.has(id) ? 'action active' : 'action'}
@@ -163,6 +161,17 @@ function ActionBar() {
       {btn('character', 'Character', 'C')}
       {btn('inventory', 'Bag', 'B')}
       {btn('bank', 'Bank', 'V')}
+      {t && t.kind === 'enemy' && !t.dead && (
+        <button
+          className={state.target.attacking ? 'action attack active' : 'action attack'}
+          onClick={() => combat.toggleAttack()}
+          data-testid="action-attack"
+          aria-pressed={state.target.attacking}
+        >
+          {state.target.attacking ? 'Stop' : 'Attack'}
+          <kbd>F</kbd>
+        </button>
+      )}
     </nav>
   );
 }

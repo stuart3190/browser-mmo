@@ -18,6 +18,8 @@ export class PlayerController {
   private readonly keys = new Set<string>();
   private lastSent = { x: Number.NaN, z: Number.NaN, r: Number.NaN };
   private sinceSend = 0;
+  /** False while dead: input is ignored (the server rejects movement anyway). */
+  private enabled = true;
 
   constructor(
     scene: Scene,
@@ -59,6 +61,11 @@ export class PlayerController {
     return this.mesh.position;
   }
 
+  setEnabled(enabled: boolean): void {
+    this.enabled = enabled;
+    if (!enabled) this.keys.clear();
+  }
+
   /** Authoritative correction from the server. */
   correct(pos: Vec3, rotationY: number): void {
     this.mesh.position.set(pos.x, 0.9, pos.z);
@@ -69,6 +76,10 @@ export class PlayerController {
   update(dt: number): void {
     let fx = 0;
     let fz = 0;
+    if (!this.enabled) {
+      this.camera.target.copyFrom(this.mesh.position);
+      return;
+    }
     if (this.keys.has('KeyW')) fz += 1;
     if (this.keys.has('KeyS')) fz -= 1;
     if (this.keys.has('KeyA')) fx -= 1;

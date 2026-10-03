@@ -2,10 +2,10 @@
 
 Foundation for **one persistent, browser-first fantasy MMORPG** intended to grow for years.
 
-> Status (2026-10-03): architecture foundation + a playable inventory/equipment loop. There is
-> **no combat or other gameplay** beyond walking around a placeholder field, picking up items, and
-> managing them (bag, equipment, stats, bank). See
-> [`docs/PROGRESS.md`](docs/PROGRESS.md) for exactly what is verified.
+> Status (2026-10-03): architecture foundation, a playable inventory/equipment loop and a
+> server-authoritative combat foundation (one melee auto-attack loop against a placeholder Grey Wolf:
+> targeting, enemy AI, death/respawn, XP, loot). No abilities, quests, crafting or social systems yet.
+> See [`docs/PROGRESS.md`](docs/PROGRESS.md) for exactly what is verified.
 
 **Agents: read [`AGENTS.md`](AGENTS.md) first**, then `docs/MASTER_PLAN.md`, `docs/PROGRESS.md`,
 `docs/DECISIONS.md`.
@@ -27,6 +27,9 @@ browser (Babylon.js) ──HTTP──▶ services/api (Fastify) ──┐
 5. **B** bag, **C** character, **V** bank: equip/unequip, compare, deposit/retrieve. Every action is
    an authoritative API call; changes from any server process are pushed back over the WebSocket
    (PostgreSQL change feed), and dropped connections reconnect automatically.
+6. Walk north to the **Grey Wolf**, tap/click it (or Tab), press **F**/Attack. The server times every
+   swing, resolves damage, runs the wolf's AI, awards XP and loot exactly once on its death; the loot
+   lands in your bag and can be equipped. See [`docs/gameplay/combat.md`](docs/gameplay/combat.md).
 
 ## Quick start
 

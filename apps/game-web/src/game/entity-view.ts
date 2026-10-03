@@ -2,6 +2,8 @@ import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
+import type { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh';
+import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import type { Scene } from '@babylonjs/core/scene';
 import type { WorldEntity } from '@mmo/schemas';
@@ -19,6 +21,8 @@ interface View {
  */
 export class EntityViews {
   private readonly views = new Map<string, View>();
+  private ring: Mesh | undefined;
+  private ringTarget: string | null = null;
 
   constructor(
     private readonly scene: Scene,
@@ -35,6 +39,7 @@ export class EntityViews {
     if (entity.id === this.localEntityId) return; // local player is rendered by PlayerController
     const existing = this.views.get(entity.id);
     if (existing) {
+      if (existing.entity.dead !== entity.dead) this.setDead(entity.id, entity.dead ?? false);
       existing.entity = entity;
       existing.target.set(entity.position.x, existing.target.y, entity.position.z);
       return;
@@ -49,6 +54,7 @@ export class EntityViews {
       target: new Vector3(entity.position.x, y, entity.position.z),
       targetRot: entity.rotationY,
     });
+    if (entity.dead) this.setDead(entity.id, true);
   }
 
   move(entityId: string, x: number, _y: number, z: number, rotationY: number): void {
@@ -69,6 +75,11 @@ export class EntityViews {
 
   update(dtSeconds: number): void {
     const k = Math.min(1, dtSeconds * 12);
+    if (this.ring) {
+      const t = this.ringTarget ? this.views.get(this.ringTarget) : undefined;
+      this.ring.isVisible = t !== undefined;
+      if (t) this.ring.position.set(t.mesh.position.x, 0.05, t.mesh.position.z);
+    }
     for (const v of this.views.values()) {
       Vector3.LerpToRef(v.mesh.position, v.target, k, v.mesh.position);
       v.mesh.rotation.y += (v.targetRot - v.mesh.rotation.y) * k;
@@ -76,11 +87,66 @@ export class EntityViews {
     }
   }
 
+  /** Maps a picked mesh back to its entity (null for the local player, world props, ground). */
+  entityIdOfMesh(mesh: AbstractMesh): string | null {
+    return this.views.has(mesh.name) ? mesh.name : null;
+  }
+
+  /** Corpses lie on their side and turn grey. */
+  setDead(entityId: string, dead: boolean): void {
+    const v = this.views.get(entityId);
+    if (!v) return;
+    v.entity = { ...v.entity, dead };
+    v.mesh.rotation.z = dead ? Math.PI / 2 : 0;
+    const mat = v.mesh.material as StandardMaterial | null;
+    if (mat && v.entity.kind === 'enemy')
+      mat.diffuseColor = dead ? new Color3(0.25, 0.25, 0.25) : new Color3(0.55, 0.55, 0.6);
+  }
+
+  /** Selection ring under the current target. */
+  setTarget(entityId: string | null): void {
+    this.ringTarget = entityId;
+    if (!this.ring) {
+      this.ring = MeshBuilder.CreateTorus(
+        'target_ring',
+        { diameter: 1.8, thickness: 0.08, tessellation: 32 },
+        this.scene,
+      );
+      const m = new StandardMaterial('target_ring_mat', this.scene);
+      m.emissiveColor = new Color3(1, 0.3, 0.2);
+      m.disableLighting = true;
+      this.ring.material = m;
+      this.ring.isPickable = false;
+    }
+    this.ring.isVisible = entityId !== null && this.views.has(entityId);
+  }
+
+  /** CSS-pixel screen coordinates of an entity (debug/automation helper). */
+  screenPosition(entityId: string, scene: Scene): { x: number; y: number } | null {
+    const v = this.views.get(entityId);
+    const engine = scene.getEngine();
+    if (!v || !scene.activeCamera) return null;
+    const p = Vector3.Project(
+      v.mesh.getAbsolutePosition(),
+      Matrix.Identity(),
+      scene.getTransformMatrix(),
+      scene.activeCamera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()),
+    );
+    const scale = engine.getHardwareScalingLevel();
+    const rect = engine.getRenderingCanvasClientRect();
+    return { x: p.x * scale + (rect?.left ?? 0), y: p.y * scale + (rect?.top ?? 0) };
+  }
+
   /** Nearest entity of a kind within range of a point (client-side hint only; server re-checks). */
-  nearest(kind: WorldEntity['kind'], from: Vector3, range: number): WorldEntity | undefined {
+  nearest(
+    kind: WorldEntity['kind'],
+    from: Vector3,
+    range: number,
+    filter: (e: WorldEntity) => boolean = () => true,
+  ): WorldEntity | undefined {
     let best: { e: WorldEntity; d: number } | undefined;
     for (const v of this.views.values()) {
-      if (v.entity.kind !== kind) continue;
+      if (v.entity.kind !== kind || !filter(v.entity)) continue;
       const d = Math.hypot(v.entity.position.x - from.x, v.entity.position.z - from.z);
       if (d <= range && (!best || d < best.d)) best = { e: v.entity, d };
     }
@@ -103,6 +169,11 @@ export class EntityViews {
       mesh.position.y = 0.6;
       mat.diffuseColor = new Color3(0.95, 0.5, 0.1);
       mat.emissiveColor = new Color3(0.4, 0.2, 0.0);
+    } else if (e.kind === 'enemy') {
+      // Placeholder wolf: a low, long box.
+      mesh = MeshBuilder.CreateBox(e.id, { width: 0.7, height: 0.8, depth: 1.5 }, this.scene);
+      mesh.position.y = 0.4;
+      mat.diffuseColor = new Color3(0.55, 0.55, 0.6);
     } else {
       mesh = MeshBuilder.CreateSphere(e.id, { diameter: 1 }, this.scene);
       mesh.position.y = 0.5;
