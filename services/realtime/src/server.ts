@@ -5,11 +5,15 @@ import type { WebSocket } from 'ws';
 import { sql } from 'drizzle-orm';
 import type { DomainContext, SessionService } from '@mmo/domain';
 import {
+  awardKill,
   characterFromRow,
   claimWorldPickup,
+  getCombatProfile,
   requireOwnedCharacter,
+  saveCharacterHealth,
   saveCharacterPosition,
 } from '@mmo/domain';
+import type { CombatProfile } from '@mmo/domain';
 import { ChangeFeedListener } from '@mmo/db';
 import type { ClientMessage } from '@mmo/networking';
 import {
@@ -21,7 +25,8 @@ import {
 import type { Logger, Metrics } from '@mmo/server-kit';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
-import type { OutMessage } from '@mmo/world';
+import type { KillEvent, OutMessage } from '@mmo/world';
+import type { Rng } from '@mmo/game-data';
 import { TokenBucket } from './rate-limit';
 import { AccountSync, loadContainerIds, sendFullState } from './sync';
 import type { SyncTarget } from './sync';
@@ -44,6 +49,30 @@ export interface RealtimeDeps {
   changeFeedUrl?: string;
   /** WebSocket ping interval; connections that miss a pong are terminated. */
   heartbeatMs?: number;
+  /**
+   * How long a character stays in the world after its connection closes. A reconnect within this
+   * window re-attaches to the same in-world character (combat continues; disconnecting cannot be
+   * used to escape a fight). 0 = remove immediately.
+   */
+  lingerMs?: number;
+  /** Simulation RNG (combat rolls). Inject a seeded one in tests. */
+  rng?: Rng;
+}
+
+/** A character present in a zone simulation, with or without a live connection. */
+interface InWorld {
+  accountId: string;
+  characterId: string;
+  name: string;
+  zone: ZoneSimulation;
+  /** Epoch ms after which a disconnected character is removed; null while connected. */
+  lingerUntil: number | null;
+}
+
+interface PendingKill {
+  kill: KillEvent;
+  attempts: number;
+  nextAttemptAt: number;
 }
 
 interface Connection {
@@ -74,8 +103,19 @@ interface Connection {
  */
 export function createRealtimeServer(deps: RealtimeDeps) {
   const { ctx, logger } = deps;
-  const zones = new Map(deps.zoneIds.map((id) => [id, new ZoneSimulation(ctx.gameData, id)]));
+  const zones = new Map(
+    deps.zoneIds.map((id) => [
+      id,
+      new ZoneSimulation(ctx.gameData, id, deps.rng ? { rng: deps.rng } : {}),
+    ]),
+  );
   const byCharacter = new Map<string, Connection>();
+  const inWorld = new Map<string, InWorld>();
+  const pendingKills: PendingKill[] = [];
+  let killsInFlight = 0;
+  let shuttingDown = false;
+  const lingerMs = deps.lingerMs ?? 10_000;
+  const rewards = deps.metrics.counter('combat_rewards_total', 'Kill reward attempts by result');
   const connections = new Set<Connection>();
   const wsConnections = deps.metrics.gauge('ws_connections', 'Open WebSocket connections');
   const wsMessages = deps.metrics.counter(
@@ -258,13 +298,34 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     conn.log = conn.log.child({ accountId: session.account.id, characterId: row.id });
     byCharacter.set(row.id, conn);
 
-    const entityId = zone.addPlayer(
-      { characterId: row.id, name: row.name, maxSpeed },
-      { x: row.posX, y: row.posY, z: row.posZ },
-      row.rotationY,
-      now,
-    );
+    const profile = await getCombatProfile(ctx.db, ctx, row.id);
+    if (conn.ws.readyState !== conn.ws.OPEN) {
+      byCharacter.delete(row.id);
+      return;
+    }
+    const lingering = inWorld.get(row.id);
+    const reattached =
+      lingering !== undefined && lingering.zone === zone && zone.getPlayer(row.id) !== undefined;
+    if (reattached) {
+      lingering.lingerUntil = null;
+      zone.resyncPlayer(row.id, now);
+    } else {
+      zone.addPlayer(
+        { characterId: row.id, name: row.name, maxSpeed, combat: combatantFrom(profile) },
+        { x: row.posX, y: row.posY, z: row.posZ },
+        row.rotationY,
+        now,
+      );
+      inWorld.set(row.id, {
+        accountId: session.account.id,
+        characterId: row.id,
+        name: row.name,
+        zone,
+        lingerUntil: null,
+      });
+    }
     const placed = zone.getPlayer(row.id)!;
+    const entityId = placed.entityId;
     send(
       conn,
       {
@@ -281,12 +342,24 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       msg.seq,
     );
     await sendFullState(ctx, syncTarget(conn));
-    broadcastZone(zone, {
-      t: 'presence.update',
-      d: { event: 'joined', characterId: row.id, name: row.name, zoneId: zone.zone.id },
+    send(conn, {
+      t: 'character.progress',
+      d: {
+        level: profile.level,
+        xp: profile.xp,
+        xpToNext: profile.xpToNext,
+        xpGained: 0,
+        levelsGained: 0,
+      },
     });
+    if (!reattached) {
+      broadcastZone(zone, {
+        t: 'presence.update',
+        d: { event: 'joined', characterId: row.id, name: row.name, zoneId: zone.zone.id },
+      });
+    }
     flush();
-    conn.log.info('player joined');
+    conn.log.info({ reattached }, 'player joined');
   }
 
   async function handleGameMessage(
@@ -335,6 +408,19 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       case 'chat.send':
         player.zone.chat(player.characterId, msg.d.channel, msg.d.text, now);
         return;
+      case 'target.set':
+        player.zone.setTarget(player.characterId, msg.d.entityId);
+        flush();
+        return;
+      case 'combat.attack':
+        if (msg.d.start) player.zone.startAttack(player.characterId);
+        else player.zone.stopAttack(player.characterId);
+        flush();
+        return;
+      case 'combat.respawn':
+        player.zone.respawn(player.characterId, now);
+        flush();
+        return;
       case 'ping':
         send(conn, { t: 'pong', d: { clientTime: msg.d.clientTime, serverTime: now } }, msg.seq);
         return;
@@ -350,29 +436,148 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     const player = conn.player;
     if (!player) return;
     if (byCharacter.get(player.characterId) === conn) byCharacter.delete(player.characterId);
-    const last = player.zone.removePlayer(player.characterId);
-    const row = await ctx.db.query.characters.findFirst({
-      where: (c, { eq }) => eq(c.id, player.characterId),
-    });
-    broadcastZone(player.zone, {
+    const entry = inWorld.get(player.characterId);
+    if (!entry || byCharacter.has(player.characterId)) return; // already re-attached elsewhere
+    if (shuttingDown || lingerMs <= 0) await leaveWorld(entry);
+    else entry.lingerUntil = Date.now() + lingerMs;
+    conn.log.info({ lingerMs: shuttingDown ? 0 : lingerMs }, 'connection closed');
+  }
+
+  /** Removes a character from its zone for good: persists position + health, announces departure. */
+  async function leaveWorld(entry: InWorld) {
+    if (inWorld.get(entry.characterId) !== entry) return;
+    inWorld.delete(entry.characterId);
+    const last = entry.zone.removePlayer(entry.characterId);
+    broadcastZone(entry.zone, {
       t: 'presence.update',
       d: {
         event: 'left',
-        characterId: player.characterId,
-        name: row?.name ?? '',
-        zoneId: player.zone.zone.id,
+        characterId: entry.characterId,
+        name: entry.name,
+        zoneId: entry.zone.zone.id,
       },
     });
+    flush();
     if (last) {
       await saveCharacterPosition(
         ctx.db,
-        player.characterId,
-        player.zone.zone.id,
+        entry.characterId,
+        entry.zone.zone.id,
         last.position,
         last.rotationY,
-      ).catch((err: unknown) => conn.log.error({ err }, 'failed to save position'));
+      )
+        .then(() => saveCharacterHealth(ctx.db, entry.characterId, last.health))
+        .catch((err: unknown) =>
+          logger.error({ err, characterId: entry.characterId }, 'failed to save character state'),
+        );
     }
-    conn.log.info('player left');
+    logger.info({ characterId: entry.characterId }, 'player left');
+  }
+
+  function combatantFrom(profile: CombatProfile) {
+    return {
+      level: profile.level,
+      stats: profile.stats,
+      maxHealth: profile.maxHealth,
+      health: profile.health,
+      weapon: profile.weapon,
+    };
+  }
+
+  /** Re-reads the character's combat profile (gear/level changed) and applies it to the simulation. */
+  async function refreshCombat(characterId: string) {
+    const entry = inWorld.get(characterId);
+    if (!entry) return;
+    const profile = await getCombatProfile(ctx.db, ctx, characterId);
+    if (inWorld.get(characterId) !== entry) return;
+    const { health: _ignored, ...rest } = combatantFrom(profile);
+    entry.zone.updateCombatProfile(characterId, rest, Date.now());
+    flush();
+  }
+
+  /** Persists one kill reward (exactly once, enforced by the DB) and notifies the player. */
+  async function processKill(p: PendingKill) {
+    const { kill } = p;
+    try {
+      const reward = await awardKill(ctx, {
+        killId: kill.killId,
+        characterId: kill.characterId,
+        enemyId: kill.enemyId,
+        zoneId: kill.zoneId,
+      });
+      rewards.inc({ result: 'ok' });
+      const conn = byCharacter.get(kill.characterId);
+      if (conn) {
+        send(conn, {
+          t: 'character.progress',
+          d: {
+            level: reward.level,
+            xp: reward.xp,
+            xpToNext: reward.xpToNext,
+            xpGained: reward.xpGained,
+            levelsGained: reward.levelsGained,
+          },
+        });
+        send(conn, {
+          t: 'combat.loot',
+          d: {
+            killId: kill.killId,
+            enemyName: kill.enemyName,
+            items: reward.items,
+            gold: reward.gold,
+            lostItems: reward.lostItems,
+          },
+        });
+      }
+      if (reward.levelsGained > 0) await refreshCombat(kill.characterId);
+      logger.info(
+        {
+          killId: kill.killId,
+          characterId: kill.characterId,
+          xp: reward.xpGained,
+          items: reward.items.length,
+          gold: reward.gold,
+        },
+        'kill rewarded',
+      );
+    } catch (err) {
+      if (err instanceof DomainError && err.code === ErrorCode.ALREADY_CLAIMED) {
+        rewards.inc({ result: 'duplicate' });
+        return;
+      }
+      rewards.inc({ result: 'error' });
+      if (p.attempts < 5) {
+        p.attempts++;
+        p.nextAttemptAt = Date.now() + 500 * 2 ** p.attempts;
+        pendingKills.push(p);
+        logger.warn(
+          { err, killId: kill.killId, attempt: p.attempts },
+          'kill reward failed; will retry',
+        );
+      } else {
+        logger.error({ err, kill }, 'kill reward failed permanently');
+      }
+    }
+  }
+
+  /** Called every tick: collects new kills and starts due reward jobs (bounded queue, no per-kill timers). */
+  function pumpKills(now: number) {
+    for (const zone of zones.values())
+      for (const kill of zone.drainKills())
+        pendingKills.push({ kill, attempts: 0, nextAttemptAt: now });
+    for (let i = pendingKills.length - 1; i >= 0; i--) {
+      const p = pendingKills[i]!;
+      if (p.nextAttemptAt > now) continue;
+      pendingKills.splice(i, 1);
+      killsInFlight++;
+      void processKill(p).finally(() => killsInFlight--);
+    }
+  }
+
+  function expireLingering(now: number) {
+    for (const entry of inWorld.values()) {
+      if (entry.lingerUntil !== null && entry.lingerUntil <= now) void leaveWorld(entry);
+    }
   }
 
   function broadcastZone(zone: ZoneSimulation, msg: OutMessage) {
@@ -405,6 +610,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       [...byCharacter.values()].filter((c) => c.player?.accountId === accountId).map(syncTarget),
     (err) => logger.error({ err }, 'change-feed fan-out failed'),
   );
+  // Gear changes (from any process) change combat output: refresh the simulation's profile.
+  sync.onCharacterItemsChanged = (characterId) => {
+    void refreshCombat(characterId).catch((err: unknown) =>
+      logger.error({ err, characterId }, 'combat refresh failed'),
+    );
+  };
   const changeFeed = deps.changeFeedUrl
     ? new ChangeFeedListener({
         url: deps.changeFeedUrl,
@@ -428,16 +639,17 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   let saveTimer: NodeJS.Timeout | undefined;
 
   async function savePositions() {
-    for (const conn of byCharacter.values()) {
-      const p = conn.player && conn.player.zone.getPlayer(conn.player.characterId);
-      if (conn.player && p)
-        await saveCharacterPosition(
-          ctx.db,
-          conn.player.characterId,
-          conn.player.zone.zone.id,
-          p.position,
-          p.rotationY,
-        );
+    for (const entry of inWorld.values()) {
+      const p = entry.zone.getPlayer(entry.characterId);
+      if (!p) continue;
+      await saveCharacterPosition(
+        ctx.db,
+        entry.characterId,
+        entry.zone.zone.id,
+        p.position,
+        p.rotationY,
+      );
+      await saveCharacterHealth(ctx.db, entry.characterId, p.health);
     }
   }
 
@@ -447,6 +659,13 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     sync,
     /** Number of authenticated connections (tests/health). */
     playerCount: () => byCharacter.size,
+    /** Characters present in zone simulations (connected or lingering). */
+    inWorldCount: () => inWorld.size,
+    /** Resolves when all queued kill rewards have been processed (tests). */
+    async rewardsIdle(): Promise<void> {
+      while (pendingKills.length > 0 || killsInFlight > 0)
+        await new Promise((r) => setTimeout(r, 20));
+    },
     async start(host: string, port: number): Promise<void> {
       await changeFeed?.start();
       heartbeatTimer = setInterval(() => {
@@ -465,6 +684,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
           const t0 = performance.now();
           const now = Date.now();
           for (const zone of zones.values()) zone.step(now);
+          pumpKills(now);
+          expireLingering(now);
           flush();
           tickDuration.set(Math.round((performance.now() - t0) * 100) / 100);
         },
@@ -476,6 +697,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       return new Promise((resolve) => http.listen(port, host, () => resolve()));
     },
     async stop(): Promise<void> {
+      shuttingDown = true;
       clearInterval(tickTimer);
       clearInterval(saveTimer);
       clearInterval(heartbeatTimer);
@@ -484,6 +706,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         conn.ws.close(1001, 'server shutting down');
         await onClose(conn);
       }
+      for (const entry of [...inWorld.values()]) await leaveWorld(entry);
+      pumpKills(Date.now());
+      while (killsInFlight > 0) await new Promise((r) => setTimeout(r, 20));
       wss.close();
       await new Promise<void>((resolve) => http.close(() => resolve()));
     },

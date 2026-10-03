@@ -24,6 +24,7 @@ const server = createRealtimeServer({
   zoneIds: [DEMO_ZONE_ID],
   tickHz: 20,
   allowedOrigins: ['http://localhost:5173'],
+  lingerMs: 100,
 });
 let url = '';
 

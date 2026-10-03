@@ -70,6 +70,8 @@ export class AccountSync {
   private readonly pendingWallets = new Set<string>();
   private timer: NodeJS.Timeout | undefined;
   private flushing: Promise<void> = Promise.resolve();
+  /** Called after a character received item changes (e.g. to refresh its combat profile). */
+  onCharacterItemsChanged: ((characterId: string) => void) | undefined;
 
   constructor(
     private readonly ctx: DomainContext,
@@ -139,6 +141,7 @@ export class AccountSync {
               stats: await getCharacterStats(this.ctx.db, this.ctx, target.characterId),
             },
           });
+          this.onCharacterItemsChanged?.(target.characterId);
         }
         if (wallets.has(accountId)) {
           target.send({
