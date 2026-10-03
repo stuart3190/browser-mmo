@@ -24,6 +24,13 @@ Update 2026-10-03 (Claude Opus 5.5): foundation + technical proof built. Proof n
 `Verified YYYY-MM-DD · agent · proof · commit`. Commits: `8454ea0` (foundation, schemas, game data, DB, domain),
 `0f0a413` (protocol, world sim, API, realtime, game + admin clients), `7fa2d8e` (docs, asset tooling, CI template; ADRs landed in `0f0a413`).
 "`pnpm verify`" = format check + lint + typecheck + 40 unit tests + 33 integration tests (real PostgreSQL 16) + build, all passing.
+"Update 2026-10-03 (Claude Opus 5.5), milestone "playable inventory + equipment loop": commit `418b1fd`.
+"Inventory E2E" = headless Chromium against the real stack (bundled API + realtime, Vite client, PostgreSQL), 24 checks:
+admin grants pushed live → hover tooltip → equip → visible stat change → comparison tooltip → level/class-restricted equips
+rejected with DB unchanged → unequip reverts stats → vault deposit/retrieve → UI double-click + 3 concurrent raw API moves
+(exactly one succeeds, one copy everywhere) → simulated socket drop → realtime server killed, item granted while down,
+server restarted → client reconnects and shows it → UI == API == PostgreSQL state → 390×844 touch layout tap-to-equip.
+
 "Browser E2E" = headless Chromium (Playwright, WebGL2 via SwiftShader) driving the real stack: login → create character →
 WASD to the sword → E → `inventory.updated` → HUD shows the item → row verified in PostgreSQL.
 
@@ -119,6 +126,10 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · entity.despawn on leave/pickup (world + realtime tests) · 0f0a413
 - [x] World state updates
   - Verified 2026-10-03 · Claude Opus 5.5 · per-tick batched world.moves with chunk-based interest (world tests) · 0f0a413
+- [x] Server-side item/wallet change push
+  - Verified 2026-10-03 · Claude Opus 5.5 · PostgreSQL LISTEN/NOTIFY change feed → `inventory.updated`(+`removed`)/`character.stats`/`wallet.updated`; realtime tests (admin grant, equip, vault, marketplace removal, cross-character shared vault, invalid equip sends nothing, resync after listener loss) + Inventory E2E (pushes from the separate API process) · 418b1fd
+- [x] Reconnect
+  - Verified 2026-10-03 · Claude Opus 5.5 · `RealtimeClient` auto-reconnect with backoff, no retry on close codes ≥ 4000 (realtime tests: simulated drop, session replaced); Inventory E2E: socket drop and full realtime server kill/restart recovered without page reload · 418b1fd
 - [x] Chat protocol
   - Verified 2026-10-03 · Claude Opus 5.5 · chat.send/chat.message for say/zone (test). No guild/party/whisper channels yet · 0f0a413
 
@@ -130,8 +141,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · 4 placeholder classes, cross-validated; proficiencies enforced by equip tests · 8454ea0
 - [x] Specialisation architecture
   - Verified 2026-10-03 · Claude Opus 5.5 · 13 placeholder specs in data, validated at load. No spec selection flow · 8454ea0
-- [ ] Stats
-  - `computeCharacterStats`/`itemTotalStats` exist but are not unit-tested and not applied anywhere yet.
+- [x] Stats
+  - Verified 2026-10-03 · Claude Opus 5.5 · `getCharacterStats` (class base + level + equipped items) — unit test (game-data), domain integration test, API `/stats` test, realtime `character.stats` push test, Inventory E2E visible change · 418b1fd
 - [ ] XP
   - Data-driven curve + `applyExperience` unit-tested; nothing awards XP yet.
 - [ ] Levels
@@ -179,8 +190,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · integration test · 8454ea0
 - [x] Validation
   - Verified 2026-10-03 · Claude Opus 5.5 · slot/class/proficiency/level/two-hand rules (unit + integration) · 8454ea0
-- [ ] Stat application
-  - Function exists; equipment does not yet change any character stat.
+- [x] Stat application
+  - Verified 2026-10-03 · Claude Opus 5.5 · equip/unequip changes effective stats (domain + realtime tests; Inventory E2E strength base → base + sword → base). No combat consumes stats yet · 418b1fd
 
 # Inventory
 
@@ -190,6 +201,12 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · materials routed to pouch; non-materials rejected (tests) · 8454ea0
 - [x] Stacking
   - Verified 2026-10-03 · Claude Opus 5.5 · merge on acquisition with provenance (test) · 8454ea0
+- [x] Inventory UI
+  - Verified 2026-10-03 · Claude Opus 5.5 · React bag window (backpack/materials slot grids, icon placeholders, rarity borders, stack counts, wallet), tooltips with requirements and comparison, tap-friendly details sheet; Inventory E2E incl. 390×844 touch layout · 418b1fd
+- [x] Equipment UI
+  - Verified 2026-10-03 · Claude Opus 5.5 · character panel paper-doll from game-data slots with equipped markers + effective stats table; equip/unequip/swap via API (Inventory E2E) · 418b1fd
+- [x] Vault/bank UI
+  - Verified 2026-10-03 · Claude Opus 5.5 · bank window (personal + shared vault tabs, backpack below); deposit/retrieve verified in Inventory E2E and DB. Placeholder: bank opens anywhere (no banker proximity check) · 418b1fd
 - [ ] Sorting
 - [ ] Filtering
   - Client helper `filterItems` exists in @mmo/ui; untested, unused.
@@ -374,32 +391,36 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 ## Current Work
 
-Nothing in progress. The foundation run of 2026-10-03 is complete (see commits above).
+Nothing in progress. Milestone "playable inventory + equipment loop" is complete on branch `claude/great-brahmagupta-h834j7` (commit `418b1fd`), awaiting owner review; not merged to `main`.
 
 ## Known Issues
 
 1. **CI not enabled and never executed.** The workflow is a template at `docs/ci/github-actions-ci.yml` (automation could not push `.github/workflows/` files). A maintainer must move it into place; it may need fixes on first run.
 2. **WebGPU unverified.** `?renderer=webgpu` path compiles but was never run on real GPU hardware; WebGL2 is the default.
-3. **API-side item changes are not pushed to the game.** Moving/equipping/listing via HTTP updates the DB, but a connected game client is not notified (needs API → realtime notification, e.g. Redis pub/sub). Only pickups push `inventory.updated`.
-4. **Single realtime process per zone.** Two realtime processes hosting the same zone would run divergent simulations. No zone registry yet.
-5. **No reconnect.** The game client does not reconnect or resume after a disconnect; reload and log in again.
-6. **Expired listings with a full bag** stay in escrow until the seller has space (no mailbox). The expiry sweep runs in every API process (safe, wasteful with replicas).
-7. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
-8. **`item_instances.listing_id` has no foreign key** (circular with listings); escrow consistency is enforced in domain code and checked on cancel/buy.
-9. **Position persistence untested.** Positions are saved every 15 s and on disconnect, but no test asserts it.
-10. **Bundle size.** Babylon chunk ≈1.9 MB minified; lazy shader chunks are merged into it by `manualChunks`.
-11. **Stack-merge rows accumulate** (`destroyed/stack_merged`); archiving needed eventually.
-12. **Dev auth only.** Anyone can log in as any username when `AUTH_DEV_LOGIN_ENABLED=true`. Usernames in `AUTH_DEV_ADMIN_USERNAMES` become admins on first login.
-13. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
+3. **Single realtime process per zone.** Two realtime processes hosting the same zone would run divergent simulations. No zone registry yet. (The change feed itself works with several processes.)
+4. **Change feed is not durable.** NOTIFY events emitted while the listener is disconnected are lost; correctness relies on the full resync after reconnect (tested). Needs a direct DB connection (not PgBouncer transaction mode).
+5. **Reconnect = full snapshot.** No session resume/replay buffer; an expired session cannot reconnect (client shows "Disconnected"; reload to log in). The game client keeps the token in memory only.
+6. **Bank opens anywhere.** No banker NPC/proximity rule yet (server would need the player's position from the realtime service).
+7. **No drag-and-drop, sorting, search, split-stack or loadout UI.** Actions are via the details sheet. Icons are text placeholders.
+8. **Main game JS chunk grew ~44 → ~181 KB gzip** with React + UI (measured, not analysed); Babylon chunk ≈1.9 MB minified still dominates; lazy shader chunks are merged into it by `manualChunks`.
+9. **One-handed weapons always equip to the main hand.** Off-hand one-handers are possible via the API but not from the UI; dual-wield rules are undesigned.
+10. **Expired listings with a full bag** stay in escrow until the seller has space (no mailbox). The expiry sweep runs in every API process (safe, wasteful with replicas).
+11. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
+12. **`item_instances.listing_id` has no foreign key** (circular with listings); escrow consistency is enforced in domain code and checked on cancel/buy.
+13. **Position persistence untested.** Positions are saved every 15 s and on disconnect, but no test asserts it.
+14. **Stack-merge rows accumulate** (`destroyed/stack_merged`); archiving needed eventually.
+15. **Dev auth only.** Anyone can log in as any username when `AUTH_DEV_LOGIN_ENABLED=true`. Usernames in `AUTH_DEV_ADMIN_USERNAMES` become admins on first login.
+16. **Camera drag/zoom** still not covered by an automated check.
+17. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
 
 ## Next Recommended Task
 
-**Milestone: playable inventory loop.**
+**Milestone: combat foundation (server-authoritative), against the placeholder Grey Wolf already in game data.**
 
-1. Enable CI (move `docs/ci/github-actions-ci.yml` to `.github/workflows/ci.yml`), run it on GitHub and fix anything it finds.
-2. API → realtime notifications so HTTP item/currency changes push `inventory.updated` to connected clients (introduce Redis pub/sub via a new ADR, or an internal HTTP hook while there is one realtime process).
-3. In-game inventory/equipment window (decide the HUD UI framework first and record it): move between backpack/vaults, equip/unequip using the existing API, show currency.
-4. Apply equipment stats to characters (`computeCharacterStats`) with unit tests.
-5. Client reconnect/resume.
+1. Enable CI (move `docs/ci/github-actions-ci.yml` to `.github/workflows/ci.yml`) and fix anything it finds.
+2. Spawn enemies from `enemy` spawn points in the zone simulation; replicate health.
+3. Targeting + auto-attack using effective stats (`getCharacterStats`) and weapon damage; server-side range, cooldown and damage validation; death/respawn.
+4. Loot drops via the existing `LootTable` + `grantItemInTx` (personal loot), XP via `applyExperience`, both persisted transactionally and pushed through the existing change feed.
+5. Minimal target frame + combat log in the React HUD.
 
-After that: server-authoritative combat foundation (targeting, auto-attack, damage validation) against the placeholder Grey Wolf enemy that already exists in data.
+Keep marketplace UI, trading, crafting and social out of that milestone.
