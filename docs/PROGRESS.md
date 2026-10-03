@@ -24,7 +24,14 @@ Update 2026-10-03 (Claude Opus 5.5): foundation + technical proof built. Proof n
 `Verified YYYY-MM-DD · agent · proof · commit`. Commits: `8454ea0` (foundation, schemas, game data, DB, domain),
 `0f0a413` (protocol, world sim, API, realtime, game + admin clients), `7fa2d8e` (docs, asset tooling, CI template; ADRs landed in `0f0a413`).
 "`pnpm verify`" = format check + lint + typecheck + 40 unit tests + 33 integration tests (real PostgreSQL 16) + build, all passing.
-"Update 2026-10-03 (Claude Opus 5.5), milestone "playable inventory + equipment loop": commit `418b1fd`.
+"Update 2026-10-03 (Claude Opus 5.5), milestone "server-authoritative combat foundation": commits `14d19cf` (rules, data,
+rewards, simulation), `4899c54` (realtime gateway), `5eb4651` (client HUD + docs). "Combat E2E" = headless Chromium against the
+real stack, 19 checks: admin-granted sword equipped via API → walk to the Grey Wolf → tap-target it (target frame) → Attack →
+wolf health falls monotonically, wolf hits back → wolf dies (Dead state) → loot toast → XP/level and kill_rewards match
+PostgreSQL → UI items == DB items → looted Trapper's Cap equipped via the inventory UI raises armour → 390×844 touch: tap
+wolf, tap Attack, health falls, frames don't overlap. Inventory E2E (24) and pickup E2E re-run green on the same build.
+
+Update 2026-10-03 (Claude Opus 5.5), milestone "playable inventory + equipment loop": commit `418b1fd`.
 "Inventory E2E" = headless Chromium against the real stack (bundled API + realtime, Vite client, PostgreSQL), 24 checks:
 admin grants pushed live → hover tooltip → equip → visible stat change → comparison tooltip → level/class-restricted equips
 rejected with DB unchanged → unequip reverts stats → vault deposit/retrieve → UI double-click + 3 concurrent raw API moves
@@ -128,6 +135,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · per-tick batched world.moves with chunk-based interest (world tests) · 0f0a413
 - [x] Server-side item/wallet change push
   - Verified 2026-10-03 · Claude Opus 5.5 · PostgreSQL LISTEN/NOTIFY change feed → `inventory.updated`(+`removed`)/`character.stats`/`wallet.updated`; realtime tests (admin grant, equip, vault, marketplace removal, cross-character shared vault, invalid equip sends nothing, resync after listener loss) + Inventory E2E (pushes from the separate API process) · 418b1fd
+- [x] Reconnect during combat
+  - Verified 2026-10-03 · Claude Opus 5.5 · connection linger (10 s) re-attaches to the same in-world character with health/target/enemy state intact (realtime test) · 4899c54
 - [x] Reconnect
   - Verified 2026-10-03 · Claude Opus 5.5 · `RealtimeClient` auto-reconnect with backoff, no retry on close codes ≥ 4000 (realtime tests: simulated drop, session replaced); Inventory E2E: socket drop and full realtime server kill/restart recovered without page reload · 418b1fd
 - [x] Chat protocol
@@ -143,21 +152,33 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · 13 placeholder specs in data, validated at load. No spec selection flow · 8454ea0
 - [x] Stats
   - Verified 2026-10-03 · Claude Opus 5.5 · `getCharacterStats` (class base + level + equipped items) — unit test (game-data), domain integration test, API `/stats` test, realtime `character.stats` push test, Inventory E2E visible change · 418b1fd
-- [ ] XP
-  - Data-driven curve + `applyExperience` unit-tested; nothing awards XP yet.
-- [ ] Levels
-  - Level stored and used for equip checks; no levelling flow.
+- [x] XP
+  - Verified 2026-10-03 · Claude Opus 5.5 · wolf kills award XP server-side (`xpForKill` unit tests; `awardKill` integration incl. 5 concurrent duplicate attempts → 1; realtime full-loop test; Combat E2E UI == DB) · 14d19cf
+- [x] Levels
+  - Verified 2026-10-03 · Claude Opus 5.5 · level-up persisted in the reward transaction and pushed (`character.progress`), max health raised live (domain + realtime tests) · 4899c54
+
 - [ ] Abilities
   - Data definitions only; no combat.
 
 # Combat
 
-- [ ] Melee combat
+- [x] Melee combat
+  - Verified 2026-10-03 · Claude Opus 5.5 · player melee auto-attack: server swing timer, range, hit/crit/damage from equipped weapon + effective stats, armour mitigation (unit, simulation, realtime tests; Combat E2E) · 14d19cf
+- [x] Enemy combat
+  - Verified 2026-10-03 · Claude Opus 5.5 · Grey Wolf AI: aggro, chase, attack, leash/evade, death, corpse, respawn (simulation tests; realtime full loop; Combat E2E) · 14d19cf
+- [x] Damage validation
+  - Verified 2026-10-03 · Claude Opus 5.5 · server-only outcomes; rejects no/invalid/dead target, out of range, attacking while dead, replayed seq; start spam cannot speed up swings (simulation + realtime tests) · 4899c54
+- [x] Targeting
+  - Verified 2026-10-03 · Claude Opus 5.5 · `target.set` validated server-side; tap/click/Tab targeting with target frame (Combat E2E desktop + touch) · 5eb4651
+- [x] Player death and respawn
+  - Verified 2026-10-03 · Claude Opus 5.5 · death blocks movement/attacks/pickups, server-gated respawn at the zone respawn point, no penalty; health persisted (simulation + realtime tests) · 4899c54
+- [x] Kill rewards (XP, loot, gold)
+  - Verified 2026-10-03 · Claude Opus 5.5 · exactly-once via `kill_rewards` PK + item `source_ref`; loot through `grantItemInTx` with provenance; full bags → items reported lost, no partial stacks (domain tests); loot reaches inventory via change feed (realtime test, Combat E2E) · 14d19cf
 - [ ] Ranged combat
+  - Bows/crossbows exist as items; only melee auto-attack is implemented.
 - [ ] Magic combat
 - [ ] Healing
-- [ ] Enemy combat
-- [ ] Damage validation
+- [ ] Abilities / resources (mana, rage)
 
 # Items
 
@@ -391,7 +412,7 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 ## Current Work
 
-Nothing in progress. Milestone "playable inventory + equipment loop" is complete on branch `claude/great-brahmagupta-h834j7` (commit `418b1fd`), awaiting owner review; not merged to `main`.
+Nothing in progress. Milestone "server-authoritative combat foundation" is complete on branch `claude/great-brahmagupta-h834j7` (commits `14d19cf`, `4899c54`, `5eb4651`), awaiting owner review; not merged to `main`.
 
 ## Known Issues
 
@@ -412,15 +433,21 @@ Nothing in progress. Milestone "playable inventory + equipment loop" is complete
 15. **Dev auth only.** Anyone can log in as any username when `AUTH_DEV_LOGIN_ENABLED=true`. Usernames in `AUTH_DEV_ADMIN_USERNAMES` become admins on first login.
 16. **Camera drag/zoom** still not covered by an automated check.
 17. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
+18. **Kill rewards are in memory until persisted.** A realtime process crash between an enemy's death and `awardKill` committing loses that reward (retries cover transient DB errors only).
+19. **No line of sight or pathfinding.** The world has no collision data; `hasLineOfSight` is a stub; enemies move in straight lines and entities can overlap.
+20. **No touch movement controls.** Phones can target and attack (verified) but cannot walk; needs an on-screen joystick.
+21. **Loot that does not fit is lost** (player is notified); no corpse looting or mailbox yet. Kill credit goes to the first damager only (no parties).
+22. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
+23. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning).
 
 ## Next Recommended Task
 
-**Milestone: combat foundation (server-authoritative), against the placeholder Grey Wolf already in game data.**
+**Milestone: world population and movement quality** (make the combat loop a small playable area):
 
 1. Enable CI (move `docs/ci/github-actions-ci.yml` to `.github/workflows/ci.yml`) and fix anything it finds.
-2. Spawn enemies from `enemy` spawn points in the zone simulation; replicate health.
-3. Targeting + auto-attack using effective stats (`getCharacterStats`) and weapon damage; server-side range, cooldown and damage validation; death/respawn.
-4. Loot drops via the existing `LootTable` + `grantItemInTx` (personal loot), XP via `applyExperience`, both persisted transactionally and pushed through the existing change feed.
-5. Minimal target frame + combat log in the React HUD.
+2. On-screen touch movement (virtual joystick) so phones can play the full loop.
+3. Several wolf spawn points / a small camp; durable kill-reward outbox (persist kill events before acknowledging death) to close the crash window.
+4. Simple collision/obstacle data for chunks (used for line of sight and enemy steering), plus enemy–player spacing.
+5. Corpse looting or a mailbox for loot that does not fit.
 
-Keep marketplace UI, trading, crafting and social out of that milestone.
+Keep abilities/resources, quests, crafting, marketplace UI and social systems for later milestones.
