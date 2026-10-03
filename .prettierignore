@@ -6,3 +6,7 @@ node_modules
 packages/db/migrations/meta
 assets/**/*.glb
 assets/**/*.gltf
+
+# Owner-authored project memory files: never reformat automatically.
+AGENTS.md
+docs/MASTER_PLAN.md

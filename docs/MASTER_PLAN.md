@@ -125,12 +125,12 @@ Use an architecture based on **base class + specialisation**.
 
 Placeholder examples only. These names are NOT final.
 
-| Base class | Specialisations                   |
-| ---------- | --------------------------------- |
-| Warrior    | Guardian, Berserker, Warlord      |
-| Mage       | Fire, Frost, Arcane, Necromancy   |
-| Ranger     | Marksman, Beastmaster, Assassin   |
-| Cleric     | Healer, Holy Warrior, Dark Priest |
+| Base class | Specialisations |
+| --- | --- |
+| Warrior | Guardian, Berserker, Warlord |
+| Mage | Fire, Frost, Arcane, Necromancy |
+| Ranger | Marksman, Beastmaster, Assassin |
+| Cleric | Healer, Holy Warrior, Dark Priest |
 
 The architecture must support:
 
