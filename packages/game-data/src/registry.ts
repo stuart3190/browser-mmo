@@ -291,7 +291,9 @@ export class GameData {
           errors.push(`quest ${q.id}: unknown enemy ${o.enemyId}`);
         if (o.kind === 'collect' && !this.itemTemplates.has(o.itemTemplateId))
           errors.push(`quest ${q.id}: unknown item ${o.itemTemplateId}`);
-        if (!q.placeholder && o.kind !== 'kill' && o.kind !== 'collect')
+        if (o.kind === 'talk' && !this.npcs.has(o.npcId))
+          errors.push(`quest ${q.id}: unknown talk NPC ${o.npcId}`);
+        if (!q.placeholder && o.kind !== 'kill' && o.kind !== 'collect' && o.kind !== 'talk')
           errors.push(`quest ${q.id}: objective kind ${o.kind} is not supported yet`);
       }
       for (const c of q.rewards.currency)

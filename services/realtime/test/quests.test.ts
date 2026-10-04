@@ -302,7 +302,10 @@ describe('quest loop over the realtime protocol', { timeout: 60_000 }, () => {
     expect(questOf(c).state).toBe('completed');
     await c.waitFor('character.progress', (m) => m.d.xpGained === 300);
     const dialogue = await c.waitFor('npc.dialogue', (m) => m.ack === t1 || m.ack === t2);
-    expect(dialogue.d.quests[0]).toMatchObject({ action: null, quest: { state: 'completed' } });
+    expect(dialogue.d.quests.find((entry) => entry.quest.questId === Q)).toMatchObject({
+      action: null,
+      quest: { state: 'completed' },
+    });
     // Once the first action has finished, a replay still reaches the durable completion guard.
     expect(await c.error(c.send('quest.turn_in', { entityId: elder2, questId: Q }))).toBe(
       'QUEST_ALREADY_COMPLETED',

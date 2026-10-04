@@ -62,3 +62,9 @@ events with null recipients still use their original recipient. Simulation check
 version 2 and accept legacy version 1; older binaries reject version 2 rather than silently dropping
 party state. After group kills exist, roll forward with a fix instead of restarting a pre-party binary:
 its reward processor does not understand group recipients. Do not delete checkpoints or pending kills.
+
+Verified 2026-10-04 by Codex; implementation commit
+`2f3aaeab5169d628c750bcf00a1b101e46364a84`. Final combined verification and screenshots are recorded
+in [PROGRESS](../PROGRESS.md) and [the evidence bundle](evidence/party-waystone/results.json).
+The corrected phone-only check can be rerun with `PARTY_UI_ONLY=1` and `PARTY_RESUME` naming the
+two hunt fixtures. It verifies real touch actions without repeating already-proven kills.

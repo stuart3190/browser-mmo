@@ -351,6 +351,11 @@ export class ZoneSimulation {
     restore(this.players, state.players);
     restore(this.pickups, state.pickups);
     restore(this.npcSpawns, state.npcSpawns);
+    // Additive static NPC content migration. Existing entity IDs and every live combat state stay intact.
+    for (const chunk of this.gameData.chunksForZone(this.zone.id))
+      for (const spawn of chunk.spawnPoints)
+        if (spawn.kind === 'npc' && ![...this.npcSpawns.values()].some((s) => s.id === spawn.id))
+          this.spawnFromPoint(spawn);
     restore(this.enemies, state.enemies);
     restore(this.groups, state.groups);
     this.respawnQueue.splice(0, this.respawnQueue.length, ...state.respawnQueue);

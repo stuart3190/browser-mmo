@@ -4,6 +4,7 @@ import type { DbOrTx, Tx } from '@mmo/db';
 import {
   applyExperience,
   applyKill,
+  applyTalk,
   questAvailability,
   questDialogue,
   questView,
@@ -407,4 +408,30 @@ export async function turnInQuest(
 /** Test/admin helper: raw persisted rows (status, progress) for a character. */
 export async function questRecords(db: DbOrTx, characterId: string): Promise<QuestRecord[]> {
   return (await questRows(db, characterId)).map(toRecord);
+}
+
+/** Called only after zone.npcInteraction has validated range, life and the NPC entity. */
+export async function recordNpcTalk(
+  ctx: DomainContext,
+  characterId: string,
+  npcId: string,
+): Promise<void> {
+  await inTransaction(ctx, async (tx) => {
+    await lockCharacter(tx, characterId);
+    for (const row of await questRows(tx, characterId, true)) {
+      if (row.status !== 'active') continue;
+      const def = ctx.gameData.quests.get(row.questId);
+      const next = def && applyTalk(def, row.progress, npcId);
+      if (!next) continue;
+      await tx
+        .update(schema.characterQuests)
+        .set({ progress: next, version: row.version + 1, updatedAt: ctx.now() })
+        .where(
+          and(
+            eq(schema.characterQuests.characterId, characterId),
+            eq(schema.characterQuests.questId, row.questId),
+          ),
+        );
+    }
+  });
 }

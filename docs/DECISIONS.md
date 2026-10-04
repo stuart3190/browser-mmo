@@ -704,3 +704,34 @@ personal inventory items, so a group may hunt longer to satisfy everyone's colle
 is fair turn-taking, not equal item value. A full reward recipient mailbox delays the group's atomic
 payout. Offline/dead/distant members are ineligible for new group kills; already-frozen rewards persist.
 No guilds, party chat, trading, raids, loot voting or new infrastructure are added.
+
+## 2026-10-04 — Short Old Waystone follow-on and additive content recovery
+
+**Date**: 2026-10-04
+
+**Decision**
+Add one level-two follow-on after the wolf hunt: Maren sends the character to Keeper Rill at the
+Old Waystone, then pays an existing Copper Band plus 150 XP/75 copper on return. Implement only
+idempotent NPC-talk progress in the existing objective grammar and transaction framework. The
+realtime gateway validates the actual living speaker and NPC range; talks are personal, not party
+credit. No generic event bus, branching engine or new quest persistence model.
+
+Add Rill after deterministic prop generation so no existing obstacle changes. An explicit SQL
+content-hash migration permits exactly this additive Greenvale upgrade while preserving the saved
+checkpoint. Recovery adds missing static NPCs after restoring existing entity IDs. Party checkpoints
+write simulation format 2 (and can read legacy format 1), so old binaries refuse new recovery state.
+
+**Reason**
+A short journey and warning about the Hollow give the existing hunt narrative purpose. Reusing the
+quest/reward framework minimizes duplication; preserving the saved world avoids resetting players'
+health, positions, cooldowns, enemy deaths or pending group rewards to add an NPC.
+
+**Alternatives considered**
+Another kill-only quest; a new quest engine; client-reported NPC visits; dropping checkpoints when
+content changes; procedural-world regeneration around the new NPC. None is required for this story.
+
+**Consequences**
+Each party member talks/turns in individually. The quest is non-repeatable and has no new combat or
+special quest inventory. This is a narrow additive migration, not automatic arbitrary content
+compatibility. Unknown content hashes still fail closed. Stop hosts for migrations and roll forward;
+pre-party binaries cannot safely process new group reward events.

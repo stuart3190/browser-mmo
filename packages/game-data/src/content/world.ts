@@ -324,6 +324,22 @@ for (let cx = -2; cx <= 1; cx++) {
   }
 }
 
+// Additive landmark NPC: appended after terrain scattering so existing props/colliders do not move.
+chunks
+  .find((c) => c.coord.cx === -1 && c.coord.cz === -2)!
+  .spawnPoints.push({
+    id: 'spawn.greenvale.waystone_keeper',
+    kind: 'npc',
+    refId: 'npc.greenvale.keeper_rill',
+    position: { x: -8, y: 0, z: -90 },
+    rotationY: 0,
+    quantity: 1,
+    respawnMs: null,
+    interactRadius: 4,
+    groupId: null,
+    wanderRadius: 0,
+  });
+
 export const zones: WorldZone[] = [
   {
     id: ZONE_ID,
@@ -410,6 +426,16 @@ export const zones: WorldZone[] = [
 
 export const npcs: NpcDefinition[] = [
   {
+    id: 'npc.greenvale.keeper_rill',
+    name: 'Keeper Rill',
+    title: 'Watcher of the Old Waystone',
+    role: 'ambient',
+    modelId: null,
+    dialogue: [
+      'The stone is warm again. Last night its old markings lit toward the Hollow. Tell Maren: the wolves are fleeing something beneath the roots. I will keep watch here.',
+    ],
+  },
+  {
     id: 'npc.greenvale.elder_maren',
     name: 'Elder Maren',
     title: 'Village Elder',
@@ -448,6 +474,38 @@ export const enemies: EnemyDefinition[] = [
 ];
 
 export const quests: QuestDefinitionInput[] = [
+  {
+    id: 'quest.greenvale.old_waystone',
+    name: 'A Whisper at the Waystone',
+    description:
+      'Maren has heard that the Old Waystone is stirring. Follow the southern road to Keeper Rill beside the stone, then bring his warning back to the village.',
+    giverNpcId: 'npc.greenvale.elder_maren',
+    minLevel: 2,
+    prerequisites: ['quest.greenvale.wolves_at_the_edge'],
+    objectives: [
+      {
+        id: 'speak_to_rill',
+        kind: 'talk',
+        npcId: 'npc.greenvale.keeper_rill',
+        label: 'Speak to Rill at the Old Waystone (south road)',
+      },
+    ],
+    rewards: {
+      xp: 150,
+      currency: [{ currencyId: 'gold', amount: 75 }],
+      items: [{ itemTemplateId: 'accessory.ring.copper_band', quantity: 1 }],
+    },
+    dialogue: {
+      offer:
+        'You have bought us a little peace. Take the south road to Keeper Rill at the Old Waystone. He says the stone has begun to stir. Hear him out, then return to me.',
+      inProgress:
+        'Follow the south road past the fields. Rill watches the Old Waystone. I need to know what he has seen.',
+      readyToTurnIn:
+        "A light toward the Hollow… perhaps the wolves were a warning. Thank you for bringing Rill's words home. Keep this ring; Greenvale may need you again.",
+      completed:
+        'Rill will keep watch. Rest here a while — we must understand what is waking before we venture deeper.',
+    },
+  },
   {
     id: 'quest.greenvale.wolves_at_the_edge',
     name: 'Wolves at the Edge',

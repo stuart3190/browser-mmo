@@ -17,6 +17,7 @@ import {
   npcDialogue,
   processKillEvent,
   recordKill,
+  recordNpcTalk,
   requireOwnedCharacter,
   turnInQuest,
 } from '@mmo/domain';
@@ -618,6 +619,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       }
       case 'npc.interact': {
         const { npcId } = player.zone.npcInteraction(player.characterId, msg.d.entityId);
+        await recordNpcTalk(ctx, player.characterId, npcId);
+        await pushQuestLog(conn, true);
         await sendDialogue(conn, msg.d.entityId, npcId, msg.seq);
         return;
       }

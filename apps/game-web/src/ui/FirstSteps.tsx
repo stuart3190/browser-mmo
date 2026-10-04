@@ -10,7 +10,8 @@ export function FirstSteps() {
     .all()
     .find((i) => i.instance.location.kind === 'equipped' && i.template.category === 'weapon');
   const sword = state.items.all().find((i) => i.template.id === 'weapon.sword.iron_longsword');
-  if (dismissed || quest?.state === 'active' || quest?.state === 'ready_to_turn_in') return null;
+  if (dismissed || state.quests.some((q) => q.state === 'active' || q.state === 'ready_to_turn_in'))
+    return null;
   const completed = quest?.state === 'completed';
   return (
     <aside className="first-steps panel" data-testid="first-steps">
@@ -33,7 +34,10 @@ export function FirstSteps() {
       </h3>
       <p>
         {completed
-          ? 'Explore Northwood, the Eastern Rocks and the Hollow. Hunt for better gear and make the roads safe.'
+          ? state.quests.find((q) => q.questId === 'quest.greenvale.old_waystone')?.state ===
+            'completed'
+            ? 'Rill keeps watch at the Old Waystone. Party up, explore the other dens and hunt for better gear.'
+            : 'Return to Elder Maren. She has heard troubling news from the Old Waystone, down the southern road.'
           : !weapon && state.character.classId === 'class.warrior'
             ? sword
               ? 'Open your Bag, select the Iron Longsword, then Equip. Find Elder Maren by the village square.'

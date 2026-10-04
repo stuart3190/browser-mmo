@@ -380,8 +380,12 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-04 · Claude Opus 5.5 · server validates NPC entity/zone/range/alive; dialogue per quest state with the single allowed action; desktop E, tap and touch Talk button (world sim + realtime tests, Quest E2E desktop + phone) · 619d91a
 - [x] Quest tracker and quest log UI
   - Verified 2026-10-04 · Claude Opus 5.5 · compact tracker (counts, "Return to Elder Maren"), log window with Active/Completed, details, rewards; phone layout checked (Quest E2E) · 619d91a
-- [ ] Repeatable / daily quests, talk/explore objectives, abandoning, quest chains UI
-  - Schema flag/shapes only; rejected by content validation for live quests.
+- [x] Talk objective and one prerequisite-linked Old Waystone follow-on
+  - Verified 2026-10-04 · Codex · data/domain/gateway/recovery tests and seven browser checks;
+    real NPC range, personal idempotent progress, touch dialogue/turn-in, persistent reward identity.
+    Commit: the implementation commit containing `packages/game-data/src/waystone.test.ts`.
+- [ ] Repeatable / daily quests, explore objectives, abandoning, general quest-chain UI
+  - Repeatables/exploration remain rejected by content validation; the two-quest chain uses existing dialogue.
 
 # Dungeons
 
@@ -401,7 +405,11 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 # Social
 
 - [ ] Friends
-- [ ] Parties
+- [x] Zone-local parties and shared hunts
+  - Verified 2026-10-04 · Codex · world/domain/gateway regressions and two-client browser hunt:
+    invitations, roles, reconnect/recovery, shared XP/quest kills, one rotating loot allocation;
+    touch accept/leave/disband and reachable panel controls. See Current Work and `gameplay/parties.md`.
+    Commit: `2f3aaeab5169d628c750bcf00a1b101e46364a84`.
 - [ ] Guilds
 - [ ] Direct messages
 - [ ] Group chat
@@ -682,9 +690,9 @@ realtime 4451. Local dev auth remains development-only. This is not a public hos
 
 ## Current Work
 
-**Party/shared-hunt milestone implemented and targeted verification passed; Old Waystone follow-on next.**
-Verified 2026-10-04 by Codex. Implementation commit: the commit containing this entry
-(`git log -1 -- services/world/src/parties.ts`). Continued verified main `e1b48acf8eaab44607c6143e64be6c61d2f72b9a`.
+**Party/shared-hunt and short Old Waystone quest complete; local verification green.**
+Verified 2026-10-04 by Codex. Party implementation commit: `2f3aaeab5169d628c750bcf00a1b101e46364a84`.
+Waystone and final verification: the commit containing `packages/game-data/src/waystone.test.ts`. Continued verified main `e1b48acf8eaab44607c6143e64be6c61d2f72b9a`.
 
 - [x] Invite/accept/decline/leave/disband, five-member cap, leader handoff, range/expiry/role checks,
       realtime roster/health, two-minute offline grace, reconnect and checkpoint recovery.
@@ -702,7 +710,28 @@ Verified 2026-10-04 by Codex. Implementation commit: the commit containing this 
     The first playthrough was interrupted by development HMR; resumed its pre-hunt characters without
     grants/teleports. After the phone-only CSS fix the hunt was not needlessly repeated.
 - [x] Changed packages typecheck, repository lint, focused world/domain/gateway checks pass.
-- [ ] Final full verification of the combined party + Waystone candidate (run after follow-on implementation).
+- [x] A Whisper at the Waystone: Maren → south road → Keeper Rill → return to Maren.
+  - Proof: two new game-data tests, a PostgreSQL quest test, gateway range/personal-progress test,
+    legacy checkpoint recovery regression and seven real browser checks. Touch acceptance/turn-in;
+    150 XP, 75 copper and one Copper Band; no repeat claim; progress/item identity survive login.
+    Existing wolf-quest prerequisite was fixture-prepared through domain APIs; the entire new quest
+    used real movement and UI. Static terrain/collision unchanged, exact prior-content hash verified.
+  - Populated content migration changed only the checkpoint content hash; other saved fields identical.
+    Details and screenshots: [Waystone](gameplay/waystone.md).
+- [x] Complete local verification of the combined candidate.
+  - Verified 2026-10-04 · Codex · repository format/lint, all workspace and script typechecks,
+    128 unit tests; 125 PostgreSQL integration cases (60 domain, 57 realtime, 8 API);
+    four production builds and production debug-artifact check. No known CRITICAL/HIGH regression found.
+  - Full verification initially stopped on two new test-only typing mistakes, corrected using WebCrypto
+    and the public GameData.load factory. Continued from typechecking, without repeating passing phases.
+    One existing process-crash fixture then raced its injected weapon against login's equipment refresh;
+    it timed out before reaching the crash hook (zero kill events). The fixture now waits for final
+    character.progress admission before injection. Other 56 realtime tests passed; the failed case
+    passed its targeted rerun with the readiness fix. Remaining domain suite and builds then passed.
+  - Browser proof: shared hunt/alternating loot/shared quest kills; separate corrected touch panel
+    accept/leave/disband; seven Waystone journey/persistence checks. Evidence: `gameplay/evidence/party-waystone`.
+  - AGENTS.md and MASTER_PLAN.md unchanged. No infrastructure redesign, hosting qualification or
+    claims of hosted CI/physical-device testing. Migrations were exercised on the populated isolated preview.
 
 Rules and deployment compatibility: [parties](gameplay/parties.md). No guilds, PvP, raids, voice,
 trading, party chat, hardware qualification or infrastructure redesign.
@@ -739,7 +768,7 @@ trading, party chat, hardware qualification or infrastructure redesign.
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
-22. **Quest scope is deliberately small.** One quest; no repeatable/daily quests, abandoning, talk/explore objectives, quest items or party credit (only the tagging character's kills count). Selling/vaulting pelts lowers collect progress (intended, documented).
+22. **Quest scope is deliberately small.** Two quests, including one idempotent NPC-talk follow-on; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
@@ -750,9 +779,8 @@ trading, party chat, hardware qualification or infrastructure redesign.
 
 ## Next Recommended Task
 
-**Party up for a shared hunt.** Add a nearby-player invitation, small party health display, explicit
-server-side group kill/quest eligibility and fair loot ownership for the existing wolves, then one
-short follow-on objective at the Old Waystone. The current first-tagger-only rule is the largest gap
-between fighting alongside someone and adventuring together. Reuse the existing starter zone,
-combat, inventory and quest systems; do not build guilds, crafting trees or another infrastructure layer.
-External hosting/CI/device follow-ups do not block this gameplay milestone.
+**Give the party a reason to investigate the Hollow.** Build one short follow-on trail and a named
+pack-leader encounter with a readable attack cue, using existing party eligibility, combat, quests
+and single-roll rewards. Tie it to Rill's warning; keep it small enough to play together in one session.
+Do not expand into guilds, raids, PvP, trading or another infrastructure qualification cycle.
+External hosting/CI/physical-device follow-ups remain separate from development.

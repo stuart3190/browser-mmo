@@ -96,7 +96,11 @@ describe('accepting', () => {
     expect(await questRecords(ctx.db, p.characterId)).toMatchObject([
       { questId: Q, status: 'active' },
     ]);
-    expect((await npcDialogue(ctx.db, ctx, p.characterId, MAREN)).quests[0]).toMatchObject({
+    expect(
+      (await npcDialogue(ctx.db, ctx, p.characterId, MAREN)).quests.find(
+        (entry) => entry.quest.questId === Q,
+      ),
+    ).toMatchObject({
       action: null,
       quest: { state: 'active' },
     });
@@ -266,7 +270,11 @@ describe('turning in', () => {
       acceptQuest(ctx, { characterId: p.characterId, questId: Q, npcId: MAREN }),
       'QUEST_ALREADY_COMPLETED',
     );
-    expect((await npcDialogue(ctx.db, ctx, p.characterId, MAREN)).quests[0]).toMatchObject({
+    expect(
+      (await npcDialogue(ctx.db, ctx, p.characterId, MAREN)).quests.find(
+        (entry) => entry.quest.questId === Q,
+      ),
+    ).toMatchObject({
       action: null,
       quest: { state: 'completed' },
     });

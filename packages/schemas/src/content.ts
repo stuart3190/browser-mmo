@@ -115,7 +115,7 @@ export const QuestObjectiveSchema = z.discriminatedUnion('kind', [
     consumeOnTurnIn: z.boolean(),
     label: z.string().min(1).max(80),
   }),
-  // Placeholder kinds (shape only; not supported by the quest runtime yet).
+  // Talk credit is written only after authoritative NPC interaction.
   z.object({
     id: ContentIdSchema,
     kind: z.literal('talk'),
@@ -124,6 +124,7 @@ export const QuestObjectiveSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     id: ContentIdSchema,
+    // Exploration remains a placeholder.
     kind: z.literal('explore'),
     zoneId: ContentIdSchema,
     areaId: ContentIdSchema,

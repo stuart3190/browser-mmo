@@ -62,7 +62,7 @@ export function objectiveProgress(
   return def.objectives.map((o) => {
     const required = o.kind === 'kill' || o.kind === 'collect' ? o.count : 1;
     const raw =
-      o.kind === 'kill'
+      o.kind === 'kill' || o.kind === 'talk'
         ? (record?.progress[o.id] ?? 0)
         : o.kind === 'collect'
           ? itemCount(o.itemTemplateId)
@@ -175,4 +175,21 @@ export function questDialogue(def: QuestDefinition, state: QuestState): string |
     case 'unavailable':
       return null;
   }
+}
+
+/** Idempotent talk credit; caller validates a living player at this actual NPC before calling. */
+export function applyTalk(
+  def: QuestDefinition,
+  progress: Readonly<Record<string, number>>,
+  npcId: string,
+): Record<string, number> | null {
+  const next = { ...progress };
+  let changed = false;
+  for (const o of def.objectives) {
+    if (o.kind === 'talk' && o.npcId === npcId && (next[o.id] ?? 0) < 1) {
+      next[o.id] = 1;
+      changed = true;
+    }
+  }
+  return changed ? next : null;
 }

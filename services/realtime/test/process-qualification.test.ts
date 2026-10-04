@@ -113,6 +113,8 @@ async function join(host: Awaited<ReturnType<typeof boot>>, p: Awaited<ReturnTyp
     ws.send(encodeClientMessage(t, ++seq, d as never));
   send('auth.hello', { token: p.token, characterId: p.id, client: 'game_web' });
   await until(() => messages.find((m) => m.t === 'zone.snapshot'));
+  // Admission's inventory/stat refresh can otherwise overwrite the test-only weapon injection.
+  await until(() => messages.find((m) => m.t === 'character.progress'));
   return { ws, messages, send };
 }
 async function state(host: Awaited<ReturnType<typeof boot>>, id: string) {

@@ -3,7 +3,8 @@ import { TimestampSchema, UuidSchema } from './common';
 
 /**
  * Social placeholders. Shapes exist so API contracts for the game client and the future mobile
- * companion app can be designed together. None of these systems is implemented yet.
+ * companion app can be designed together. Guilds/friends/messages remain placeholders;
+ * the party core is implemented by the authoritative zone.
  */
 
 export const GuildRankSchema = z.object({

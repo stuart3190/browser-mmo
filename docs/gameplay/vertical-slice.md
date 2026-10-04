@@ -50,9 +50,8 @@ Equipment and inventory still use versioned, transactional operations.
 ## Playing together
 
 Two clients can travel together and fight the same wolves. Movement, health, damage, deaths and
-respawns come from the same authoritative zone. **There is no party or shared-credit system yet:**
-the first damager receives the kill's XP/loot/quest progress. Other players see the same death but
-must earn their own drops. No shared corpse inventory or duplicated loot is implied. Separate
+respawns come from the same authoritative zone. **Parties now share eligible kill XP and quest credit**, with one loot-table evaluation allocated
+round-robin. Solo kills retain first-tagger ownership. See [party rules](parties.md). No shared corpse inventory or duplicated loot is implied. Separate
 characters have separate progression; account storage follows the existing account-vault rules.
 
 ## Presentation scope
@@ -65,10 +64,8 @@ assets, not final character art, a skeletal animation pipeline or measured physi
 
 ## Next gameplay milestone
 
-A small **party and shared hunt**: invite a nearby player, show party health, and define server-side
-eligible group kill/quest credit and fair loot ownership for the existing wolves. Pair this with one
-short follow-on objective at the Old Waystone. Keep scope to a reason for two people to adventure
-together; no guilds, crafting tree, giant skill system or new infrastructure.
+Parties and the [Old Waystone follow-on](waystone.md) are now playable. Next: a short Hollow trail
+and one named pack-leader encounter using the existing party/combat/reward systems.
 
 Verification and current implementation commit are recorded in PROGRESS.md. The development
 preview uses its own database and loopback ports; it is not a public production deployment.

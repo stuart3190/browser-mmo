@@ -57,6 +57,13 @@
       "when": 1791145385606,
       "tag": "0007_graceful_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791145385607,
+      "tag": "0008_waystone_content",
+      "breakpoints": true
     }
   ]
 }
