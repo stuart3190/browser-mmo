@@ -605,13 +605,26 @@ Implementation/evidence commit: `7748e7e4722edbf683ed2a3a4f9f14c3623af994`. Veri
 All proof files are under `docs/hardening/evidence/production-qualification`; full limitations and
 external actions are in `docs/hardening/production-qualification-2026-10-04.md`. Main is unchanged.
 
+## Merge gate follow-up — 2026-10-04
+
+- [x] Recheck CI access paths and run an isolated 180-second production combat/economy capacity stage.
+  - Verified: 2026-10-04; agent/model: Codex; tested commit: `100d6c50514787a6bd19ed1639a3223355c86d81`.
+  - Proof: [merge gate report](hardening/merge-gates-2026-10-04.md) and sanitized raw evidence.
+  - Five players: 19.4405 Hz, 100 skipped slots, RTT p95 152 ms, zero HTTP errors/disconnects.
+    Tick-rate gate failed; higher concurrency was not attempted. CPU affinity control worsened timing.
+- [ ] Hosted Actions success for the final branch SHA: CLI token invalid, API 401/404,
+      alternative connector/browser paths unavailable; owner device authorization required.
+- [ ] Stable capacity with headroom: not certified. No new code or architecture changes justified.
+
 ## Current Work
 
 **Production-mode qualification remains FAIL / DO NOT MERGE.** See
 [production qualification](hardening/production-qualification-2026-10-04.md) for the isolated TLS
 production deployment, password-only auth, restricted runtime DB role, real combat/economy load,
 deployed crash/session tests, populated migration, encrypted local restore and physical-phone checklist.
-Hosted Actions still returns HTTP 404. Corrected representative load failed at one and five players;
+Hosted Actions still returns HTTP 404; owner device authorization is required. See the
+[latest merge-gate evidence](hardening/merge-gates-2026-10-04.md): another five-player stage
+missed the tick-rate gate at 19.4405 Hz despite improved 152 ms p95 RTT. Earlier load failed at one and five players;
 no safe capacity is certified. Main remains unchanged. No gameplay work or external invitations.
 
 ## Known Issues

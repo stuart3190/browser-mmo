@@ -1,0 +1,34 @@
+{
+  "measurementWindow": {
+    "start": "2026-10-04T16:55:38.222Z",
+    "seconds": 180.036364092
+  },
+  "eventLoop": {
+    "windows": 35,
+    "windowP95MedianMs": 19.447807,
+    "windowP95MaxMs": 38.993919,
+    "windowP99MaxMs": 104.136703,
+    "maxMs": 322.437119,
+    "note": "Five-second histograms; these window percentiles are not aggregate request percentiles."
+  },
+  "host": {
+    "samples": 165,
+    "idlePercentMean": 90.33939393939394,
+    "ioWaitPercentMean": 1.0787878787878789,
+    "stealPercentMax": 0,
+    "runQueueMax": 14,
+    "swapInMax": 0,
+    "swapOutMax": 0
+  },
+  "walDelta": {
+    "wal_write": 4283,
+    "wal_sync": 4278,
+    "wal_write_time": 558.9370000000017,
+    "wal_sync_time": 25119.699999999953
+  },
+  "walSyncMeanMs": 5.87183263207105,
+  "wsApplicationBytesPerSecond": {
+    "serverToClients": 21632.085382538873,
+    "clientsToServer": 6565.895762013598
+  }
+}
