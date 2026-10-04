@@ -42,6 +42,9 @@ only. No abilities, resources (mana/rage), threat tables, effects, crowd control
 8. Loot is equippable with the existing inventory UI; equipment changes refresh the in-world combat
    profile (change feed → `getCombatProfile`), so damage changes immediately.
 
+Class abilities (Heavy Strike, Firebolt, ...) use the same hit/crit/armour rules and the same
+target, range and line-of-sight checks; see [classes](classes.md).
+
 ## Formulas (first pass, not balanced)
 
 All numbers come from `combatRules` / the enemy's `combat` block.

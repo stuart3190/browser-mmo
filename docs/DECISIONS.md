@@ -375,6 +375,22 @@ Selling or vaulting quest items lowers progress (intended); a full Recovered loo
 
 ---
 
+## 2026-10-04 — Playable classes and server-authoritative abilities
+
+**Decision**
+Warrior and Mage are the only playable classes (`playable` flag gates creation). Abilities are data (class, unlock level, range, cooldown, damage school/base/weapon multiplier/stat scaling) executed synchronously by `ZoneSimulation.useAbility` against the current server-side target, with server-clock cooldowns plus a 1 s global cooldown; running cooldowns are saved to `characters.ability_cooldowns` on leaving the world. No resource system yet. `docs/adr/0019-class-abilities.md`, `docs/gameplay/classes.md`.
+
+**Reason**
+Keeps every check and outcome on the server's single-threaded tick world (no double execution), reuses targeting, stats and the kill pipeline, and stays extensible for future classes.
+
+**Alternatives considered**
+Client cooldown timers, per-use cooldown history rows, introducing mana/rage now.
+
+**Consequences**
+Only instant single-target hostile abilities; casts/AoE/heals/effects need an effect grammar later. A crash can drop unsaved cooldowns (≤ 12 s).
+
+---
+
 ## Open questions
 
 These are not yet decided. Record a dated entry above when one is.
