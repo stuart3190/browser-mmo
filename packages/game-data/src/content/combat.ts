@@ -6,6 +6,7 @@ import type { CombatRules } from '@mmo/schemas';
  */
 export const combatRules: CombatRules = {
   unarmed: { damage: { min: 1, max: 3 }, attackSpeedMs: 2000 },
+  abilityGlobalCooldownMs: 1000,
   playerMeleeRange: 3.5,
   rangeTolerance: 0.75,
   baseHitChance: 0.95,

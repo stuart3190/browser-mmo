@@ -19,10 +19,14 @@ export const STARTING_ZONE_ID = 'zone.greenvale.meadows';
 export async function createCharacter(
   ctx: DomainContext,
   input: { accountId: string; name: string; classId: string },
+  /** Tests/dev tools only: allow creating a character of a not-yet-playable placeholder class. */
+  options: { allowUnplayableClass?: boolean } = {},
 ): Promise<PlayerCharacter> {
   const name = CharacterNameSchema.parse(input.name);
-  if (!ctx.gameData.classes.has(input.classId))
-    throw new DomainError(ErrorCode.VALIDATION_FAILED, 'Unknown class');
+  const cls = ctx.gameData.classes.get(input.classId);
+  if (!cls) throw new DomainError(ErrorCode.VALIDATION_FAILED, 'Unknown class');
+  if (!cls.playable && !options.allowUnplayableClass)
+    throw new DomainError(ErrorCode.VALIDATION_FAILED, `${cls.name} is not playable yet`);
   const zone = ctx.gameData.zone(STARTING_ZONE_ID);
   try {
     return await inTransaction(ctx, async (tx) => {

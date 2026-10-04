@@ -51,22 +51,49 @@ export const AbilityTargetingSchema = z.enum([
   'aoe_self',
 ]);
 
+/** How an ability deals damage (first pass: direct damage only, no effects/status). */
+export const AbilityDamageSchema = z.object({
+  /** physical: weapon-based, mitigated by armour. magic: spell power, not mitigated (no resistances yet). */
+  school: z.enum(['physical', 'magic']),
+  /** Flat roll added to every use. */
+  base: z.object({ min: z.number().nonnegative(), max: z.number().nonnegative() }),
+  /** Fraction of the equipped weapon's damage roll added (0 for spells). */
+  weaponMultiplier: z.number().min(0),
+  /** Damage per point of an effective stat, e.g. { strength: 0.8 } or { intellect: 1.2, spell_power: 1 }. */
+  scaling: z.record(z.string(), z.number().min(0)).default({}),
+});
+export type AbilityDamage = z.infer<typeof AbilityDamageSchema>;
+
 /**
- * Ability definition. Only the data shape exists; there is NO combat implementation yet.
- * `effects` is intentionally opaque so the combat system can define its own effect grammar later.
+ * Ability definition. Live (non-placeholder) abilities are executed by the zone simulation:
+ * `autoAttack` toggles the melee swing loop, otherwise `damage` is applied instantly to the target.
+ * `effects` stays opaque for future effect grammar.
  */
 export const AbilityDefinitionSchema = z.object({
   id: ContentIdSchema,
   name: LocalizedNameSchema,
   description: z.string().max(500),
+  /** Owning class; null = shared by every class that lists it. */
+  classId: ContentIdSchema.nullable().default(null),
   targeting: AbilityTargetingSchema,
   rangeMeters: z.number().nonnegative(),
   cooldownMs: z.number().int().nonnegative(),
   castTimeMs: z.number().int().nonnegative(),
   resourceCost: z.number().int().nonnegative(),
   unlockLevel: z.number().int().min(1),
+  /** Toggles the existing auto-attack swing loop instead of resolving damage itself. */
+  autoAttack: z.boolean().default(false),
+  damage: AbilityDamageSchema.nullable().default(null),
+  /** Placeholder presentation (no final art): bar glyph/colour and the effect drawn on use. */
+  icon: z
+    .object({ glyph: z.string().min(1).max(3), color: z.string().regex(/^#[0-9a-fA-F]{6}$/) })
+    .default({ glyph: '?', color: '#888888' }),
+  visual: z.enum(['melee', 'projectile']).default('melee'),
   effects: z.array(z.record(z.string(), z.unknown())).default([]),
+  /** Placeholder abilities exist for specs/future classes and can never be used. */
+  placeholder: z.boolean().default(false),
 });
+export type AbilityDefinitionInput = z.input<typeof AbilityDefinitionSchema>;
 export type AbilityDefinition = z.infer<typeof AbilityDefinitionSchema>;
 
 /** Non-combat skills (gathering, crafting professions...). Placeholder shape. */
@@ -100,10 +127,14 @@ export const CharacterClassSchema = z.object({
   /** Equipment type IDs (see game-data equipment types) the class may wear/wield. */
   armorProficiencies: z.array(ContentIdSchema),
   weaponProficiencies: z.array(ContentIdSchema),
+  /** Abilities on the class's bar, in slot order (each may unlock at a later level). */
   baseAbilityIds: z.array(ContentIdSchema),
   specialisationIds: z.array(ContentIdSchema),
+  /** Only playable classes can be chosen at character creation. */
+  playable: z.boolean().default(false),
   placeholder: z.boolean().default(true),
 });
+export type CharacterClassInput = z.input<typeof CharacterClassSchema>;
 export type CharacterClass = z.infer<typeof CharacterClassSchema>;
 
 // ---------------------------------------------------------------------------

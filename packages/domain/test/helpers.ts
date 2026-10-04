@@ -42,7 +42,11 @@ export async function makePlayer(
 ): Promise<TestPlayer> {
   const username = `u_${uuidv7().replace(/-/g, '').slice(-16)}`;
   const { accountId } = await new DevAuthProvider(new Set()).authenticate(ctx, { username });
-  const c = await createCharacter(ctx, { accountId, name: uniqueName('Test'), classId });
+  const c = await createCharacter(
+    ctx,
+    { accountId, name: uniqueName('Test'), classId },
+    { allowUnplayableClass: true },
+  );
   return { accountId, characterId: c.id };
 }
 

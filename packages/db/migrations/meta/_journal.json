@@ -36,6 +36,13 @@
       "when": 1791102824377,
       "tag": "0004_quests",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791106791931,
+      "tag": "0005_ability_cooldowns",
+      "breakpoints": true
     }
   ]
 }

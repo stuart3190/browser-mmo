@@ -31,6 +31,8 @@ export type EnemyCombat = z.infer<typeof EnemyCombatSchema>;
 export const CombatRulesSchema = z.object({
   /** Weapon used when nothing is equipped in the main hand. */
   unarmed: z.object({ damage: DamageRangeSchema, attackSpeedMs: z.number().int().positive() }),
+  /** Shared lockout after using any (non-auto-attack) ability, so abilities cannot be chained in one tick. */
+  abilityGlobalCooldownMs: z.number().int().nonnegative().default(1000),
   /** Melee reach of player auto-attacks (metres, centre to centre). */
   playerMeleeRange: z.number().positive(),
   /** Server-side slack added to range checks for latency/interpolation. */

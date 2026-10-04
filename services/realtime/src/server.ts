@@ -16,6 +16,7 @@ import {
   processKillEvent,
   recordKill,
   requireOwnedCharacter,
+  saveAbilityCooldowns,
   saveCharacterHealth,
   saveCharacterPosition,
   turnInQuest,
@@ -156,6 +157,10 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     'Inbound WebSocket messages by type/result',
   );
   const pickups = deps.metrics.counter('world_pickups_total', 'Pickup attempts by result');
+  const abilityUses = deps.metrics.counter(
+    'ability_uses_total',
+    'Accepted ability uses by outcome',
+  );
   const questsMetric = deps.metrics.counter('quest_actions_total', 'Successful quest actions');
   const tickDuration = deps.metrics.gauge(
     'world_tick_ms',
@@ -443,6 +448,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         flush();
         return;
       }
+      case 'ability.use': {
+        const r = player.zone.useAbility(player.characterId, msg.d.abilityId, now);
+        abilityUses.inc({ outcome: r.outcome });
+        flush();
+        return;
+      }
       case 'npc.interact': {
         const { npcId } = player.zone.npcInteraction(player.characterId, msg.d.entityId);
         await sendDialogue(conn, msg.d.entityId, npcId, msg.seq);
@@ -598,6 +609,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         last.rotationY,
       )
         .then(() => saveCharacterHealth(ctx.db, entry.characterId, last.health))
+        .then(() =>
+          saveAbilityCooldowns(ctx.db, entry.characterId, last.abilityCooldowns, Date.now()),
+        )
         .catch((err: unknown) =>
           logger.error({ err, characterId: entry.characterId }, 'failed to save character state'),
         );
@@ -607,6 +621,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   function combatantFrom(profile: CombatProfile) {
     return {
+      classId: profile.classId,
+      abilityCooldowns: profile.abilityCooldowns,
       level: profile.level,
       stats: profile.stats,
       maxHealth: profile.maxHealth,

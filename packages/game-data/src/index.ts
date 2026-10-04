@@ -23,6 +23,7 @@ export * from './rules/world';
 export * from './rules/combat';
 export * from './rules/collision';
 export * from './rules/quests';
+export * from './rules/abilities';
 export { propShapes, PLAYER_COLLISION_RADIUS, ENEMY_COLLISION_RADIUS } from './content/props';
 export type { PropKind, PropShape } from './content/props';
 

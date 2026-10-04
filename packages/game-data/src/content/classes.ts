@@ -1,6 +1,6 @@
 import type {
-  AbilityDefinition,
-  CharacterClass,
+  AbilityDefinitionInput,
+  CharacterClassInput,
   CharacterSpecialisation,
   SkillDefinition,
 } from '@mmo/schemas';
@@ -14,11 +14,11 @@ import type {
 const ability = (
   id: string,
   name: string,
-  targeting: AbilityDefinition['targeting'],
+  targeting: AbilityDefinitionInput['targeting'],
   rangeMeters: number,
   cooldownMs: number,
   unlockLevel = 1,
-): AbilityDefinition => ({
+): AbilityDefinitionInput => ({
   id,
   name,
   description: 'Placeholder ability. No combat implementation exists yet.',
@@ -29,13 +29,114 @@ const ability = (
   resourceCost: 0,
   unlockLevel,
   effects: [],
+  placeholder: true,
 });
 
-export const abilities: AbilityDefinition[] = [
-  ability('ability.warrior.strike', 'Strike', 'enemy', 3, 0),
+/**
+ * Live abilities (first pass, not balanced; formulas in docs/gameplay/classes.md).
+ * Melee range matches combatRules.playerMeleeRange; the server adds rangeTolerance.
+ */
+const live: AbilityDefinitionInput[] = [
+  {
+    id: 'ability.common.attack',
+    name: 'Attack',
+    description: 'Toggle automatic attacks with your weapon against your target.',
+    classId: null,
+    targeting: 'enemy',
+    rangeMeters: 3.5,
+    cooldownMs: 0,
+    castTimeMs: 0,
+    resourceCost: 0,
+    unlockLevel: 1,
+    autoAttack: true,
+    icon: { glyph: '⚔', color: '#c9c9c9' },
+  },
+  {
+    id: 'ability.warrior.heavy_strike',
+    name: 'Heavy Strike',
+    description: 'A powerful melee blow: weapon damage plus a bonus that grows with Strength.',
+    classId: 'class.warrior',
+    targeting: 'enemy',
+    rangeMeters: 3.5,
+    cooldownMs: 6_000,
+    castTimeMs: 0,
+    resourceCost: 0,
+    unlockLevel: 1,
+    damage: {
+      school: 'physical',
+      base: { min: 8, max: 12 },
+      weaponMultiplier: 1,
+      scaling: { strength: 0.8, attack_power: 0.5 },
+    },
+    icon: { glyph: 'HS', color: '#d9822b' },
+    visual: 'melee',
+  },
+  {
+    id: 'ability.warrior.battle_strike',
+    name: 'Battle Strike',
+    description: 'A crushing strike that hits far harder than Heavy Strike. Unlocks at level 2.',
+    classId: 'class.warrior',
+    targeting: 'enemy',
+    rangeMeters: 3.5,
+    cooldownMs: 12_000,
+    castTimeMs: 0,
+    resourceCost: 0,
+    unlockLevel: 2,
+    damage: {
+      school: 'physical',
+      base: { min: 14, max: 18 },
+      weaponMultiplier: 1.5,
+      scaling: { strength: 1, attack_power: 0.5 },
+    },
+    icon: { glyph: 'BS', color: '#e04a3c' },
+    visual: 'melee',
+  },
+  {
+    id: 'ability.mage.firebolt',
+    name: 'Firebolt',
+    description: 'Hurl a bolt of fire at a distant enemy. Scales with Intellect and Spell Power.',
+    classId: 'class.mage',
+    targeting: 'enemy',
+    rangeMeters: 25,
+    cooldownMs: 4_000,
+    castTimeMs: 0,
+    resourceCost: 0,
+    unlockLevel: 1,
+    damage: {
+      school: 'magic',
+      base: { min: 12, max: 18 },
+      weaponMultiplier: 0,
+      scaling: { intellect: 0.8, spell_power: 1 },
+    },
+    icon: { glyph: 'FB', color: '#ff7a1a' },
+    visual: 'projectile',
+  },
+  {
+    id: 'ability.mage.flame_burst',
+    name: 'Flame Burst',
+    description: 'An intense burst of flame at range. Unlocks at level 2.',
+    classId: 'class.mage',
+    targeting: 'enemy',
+    rangeMeters: 20,
+    cooldownMs: 10_000,
+    castTimeMs: 0,
+    resourceCost: 0,
+    unlockLevel: 2,
+    damage: {
+      school: 'magic',
+      base: { min: 22, max: 30 },
+      weaponMultiplier: 0,
+      scaling: { intellect: 1.2, spell_power: 1.2 },
+    },
+    icon: { glyph: 'FL', color: '#ffcf40' },
+    visual: 'projectile',
+  },
+];
+
+export const abilities: AbilityDefinitionInput[] = [
+  ...live,
   ability('ability.warrior.shield_wall', 'Shield Wall', 'self', 0, 60_000, 10),
   ability('ability.warrior.whirlwind', 'Whirlwind', 'aoe_self', 5, 10_000, 10),
-  ability('ability.mage.firebolt', 'Firebolt', 'enemy', 30, 0),
   ability('ability.mage.frost_nova', 'Frost Nova', 'aoe_self', 8, 20_000, 10),
   ability('ability.ranger.aimed_shot', 'Aimed Shot', 'enemy', 35, 6_000),
   ability('ability.ranger.call_companion', 'Call Companion', 'self', 0, 5_000, 10),
@@ -96,7 +197,7 @@ export const specialisations: CharacterSpecialisation[] = [
 const specIds = (classId: string) =>
   specialisations.filter((s) => s.classId === classId).map((s) => s.id);
 
-export const classes: CharacterClass[] = [
+export const classes: CharacterClassInput[] = [
   {
     id: 'class.warrior',
     name: 'Warrior',
@@ -114,8 +215,13 @@ export const classes: CharacterClass[] = [
     statsPerLevel: { strength: 2, agility: 1, stamina: 2, max_health: 14 },
     armorProficiencies: ['plate', 'mail', 'leather', 'cloth', 'shield'],
     weaponProficiencies: ['sword', 'axe', 'mace', 'dagger', 'crossbow'],
-    baseAbilityIds: ['ability.warrior.strike'],
+    baseAbilityIds: [
+      'ability.common.attack',
+      'ability.warrior.heavy_strike',
+      'ability.warrior.battle_strike',
+    ],
     specialisationIds: specIds('class.warrior'),
+    playable: true,
     placeholder: true,
   },
   {
@@ -136,8 +242,9 @@ export const classes: CharacterClass[] = [
     statsPerLevel: { intellect: 2, spirit: 1, stamina: 1, max_health: 9, max_mana: 15 },
     armorProficiencies: ['cloth'],
     weaponProficiencies: ['staff', 'wand', 'dagger'],
-    baseAbilityIds: ['ability.mage.firebolt'],
+    baseAbilityIds: ['ability.common.attack', 'ability.mage.firebolt', 'ability.mage.flame_burst'],
     specialisationIds: specIds('class.mage'),
+    playable: true,
     placeholder: true,
   },
   {

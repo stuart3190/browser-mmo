@@ -134,6 +134,15 @@ export const characters = pgTable(
     rotationY: doublePrecision('rotation_y').notNull().default(0),
     /** Last persisted health; NULL = full. 0 = dead (must respawn on next login). */
     currentHealth: integer('current_health'),
+    /**
+     * Ability cooldowns that had not expired when the character left the world:
+     * { abilityId: readyAtEpochMs, '*': globalReadyAtEpochMs }. Restored on join; expired entries
+     * are dropped. Not a history table.
+     */
+    abilityCooldowns: jsonb('ability_cooldowns')
+      .$type<Record<string, number>>()
+      .notNull()
+      .default({}),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),

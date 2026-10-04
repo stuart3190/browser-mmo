@@ -65,7 +65,7 @@ try {
   const n = await syncItemTemplates(handle.db, gameData);
   console.log(`Synced ${n} item templates.`);
 
-  await ensurePlayer('admin', 'Warden', 'class.cleric');
+  await ensurePlayer('admin', 'Warden', 'class.mage');
 
   const alice = await ensurePlayer('alice', 'Alice', 'class.warrior');
   if (alice.created) {

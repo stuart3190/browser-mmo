@@ -115,7 +115,14 @@ export const QuestTurnInMsg = clientMsg(
   z.object({ entityId: EntityIdSchema, questId: ContentIdSchema }),
 );
 
+/**
+ * Use an ability on the current server-side target. The server checks class, level, cooldown
+ * (server clock), target, range and line of sight, and computes the outcome itself.
+ */
+export const AbilityUseMsg = clientMsg('ability.use', z.object({ abilityId: ContentIdSchema }));
+
 export const ClientMessageSchema = z.discriminatedUnion('t', [
+  AbilityUseMsg,
   NpcInteractMsg,
   QuestAcceptMsg,
   QuestTurnInMsg,
@@ -290,6 +297,30 @@ export const CombatDamageMsg = serverMsg(
     amount: z.number().int().nonnegative(),
     targetHealth: z.number().int().nonnegative(),
     targetMaxHealth: z.number().int().positive(),
+    /** The ability that dealt it (null/absent for auto-attack swings and enemy attacks). */
+    abilityId: ContentIdSchema.nullable().optional(),
+  }),
+);
+
+/**
+ * The player's abilities as the server sees them: which are unlocked for their class and level,
+ * and when each is ready again (server clock — convert with the auth.ok serverTime offset).
+ * Sent on join/resync, after every ability use and when a level-up unlocks something.
+ */
+export const AbilityStateMsg = serverMsg(
+  'ability.state',
+  z.object({
+    abilities: z.array(
+      z.object({
+        abilityId: ContentIdSchema,
+        unlocked: z.boolean(),
+        readyAt: z.number(),
+      }),
+    ),
+    globalReadyAt: z.number(),
+    serverTime: z.number(),
+    /** Abilities that just became available (level-up). */
+    newlyUnlocked: z.array(ContentIdSchema),
   }),
 );
 
@@ -412,6 +443,7 @@ export const QuestCompletedMsg = serverMsg(
 );
 
 export const ServerMessageSchema = z.discriminatedUnion('t', [
+  AbilityStateMsg,
   NpcDialogueMsg,
   QuestLogMsg,
   QuestCompletedMsg,

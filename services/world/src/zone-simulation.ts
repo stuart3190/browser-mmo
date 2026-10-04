@@ -2,7 +2,13 @@ import type { CollisionWorld, GameData, Rng, WeaponProfile } from '@mmo/game-dat
 import {
   ENEMY_COLLISION_RADIUS,
   PLAYER_COLLISION_RADIUS,
+  abilityAvailability,
   applyDamage,
+  classAbilities,
+  cooldownRemainingMs,
+  newlyUnlockedAbilities,
+  resolveAbility,
+  startCooldown,
   canPlayerRespawn,
   chunkCoordFor,
   chunkKey,
@@ -53,6 +59,10 @@ export type OutMessage = ServerMessage extends infer M
 
 /** Server-derived combat inputs for a player (from @mmo/domain getCombatProfile). */
 export interface CombatantProfile {
+  /** Persisted class (server data). Defaults to Warrior for tests that do not care. */
+  classId?: string;
+  /** Still-running cooldowns restored from persistence (epoch ms; '*' = global cooldown). */
+  abilityCooldowns?: Record<string, number>;
   level: number;
   stats: StatBlock;
   maxHealth: number;
@@ -118,6 +128,11 @@ interface PlayerState extends PlayerInfo {
   lastCombatAtMs: number;
   inCombat: boolean;
   lastOutOfRangeNoticeMs: number;
+  // --- abilities ---
+  classId: string;
+  /** abilityId -> server time the ability is ready again. */
+  cooldowns: Map<string, number>;
+  globalReadyAtMs: number;
 }
 
 /**
@@ -312,6 +327,13 @@ export class ZoneSimulation {
       lastCombatAtMs: 0,
       inCombat: false,
       lastOutOfRangeNoticeMs: 0,
+      classId: info.combat.classId ?? 'class.warrior',
+      cooldowns: new Map(
+        Object.entries(info.combat.abilityCooldowns ?? {}).filter(
+          ([id, t]) => id !== '*' && t > nowMs,
+        ),
+      ),
+      globalReadyAtMs: Math.max(0, info.combat.abilityCooldowns?.['*'] ?? 0),
     };
     this.players.set(info.characterId, state);
 
@@ -332,6 +354,7 @@ export class ZoneSimulation {
     }
     this.sendVitals(state, nowMs);
     this.sendCombatState(state, 'target_cleared');
+    this.sendAbilityState(state, nowMs);
     return entity.id;
   }
 
@@ -350,11 +373,17 @@ export class ZoneSimulation {
     });
     this.sendVitals(p, nowMs);
     this.sendCombatState(p, p.targetId ? 'target_set' : 'target_cleared');
+    this.sendAbilityState(p, nowMs);
   }
 
-  removePlayer(
-    characterId: string,
-  ): { position: Vec3; rotationY: number; health: number } | undefined {
+  removePlayer(characterId: string):
+    | {
+        position: Vec3;
+        rotationY: number;
+        health: number;
+        abilityCooldowns: Record<string, number>;
+      }
+    | undefined {
     const p = this.players.get(characterId);
     if (!p) return undefined;
     this.players.delete(characterId);
@@ -370,7 +399,12 @@ export class ZoneSimulation {
         });
       }
     }
-    return { position: p.position, rotationY: p.rotationY, health: Math.round(p.health) };
+    return {
+      position: p.position,
+      rotationY: p.rotationY,
+      health: Math.round(p.health),
+      abilityCooldowns: { ...Object.fromEntries(p.cooldowns), '*': p.globalReadyAtMs },
+    };
   }
 
   getPlayer(characterId: string):
@@ -385,6 +419,9 @@ export class ZoneSimulation {
         attacking: boolean;
         nextAttackAtMs: number;
         weapon: WeaponProfile;
+        stats: StatBlock;
+        level: number;
+        classId: string;
       }>
     | undefined {
     return this.players.get(characterId);
@@ -679,6 +716,7 @@ export class ZoneSimulation {
     const p = this.players.get(characterId);
     if (!p) return;
     const gained = Math.max(0, profile.maxHealth - p.maxHealth);
+    const unlocked = newlyUnlockedAbilities(this.gameData, p.classId, p.level, profile.level);
     p.level = profile.level;
     p.stats = profile.stats;
     p.weapon = profile.weapon;
@@ -693,6 +731,101 @@ export class ZoneSimulation {
     entity.level = profile.level;
     this.syncEntityHealth(p.entityId, Math.round(p.health), p.maxHealth, p.dead);
     this.sendVitals(p, nowMs);
+    if (unlocked.length > 0)
+      this.sendAbilityState(
+        p,
+        nowMs,
+        unlocked.map((a) => a.id),
+      );
+  }
+
+  /**
+   * Uses an ability on the player's current (server-side) target. Everything is validated here:
+   * class ownership, level unlock, alive, cooldown and global cooldown on the SERVER clock,
+   * hostile living target, range (+ tolerance) and line of sight. The outcome is rolled here.
+   * Auto-attack abilities toggle the swing loop. Throws a DomainError on rejection.
+   */
+  useAbility(
+    characterId: string,
+    abilityId: string,
+    nowMs: number,
+  ): { outcome: 'hit' | 'crit' | 'miss' | 'toggled'; damage: number } {
+    const p = this.requirePlayer(characterId);
+    const ok = abilityAvailability(this.gameData, abilityId, p.classId, p.level);
+    if (!ok.ok) {
+      const [code, message] =
+        ok.reason === 'UNKNOWN'
+          ? [ErrorCode.ABILITY_UNKNOWN, 'Unknown ability']
+          : ok.reason === 'LOCKED'
+            ? [ErrorCode.ABILITY_LOCKED, 'You have not learned that ability yet']
+            : [ErrorCode.ABILITY_NOT_AVAILABLE, 'Your class cannot use that ability'];
+      throw new DomainError(code, message);
+    }
+    const ability = this.gameData.abilities.get(abilityId)!;
+    if (p.dead) throw new DomainError(ErrorCode.YOU_ARE_DEAD, 'You are dead');
+    if (ability.autoAttack) {
+      if (p.attacking) this.stopAttack(characterId);
+      else this.startAttack(characterId);
+      return { outcome: 'toggled', damage: 0 };
+    }
+    const remaining = cooldownRemainingMs(
+      p.cooldowns.get(abilityId) ?? 0,
+      p.globalReadyAtMs,
+      nowMs,
+    );
+    if (remaining > 0)
+      throw new DomainError(ErrorCode.ON_COOLDOWN, `${ability.name} is not ready`, {
+        remainingMs: remaining,
+      });
+    if (!p.targetId) throw new DomainError(ErrorCode.NO_TARGET, 'You have no target');
+    const enemy = this.enemies.get(p.targetId);
+    const entity = enemy && this.entities.get(enemy.entityId);
+    if (!enemy || !entity)
+      throw new DomainError(ErrorCode.INVALID_TARGET, 'You cannot attack that');
+    if (enemy.mode === 'dead' || enemy.mode === 'dying')
+      throw new DomainError(ErrorCode.TARGET_DEAD, 'Your target is dead');
+    if (
+      !isInRange(
+        distance2D(p.position, entity.position),
+        ability.rangeMeters,
+        this.rules.rangeTolerance,
+      )
+    )
+      throw new DomainError(ErrorCode.OUT_OF_RANGE, 'Out of range');
+    if (!this.hasLineOfSight(p.position, entity.position))
+      throw new DomainError(ErrorCode.NO_LINE_OF_SIGHT, 'Target not in line of sight');
+
+    const cd = startCooldown(this.rules, ability, nowMs);
+    p.cooldowns.set(abilityId, cd.readyAtMs);
+    p.globalReadyAtMs = cd.globalReadyAtMs;
+    p.lastCombatAtMs = nowMs;
+    const result = resolveAbility(
+      this.rules,
+      ability,
+      { level: p.level, stats: p.stats, weapon: p.weapon },
+      { level: enemy.def.level, armor: enemy.def.combat.armor },
+      this.rng,
+    );
+    this.hitEnemy(p, enemy, entity, result.outcome, result.damage, nowMs, abilityId);
+    this.sendAbilityState(p, nowMs);
+    return result;
+  }
+
+  /** Current ability bar state for a player (unlocks + server-clock ready times). */
+  private sendAbilityState(p: PlayerState, nowMs: number, newlyUnlocked: string[] = []): void {
+    this.push(p.characterId, {
+      t: 'ability.state',
+      d: {
+        abilities: classAbilities(this.gameData, p.classId).map((a) => ({
+          abilityId: a.id,
+          unlocked: abilityAvailability(this.gameData, a.id, p.classId, p.level).ok,
+          readyAt: p.cooldowns.get(a.id) ?? 0,
+        })),
+        globalReadyAt: p.globalReadyAtMs,
+        serverTime: nowMs,
+        newlyUnlocked,
+      },
+    });
   }
 
   /** Current health for persistence. */
@@ -1034,26 +1167,40 @@ export class ZoneSimulation {
         { level: enemy.def.level, armor: enemy.def.combat.armor },
         this.rng,
       );
-      // Aggro + tag: the first character to damage an enemy owns the kill.
-      enemy.taggedBy ??= p.characterId;
-      if (enemy.mode !== 'engaged' || !enemy.targetCharacterId)
-        this.engage(enemy, p.characterId, nowMs);
-      const { health, killed } = applyDamage(enemy.health, result.damage);
-      enemy.health = health;
-      entity.health = health;
-      this.toKnowers(enemy.entityId, {
-        t: 'combat.damage',
-        d: {
-          sourceId: p.entityId,
-          targetId: enemy.entityId,
-          outcome: result.outcome,
-          amount: result.damage,
-          targetHealth: health,
-          targetMaxHealth: enemy.maxHealth,
-        },
-      });
-      if (killed) this.enemyDying(enemy, p, nowMs);
+      this.hitEnemy(p, enemy, entity, result.outcome, result.damage, nowMs, null);
     }
+  }
+
+  /** Applies a player's swing or ability result to an enemy (tagging, aggro, damage, death). */
+  private hitEnemy(
+    p: PlayerState,
+    enemy: EnemyState,
+    entity: WorldEntity,
+    outcome: 'hit' | 'crit' | 'miss',
+    damage: number,
+    nowMs: number,
+    abilityId: string | null,
+  ): void {
+    // Aggro + tag: the first character to damage an enemy owns the kill.
+    enemy.taggedBy ??= p.characterId;
+    if (enemy.mode !== 'engaged' || !enemy.targetCharacterId)
+      this.engage(enemy, p.characterId, nowMs);
+    const { health, killed } = applyDamage(enemy.health, damage);
+    enemy.health = health;
+    entity.health = health;
+    this.toKnowers(enemy.entityId, {
+      t: 'combat.damage',
+      d: {
+        sourceId: p.entityId,
+        targetId: enemy.entityId,
+        outcome,
+        amount: damage,
+        targetHealth: health,
+        targetMaxHealth: enemy.maxHealth,
+        abilityId,
+      },
+    });
+    if (killed) this.enemyDying(enemy, p, nowMs);
   }
 
   /** Health hit 0: freeze the enemy and queue a write-ahead kill event for the host to persist. */

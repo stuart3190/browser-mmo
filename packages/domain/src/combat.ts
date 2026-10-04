@@ -24,6 +24,8 @@ import { inTransaction } from './tx';
 /** Everything the zone simulation needs to fight as this character (all server-derived). */
 export interface CombatProfile {
   characterId: string;
+  /** Persisted class (set at creation; the client never supplies it during play). */
+  classId: string;
   level: number;
   xp: number;
   xpToNext: number;
@@ -32,6 +34,8 @@ export interface CombatProfile {
   /** Persisted health (null in DB = full). */
   health: number;
   weapon: WeaponProfile & { templateId: string | null };
+  /** Persisted, possibly still running ability cooldowns (epoch ms). */
+  abilityCooldowns: Record<string, number>;
 }
 
 /**
@@ -80,6 +84,8 @@ export async function getCombatProfile(
   const maxHealth = maxHealthFromStats(rules, stats);
   return {
     characterId,
+    classId: character.classId,
+    abilityCooldowns: character.abilityCooldowns,
     level: character.level,
     xp: character.xp,
     xpToNext: xpToNextLevel(ctx.gameData.raw.experienceCurve, character.level),
@@ -88,6 +94,20 @@ export async function getCombatProfile(
     health: Math.min(maxHealth, character.currentHealth ?? maxHealth),
     weapon,
   };
+}
+
+/** Persists cooldowns that are still running (on leaving the world); expired ones are dropped. */
+export async function saveAbilityCooldowns(
+  db: DbOrTx,
+  characterId: string,
+  cooldowns: Record<string, number>,
+  nowMs: number,
+): Promise<void> {
+  const running = Object.fromEntries(Object.entries(cooldowns).filter(([, t]) => t > nowMs));
+  await db
+    .update(schema.characters)
+    .set({ abilityCooldowns: running })
+    .where(eq(schema.characters.id, characterId));
 }
 
 /** Persists current health (called on disconnect and periodically, like position). */

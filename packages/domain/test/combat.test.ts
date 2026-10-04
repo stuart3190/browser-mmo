@@ -6,6 +6,8 @@ import { uuidv7 } from '@mmo/shared';
 import {
   activeRespawns,
   awardKill,
+  createCharacter,
+  saveAbilityCooldowns,
   dueKillEvents,
   processKillEvent,
   recordKill,
@@ -65,6 +67,31 @@ describe('combat profile', () => {
 
     await saveCharacterHealth(ctx.db, p.characterId, 9);
     expect((await getCombatProfile(ctx.db, ctx, p.characterId)).health).toBe(9);
+  });
+});
+
+describe('class persistence', () => {
+  it('only playable classes can be created; the persisted class feeds the combat profile', async () => {
+    const { accountId } = await makePlayer(ctx, 'class.warrior');
+    await expectCode(
+      createCharacter(ctx, { accountId, name: 'Rangerperson', classId: 'class.ranger' }),
+      'VALIDATION_FAILED',
+    );
+    await expectCode(
+      createCharacter(ctx, { accountId, name: 'Nobodyclass', classId: 'class.nope' }),
+      'VALIDATION_FAILED',
+    );
+    const mage = await makePlayer(ctx, 'class.mage');
+    const profile = await getCombatProfile(ctx.db, ctx, mage.characterId);
+    expect(profile).toMatchObject({ classId: 'class.mage', abilityCooldowns: {} });
+    await saveAbilityCooldowns(
+      ctx.db,
+      mage.characterId,
+      { 'ability.mage.firebolt': Date.now() + 5000, 'ability.mage.flame_burst': Date.now() - 1 },
+      Date.now(),
+    );
+    const again = await getCombatProfile(ctx.db, ctx, mage.characterId);
+    expect(Object.keys(again.abilityCooldowns)).toEqual(['ability.mage.firebolt']);
   });
 });
 

@@ -162,6 +162,27 @@ export class GameData {
         need(this.equipmentTypes, p, `class ${c.id} proficiency`),
       );
     }
+    for (const a of this.raw.abilities) {
+      if (a.classId) need(this.classes, a.classId, `ability ${a.id}`);
+      if (a.placeholder) continue;
+      // What the runtime supports today: instant, hostile-target, cooldown-only abilities.
+      if (a.targeting !== 'enemy') errors.push(`ability ${a.id}: only 'enemy' targeting is live`);
+      if (a.castTimeMs !== 0 || a.resourceCost !== 0)
+        errors.push(`ability ${a.id}: cast times and resource costs are not supported yet`);
+      if (a.autoAttack === (a.damage !== null))
+        errors.push(`ability ${a.id}: needs exactly one of autoAttack or damage`);
+      if (a.damage && a.damage.base.min > a.damage.base.max)
+        errors.push(`ability ${a.id}: damage min > max`);
+    }
+    for (const c of this.raw.classes) {
+      for (const id of c.baseAbilityIds) {
+        const a = this.abilities.get(id);
+        if (a && a.classId && a.classId !== c.id)
+          errors.push(`class ${c.id} lists ${id}, which belongs to ${a.classId}`);
+        if (a && c.playable && a.placeholder)
+          errors.push(`playable class ${c.id} lists placeholder ability ${id}`);
+      }
+    }
     for (const s of this.raw.specialisations) {
       need(this.classes, s.classId, `spec ${s.id}`);
       s.abilityIds.forEach((a) => need(this.abilities, a, `spec ${s.id}`));
