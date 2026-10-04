@@ -121,7 +121,19 @@ export const QuestTurnInMsg = clientMsg(
  */
 export const AbilityUseMsg = clientMsg('ability.use', z.object({ abilityId: ContentIdSchema }));
 
+export const PartyInviteMsg = clientMsg('party.invite', z.object({ characterId: UuidSchema }));
+export const PartyRespondMsg = clientMsg(
+  'party.respond',
+  z.object({ invitationId: UuidSchema, accept: z.boolean() }),
+);
+export const PartyLeaveMsg = clientMsg('party.leave', z.object({ partyId: UuidSchema }));
+export const PartyDisbandMsg = clientMsg('party.disband', z.object({ partyId: UuidSchema }));
+
 export const ClientMessageSchema = z.discriminatedUnion('t', [
+  PartyInviteMsg,
+  PartyRespondMsg,
+  PartyLeaveMsg,
+  PartyDisbandMsg,
   AbilityUseMsg,
   NpcInteractMsg,
   QuestAcceptMsg,
@@ -250,12 +262,28 @@ export const ChatMessageMsg = serverMsg(
   }),
 );
 
-/** Placeholder: party state push. Shape reserved; not emitted until parties exist. */
+/** Full authoritative party state, also sent on reconnect. */
 export const PartyUpdateMsg = serverMsg(
   'party.update',
   z.object({
     partyId: UuidSchema.nullable(),
-    members: z.array(z.object({ characterId: UuidSchema, name: z.string(), online: z.boolean() })),
+    leaderCharacterId: UuidSchema.nullable(),
+    members: z
+      .array(
+        z.object({
+          characterId: UuidSchema,
+          name: z.string(),
+          online: z.boolean(),
+          zoneId: z.string(),
+          health: z.number(),
+          maxHealth: z.number(),
+        }),
+      )
+      .max(5),
+    invitation: z
+      .object({ id: UuidSchema, fromName: z.string(), expiresAt: z.number() })
+      .nullable(),
+    pendingInvite: z.boolean(),
   }),
 );
 

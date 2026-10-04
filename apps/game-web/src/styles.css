@@ -1207,3 +1207,84 @@ body:has(.login) {
     min-height: 44px;
   }
 }
+
+/* Compact shared-hunt roster; full actions use the existing responsive window. */
+.party-summary {
+  position: absolute;
+  left: 14px;
+  top: 152px;
+  width: 210px;
+  padding: 8px;
+  pointer-events: auto;
+}
+.party-summary button {
+  min-height: 44px;
+}
+.party-heading {
+  width: 100%;
+  text-align: left;
+}
+.party-member {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3px;
+  margin-top: 5px;
+  font-size: 12px;
+}
+.party-member progress {
+  width: 100%;
+  height: 6px;
+  accent-color: #87b765;
+}
+.party-nearby > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 0;
+}
+.party-nearby button,
+.window-party button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.window-party {
+  width: min(400px, 100vw);
+  box-sizing: border-box;
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .party-summary ~ .controls-help {
+    left: auto;
+    right: 8px;
+    top: 300px;
+  }
+}
+@media (max-width: 600px) {
+  .party-summary {
+    left: 8px;
+    top: 142px;
+    width: 155px;
+    font-size: 12px;
+  }
+  .party-summary > div > button {
+    padding: 7px;
+  }
+  .action-bar {
+    gap: 3px;
+  }
+  .action-bar .action {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+}
+/* Party sheets must receive touch input instead of the combat controls beneath them. */
+.ui-root:has(.window-party) .touch-controls,
+.ui-root:has(.window-party) > .ability-bar {
+  display: none;
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .ui-root:has(.quest-tracker) .party-summary {
+    top: 174px;
+  }
+}

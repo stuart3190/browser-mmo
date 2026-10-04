@@ -644,7 +644,7 @@ retain their measurements; they do not override this updated policy or claim ext
     Replace the sleep with the final admission message (`character.progress`) and guaranteed cleanup.
     No runtime admission guard is relaxed. The final full run after this correction passed.
 
-## Current Work
+## Greenvale playable slice — 2026-10-04
 
 **Greenvale playable slice completed.** Continues main `2bec69c004d772a776f13a80f163aeba2975957c`;
 implementation/proof commit is the commit containing this entry (resolve with
@@ -679,6 +679,33 @@ See [slice design and controls](gameplay/vertical-slice.md) and
 [playthrough evidence](gameplay/evidence/greenvale-slice/playthrough.json).
 Preview: `http://127.0.0.1:5178/` on this VPS only, isolated development DB `mmo_slice`, API 4450,
 realtime 4451. Local dev auth remains development-only. This is not a public hosted release.
+
+## Current Work
+
+**Party/shared-hunt milestone implemented and targeted verification passed; Old Waystone follow-on next.**
+Verified 2026-10-04 by Codex. Implementation commit: the commit containing this entry
+(`git log -1 -- services/world/src/parties.ts`). Continued verified main `e1b48acf8eaab44607c6143e64be6c61d2f72b9a`.
+
+- [x] Invite/accept/decline/leave/disband, five-member cap, leader handoff, range/expiry/role checks,
+      realtime roster/health, two-minute offline grace, reconnect and checkpoint recovery.
+  - Proof: 44 world tests including party eligibility/recovery and a real simulated group kill;
+    targeted gateway test passes sequence/invite replay, stale party ID, roles, reconnect and host restart.
+- [x] Server-owned shared XP and quest kill credit; single loot-table evaluation allocated round-robin.
+      Frozen recipients/owner survive retries. Existing atomic outbox and item provenance remain in use.
+  - Proof: four PostgreSQL party reward tests: concurrent processing, exact XP/quest counts,
+    one loot owner, malformed/empty eligibility, rollback after an injected mid-group failure and retry.
+- [x] Browser Party panel and health roster with functional touch actions.
+  - Proof: two real clients invited/accepted, killed two actual wolves for 25 XP each per kill,
+    alternating item/coin ownership, exactly two quest kills each, and retained party/50 XP after re-login.
+    Phone follow-up passed actual touch accept/leave, leader disband and reachable 44 px-high actions.
+    No browser exceptions in the passing follow-up. Fixed sheet overflow and combat-control interception.
+    The first playthrough was interrupted by development HMR; resumed its pre-hunt characters without
+    grants/teleports. After the phone-only CSS fix the hunt was not needlessly repeated.
+- [x] Changed packages typecheck, repository lint, focused world/domain/gateway checks pass.
+- [ ] Final full verification of the combined party + Waystone candidate (run after follow-on implementation).
+
+Rules and deployment compatibility: [parties](gameplay/parties.md). No guilds, PvP, raids, voice,
+trading, party chat, hardware qualification or infrastructure redesign.
 
 ## Known Issues
 

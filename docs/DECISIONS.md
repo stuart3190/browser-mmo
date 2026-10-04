@@ -670,3 +670,37 @@ No server schema, protocol or economy changes. Existing characters retain their 
 animations never determine damage. Geometry is deliberately simple; remote weapon appearance is not
 yet replicated. First-damager ownership remains explicit until a scoped party/shared-hunt milestone.
 Physical phone performance and public hosting are separate follow-ups, not development gates.
+
+## 2026-10-04 — Zone-owned parties and atomic shared hunt rewards
+
+**Date**: 2026-10-04
+
+**Decision**
+Keep parties inside the exclusively owned zone simulation and its durable checkpoint. Five members,
+leader invites/disbands, 20 m invitation/acceptance range, 30 s single-use invitations, two-minute
+membership grace after disconnect. Restore the full party snapshot on reconnect; after host recovery
+members start offline and invitations are cancelled. Party IDs fence stale leave/disband requests.
+
+Capture the tagger's party cohort on first damage. At death, intersect it with the tagger's current
+party and living, online members within 40 m. Divide each eligible character's level-adjusted solo XP
+by recipient count (floor), advance everyone's active kill objectives, and allocate the single normal
+loot roll including coins round-robin among eligible members. Zero eligible group members means no
+reward. Solo/disbanded tags retain the original tagger rule. Freeze recipients/loot owner in the death
+checkpoint and durable kill event; apply the whole group's rewards in the existing outbox transaction,
+locking characters in ID order. Keep the per-kill/per-character and item source-reference dedupe keys.
+
+**Reason**
+Players need a reason to hunt together without multiplying loot or adding a second reward pipeline.
+The existing checkpoint and outbox already provide ownership, recovery and exactly-once boundaries.
+
+**Alternatives considered**
+Full XP/loot per member; client-reported contribution; a new persistent social microservice; loot voting;
+party membership queried later by the reward worker. These either inflate rewards, trust the client,
+add unnecessary scope, or let a delayed reward change recipients after the fight.
+
+**Consequences**
+Parties are currently zone-local; cross-zone travel needs an explicit handoff later. Pelts remain
+personal inventory items, so a group may hunt longer to satisfy everyone's collect objective. Round-robin
+is fair turn-taking, not equal item value. A full reward recipient mailbox delays the group's atomic
+payout. Offline/dead/distant members are ineligible for new group kills; already-frozen rewards persist.
+No guilds, party chat, trading, raids, loot voting or new infrastructure are added.

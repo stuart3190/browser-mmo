@@ -513,6 +513,8 @@ export const killEvents = pgTable(
     characterId: uuid('character_id')
       .notNull()
       .references(() => characters.id),
+    recipients: jsonb('recipients').$type<string[]>(),
+    lootCharacterId: uuid('loot_character_id'),
     diedAt: timestamp('died_at', { withTimezone: true }).notNull(),
     respawnAt: timestamp('respawn_at', { withTimezone: true }).notNull(),
     /** pending -> rewarded | void (permanently unrewardable, e.g. character deleted). */

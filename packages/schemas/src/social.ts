@@ -41,8 +41,7 @@ export const PartySchema = z.object({
   id: UuidSchema,
   leaderCharacterId: UuidSchema,
   memberCharacterIds: z.array(UuidSchema).max(5),
-  lootRule: z.enum(['free_for_all', 'round_robin', 'need_before_greed', 'master_loot']),
-  placeholder: z.literal(true),
+  lootRule: z.literal('round_robin'),
 });
 export type Party = z.infer<typeof PartySchema>;
 

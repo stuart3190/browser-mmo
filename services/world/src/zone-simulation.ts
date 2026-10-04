@@ -34,6 +34,7 @@ import type {
   WorldZone,
 } from '@mmo/schemas';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
+import { Parties } from './parties';
 import { NavGrid } from './navigation';
 
 type XZ = { x: number; z: number };
@@ -87,6 +88,8 @@ export interface KillEvent {
   enemyEntityId: string;
   /** Character credited with the kill (first to damage it: "tagging"). */
   characterId: string;
+  recipients?: string[];
+  lootCharacterId?: string;
   zoneId: string;
   spawnPointId: string;
   groupId: string | null;
@@ -153,6 +156,7 @@ interface EnemyState {
   maxHealth: number;
   targetCharacterId: string | null;
   taggedBy: string | null;
+  tagCohort?: ReturnType<Parties['cohort']>;
   nextAttackAtMs: number;
   diedAtMs: number;
   corpseRemoved: boolean;
@@ -208,6 +212,28 @@ export interface ZoneSimulationOptions {
 }
 
 export class ZoneSimulation {
+  readonly parties: Parties;
+  private partyViews = new Map<string, string>();
+  private nextPartyUpdate = 0;
+  setConnected(id: string, online: boolean, now: number): void {
+    this.parties.connected(id, online, now);
+    this.syncParties();
+  }
+  syncParties(forceId?: string): void {
+    for (const id of this.players.keys()) {
+      const d = this.parties.view(id),
+        json = JSON.stringify(d);
+      if (
+        id === forceId ||
+        (this.partyViews.get(id) !== json &&
+          (d.partyId || d.invitation || d.pendingInvite || this.partyViews.has(id)))
+      ) {
+        this.push(id, { t: 'party.update', d });
+        this.partyViews.set(id, json);
+      }
+    }
+  }
+
   readonly zone: WorldZone;
   private tickCount = 0;
   private nextEntity = 1;
@@ -235,6 +261,7 @@ export class ZoneSimulation {
     opts: ZoneSimulationOptions = {},
   ) {
     this.zone = gameData.zone(zoneId);
+    this.parties = new Parties((id) => this.players.get(id), zoneId);
     this.interestRadius = opts.interestRadiusChunks ?? 2;
     this.interactTolerance = opts.interactTolerance ?? 1.0;
     this.rng = opts.rng ?? defaultRng;
@@ -266,7 +293,8 @@ export class ZoneSimulation {
   checkpoint(): string {
     return JSON.stringify(
       {
-        version: 1,
+        version: 2,
+        parties: this.parties.checkpoint(),
         tickCount: this.tickCount,
         nextEntity: this.nextEntity,
         entities: this.entities,
@@ -297,6 +325,7 @@ export class ZoneSimulation {
       return value;
     }) as {
       version: number;
+      parties?: ReturnType<Parties['checkpoint']>;
       tickCount: number;
       nextEntity: number;
       entities: Map<string, WorldEntity>;
@@ -308,8 +337,10 @@ export class ZoneSimulation {
       kills: KillEvent[];
       groups: Map<string, GroupState>;
     };
-    if (state.version !== 1 || !(state.players instanceof Map))
+    if ((state.version !== 1 && state.version !== 2) || !(state.players instanceof Map))
       throw new Error('Unsupported zone checkpoint; explicit migration required');
+    this.parties.restore(state.parties, Date.now());
+    this.partyViews.clear();
     this.tickCount = state.tickCount;
     this.nextEntity = state.nextEntity;
     const restore = <T>(to: Map<string, T>, from: Map<string, T>) => {
@@ -410,6 +441,7 @@ export class ZoneSimulation {
       globalReadyAtMs: Math.max(0, info.combat.abilityCooldowns?.['*'] ?? 0),
     };
     this.players.set(info.characterId, state);
+    this.parties.connected(info.characterId, true, nowMs);
 
     // Full snapshot of the AOI for the newcomer...
     const visible = this.entitiesVisibleFrom(pos);
@@ -472,6 +504,8 @@ export class ZoneSimulation {
     | undefined {
     const p = this.players.get(characterId);
     if (!p) return undefined;
+    this.parties.connected(characterId, false, Date.now());
+    this.partyViews.delete(characterId);
     this.players.delete(characterId);
     for (const e of this.enemies.values())
       if (e.targetCharacterId === characterId) this.disengage(e);
@@ -521,6 +555,7 @@ export class ZoneSimulation {
         maxHealth: number;
         targetCharacterId: string | null;
         taggedBy: string | null;
+        tagCohort?: ReturnType<Parties['cohort']>;
         defId: string;
         spawnPointId: string;
         groupId: string | null;
@@ -952,6 +987,11 @@ export class ZoneSimulation {
 
   /** Advances the simulation: respawns, interest updates, batched movement broadcast. */
   step(nowMs: number): void {
+    if (nowMs >= this.nextPartyUpdate) {
+      this.parties.expire(nowMs);
+      this.syncParties();
+      this.nextPartyUpdate = nowMs + 1000;
+    }
     this.tickCount++;
     const dtMs =
       this.lastStepMs === null ? 0 : Math.min(1000, Math.max(0, nowMs - this.lastStepMs));
@@ -1272,7 +1312,10 @@ export class ZoneSimulation {
     abilityId: string | null,
   ): void {
     // Aggro + tag: the first character to damage an enemy owns the kill.
-    enemy.taggedBy ??= p.characterId;
+    if (!enemy.taggedBy) {
+      enemy.taggedBy = p.characterId;
+      enemy.tagCohort = this.parties.cohort(p.characterId);
+    }
     if (enemy.mode !== 'engaged' || !enemy.targetCharacterId)
       this.engage(enemy, p.characterId, nowMs);
     const { health, killed } = applyDamage(enemy.health, damage);
@@ -1306,7 +1349,14 @@ export class ZoneSimulation {
         Math.floor(this.rng.next() * (group.def.respawnMs.max - group.def.respawnMs.min + 1))
       : (enemy.spawn.respawnMs ?? 0);
     enemy.respawnAtMs = nowMs + Math.max(delay, enemy.def.combat.corpseMs);
+    const tag = enemy.taggedBy ?? killer.characterId;
+    const distribution = this.parties.rewards(
+      tag,
+      enemy.tagCohort,
+      this.entities.get(enemy.entityId)!.position,
+    );
     this.kills.push({
+      ...distribution,
       killId,
       enemyId: enemy.def.id,
       enemyName: enemy.def.name,
@@ -1448,6 +1498,7 @@ export class ZoneSimulation {
     enemy.mode = 'idle';
     enemy.path = null;
     enemy.taggedBy = null;
+    delete enemy.tagCohort;
     enemy.health = enemy.maxHealth;
     enemy.nextWanderAtMs = nowMs + 3000 + this.rng.next() * 5000;
     this.syncEntityHealth(enemy.entityId, enemy.health, enemy.maxHealth, false);

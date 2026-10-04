@@ -11,6 +11,7 @@ import { hoverTooltip } from './hover';
 import { InventoryWindow } from './InventoryWindow';
 import { ItemDetails } from './ItemDetails';
 import { ItemTooltip } from './ItemTooltip';
+import { PartyPanel, PartySummary } from './PartyUI';
 import { FirstSteps } from './FirstSteps';
 import { AbilityBar } from './AbilityBar';
 import { Minimap } from './Minimap';
@@ -18,6 +19,7 @@ import { DialoguePanel, QuestLogWindow, QuestTracker } from './QuestUI';
 import { TouchControls, useTouchControls } from './TouchControls';
 
 const SHORTCUTS: Record<string, WindowId> = {
+  KeyP: 'party',
   KeyB: 'inventory',
   KeyI: 'inventory',
   KeyC: 'character',
@@ -35,8 +37,12 @@ export function mountGameUi(root: HTMLElement, deps: UiDeps): void {
 }
 
 function GameUI() {
-  const { state, combat, gameData } = useGame();
+  const { state, combat, gameData, controls } = useGame();
   const touch = useTouchControls();
+  const partyOpen = state.open.has('party');
+  useEffect(() => {
+    if (partyOpen) controls.analog.clear();
+  }, [partyOpen, controls]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.repeat) return;
@@ -75,6 +81,7 @@ function GameUI() {
   return (
     <div className={touch ? 'ui-root touch' : 'ui-root'}>
       <PlayerFrame />
+      <PartySummary />
       <TargetFrame />
       <Minimap />
       <QuestTracker />
@@ -96,6 +103,7 @@ function GameUI() {
         <InventoryWindow />
         <BankWindow />
         <QuestLogWindow />
+        <PartyPanel />
       </div>
       <DialoguePanel />
       <ItemDetails />
@@ -206,6 +214,7 @@ function ActionBar() {
       {btn('bank', 'Bank', 'V')}
 
       {btn('quests', 'Quests', 'J')}
+      {btn('party', 'Party', 'P')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button
           className={state.target.attacking ? 'action attack active' : 'action attack'}

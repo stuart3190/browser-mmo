@@ -145,6 +145,8 @@ export interface AwardKillInput {
   characterId: string;
   enemyId: string;
   zoneId: string;
+  shareCount?: number;
+  receivesLoot?: boolean;
 }
 
 /**
@@ -179,7 +181,9 @@ export async function awardKillInTx(
   const actor = { accountId: character.accountId, characterId: character.id };
 
   // XP / level
-  const xpGained = xpForKill(rules, enemy.xpReward, enemy.level, character.level, curve);
+  const xpGained = Math.floor(
+    xpForKill(rules, enemy.xpReward, enemy.level, character.level, curve) / (input.shareCount ?? 1),
+  );
   const progressed = applyExperience(curve, { level: character.level, xp: character.xp }, xpGained);
   if (xpGained > 0) {
     await tx
@@ -190,7 +194,10 @@ export async function awardKillInTx(
 
   // Loot (bags first, mailbox on overflow)
   const table = enemy.lootTableId ? ctx.gameData.lootTables.get(enemy.lootTableId) : undefined;
-  const roll = table ? rollLootTable(table, ctx.rng) : { items: [], currency: null };
+  const roll =
+    table && input.receivesLoot !== false
+      ? rollLootTable(table, ctx.rng)
+      : { items: [], currency: null };
   const changed: ItemRow[] = [];
   const mailedItems: KillReward['mailedItems'] = [];
   for (const [n, drop] of roll.items.entries()) {
@@ -301,6 +308,8 @@ export interface KillEventRecord {
   spawnPointId: string;
   groupId: string | null;
   characterId: string;
+  recipients?: string[];
+  lootCharacterId?: string;
   diedAt: Date;
   respawnAt: Date;
 }
@@ -317,7 +326,7 @@ export async function recordKill(db: DbOrTx, event: KillEventRecord): Promise<vo
 }
 
 export type ProcessKillResult =
-  | { status: 'rewarded'; reward: KillReward }
+  | { status: 'rewarded'; reward: KillReward; rewards: KillReward[] }
   /** Already rewarded or voided earlier (or by a concurrent processor that just finished). */
   | { status: 'done' }
   /** Another processor holds the event right now; it will finish it. */
@@ -374,27 +383,48 @@ export async function processKillEvent(
             lastError: error,
           })
           .where(eq(schema.killEvents.killId, killId));
-      const [already] = await tx
-        .select({ killId: schema.killRewards.killId })
-        .from(schema.killRewards)
-        .where(
-          and(
-            eq(schema.killRewards.killId, killId),
-            eq(schema.killRewards.characterId, event.characterId),
-          ),
-        );
-      if (already) {
+      const recipients = event.recipients ?? [event.characterId];
+      const lootOwner = event.lootCharacterId ?? event.characterId;
+      if (recipients.length === 0) {
         await markDone('rewarded');
         return { status: 'done' };
       }
-      const reward = await awardKillInTx(tx, ctx, {
-        killId,
-        characterId: event.characterId,
-        enemyId: event.enemyId,
-        zoneId: event.zoneId,
-      });
+      if (
+        recipients.length < 1 ||
+        recipients.length > 5 ||
+        new Set(recipients).size !== recipients.length ||
+        !recipients.includes(lootOwner)
+      )
+        throw new DomainError(ErrorCode.VALIDATION_FAILED, 'Invalid kill reward recipients');
+      const existing = await tx
+        .select()
+        .from(schema.killRewards)
+        .where(eq(schema.killRewards.killId, killId));
+      if (existing.length) {
+        // All party rewards commit together. A partial pre-existing group is corruption, not success.
+        if (
+          existing.length !== recipients.length ||
+          !existing.every((r) => recipients.includes(r.characterId))
+        )
+          throw new Error('Partial kill reward set requires investigation');
+        await markDone('rewarded');
+        return { status: 'done' };
+      }
+      const rewards: KillReward[] = [];
+      // Stable character lock order for overlapping group kills.
+      for (const characterId of [...recipients].sort())
+        rewards.push(
+          await awardKillInTx(tx, ctx, {
+            killId,
+            characterId,
+            enemyId: event.enemyId,
+            zoneId: event.zoneId,
+            shareCount: recipients.length,
+            receivesLoot: characterId === lootOwner,
+          }),
+        );
       await markDone('rewarded');
-      return { status: 'rewarded', reward };
+      return { status: 'rewarded', reward: rewards[0]!, rewards };
     });
   } catch (err) {
     const mapped = mapAlreadyClaimed(err);

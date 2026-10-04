@@ -20,6 +20,12 @@ export interface Controls {
 }
 
 export interface UiDeps {
+  party: {
+    invite: (id: string) => void;
+    respond: (id: string, accept: boolean) => void;
+    leave: () => void;
+    disband: () => void;
+  };
   state: GameState;
   actions: ItemActions;
   combat: CombatActions;

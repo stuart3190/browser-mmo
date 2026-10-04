@@ -242,3 +242,24 @@ it('sends matching local vitals for every consecutive nonlethal hit', () => {
   const vitals = t.of(p.id, 'player.vitals').map((m) => m.d.health);
   for (const hit of hits) expect(vitals).toContain(hit.d.targetHealth);
 });
+
+it('freezes group recipients and rotating loot owner in the durable death checkpoint', () => {
+  const t = setup();
+  const a = t.join(
+    { x: 2, y: 0, z: 12 },
+    { ...fists, weapon: { min: 200, max: 200, attackSpeedMs: 2000 } },
+  );
+  const b = t.join({ x: 3, y: 0, z: 12 });
+  t.sim.parties.invite(a.id, b.id, t.now);
+  t.sim.parties.respond(b.id, t.sim.parties.view(b.id).invitation!.id, true, t.now);
+  t.sim.setTarget(a.id, t.wolf.id);
+  t.sim.startAttack(a.id);
+  t.advance(2500, false);
+  const image = t.sim.checkpoint();
+  const recovered = new ZoneSimulation(gd, ARENA);
+  recovered.restoreCheckpoint(image);
+  const kills = recovered.drainKills();
+  expect(kills).toHaveLength(1);
+  expect(kills[0]).toMatchObject({ recipients: [a.id, b.id], lootCharacterId: a.id });
+  expect(recovered.parties.view(b.id).partyId).toBe(t.sim.parties.view(a.id).partyId);
+});

@@ -507,6 +507,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
           lingerUntil: null,
         });
       }
+      zone.setConnected(row.id, true, now);
+      zone.syncParties(row.id);
       const placed = zone.getPlayer(row.id)!;
       const entityId = placed.entityId;
       send(
@@ -557,6 +559,21 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     now: number,
   ) {
     switch (msg.t) {
+      case 'party.invite':
+        player.zone.parties.invite(player.characterId, msg.d.characterId, now);
+        player.zone.syncParties();
+        return;
+      case 'party.respond':
+        player.zone.parties.respond(player.characterId, msg.d.invitationId, msg.d.accept, now);
+        player.zone.syncParties();
+        return;
+      case 'party.leave':
+      case 'party.disband':
+        if (player.zone.parties.view(player.characterId).partyId !== msg.d.partyId)
+          throw new DomainError(ErrorCode.CONFLICT, 'Party changed; refresh and try again');
+        player.zone.parties.leave(player.characterId, msg.t === 'party.disband');
+        player.zone.syncParties();
+        return;
       case 'move.input':
         player.zone.handleMove(player.characterId, msg.d.position, msg.d.rotationY, now);
         return;
@@ -740,6 +757,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     if (byCharacter.get(player.characterId) === conn) byCharacter.delete(player.characterId);
     const entry = inWorld.get(player.characterId);
     if (!entry || byCharacter.has(player.characterId)) return; // already re-attached elsewhere
+    entry.zone.setConnected(player.characterId, false, Date.now());
     if (shuttingDown || lingerMs <= 0) await leaveWorld(entry);
     else entry.lingerUntil = Date.now() + lingerMs;
     conn.log.info({ lingerMs: shuttingDown ? 0 : lingerMs }, 'connection closed');
@@ -884,6 +902,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         spawnPointId: kill.spawnPointId,
         groupId: kill.groupId,
         characterId: kill.characterId,
+        recipients: kill.recipients ?? [kill.characterId],
+        lootCharacterId: kill.lootCharacterId ?? kill.characterId,
         diedAt: new Date(kill.diedAtMs),
         respawnAt: new Date(kill.respawnAtMs),
       });
@@ -920,7 +940,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         await faults.afterReward?.(killId);
         if (crashed) return;
         rewards.inc({ result: recovered ? 'recovered' : 'ok' });
-        await notifyReward(result.reward, recovered);
+        for (const reward of result.rewards) await notifyReward(reward, recovered);
       } else if (result.status === 'retry') {
         rewards.inc({ result: 'error' });
         logger.warn(

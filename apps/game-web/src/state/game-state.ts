@@ -2,7 +2,7 @@ import type { ConnectionStatus, ServerPayload } from '@mmo/networking';
 import type { CharacterStats, CurrencyBalance, PlayerCharacter, QuestView } from '@mmo/schemas';
 import { ItemStore } from '@mmo/ui';
 
-export type WindowId = 'inventory' | 'character' | 'bank' | 'quests';
+export type WindowId = 'inventory' | 'character' | 'bank' | 'quests' | 'party';
 
 export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 
@@ -27,6 +27,7 @@ export interface Toast {
 export interface EntityInfo {
   id: string;
   kind: string;
+  characterId?: string | null | undefined;
   name: string;
   level?: number | undefined;
   health?: number | undefined;
@@ -75,6 +76,13 @@ export class GameState {
   // --- quests (all server-provided) ---
   /** The authoritative quest log (replaced on every quest.log). */
   quests: QuestView[] = [];
+  party: ServerPayload<'party.update'> = {
+    partyId: null,
+    leaderCharacterId: null,
+    members: [],
+    invitation: null,
+    pendingInvite: false,
+  };
   /** Open NPC dialogue (the server's answer to npc.interact / quest actions). */
   dialogue: NpcDialogueView | null = null;
   /** serverTime - Date.now() at last auth.ok, for displaying server timestamps. */

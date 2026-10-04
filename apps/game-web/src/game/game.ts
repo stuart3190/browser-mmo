@@ -83,6 +83,16 @@ export async function startGame(args: {
     actions,
     combat,
     quests: questActions,
+    party: {
+      invite: (characterId) => net.send('party.invite', { characterId }),
+      respond: (invitationId, accept) => net.send('party.respond', { invitationId, accept }),
+      leave: () => {
+        if (state.party.partyId) net.send('party.leave', { partyId: state.party.partyId });
+      },
+      disband: () => {
+        if (state.party.partyId) net.send('party.disband', { partyId: state.party.partyId });
+      },
+    },
     gameData,
     controls: {
       analog,
@@ -114,6 +124,7 @@ export async function startGame(args: {
   const info = (e: WorldEntity): EntityInfo => ({
     id: e.id,
     kind: e.kind,
+    characterId: e.characterId,
     name: e.name,
     level: e.level,
     health: e.health,
@@ -365,6 +376,11 @@ export async function startGame(args: {
     player?.correct(m.d.position, m.d.rotationY);
     state.addLog(`Position corrected by server (${m.d.reason})`, 'error');
   });
+  net.on('party.update', (m) =>
+    state.update((s) => {
+      s.party = m.d;
+    }),
+  );
   net.on('presence.update', (m) => state.addLog(`${m.d.name} ${m.d.event} the zone`));
   net.on('chat.message', (m) => state.addLog(`[${m.d.channel}] ${m.d.from.name}: ${m.d.text}`));
   const updateWeapon = () =>
