@@ -843,3 +843,12 @@ First playtest the complete three-quest starter route with fresh solo/party char
 and combat pacing. Then extend the Hollow locally with a second readable enemy behaviour and a small
 quest payoff, reusing current world/party/reward systems. No guilds, raids, PvP, crafting or giant quest
 engine. Hosting/CI/physical-device follow-ups remain separate from gameplay development.
+
+## Mobile display follow-up — 2026-10-05
+
+- [x] Gesture-only touch entry fullscreen action, optional landscape lock, browser fallback and nonblocking fullscreen re-entry.
+- [x] Standalone PWA manifest/icons and online-only worker; no authenticated/offline cache.
+- [x] Dynamic viewport canvas, safe-area HUD and compact portrait/landscape controls; renderer follows canvas size.
+- Verification: Codex, 2026-10-05. Client typecheck/unit tests/production build; repository lint/format; browser regression `scripts/e2e/mobile-display.cjs` at 390×844, 844×390, reduced-height 390×650 and desktop 1280×800. Checks visible control bounds/hit targets, fullscreen denial, native fullscreen/exit/re-entry and absence of desktop prompt. Commit: this mobile-display change (resolve with `git log -- apps/game-web/src/mobile-display.ts`).
+- Known limitation: emulated Chromium is not a physical Samsung device. Android navigation bars, orientation permission and browser install UI remain controlled by the browser/OS. Test installation and bar transitions on a real phone; this does not block gameplay development.
+- Next gameplay task remains the Root-Wound investigation above; no gameplay changed here.

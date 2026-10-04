@@ -25,7 +25,7 @@ body {
 }
 #game {
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   display: block;
   outline: none;
 }
@@ -452,7 +452,7 @@ kbd {
   border: 1px solid var(--accent);
   border-radius: var(--radius);
   padding: 10px;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100dvh - 140px);
   overflow: auto;
 }
 .details-actions {
@@ -584,7 +584,7 @@ kbd {
     left: 0;
     right: 0;
     bottom: 64px;
-    max-height: 62vh;
+    max-height: 62dvh;
     flex-direction: column;
     align-items: stretch;
     overflow: auto;
@@ -600,7 +600,7 @@ kbd {
     top: auto;
     bottom: 64px;
     width: auto;
-    max-height: 70vh;
+    max-height: 70dvh;
     border-radius: var(--radius) var(--radius) 0 0;
     z-index: 2;
   }
@@ -1295,4 +1295,177 @@ body:has(.login) {
   padding: 6px;
   font-weight: 700;
   font-size: 12px;
+}
+
+/* Browser bars resize the dynamic viewport; safe areas belong to the whole HUD, not individual
+   buttons. Fullscreen is optional and the same layout works in a regular browser tab. */
+#game {
+  height: 100vh;
+  height: 100dvh;
+}
+#ui {
+  height: 100dvh;
+}
+.mobile-display {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  pointer-events: none;
+}
+.fullscreen-start {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(340px, calc(100% - 48px));
+  height: fit-content;
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  pointer-events: auto;
+}
+.fullscreen-start h2 {
+  font-family: Georgia, serif;
+}
+.fullscreen-start p {
+  line-height: 1.5;
+}
+.fullscreen-start button {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+}
+.fullscreen-return {
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+.fullscreen-return > button {
+  min-height: 44px;
+  font-size: 12px;
+  background: #193330e6;
+}
+.fullscreen-note {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(280px, 85vw);
+}
+@media (pointer: coarse) {
+  #ui {
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    left: env(safe-area-inset-left, 0px);
+    right: env(safe-area-inset-right, 0px);
+    bottom: env(safe-area-inset-bottom, 0px);
+    height: auto;
+  }
+  .ui-root.touch {
+    position: absolute;
+    inset: 0;
+  }
+  .ui-root.touch .joystick,
+  .ui-root.touch .touch-buttons {
+    bottom: 76px;
+  }
+  .ui-root.touch .action-bar {
+    bottom: 12px;
+  }
+  .ui-root.touch .minimap {
+    bottom: 248px;
+  }
+  .login {
+    box-sizing: border-box;
+    max-height: 100%;
+    overflow: auto;
+  }
+  .ui-root.touch .controls-help {
+    display: none;
+  }
+  .ui-root.touch:has(.window, .dialogue, .details) .touch-controls {
+    visibility: hidden;
+  }
+  .windows,
+  .details,
+  .dialogue {
+    max-height: calc(100% - 76px);
+  }
+}
+@media (pointer: coarse) and (max-width: 600px) {
+  .joystick {
+    width: 112px;
+    height: 112px;
+    left: 10px;
+  }
+  .touch-buttons {
+    right: 10px;
+    gap: 8px;
+    grid-template-columns: auto auto;
+    grid-template-areas: 'interact target' 'abilities abilities' 'attack attack';
+  }
+  .touch-btn.attack {
+    width: 64px;
+    height: 64px;
+  }
+  .ui-root.touch .minimap {
+    bottom: 310px;
+  }
+  .fullscreen-return {
+    top: auto;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px) + 58px);
+    left: 50%;
+  }
+}
+@media (pointer: coarse) and (max-height: 540px) {
+  .frame {
+    width: 180px;
+  }
+  .ui-root.touch .minimap {
+    top: 6px;
+    bottom: auto;
+    right: 204px;
+    width: 64px;
+  }
+  .minimap canvas {
+    width: 64px;
+    height: 64px;
+  }
+  .minimap-label,
+  .quest-tracker,
+  .party-summary .party-member {
+    display: none;
+  }
+  .party-summary,
+  .ui-root.touch:has(.quest-tracker) .party-summary {
+    top: 100px;
+    width: 155px;
+    padding: 2px;
+  }
+  .joystick {
+    width: 108px;
+    height: 108px;
+  }
+  .touch-buttons {
+    gap: 8px;
+  }
+  .touch-btn,
+  .touch-btn.attack {
+    width: 52px;
+    height: 52px;
+  }
+  .ui-root.touch .prompt {
+    top: 36%;
+    max-width: 40%;
+  }
+  .ui-root.touch .windows,
+  .ui-root.touch .details,
+  .ui-root.touch .dialogue {
+    z-index: 3;
+  }
+}
+@media (pointer: coarse) {
+  .action-bar .action {
+    font-size: 12px;
+  }
 }

@@ -800,3 +800,10 @@ configured limit. Password accounts are operator-provisioned, no public signup o
 Preview data is separate from prior local playthroughs. Local deployment dumps/releases need periodic
 pruning; off-host backup and alert operations remain follow-ups. Failed migrations leave only this
 preview stopped for inspection. No automatic backward database/checkpoint rollback.
+
+## 2026-10-05 — Mobile display is optional and gesture-driven
+
+- **Decision:** Offer touch-first players Start / Enter Fullscreen after character selection, before connecting to the world. Request document fullscreen from that click, then best-effort landscape lock. Browser continuation and an unobtrusive re-entry button remain available. Use dynamic viewport height and a safe-area HUD, including compact landscape controls.
+- **Reason:** Browser and Android bars otherwise consume playable space; web pages cannot guarantee immersive mode or force orientation.
+- **Alternatives considered:** Automatic fullscreen (blocked without activation), repeatedly reopening a modal (disruptive), requiring installation (unnecessary barrier).
+- **Consequences:** Installable standalone manifest and icons reduce browser chrome. The service worker is online-only: no account/game data or stale release caching, no offline-play promise. Browser/system navigation remains user-controlled; physical Samsung verification is still required. Desktop has no entry prompt or fullscreen control.

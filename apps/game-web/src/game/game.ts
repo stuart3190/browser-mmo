@@ -462,6 +462,10 @@ export async function startGame(args: {
     scene.render();
   });
   window.addEventListener('resize', () => engine.resize());
+  // Browser chrome can change dvh without a layout-window resize on mobile.
+  const viewportResize = new ResizeObserver(() => engine.resize());
+  viewportResize.observe(args.canvas);
+  scene.onDisposeObservable.addOnce(() => viewportResize.disconnect());
   setInterval(() => net.send('ping', { clientTime: performance.now() }), 15_000);
 }
 
