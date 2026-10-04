@@ -13,9 +13,11 @@ export const authRoutes =
     app.post('/auth/password-login', async (req) => {
       const provider = deps.authProviders.get('password');
       if (!provider) throw new DomainError(ErrorCode.NOT_FOUND, 'Password login disabled');
-      const { accountId } = await provider.authenticate(deps.ctx, req.body);
+      const { accountId, credential } = await provider.authenticate(deps.ctx, req.body);
+      if (!credential)
+        throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Missing verified credential');
       const { client } = DevLoginRequestSchema.parse(req.body);
-      const session = await deps.sessions.create(deps.ctx, accountId, client);
+      const session = await deps.sessions.create(deps.ctx, accountId, client, credential);
       return {
         token: session.token,
         expiresAt: session.expiresAt.toISOString(),

@@ -610,3 +610,36 @@ An isolated TLS certificate, locally encrypted restore and passing local tests d
 hosting, off-host disaster recovery, physical-phone performance or hosted CI. All remain separate
 release gates. Keep main unchanged while Actions results are unreadable or capacity gates fail.
 See `docs/hardening/production-qualification-2026-10-04.md` for evidence and limitations.
+
+## 2026-10-04 — Local code merge criteria and password rotation ordering
+
+**Date**: 2026-10-04
+
+**Decision**
+Per the owner's explicit instruction, supersede the merge restrictions in the earlier operational
+release-gates, measured release-qualification and production-mode qualification entries. Hosted CI
+visibility, hosting capacity, physical-device testing and off-host operations remain external follow-ups;
+they do not prevent development or a merge with passing full local verification and no known actionable
+CRITICAL/HIGH in-repo blocker. Preserve existing performance/security limits and historical evidence.
+
+Keep the password provider/session architecture. Carry the verified identity/hash internally from
+password authentication to session creation. Lock the account in the issuance transaction, recheck
+that credential, then insert the session. Rotation already locks the same account before updating the
+hash and revoking sessions. The HTTP password route requires this evidence; it is never returned in
+its response. Slow password hashing stays outside the database transaction.
+
+**Reason**
+External qualification was repeatedly preventing development despite locally verified code. The owner
+explicitly changed those priorities. Code review also found that a login verified before password
+rotation could otherwise issue a new valid session after rotation had revoked existing sessions.
+
+**Alternatives considered**
+Continue blocking development on external measurements; weaken production safety limits; replace auth;
+hold a database lock during scrypt; rely on revoking only sessions that existed before hashing finished.
+None is necessary for this focused merge or correctly addresses the credential race with bounded work.
+
+**Consequences**
+Issuance and rotation have a defined order: issuance first is revoked by rotation; rotation first makes
+old verification fail. Trusted development/test session creation remains available internally. New
+credential-changing code must preserve account-first locking. No schema, gameplay or public auth flow
+is added. Local verification is not hosted CI success, device acceptance or production capacity proof.

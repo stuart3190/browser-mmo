@@ -4,7 +4,7 @@ import { schema } from '@mmo/db';
 import { DevLoginRequestSchema } from '@mmo/schemas';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import type { Role } from '@mmo/shared';
-import type { AuthProvider } from './auth';
+import type { AuthProvider, VerifiedCredential } from './auth';
 import type { DomainContext } from './context';
 import { ensureAccountVault } from './containers';
 import { inTransaction } from './tx';
@@ -43,7 +43,10 @@ export async function hashPassword(password: string): Promise<string> {
 }
 export class PasswordAuthProvider implements AuthProvider {
   readonly id = 'password';
-  async authenticate(ctx: DomainContext, credentials: unknown): Promise<{ accountId: string }> {
+  async authenticate(
+    ctx: DomainContext,
+    credentials: unknown,
+  ): Promise<{ accountId: string; credential: VerifiedCredential }> {
     const { username } = DevLoginRequestSchema.parse(credentials);
     const password = passwordInput((credentials as Record<string, unknown>).password);
     const [identity] = await ctx.db
@@ -62,7 +65,10 @@ export class PasswordAuthProvider implements AuthProvider {
     const valid = timingSafeEqual(key, Buffer.from(match?.[2] ?? '00'.repeat(64), 'hex'));
     if (!valid || !match || !identity)
       throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Invalid username or password');
-    return { accountId: identity.accountId };
+    return {
+      accountId: identity.accountId,
+      credential: { identityId: identity.id, secretHash: identity.secretHash! },
+    };
   }
 }
 

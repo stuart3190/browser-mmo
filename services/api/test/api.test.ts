@@ -251,3 +251,54 @@ it('production refuses dev/no auth and supports provisioned password login witho
     await prod.close();
   }
 });
+
+it('rejects a password login when rotation commits before session issuance', async () => {
+  const ctx = createDomainContext({ db: handle.db, gameData: getGameData() });
+  const username = `rotate_${uniq()}`;
+  const password = 'old password for overlapping login';
+  const replacement = 'replacement password for login';
+  await provisionPasswordAccount(ctx, username, password);
+  const provider = new PasswordAuthProvider();
+  let rotate = true;
+  const prod = await buildApp({
+    ctx,
+    env: { CORS_ORIGINS: 'https://game.example', NODE_ENV: 'production' },
+    logger: createLogger({ service: 'rotation-test', level: 'silent' }),
+    metrics: new Metrics(),
+    sessions: new SessionService(1),
+    authProviders: new Map([
+      [
+        'password',
+        {
+          id: 'password',
+          async authenticate(context, credentials) {
+            const verified = await provider.authenticate(context, credentials);
+            if (rotate) {
+              rotate = false;
+              await provisionPasswordAccount(ctx, username, replacement);
+            }
+            return verified;
+          },
+        },
+      ],
+    ]),
+  });
+  try {
+    const stale = await prod.inject({
+      method: 'POST',
+      url: '/v1/auth/password-login',
+      payload: { username, password },
+    });
+    expect(stale.statusCode).toBe(401);
+    expect(stale.json()).not.toHaveProperty('token');
+    const fresh = await prod.inject({
+      method: 'POST',
+      url: '/v1/auth/password-login',
+      payload: { username, password: replacement },
+    });
+    expect(fresh.statusCode).toBe(200);
+    expect(Object.keys(fresh.json()).sort()).toEqual(['account', 'expiresAt', 'token']);
+  } finally {
+    await prod.close();
+  }
+});

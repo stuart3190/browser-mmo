@@ -113,12 +113,17 @@ async function newAccount() {
 
 async function join(token: string, characterId: string) {
   const c = new TestClient();
-  await c.opened;
-  c.send('auth.hello', { token, characterId, client: 'game_web' });
-  await c.waitFor('auth.ok');
-  await c.waitFor('character.stats');
-  await c.waitFor('wallet.updated');
-  return c;
+  try {
+    await c.opened;
+    c.send('auth.hello', { token, characterId, client: 'game_web' });
+    await c.waitFor('auth.ok');
+    await c.waitFor('character.stats');
+    await c.waitFor('wallet.updated');
+    return c;
+  } catch (err) {
+    c.ws.terminate();
+    throw err;
+  }
 }
 
 const grant = (characterId: string, templateId: string) =>
@@ -458,13 +463,24 @@ describe('reconnect', () => {
     });
     const statuses: string[] = [];
     first.onStatus((s) => statuses.push(s));
-    await first.connect({ token: acc.token, characterId: ch.id, client: 'game_web' });
-    await sleep(200);
-    const second = await join(acc.token, ch.id); // same character logs in from another client
-    await sleep(500);
-    expect(statuses.at(-1)).toBe('closed');
-    expect(first.reconnects).toBe(0);
-    second.ws.close();
+    let admitted = false;
+    first.on('character.progress', () => {
+      admitted = true;
+    });
+    let second: TestClient | undefined;
+    try {
+      await first.connect({ token: acc.token, characterId: ch.id, client: 'game_web' });
+      // connect() resolves at socket-open, not completed server admission. A fixed sleep
+      // accidentally tests concurrent admission rather than deliberate session replacement.
+      await vi.waitFor(() => expect(admitted).toBe(true), { timeout: 4000 });
+      second = await join(acc.token, ch.id);
+      await vi.waitFor(() => expect(statuses.at(-1)).toBe('closed'), { timeout: 4000 });
+      await sleep(500); // observe beyond the configured reconnect backoff
+      expect(first.reconnects).toBe(0);
+    } finally {
+      first.close();
+      second?.ws.close();
+    }
   });
 });
 

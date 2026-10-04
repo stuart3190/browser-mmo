@@ -17,10 +17,18 @@ import { inTransaction } from './tx';
  * provider-independent opaque bearer tokens. Adding email/password or OAuth means adding a
  * provider (and an `auth_identities` row per linked identity) — nothing else changes.
  */
+export interface VerifiedCredential {
+  identityId: string;
+  secretHash: string;
+}
+
 export interface AuthProvider {
   /** Stored in auth_identities.provider. */
   readonly id: string;
-  authenticate(ctx: DomainContext, credentials: unknown): Promise<{ accountId: string }>;
+  authenticate(
+    ctx: DomainContext,
+    credentials: unknown,
+  ): Promise<{ accountId: string; credential?: VerifiedCredential }>;
 }
 
 /**
@@ -77,26 +85,47 @@ export class SessionService {
     ctx: DomainContext,
     accountId: string,
     clientKind: ClientKind,
+    credential?: VerifiedCredential,
   ): Promise<{ token: string; expiresAt: Date; account: PlayerAccount }> {
     const token = randomBytes(32).toString('base64url');
     const now = ctx.now();
     const expiresAt = new Date(now.getTime() + this.ttlHours * 3_600_000);
-    const [account] = await ctx.db
-      .select()
-      .from(schema.accounts)
-      .where(eq(schema.accounts.id, accountId));
-    if (!account) throw new DomainError(ErrorCode.NOT_FOUND, 'Account not found');
-    if (account.status !== 'active')
-      throw new DomainError(ErrorCode.FORBIDDEN, `Account is ${account.status}`);
-    await ctx.db.insert(schema.sessions).values({
-      id: uuidv7(),
-      accountId,
-      tokenHash: hashToken(token),
-      clientKind,
-      createdAt: now,
-      expiresAt,
+    // Password rotation locks this same account before replacing the hash/revoking sessions.
+    // Hashing stays outside the transaction; recheck its evidence before issuing a session.
+    return inTransaction(ctx, async (tx) => {
+      const [account] = await tx
+        .select()
+        .from(schema.accounts)
+        .where(eq(schema.accounts.id, accountId))
+        .for('update');
+      if (!account) throw new DomainError(ErrorCode.NOT_FOUND, 'Account not found');
+      if (account.status !== 'active')
+        throw new DomainError(ErrorCode.FORBIDDEN, `Account is ${account.status}`);
+      if (credential) {
+        const [identity] = await tx
+          .select({ id: schema.authIdentities.id })
+          .from(schema.authIdentities)
+          .where(
+            and(
+              eq(schema.authIdentities.id, credential.identityId),
+              eq(schema.authIdentities.accountId, accountId),
+              eq(schema.authIdentities.provider, 'password'),
+              eq(schema.authIdentities.secretHash, credential.secretHash),
+            ),
+          );
+        if (!identity)
+          throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Credentials changed; log in again');
+      }
+      await tx.insert(schema.sessions).values({
+        id: uuidv7(),
+        accountId,
+        tokenHash: hashToken(token),
+        clientKind,
+        createdAt: now,
+        expiresAt,
+      });
+      return { token, expiresAt, account: accountFromRow(account) };
     });
-    return { token, expiresAt, account: accountFromRow(account) };
   }
 
   /** Resolves a bearer token. Returns null for unknown/expired/revoked tokens or inactive accounts. */

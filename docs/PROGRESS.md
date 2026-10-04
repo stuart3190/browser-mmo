@@ -618,21 +618,38 @@ external actions are in `docs/hardening/production-qualification-2026-10-04.md`.
 
 ## Current Work
 
-**Production-mode qualification remains FAIL / DO NOT MERGE.** See
-[production qualification](hardening/production-qualification-2026-10-04.md) for the isolated TLS
-production deployment, password-only auth, restricted runtime DB role, real combat/economy load,
-deployed crash/session tests, populated migration, encrypted local restore and physical-phone checklist.
-Hosted Actions still returns HTTP 404; owner device authorization is required. See the
-[latest merge-gate evidence](hardening/merge-gates-2026-10-04.md): another five-player stage
-missed the tick-rate gate at 19.4405 Hz despite improved 152 ms p95 RTT. Earlier load failed at one and five players;
-no safe capacity is certified. Main remains unchanged. No gameplay work or external invitations.
+**Hardening locally verified and ready for fast-forward merge; external qualification is not a development/merge gate.** The owner's
+latest instruction supersedes earlier DO NOT MERGE recommendations based solely on hosted CI
+visibility, VPS capacity or physical-device availability. Merge requires local verification and no
+known actionable CRITICAL/HIGH in-repo correctness/security issue. Historical qualification reports
+retain their measurements; they do not override this updated policy or claim external release readiness.
+
+- [x] Close password-rotation versus session-issuance race.
+  - Verified 2026-10-04 · Codex · three password-domain tests and the targeted production HTTP
+    rotation regression passed against disposable PostgreSQL. Full verification recorded below.
+  - Session creation locks the account shared with password rotation and rechecks the authenticated
+    identity/hash before insertion. An old in-flight password login cannot outlive rotation revocation.
+    HTTP requires the verified credential and never returns it to the client.
+  - Implementation/proof commit: the commit containing this entry (resolve with `git log -1 -- packages/domain/src/auth.ts`).
+- [x] Final complete local verification.
+  - Verified 2026-10-04 · Codex · final `NODE_ENV=production pnpm verify` exited zero:
+    format, lint, all workspace/script types, 119 unit tests, 118 real-PostgreSQL integration tests
+    (55 domain, 55 realtime, 8 API), all four builds and production debug-artifact rejection check.
+  - Final reconnect replacement regression passes and teardown completes. No known actionable
+    CRITICAL/HIGH in-repo blocker remains from this review; external outcomes remain unclaimed.
+  - Proof commit: the commit containing this verification entry; same implementation as the run.
+  - First full attempt passed format/lint/typechecks, 119 unit tests, 55 domain integrations and
+    54/55 realtime tests. The session-replacement test used a 200 ms sleep after socket-open;
+    it raced incomplete admission and then leaked a client on failure, timing out teardown.
+    Replace the sleep with the final admission message (`character.progress`) and guaranteed cleanup.
+    No runtime admission guard is relaxed. The final full run after this correction passed.
 
 ## Known Issues
 
-### External pre-alpha gates
+### External follow-ups (not development or merge gates)
 
-1. **Hosted CI must be checked on the latest branch commit before merge.** The actual workflow is now installed; no manual copy or credential-scope fix is required. Open the repository's Actions page and confirm the latest run is green. The available CLI credential is reported invalid and the private Actions endpoint returns HTTP 404; SSH push does not establish CI success. CI now builds with NODE_ENV=production and rejects development/debug artifacts.
-2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. The final restricted-role production-mode combat/economy run was 19.37 Hz / p95 RTT 252 ms with 76 skipped slots in 120 s. Earlier corrected runs failed at one and five players too; higher stages were intentionally stopped. Kernel timer-only tracing measured 55.5 ms p99 run-queue delay. Repeat on stable intended hosting with combat/economy traffic and explicit headroom before invitations; no safe cap is certified.
+1. **Hosted CI visibility remains an external follow-up.** The actual workflow is now installed; no manual copy or credential-scope fix is required. Open the repository's Actions page and confirm the latest run is green. The available CLI credential is reported invalid and the private Actions endpoint returns HTTP 404; SSH push does not establish CI success. CI now builds with NODE_ENV=production and rejects development/debug artifacts.
+2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. The latest restricted-role production-mode combat/economy run was 19.44 Hz / p95 RTT 152 ms with 100 skipped slots in 180 s. Earlier corrected runs failed at one and five players too; higher stages were intentionally stopped. Kernel timer-only tracing measured 55.5 ms p99 run-queue delay. Repeat on stable intended hosting with combat/economy traffic and explicit headroom before invitations; no safe cap is certified.
 3. **Physical phone/GPU acceptance remains unverified.** Software-rendered desktop/phone viewports had poor frame times. Real iOS Safari/Android Chrome, touch conflicts, WebGPU fallback, cellular startup, thermal and battery tests remain required.
 4. **Public deployment operations remain external.** Isolated production-mode TLS/private ingress, password accounts, a restricted runtime role, and a real-checkpoint encrypted local restore/startup have now been exercised. Public DNS/certificates, persistent supervision, scheduled encrypted off-host backups and alert delivery still need operation. The local restore is not an off-host backup service. Reconcile bans/credential changes newer than a restored backup before reopening ingress.
 
@@ -670,11 +687,8 @@ no safe capacity is certified. Main remains unchanged. No gameplay work or exter
 
 ## Next Recommended Task
 
-**Resolve the measured release blockers, not new gameplay.** Restore Actions visibility and obtain
-a genuine green run for the final SHA. Qualify a host with predictable CPU scheduling and durable
-PostgreSQL latency; do not raise the five-connection pilot ceiling until the 19.5 Hz / <250 ms p95
-RTT gate passes with headroom and representative combat/economy load. Test physical phones using
-the [physical Android checklist](deployment/ANDROID_ACCEPTANCE.md), and operate public TLS/ingress,
-invited accounts, monitoring and encrypted off-host backup/restore. Isolated production-mode
-ingress, populated migration and local encrypted restore are now tested. No AI rewrite, broker, distributed zone infrastructure or new content is justified
-by the current profile. Keep main unchanged until merge gates are satisfied.
+Resume game development from the existing implementation under MASTER_PLAN with a separately
+scoped gameplay milestone. Do not rebuild completed systems. Hosting capacity, physical-device
+acceptance, hosted Actions visibility and off-host operations remain documented external follow-ups,
+not blockers to development or this locally verified code merge. No gameplay is added in this run.
+Do not describe a merge as approval for an unrestricted public release or a performance certification.
