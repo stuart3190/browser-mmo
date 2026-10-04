@@ -2,7 +2,7 @@
 	admin off
 	auto_https off
 }
-http://127.0.0.1:4460 {
+http://:4460 {
 	bind 127.0.0.1
 	encode zstd gzip
 	header X-Robots-Tag "noindex, nofollow"
