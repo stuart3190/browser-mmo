@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
+import { AbilityBar } from './AbilityBar';
+import { useTap } from './tap';
 import { useGame } from './context';
 
 /** Joystick travel in CSS px; the knob is clamped to this radius. */
@@ -38,6 +40,9 @@ export function TouchControls() {
   const canAttack = t !== null && t.kind === 'enemy' && !t.dead;
   const dead = state.vitals?.dead ?? false;
   const interactLabel = state.prompt?.replace(/^Press E to /, '') ?? null;
+  const interactTap = useTap(() => controls.interact());
+  const targetTap = useTap(() => controls.targetNearest());
+  const attackTap = useTap(() => combat.toggleAttack());
   return (
     <div className="touch-controls" data-testid="touch-controls">
       <Joystick disabled={dead} />
@@ -45,7 +50,7 @@ export function TouchControls() {
         {interactLabel && !dead && (
           <button
             className="touch-btn interact"
-            onClick={() => controls.interact()}
+            {...interactTap}
             data-testid="touch-interact"
             aria-label={interactLabel}
           >
@@ -55,17 +60,18 @@ export function TouchControls() {
         {!dead && (
           <button
             className="touch-btn next-target"
-            onClick={() => controls.targetNearest()}
+            {...targetTap}
             data-testid="touch-target"
             aria-label="Target nearest enemy"
           >
             ◎
           </button>
         )}
+        {!dead && <AbilityBar touch />}
         {canAttack && !dead && (
           <button
             className={state.target.attacking ? 'touch-btn attack active' : 'touch-btn attack'}
-            onClick={() => combat.toggleAttack()}
+            {...attackTap}
             data-testid="touch-attack"
             aria-pressed={state.target.attacking}
           >

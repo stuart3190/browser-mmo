@@ -101,6 +101,11 @@ export class EntityViews {
   }
 
   /** Maps a picked mesh back to its entity (null for the local player, world props, ground). */
+  /** World position of an entity's mesh (effects). */
+  meshPosition(entityId: string): Vector3 | null {
+    return this.views.get(entityId)?.mesh.position ?? null;
+  }
+
   /** Current (smoothed) positions of replicated entities, for the minimap. */
   markers(): { id: string; kind: WorldEntity['kind']; x: number; z: number; dead: boolean }[] {
     return [...this.views.values()].map((v) => ({

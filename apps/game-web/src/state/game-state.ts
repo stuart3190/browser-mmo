@@ -69,6 +69,9 @@ export class GameState {
   /** Last combat feedback line (shown in the target frame; the log is hidden on phones). */
   combatLine: { text: string; kind: 'info' | 'error' } | null = null;
   readonly world = new Map<string, EntityInfo>();
+  // --- abilities (server-provided; times converted to the local clock on receipt) ---
+  abilities: { abilityId: string; unlocked: boolean; readyAtLocal: number }[] = [];
+  globalReadyAtLocal = 0;
   // --- quests (all server-provided) ---
   /** The authoritative quest log (replaced on every quest.log). */
   quests: QuestView[] = [];

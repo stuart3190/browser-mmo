@@ -939,3 +939,95 @@ kbd {
     top: 176px;
   }
 }
+
+/* Ability bar */
+.ability-bar {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+.ability-bar .ability {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  overflow: hidden;
+  background: rgba(16, 18, 26, 0.85);
+}
+.ability-bar .glyph {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+}
+.ability-bar .ability-name {
+  font-size: 8px;
+  line-height: 1.1;
+  margin-top: 3px;
+  max-width: 54px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ability-bar kbd {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font-size: 9px;
+}
+.ability-bar .ability.active {
+  box-shadow: 0 0 8px var(--down);
+}
+.ability-bar .ability.locked {
+  opacity: 0.45;
+}
+.ability-bar .lock {
+  position: absolute;
+  inset: auto 0 0 0;
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.6);
+}
+.ability-bar .cooldown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+}
+.ability-bar .cooldown-text {
+  position: absolute;
+  inset: auto 0 0 0;
+  bottom: 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+/* Touch: abilities sit left of the round Attack button, clear of the joystick. */
+.ability-bar.touch {
+  position: static;
+  transform: none;
+  grid-area: abilities;
+  align-self: end;
+}
+.ability-bar.touch .ability {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+.touch-buttons {
+  grid-template-columns: auto auto auto;
+  grid-template-areas:
+    '. interact target'
+    'abilities abilities attack';
+}

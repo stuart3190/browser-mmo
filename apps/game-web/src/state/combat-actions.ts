@@ -24,6 +24,14 @@ export class CombatActions {
     this.net.send('combat.attack', { start: !this.state.target.attacking });
   }
 
+  /**
+   * Ask to use an ability. The bar greys out abilities that are on cooldown or locked, but that is
+   * cosmetic: the server decides (class, level, cooldown, target, range, line of sight).
+   */
+  useAbility(abilityId: string): void {
+    this.net.send('ability.use', { abilityId });
+  }
+
   respawn(): void {
     this.net.send('combat.respawn', {});
   }

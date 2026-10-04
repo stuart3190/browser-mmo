@@ -7,7 +7,7 @@ export function showLogin(
   root: HTMLElement,
   api: ApiClient,
 ): Promise<{ token: string; character: PlayerCharacter }> {
-  const classes = [...getGameData().classes.values()];
+  const classes = [...getGameData().classes.values()].filter((c) => c.playable);
   const panel = document.createElement('div');
   panel.className = 'login';
   panel.innerHTML = `

@@ -18,6 +18,7 @@ import '@babylonjs/core/Culling/ray';
 import type { WorldEntity } from '@mmo/schemas';
 import { mountGameUi } from '../ui/GameUI';
 import { EntityViews, projectToScreen } from './entity-view';
+import { Effects } from './effects';
 import { FloatingText } from './floating-text';
 import { AnalogInput } from './analog-input';
 import { PlayerController } from './player-controller';
@@ -55,6 +56,7 @@ export async function startGame(args: {
   const questActions = new QuestActions(net, state);
   const analog = new AnalogInput();
   const floating = new FloatingText();
+  const effects = new Effects(scene);
   let zoneId: string | null = null;
   /** E key / touch "Interact" button: pick up a nearby item or talk to a nearby NPC. */
   const interact = () => {
@@ -220,6 +222,13 @@ export async function startGame(args: {
         );
       if (m.d.outcome !== 'miss' && !onMe) entities?.flash(m.d.targetId);
     }
+    const ability = m.d.abilityId ? gameData.abilities.get(m.d.abilityId) : undefined;
+    if (ability?.visual === 'projectile' && entities) {
+      const from =
+        m.d.sourceId === state.myEntityId ? player?.position : entities.meshPosition(m.d.sourceId);
+      const to = entities.meshPosition(m.d.targetId);
+      if (from && to) effects.projectile(from, to, ability.icon.color);
+    }
     const src = state.nameOf(m.d.sourceId);
     const dst = state.nameOf(m.d.targetId);
     const mine = m.d.sourceId === state.myEntityId || m.d.targetId === state.myEntityId;
@@ -232,12 +241,32 @@ export async function startGame(args: {
         : m.d.outcome === 'crit'
           ? 'critically hits'
           : 'hits';
+    const by = ability ? `${src === 'You' ? 'Your' : `${src}'s`} ${ability.name}` : src;
+    const v = ability
+      ? verb.replace(/^hit$/, 'hits').replace(/^critically hit$/, 'critically hits')
+      : verb;
     combatLine(
       m.d.outcome === 'miss'
-        ? `${src} ${m.d.sourceId === state.myEntityId ? 'miss' : 'misses'} ${dst === 'You' ? 'you' : dst}`
-        : `${src} ${verb} ${dst === 'You' ? 'you' : dst} for ${m.d.amount}`,
+        ? `${by} ${ability ? 'misses' : m.d.sourceId === state.myEntityId ? 'miss' : 'misses'} ${dst === 'You' ? 'you' : dst}`
+        : `${by} ${v} ${dst === 'You' ? 'you' : dst} for ${m.d.amount}`,
       m.d.targetId === state.myEntityId ? 'error' : 'info',
     );
+  });
+  net.on('ability.state', (m) => {
+    const offset = Date.now() - m.d.serverTime; // server -> local clock for countdowns
+    state.update((s) => {
+      s.abilities = m.d.abilities.map((a) => ({
+        abilityId: a.abilityId,
+        unlocked: a.unlocked,
+        readyAtLocal: a.readyAt > 0 ? a.readyAt + offset : 0,
+      }));
+      s.globalReadyAtLocal = m.d.globalReadyAt > 0 ? m.d.globalReadyAt + offset : 0;
+    });
+    for (const id of m.d.newlyUnlocked) {
+      const name = gameData.abilities.get(id)?.name ?? id;
+      state.toast(`New ability unlocked: ${name}`);
+      state.addLog(`You learned ${name}`);
+    }
   });
   net.on('entity.health', (m) =>
     patchEntity(m.d.entityId, { health: m.d.health, maxHealth: m.d.maxHealth, dead: m.d.dead }),
@@ -368,6 +397,7 @@ export async function startGame(args: {
     if (!player || !entities) return;
     player.update(dt);
     entities.update(dt);
+    effects.update(dt);
     const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
     const npc = pickup ? undefined : entities.nearest('npc', player.position, INTERACT_RANGE + 1);
     const prompt = pickup
@@ -444,6 +474,14 @@ function exposeDebug(
       if (!m || !p) return false;
       p.camera.alpha = Math.atan2(p.position.z - m.z, p.position.x - m.x);
       return true;
+    },
+    /** Ability unlock/cooldown state exactly as the server reported it (local-clock ready times). */
+    get abilities() {
+      return {
+        list: state.abilities,
+        globalReadyAt: state.globalReadyAtLocal,
+        classId: state.character.classId,
+      };
     },
     /** Entity id of the first replicated NPC (Elder Maren in Greenvale). */
     get npcId() {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { classAbilities } from '@mmo/game-data';
 import { createRoot } from 'react-dom/client';
 import type { WindowId } from '../state/game-state';
 import { BankWindow } from './BankWindow';
@@ -10,6 +11,7 @@ import { hoverTooltip } from './hover';
 import { InventoryWindow } from './InventoryWindow';
 import { ItemDetails } from './ItemDetails';
 import { ItemTooltip } from './ItemTooltip';
+import { AbilityBar } from './AbilityBar';
 import { Minimap } from './Minimap';
 import { DialoguePanel, QuestLogWindow, QuestTracker } from './QuestUI';
 import { TouchControls, useTouchControls } from './TouchControls';
@@ -32,7 +34,7 @@ export function mountGameUi(root: HTMLElement, deps: UiDeps): void {
 }
 
 function GameUI() {
-  const { state, combat } = useGame();
+  const { state, combat, gameData } = useGame();
   const touch = useTouchControls();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -56,12 +58,18 @@ function GameUI() {
         combat.toggleAttack();
         return;
       }
+      const digit = /^Digit([1-9])$/.exec(e.code);
+      if (digit) {
+        const slot = classAbilities(gameData, state.character.classId)[Number(digit[1]) - 1];
+        if (slot) combat.useAbility(slot.id);
+        return;
+      }
       const w = SHORTCUTS[e.code];
       if (w) state.toggle(w);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [state, combat]);
+  }, [state, combat, gameData]);
 
   return (
     <div className={touch ? 'ui-root touch' : 'ui-root'}>
@@ -83,6 +91,7 @@ function GameUI() {
       <DialoguePanel />
       <ItemDetails />
       <HoverTooltip />
+      {!touch && <AbilityBar />}
       {touch && <TouchControls />}
       <ActionBar />
     </div>
