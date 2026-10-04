@@ -327,6 +327,38 @@ Kill events are in memory until persisted (a crash in that window loses the rewa
 
 ---
 
+## 2026-10-04 — Data-driven collision, grid navigation and spawn-group population
+
+**Decision**
+One prop-shape table drives both placeholder visuals and gameplay colliders; a pure `CollisionWorld` (spatial hash: overlap, swept movement, line of sight, slide) is shared by server movement validation, combat LOS, enemy steering and client prediction; enemies path with a lazily built 1 m `NavGrid` (A* + smoothing) and give up/return when stuck or unreachable; zones populate through data-driven spawn groups (`maxAlive`, respawn window, minimum player distance) filled from the tick. `docs/adr/0016-world-collision-navigation-population.md`.
+
+**Reason**
+Obstacles must block movement and sight consistently on client and server, enemies must not walk through walls or attack through them, and population must scale without per-entity timers.
+
+**Alternatives considered**
+Physics engine on both sides; Recast navmesh; per-enemy spawn points only.
+
+**Consequences**
+2D collision only (no height/levels yet); static obstacles only; navigation can be swapped behind `findPath`.
+
+---
+
+## 2026-10-04 — Write-ahead kill events (outbox) and mailbox overflow loot
+
+**Decision**
+Supersedes the "kill events are in memory until persisted" consequence of the 2026-10-03 combat entry. Enemy deaths are recorded in `kill_events` before they become visible (`dying` → record → `confirmKill`); rewards are applied from the row exactly once (`FOR UPDATE SKIP LOCKED`, status in the same transaction), retried with backoff, recovered on startup and by a periodic sweep; persisted respawn times are restored into zones on start. Loot that does not fit the bags goes to a system-only `mailbox` container ("Recovered loot"); a full mailbox keeps the kill pending instead of dropping loot. `docs/adr/0017-durable-kill-events-mailbox.md`.
+
+**Reason**
+A crash or DB failure must never lose, duplicate or partially apply a legitimate reward, resurrect a recorded death early, or destroy loot because bags are full.
+
+**Alternatives considered**
+Recording and rewarding in one transaction; corpse looting first; deterministic loot seeds.
+
+**Consequences**
+Deaths are announced one DB write later; a full mailbox delays the whole reward; `kill_events` needs a retention job before production.
+
+---
+
 ## Open questions
 
 These are not yet decided. Record a dated entry above when one is.

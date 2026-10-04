@@ -22,20 +22,39 @@ World
 - `environment.dayNightCycle` / `weatherProfileId` are hooks for later.
 - Dynamic events, world bosses: `EnemyDefinition.isWorldBoss` exists; no event system yet. Basic enemies are simulated (see Enemies).
 
-## Demo content
+## Demo content (Greenvale Meadows)
 
-One region, one zone, 2×2 chunks (128 m square): an NPC (Elder Maren), two pickup spawn points
-(Iron Longsword, respawn 20 s; Copper Ore ×3, respawn 15 s), placeholder trees/rocks/building/fence.
-Cross-validation guarantees spawn points lie inside their chunk and reference existing content.
+One region, one zone, 4×4 chunks of 64 m (256 m square), authored in
+`packages/game-data/src/content/world.ts`: Greenvale Village at the origin (safe zone r = 32 m,
+houses, fences, Elder Maren, sword and ore pickups, respawn point), a waystone respawn point in the
+south, a rock ridge in the east, forest in the north, and a seeded scatter of trees and rocks that
+keeps roads, the village, spawn points and landmarks clear. Landmarks (village, Northwood Den,
+Eastern Rocks, The Hollow, Old Waystone) appear on the minimap.
 
-## Enemies
+Cross-validation (registry) guarantees: spawn points inside their chunk and referencing existing
+content; respawn points / default spawn not inside colliders; enemy spawns not inside colliders or
+safe zones; every spawn group has at least `maxAlive` points and a valid respawn window.
 
-Enemy spawn points (`kind: 'enemy'`) spawn combatants defined by `EnemyDefinition.combat`
-(damage, attack speed/range, aggro/leash ranges, move speed, armour, corpse time). The zone
-simulation runs a small per-enemy state machine each tick: **idle** (aggro on proximity) →
-**engaged** (chase in a straight line, attack on a server swing timer) → **returning** (evade:
-walk home, reset health) or **dead** (corpse, then the spawn point respawns a new entity after
-`respawnMs`). Demo: one Grey Wolf at (2, 0, 14). See [combat](../gameplay/combat.md).
+## Collision and line of sight
+
+Props get their collider from the shared prop-shape table (`content/props.ts`), which also sizes the
+client's placeholder meshes; chunks may add explicit colliders. `CollisionWorld` (spatial hash) is
+used by server movement validation, client prediction (same slide rule), enemy steering and combat
+line of sight. Trees, rocks and buildings block sight; fences block movement only. ADR 0016.
+
+## Enemies and population
+
+Enemy spawn points either belong to a **spawn group** (`maxAlive`, `respawnMs {min,max}`,
+`minPlayerDistance`) or respawn individually (`respawnMs`). Groups are refilled from the tick on
+random free points with no player nearby — no per-entity timers. Greenvale has three wolf dens (2
+alive each, 20–35 s) and a group of 4 roamer points (2 alive, 30–60 s); wolves wander within 5 m of
+their point.
+
+Per-enemy state machine each tick: **idle** (wander; aggro on proximity with line of sight) →
+**engaged** (steer straight when clear, otherwise follow a cached A* path on the `NavGrid`; attack
+only in range with LOS; leash at 30 m; give up if unreachable or stuck) → **returning** (evade: walk
+home, reset health; snap home if stuck) or **dying → dead** (write-ahead kill record, corpse, slot
+respawn at the recorded time; restored after restarts). See [combat](../gameplay/combat.md).
 
 ## Streaming (client)
 

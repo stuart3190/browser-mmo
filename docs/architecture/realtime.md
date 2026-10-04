@@ -115,6 +115,11 @@ gets a full snapshot because NOTIFY is not durable.
 - **Movement**: accepted if inside zone bounds and within `maxSpeed × 1.5 × Δt + 0.25 m` of the
   last accepted position (Δt capped at 1 s); otherwise `move.correction`. Server owns Y (flat
   ground for now). Future: input-based movement with server simulation + client reconciliation.
+- **Collision**: moves that end inside a collider or sweep through one are rejected
+  (`move.correction` reason `blocked`); the client predicts with the same `CollisionWorld.slide`.
+- **Kills** are write-ahead: `drainKills` → `recordKill` (retried) → `confirmKill` →
+  `processKillEvent`; startup restores respawn slots (`activeRespawns`) and processes due kill
+  events, and a 5 s sweep repeats that (ADR 0017). Test-only `faults` hooks and `simulateCrash()`.
 - **Pickups** are two-phase: reserve in memory (range check, single reserver) → persist via
   `claimWorldPickup` with `source_ref = world_pickup:<spawnPoint>:<spawnInstanceUuid>` (unique
   index) → commit (despawn, schedule respawn) or release on failure. Duplicate claims are

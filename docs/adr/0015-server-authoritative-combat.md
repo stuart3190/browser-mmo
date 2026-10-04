@@ -1,6 +1,6 @@
 # 0015 — Server-authoritative combat in the zone tick, exactly-once rewards, reconnect linger
 
-Status: Accepted · Date: 2026-10-03
+Status: Accepted (decision 2's in-memory reward queue superseded by [0017](0017-durable-kill-events-mailbox.md)) · Date: 2026-10-03
 
 ## Context
 

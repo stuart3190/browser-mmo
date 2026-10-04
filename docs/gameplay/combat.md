@@ -27,14 +27,18 @@ only. No abilities, resources (mana/rage), threat tables, effects, crowd control
 4. Damage is resolved with the formulas below; `combat.damage` goes to everyone who can see the target.
 5. The wolf aggroes on proximity (8 m) or when hit, chases, attacks on its own timer, leashes at
    30 m and evades (walks home, resets to full health) when its target dies, leaves or it leashes.
-6. At 0 health: `combat.death`, attackers stop (`target_dead`), corpse stays 3 s, a kill event is
-   queued for the player who **tagged** it (first damage), and the spawn point respawns a fresh wolf
-   after 8 s.
-7. The gateway persists the reward with `awardKill` (one transaction): XP + level, loot via the
+6. At 0 health the wolf enters `dying` (untargetable, harmless) and a kill event is emitted for the
+   player who **tagged** it (first damage). The gateway records it durably in `kill_events`
+   (write-ahead) and only then confirms it: `combat.death`, attackers stop (`target_dead`), corpse
+   stays 3 s, and the spawn slot respawns at the recorded `respawn_at` (group window, e.g. 20–35 s).
+7. The gateway applies the reward from the kill event (`processKillEvent` → `awardKillInTx`, one
+   transaction that also marks the event `rewarded`): XP + level, loot via the
    single item-creation path (`grantItemInTx`, `source_ref kill:<kill>:<character>:<n>`, history
    correlated by kill ID), gold via the ledger, and a `kill_rewards` row whose primary key
-   `(kill_id, character_id)` makes a second award impossible. The player gets `character.progress`
-   and `combat.loot`; items also arrive via the change feed (`inventory.updated`).
+   `(kill_id, character_id)` makes a second award impossible. Drops that do not fit the bags go to
+   the **mailbox** ("Recovered loot" bag tab, Take to retrieve). The player gets `character.progress`
+   and `combat.loot` (`mailedItems`, `recovered`); items also arrive via the change feed.
+   Crash safety and recovery: `docs/adr/0017-durable-kill-events-mailbox.md`.
 8. Loot is equippable with the existing inventory UI; equipment changes refresh the in-world combat
    profile (change feed → `getCombatProfile`), so damage changes immediately.
 
@@ -73,14 +77,16 @@ wolf keeps attacking a lingering character.
 
 Nonexistent/invalid/dead targets, out-of-range starts, attacking while dead, replayed sequence
 numbers (connection sequence guard), start spamming (cannot speed up swings), duplicate kill
-rewards (5 concurrent `awardKill` calls for one kill → one succeeds), duplicate loot (`source_ref`
-unique), level-ups persisted once. Rewards are queued and retried on transient DB errors; the
-database guarantees they apply at most once.
+rewards (5 concurrent `awardKill` calls for one kill → one succeeds; 6 concurrent
+`processKillEvent` calls → one), duplicate loot (`source_ref` unique), level-ups persisted once,
+crashes before/after recording and after rewarding, two nodes recovering the same kills, lost write
+acknowledgements (`services/realtime/test/durable-kills.test.ts`). Attacks and idle aggro require
+line of sight (`CollisionWorld.hasLineOfSight`; fences do not block sight, trees/rocks/buildings do).
 
 ## Known limits
 
-- No line-of-sight: the world has no collision geometry yet (`hasLineOfSight` is a stub returning true).
-- Enemy movement is a straight line on flat ground; no pathfinding, no collision between entities.
+- Enemies path around static obstacles (grid A*, ADR 0016) but do not collide with each other or
+  with players; terrain is flat.
 - Single tagger gets the kill; no parties/shared credit yet.
-- Loot that does not fit in full bags is lost (no corpse looting/mailbox yet); the player is told.
-- Touch devices have no on-screen movement control yet (they can target and attack).
+- If the mailbox (200 slots) is also full, the whole reward (XP included) waits until there is room.
+- Ranged attacks/abilities do not exist yet; LOS is checked for melee and aggro only.
