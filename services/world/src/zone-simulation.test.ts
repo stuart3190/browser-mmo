@@ -30,8 +30,9 @@ describe('ZoneSimulation', () => {
     const snap = out.find((m) => m.t === 'zone.snapshot');
     expect(snap).toBeDefined();
     if (snap?.t === 'zone.snapshot') {
-      const kinds = snap.d.entities.map((e) => e.kind).sort();
-      expect(kinds).toEqual(['enemy', 'npc', 'pickup', 'pickup', 'player']);
+      const kinds = new Set(snap.d.entities.map((e) => e.kind));
+      expect([...kinds].sort()).toEqual(['enemy', 'npc', 'pickup', 'player']);
+      expect(snap.d.entities.filter((e) => e.kind === 'pickup')).toHaveLength(2);
     }
   });
 

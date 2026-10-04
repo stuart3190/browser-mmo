@@ -34,6 +34,58 @@ export const WorldRegionSchema = z.object({
 });
 export type WorldRegion = z.infer<typeof WorldRegionSchema>;
 
+/**
+ * Authoritative gameplay collision shape (metres, XZ plane). Visual meshes and colliders are both
+ * derived from the same prop data (see game-data `propShapes`), so they cannot drift apart.
+ * `blocksSight` false = blocks movement only (e.g. a low fence).
+ */
+export const ColliderSchema = z.discriminatedUnion('shape', [
+  z.object({
+    shape: z.literal('circle'),
+    x: z.number(),
+    z: z.number(),
+    radius: z.number().positive(),
+    blocksSight: z.boolean(),
+  }),
+  z.object({
+    shape: z.literal('box'),
+    x: z.number(),
+    z: z.number(),
+    halfWidth: z.number().positive(),
+    halfDepth: z.number().positive(),
+    rotationY: z.number(),
+    blocksSight: z.boolean(),
+  }),
+]);
+export type Collider = z.infer<typeof ColliderSchema>;
+
+/** Population control for a set of spawn points: at most `maxAlive` live at once, varied positions. */
+export const SpawnGroupSchema = z.object({
+  id: ContentIdSchema,
+  name: LocalizedNameSchema,
+  maxAlive: z.number().int().positive(),
+  /** Random delay range after a death before the group may spawn again. */
+  respawnMs: z.object({ min: z.number().int().nonnegative(), max: z.number().int().nonnegative() }),
+  /** Never (re)spawn on a point with a player closer than this (no spawning on top of people). */
+  minPlayerDistance: z.number().nonnegative(),
+});
+export type SpawnGroup = z.infer<typeof SpawnGroupSchema>;
+
+/** A circle in which no enemy spawn points may be placed (towns, starting areas). */
+export const SafeZoneSchema = z.object({
+  id: ContentIdSchema,
+  name: LocalizedNameSchema,
+  center: Vec3Schema,
+  radius: z.number().positive(),
+});
+
+/** A named place players respawn at after death (graveyard/waystone). Nearest one is used. */
+export const RespawnPointSchema = z.object({
+  id: ContentIdSchema,
+  name: LocalizedNameSchema,
+  position: Vec3Schema,
+});
+
 /** A link that moves a player from one zone to another (door, portal, road edge). */
 export const ZoneTransitionSchema = z.object({
   id: ContentIdSchema,
@@ -62,6 +114,13 @@ export const WorldZoneSchema = z.object({
   }),
   defaultSpawn: Vec3Schema,
   transitions: z.array(ZoneTransitionSchema),
+  respawnPoints: z.array(RespawnPointSchema).default([]),
+  safeZones: z.array(SafeZoneSchema).default([]),
+  spawnGroups: z.array(SpawnGroupSchema).default([]),
+  /** Named areas shown on the map (exploration readability). */
+  landmarks: z
+    .array(z.object({ id: ContentIdSchema, name: LocalizedNameSchema, position: Vec3Schema }))
+    .default([]),
   /** Hooks for later systems. */
   environment: z.object({
     dayNightCycle: z.boolean(),
@@ -100,6 +159,10 @@ export const SpawnPointSchema = z.object({
   respawnMs: z.number().int().positive().nullable(),
   /** Interaction radius for pickups/NPCs (server validated). */
   interactRadius: z.number().positive().default(3),
+  /** Spawn group controlling population/respawn; null = this point respawns on its own `respawnMs`. */
+  groupId: ContentIdSchema.nullable().default(null),
+  /** Idle enemies wander within this radius of the point (0 = stand still). */
+  wanderRadius: z.number().nonnegative().default(0),
 });
 export type SpawnPoint = z.infer<typeof SpawnPointSchema>;
 
@@ -110,6 +173,8 @@ export const WorldChunkSchema = z.object({
   terrainAssetId: z.string().max(200).nullable(),
   groundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   props: z.array(ChunkPropSchema),
+  /** Extra authoritative colliders not tied to a visible prop (cliffs, invisible walls). */
+  colliders: z.array(ColliderSchema).default([]),
   spawnPoints: z.array(SpawnPointSchema),
 });
 export type WorldChunk = z.infer<typeof WorldChunkSchema>;

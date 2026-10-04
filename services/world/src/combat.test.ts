@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { DEMO_ZONE_ID, getGameData, seededRng } from '@mmo/game-data';
+import { seededRng } from '@mmo/game-data';
 import type { Vec3 } from '@mmo/schemas';
 import { uuidv7 } from '@mmo/shared';
+import { ARENA, WOLF_HOME, arenaGameData } from './test-arena';
 import { ZoneSimulation } from './zone-simulation';
 import type { CombatantProfile, OutMessage } from './zone-simulation';
 
-const gd = getGameData();
-const WOLF_HOME = { x: 2, y: 0, z: 14 };
+const gd = arenaGameData();
 const FAR: Vec3 = { x: -40, y: 0, z: 40 };
 const fists: CombatantProfile = {
   level: 1,
@@ -17,7 +17,7 @@ const fists: CombatantProfile = {
 };
 
 function setup(seed = 1) {
-  const sim = new ZoneSimulation(gd, DEMO_ZONE_ID, { rng: seededRng(seed) });
+  const sim = new ZoneSimulation(gd, ARENA, { rng: seededRng(seed), nowMs: 1_000 });
   const wolf = sim.listEntities().find((e) => e.kind === 'enemy')!;
   let now = 1_000;
   const join = (pos: Vec3, combat: CombatantProfile = fists) => {
@@ -31,11 +31,18 @@ function setup(seed = 1) {
     return { id, entityId };
   };
   const msgs = new Map<string, OutMessage[]>();
-  const advance = (ms: number) => {
+  const confirmed: ReturnType<typeof sim.drainKills> = [];
+  /** Steps the sim; kills are made durable immediately (as the host does after its DB write). */
+  const advance = (ms: number, autoConfirm = true) => {
     const end = now + ms;
     while (now < end) {
       now += 50;
       sim.step(now);
+      if (autoConfirm)
+        for (const k of sim.drainKills()) {
+          confirmed.push(k);
+          sim.confirmKill(k.killId, now);
+        }
       for (const [cid, list] of sim.drainOutbox())
         msgs.set(cid, [...(msgs.get(cid) ?? []), ...list]);
     }
@@ -49,6 +56,7 @@ function setup(seed = 1) {
     advance,
     of,
     msgs,
+    confirmed,
     get now() {
       return now;
     },
@@ -106,9 +114,9 @@ describe('auto-attack', () => {
     );
     t.sim.setTarget(p.id, t.wolf.id);
     t.sim.startAttack(p.id);
-    t.advance(6_000);
+    t.advance(2_500);
     expect(t.sim.getEnemy(t.wolf.id)!.mode).toBe('dead');
-    const kills = t.sim.drainKills();
+    const kills = t.confirmed;
     expect(kills).toHaveLength(1);
     expect(kills[0]).toMatchObject({ enemyId: 'enemy.greenvale.grey_wolf', characterId: p.id });
     expect(t.of(p.id, 'combat.death').filter((m) => m.d.kind === 'enemy')).toHaveLength(1);
@@ -117,10 +125,15 @@ describe('auto-attack', () => {
     ).toBe(true);
     expect(() => t.sim.startAttack(p.id)).toThrow(expect.objectContaining({ code: 'TARGET_DEAD' }));
     t.advance(10_000);
-    expect(t.sim.drainKills()).toHaveLength(0);
+    expect(t.confirmed).toHaveLength(1);
+    expect(t.sim.getEnemy(t.wolf.id)).toBeUndefined(); // corpse removed from memory, not leaked
     const respawned = t.sim.listEntities().find((e) => e.kind === 'enemy')!;
     expect(respawned.id).not.toBe(t.wolf.id);
-    expect(respawned).toMatchObject({ health: 80, dead: false, position: WOLF_HOME });
+    expect(respawned).toMatchObject({
+      health: 80,
+      dead: false,
+      position: { x: WOLF_HOME.x, z: WOLF_HOME.z },
+    });
   });
 
   it('uses the current weapon: a better weapon profile kills faster', () => {
@@ -168,7 +181,7 @@ describe('enemy AI, player death and respawn', () => {
     expect(after).toMatchObject({
       dead: false,
       health: 144,
-      position: gd.zone(DEMO_ZONE_ID).defaultSpawn,
+      position: { x: 0, y: 0, z: -8 },
     });
     expect(() => t.sim.respawn(p.id, t.now)).toThrow(expect.objectContaining({ code: 'NOT_DEAD' }));
   });
@@ -206,9 +219,8 @@ describe('enemy AI, player death and respawn', () => {
     t.sim.setTarget(b.id, t.wolf.id);
     t.sim.startAttack(b.id);
     t.advance(2_000);
-    const kills = t.sim.drainKills();
-    expect(kills).toHaveLength(1);
-    expect(kills[0]!.characterId).toBe(a.id);
+    expect(t.confirmed).toHaveLength(1);
+    expect(t.confirmed[0]!.characterId).toBe(a.id);
   });
 
   it('regenerates health out of combat', () => {

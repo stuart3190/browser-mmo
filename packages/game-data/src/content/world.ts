@@ -1,17 +1,35 @@
 import type {
+  ChunkPropSchema,
   DungeonDefinition,
   EnemyDefinition,
   NpcDefinition,
   QuestDefinition,
+  SpawnPoint,
   WorldChunk,
   WorldRegion,
   WorldZone,
 } from '@mmo/schemas';
+import type { z } from 'zod';
+import { seededRng } from '../rules/random';
 
 /**
- * DEMO WORLD — just enough data to prove the region → zone → chunk architecture.
- * One region, one zone, a 2×2 grid of 64 m chunks (128 m × 128 m) centred on the origin.
+ * GREENVALE MEADOWS — first playable zone (256 m × 256 m, 4×4 chunks of 64 m).
+ *
+ *   north:  Northwood (forest) with a wolf den behind a broken fence line
+ *   east:   Eastern Rocks behind a rock ridge, second den
+ *   south-west: the Hollow, third den
+ *   centre: Greenvale Village (safe zone: no enemy spawns), elder, pickups, respawn point
+ *   south:  Old Waystone (second respawn point)
+ *
+ * Hand-placed: village, fences, ridge, dens, spawn points, landmarks.
+ * Generated (deterministic seed, so identical on every server and client): scattered trees and
+ * rocks, kept clear of roads, spawn points, the village and each other.
+ * Colliders come from props via the shared prop-shape table (see props.ts).
  */
+
+type Prop = z.input<typeof ChunkPropSchema>;
+const ZONE_ID = 'zone.greenvale.meadows';
+const CHUNK = 64;
 
 export const regions: WorldRegion[] = [
   {
@@ -19,178 +37,372 @@ export const regions: WorldRegion[] = [
     name: 'Greenvale',
     description: 'Placeholder starting region: farmland and forest on the edge of the old kingdom.',
     levelRange: { min: 1, max: 10 },
-    zoneIds: ['zone.greenvale.meadows'],
+    zoneIds: [ZONE_ID],
     themes: ['medieval', 'pastoral'],
   },
 ];
 
+const village = { x: 0, z: 0, radius: 32 };
+
+const wolfPoint = (id: string, x: number, z: number, groupId: string): SpawnPoint => ({
+  id: `spawn.greenvale.${id}`,
+  kind: 'enemy',
+  position: { x, y: 0, z },
+  rotationY: 0,
+  refId: 'enemy.greenvale.grey_wolf',
+  quantity: 1,
+  respawnMs: null,
+  interactRadius: 3,
+  groupId,
+  wanderRadius: 5,
+});
+
+const spawnPoints: SpawnPoint[] = [
+  // Village (safe zone): NPC + resource pickups
+  {
+    id: 'spawn.greenvale.elder',
+    kind: 'npc',
+    position: { x: -6, y: 0, z: 6 },
+    rotationY: Math.PI,
+    refId: 'npc.greenvale.elder_maren',
+    quantity: 1,
+    respawnMs: null,
+    interactRadius: 4,
+    groupId: null,
+    wanderRadius: 0,
+  },
+  {
+    id: 'spawn.greenvale.ore_pile',
+    kind: 'pickup',
+    position: { x: -10, y: 0, z: -12 },
+    rotationY: 0,
+    refId: 'material.ore.copper_ore',
+    quantity: 3,
+    respawnMs: 15_000,
+    interactRadius: 3,
+    groupId: null,
+    wanderRadius: 0,
+  },
+  {
+    id: 'spawn.greenvale.sword_rack',
+    kind: 'pickup',
+    position: { x: 8, y: 0, z: -14 },
+    rotationY: 0,
+    refId: 'weapon.sword.iron_longsword',
+    quantity: 1,
+    respawnMs: 20_000,
+    interactRadius: 3,
+    groupId: null,
+    wanderRadius: 0,
+  },
+  // Northwood den
+  wolfPoint('wolf_north_1', 4, 62, 'group.greenvale.den_north'),
+  wolfPoint('wolf_north_2', 15, 70, 'group.greenvale.den_north'),
+  wolfPoint('wolf_north_3', -7, 73, 'group.greenvale.den_north'),
+  // Eastern Rocks den
+  wolfPoint('wolf_east_1', 76, -6, 'group.greenvale.den_east'),
+  wolfPoint('wolf_east_2', 86, 4, 'group.greenvale.den_east'),
+  wolfPoint('wolf_east_3', 70, -20, 'group.greenvale.den_east'),
+  // South-west Hollow den
+  wolfPoint('wolf_sw_1', -62, -62, 'group.greenvale.den_sw'),
+  wolfPoint('wolf_sw_2', -73, -50, 'group.greenvale.den_sw'),
+  wolfPoint('wolf_sw_3', -50, -75, 'group.greenvale.den_sw'),
+  // Roamers: lone wolves in the wider meadows
+  wolfPoint('wolf_roam_1', -84, 40, 'group.greenvale.roamers'),
+  wolfPoint('wolf_roam_2', 45, -84, 'group.greenvale.roamers'),
+  wolfPoint('wolf_roam_3', 92, 86, 'group.greenvale.roamers'),
+  wolfPoint('wolf_roam_4', -32, 104, 'group.greenvale.roamers'),
+];
+
+const handPlaced: Prop[] = [
+  // Village
+  {
+    id: 'house_a',
+    kind: 'building',
+    position: { x: -20, y: 0, z: 18 },
+    rotationY: 0.2,
+    scale: 1,
+    modelId: null,
+  },
+  {
+    id: 'house_b',
+    kind: 'building',
+    position: { x: 19, y: 0, z: 19 },
+    rotationY: -0.3,
+    scale: 1,
+    modelId: null,
+  },
+  {
+    id: 'house_c',
+    kind: 'building',
+    position: { x: -21, y: 0, z: -20 },
+    rotationY: 0.1,
+    scale: 1,
+    modelId: null,
+  },
+  {
+    id: 'fence_v1',
+    kind: 'fence',
+    position: { x: 15, y: 0, z: -5 },
+    rotationY: 0,
+    scale: 1,
+    modelId: null,
+  },
+  {
+    id: 'marker_square',
+    kind: 'marker',
+    position: { x: 0, y: 0, z: 0 },
+    rotationY: 0,
+    scale: 1,
+    modelId: null,
+  },
+  // Broken fence line guarding the north road (gap at the road)
+  {
+    id: 'fence_n1',
+    kind: 'fence',
+    position: { x: -16, y: 0, z: 48 },
+    rotationY: 0,
+    scale: 1,
+    modelId: null,
+  },
+  {
+    id: 'fence_n2',
+    kind: 'fence',
+    position: { x: -26, y: 0, z: 48 },
+    rotationY: 0,
+    scale: 1,
+    modelId: null,
+  },
+  {
+    id: 'fence_n3',
+    kind: 'fence',
+    position: { x: 16, y: 0, z: 48 },
+    rotationY: 0,
+    scale: 1,
+    modelId: null,
+  },
+  {
+    id: 'fence_n4',
+    kind: 'fence',
+    position: { x: 26, y: 0, z: 48 },
+    rotationY: 0,
+    scale: 1,
+    modelId: null,
+  },
+  // Rock ridge between the village and the Eastern Rocks (gap at the east road)
+  ...[-30, -24, -18, -12, 12, 18, 24, 30].map((z, i): Prop => ({
+    id: `ridge_${i}`,
+    kind: 'rock',
+    position: { x: 48, y: 0, z },
+    rotationY: i,
+    scale: 2.2,
+    modelId: null,
+  })),
+  // Den dressing
+  {
+    id: 'den_n_rock',
+    kind: 'rock',
+    position: { x: 6, y: 0, z: 80 },
+    rotationY: 0.4,
+    scale: 2.5,
+    modelId: null,
+  },
+  {
+    id: 'den_e_rock',
+    kind: 'rock',
+    position: { x: 92, y: 0, z: -12 },
+    rotationY: 1.2,
+    scale: 2.8,
+    modelId: null,
+  },
+  {
+    id: 'den_sw_rock',
+    kind: 'rock',
+    position: { x: -70, y: 0, z: -72 },
+    rotationY: 2.1,
+    scale: 2.4,
+    modelId: null,
+  },
+  {
+    id: 'waystone',
+    kind: 'marker',
+    position: { x: -5, y: 0, z: -95 },
+    rotationY: 0,
+    scale: 1,
+    modelId: null,
+  },
+];
+
+/** Corridors kept free of generated props (main roads). */
+const onRoad = (x: number, z: number) =>
+  (z > 28 && Math.abs(x) < 7) || // north road
+  (x > 28 && Math.abs(z) < 7) || // east road
+  (z < -28 && Math.abs(x + z * 0.05) < 7) || // south road to the waystone
+  (x < -20 && z < -20 && Math.abs(x - z) < 9); // south-west track
+
+function scatter(): Prop[] {
+  const rng = seededRng(20261004);
+  const out: Prop[] = [];
+  const clear = (x: number, z: number, r: number) =>
+    Math.hypot(x - village.x, z - village.z) > village.radius + 6 &&
+    !onRoad(x, z) &&
+    spawnPoints.every((s) => Math.hypot(s.position.x - x, s.position.z - z) > 7) &&
+    [...handPlaced, ...out].every(
+      (p) => Math.hypot(p.position.x - x, p.position.z - z) > r + 2.5 * p.scale,
+    ) &&
+    Math.hypot(x + 5, z + 95) > 10;
+  const place = (
+    kind: 'tree' | 'rock',
+    count: number,
+    area: (x: number, z: number) => boolean,
+    scale: [number, number],
+  ) => {
+    let made = 0;
+    for (let tries = 0; made < count && tries < count * 40; tries++) {
+      const x = -124 + rng.next() * 248;
+      const z = -124 + rng.next() * 248;
+      const s = scale[0] + rng.next() * (scale[1] - scale[0]);
+      if (!area(x, z) || !clear(x, z, s * 1.5)) continue;
+      out.push({
+        id: `${kind}_${out.length}`,
+        kind,
+        position: { x: Math.round(x * 10) / 10, y: 0, z: Math.round(z * 10) / 10 },
+        rotationY: Math.round(rng.next() * 62) / 10,
+        scale: Math.round(s * 100) / 100,
+        modelId: null,
+      });
+      made++;
+    }
+  };
+  place('tree', 110, (_x, z) => z > 40, [0.9, 1.4]); // Northwood
+  place('tree', 45, (x, z) => z <= 40 && !(x > 50), [0.8, 1.3]); // scattered meadow trees
+  place('rock', 40, (x) => x > 52, [1, 2]); // Eastern Rocks
+  place('rock', 20, (x, z) => x < -30 && z < -30, [1, 1.8]); // Hollow
+  return out;
+}
+
+const allProps = [...handPlaced, ...scatter()];
+
+const GROUND: Record<string, string> = {
+  '-2,1': '#4f7d32',
+  '-1,1': '#4c7a30',
+  '0,1': '#4a782f',
+  '1,1': '#557f36',
+  '-2,0': '#5c8a37',
+  '-1,0': '#5a8a36',
+  '0,0': '#689a40',
+  '1,0': '#7a8f4a',
+  '-2,-1': '#5f8a3a',
+  '-1,-1': '#5f8f3a',
+  '0,-1': '#64943d',
+  '1,-1': '#7d8d4c',
+  '-2,-2': '#667f3c',
+  '-1,-2': '#6a8c42',
+  '0,-2': '#6d9244',
+  '1,-2': '#7b8e4e',
+};
+
+export const chunks: WorldChunk[] = [];
+for (let cx = -2; cx <= 1; cx++) {
+  for (let cz = -2; cz <= 1; cz++) {
+    const inChunk = (p: { x: number; z: number }) =>
+      Math.floor(p.x / CHUNK) === cx && Math.floor(p.z / CHUNK) === cz;
+    chunks.push({
+      zoneId: ZONE_ID,
+      coord: { cx, cz },
+      terrainAssetId: null,
+      groundColor: GROUND[`${cx},${cz}`] ?? '#5f8f3a',
+      props: allProps
+        .filter((p) => inChunk(p.position))
+        .map((p) => ({
+          ...p,
+          position: { x: p.position.x, y: 0, z: p.position.z },
+        })) as WorldChunk['props'],
+      colliders: [],
+      spawnPoints: spawnPoints.filter((s) => inChunk(s.position)),
+    });
+  }
+}
+
 export const zones: WorldZone[] = [
   {
-    id: 'zone.greenvale.meadows',
+    id: ZONE_ID,
     regionId: 'region.greenvale',
     name: 'Greenvale Meadows',
     kind: 'wilderness',
     instanced: false,
-    chunkSize: 64,
-    bounds: { minCx: -1, maxCx: 0, minCz: -1, maxCz: 0 },
+    chunkSize: CHUNK,
+    bounds: { minCx: -2, maxCx: 1, minCz: -2, maxCz: 1 },
     defaultSpawn: { x: 0, y: 0, z: -8 },
     transitions: [],
     environment: { dayNightCycle: false, weatherProfileId: null, ambientColor: '#9fc5e8' },
-  },
-];
-
-const Z = 'zone.greenvale.meadows';
-
-export const chunks: WorldChunk[] = [
-  {
-    zoneId: Z,
-    coord: { cx: -1, cz: -1 },
-    terrainAssetId: null,
-    groundColor: '#5f8f3a',
-    props: [
+    respawnPoints: [
       {
-        id: 'tree_a',
-        kind: 'tree',
-        position: { x: -30, y: 0, z: -20 },
-        rotationY: 0,
-        scale: 1.2,
-        modelId: null,
+        id: 'respawn.greenvale.village',
+        name: 'Greenvale Village',
+        position: { x: 0, y: 0, z: -8 },
       },
+      { id: 'respawn.greenvale.waystone', name: 'Old Waystone', position: { x: -5, y: 0, z: -90 } },
+    ],
+    safeZones: [
       {
-        id: 'tree_b',
-        kind: 'tree',
-        position: { x: -45, y: 0, z: -40 },
-        rotationY: 0,
-        scale: 1,
-        modelId: null,
-      },
-      {
-        id: 'rock_a',
-        kind: 'rock',
-        position: { x: -12, y: 0, z: -30 },
-        rotationY: 0.4,
-        scale: 1.5,
-        modelId: null,
+        id: 'safe.greenvale.village',
+        name: 'Greenvale Village',
+        center: { x: 0, y: 0, z: 0 },
+        radius: village.radius,
       },
     ],
-    spawnPoints: [
+    spawnGroups: [
       {
-        id: 'spawn.greenvale.ore_pile',
-        kind: 'pickup',
-        position: { x: -10, y: 0, z: -12 },
-        rotationY: 0,
-        refId: 'material.ore.copper_ore',
-        quantity: 3,
-        respawnMs: 15_000,
-        interactRadius: 3,
+        id: 'group.greenvale.den_north',
+        name: 'Northwood Den',
+        maxAlive: 2,
+        respawnMs: { min: 20_000, max: 35_000 },
+        minPlayerDistance: 18,
+      },
+      {
+        id: 'group.greenvale.den_east',
+        name: 'Eastern Rocks Den',
+        maxAlive: 2,
+        respawnMs: { min: 20_000, max: 35_000 },
+        minPlayerDistance: 18,
+      },
+      {
+        id: 'group.greenvale.den_sw',
+        name: 'Hollow Den',
+        maxAlive: 2,
+        respawnMs: { min: 20_000, max: 35_000 },
+        minPlayerDistance: 18,
+      },
+      {
+        id: 'group.greenvale.roamers',
+        name: 'Meadow Roamers',
+        maxAlive: 2,
+        respawnMs: { min: 30_000, max: 60_000 },
+        minPlayerDistance: 25,
       },
     ],
-  },
-  {
-    zoneId: Z,
-    coord: { cx: 0, cz: -1 },
-    terrainAssetId: null,
-    groundColor: '#64943d',
-    props: [
+    landmarks: [
       {
-        id: 'tree_c',
-        kind: 'tree',
-        position: { x: 25, y: 0, z: -35 },
-        rotationY: 0,
-        scale: 1.3,
-        modelId: null,
-      },
-      {
-        id: 'fence_a',
-        kind: 'fence',
-        position: { x: 15, y: 0, z: -5 },
-        rotationY: 0,
-        scale: 1,
-        modelId: null,
-      },
-    ],
-    spawnPoints: [
-      {
-        id: 'spawn.greenvale.sword_rack',
-        kind: 'pickup',
-        position: { x: 8, y: 0, z: -14 },
-        rotationY: 0,
-        refId: 'weapon.sword.iron_longsword',
-        quantity: 1,
-        respawnMs: 20_000,
-        interactRadius: 3,
-      },
-    ],
-  },
-  {
-    zoneId: Z,
-    coord: { cx: -1, cz: 0 },
-    terrainAssetId: null,
-    groundColor: '#5a8a36',
-    props: [
-      {
-        id: 'house_a',
-        kind: 'building',
-        position: { x: -20, y: 0, z: 18 },
-        rotationY: 0.2,
-        scale: 1,
-        modelId: null,
-      },
-      {
-        id: 'tree_d',
-        kind: 'tree',
-        position: { x: -50, y: 0, z: 40 },
-        rotationY: 0,
-        scale: 1.1,
-        modelId: null,
-      },
-    ],
-    spawnPoints: [
-      {
-        id: 'spawn.greenvale.elder',
-        kind: 'npc',
-        position: { x: -6, y: 0, z: 6 },
-        rotationY: Math.PI,
-        refId: 'npc.greenvale.elder_maren',
-        quantity: 1,
-        respawnMs: null,
-        interactRadius: 4,
-      },
-    ],
-  },
-  {
-    zoneId: Z,
-    coord: { cx: 0, cz: 0 },
-    terrainAssetId: null,
-    groundColor: '#689a40',
-    props: [
-      {
-        id: 'rock_b',
-        kind: 'rock',
-        position: { x: 35, y: 0, z: 30 },
-        rotationY: 1.1,
-        scale: 2,
-        modelId: null,
-      },
-      {
-        id: 'marker_spawn',
-        kind: 'marker',
+        id: 'landmark.greenvale.village',
+        name: 'Greenvale Village',
         position: { x: 0, y: 0, z: 0 },
-        rotationY: 0,
-        scale: 1,
-        modelId: null,
       },
-    ],
-    spawnPoints: [
       {
-        id: 'spawn.greenvale.wolf_1',
-        kind: 'enemy',
-        position: { x: 2, y: 0, z: 14 },
-        rotationY: Math.PI,
-        refId: 'enemy.greenvale.grey_wolf',
-        quantity: 1,
-        respawnMs: 8_000,
-        interactRadius: 3,
+        id: 'landmark.greenvale.northwood',
+        name: 'Northwood Den',
+        position: { x: 5, y: 0, z: 68 },
+      },
+      {
+        id: 'landmark.greenvale.eastern_rocks',
+        name: 'Eastern Rocks',
+        position: { x: 78, y: 0, z: -6 },
+      },
+      { id: 'landmark.greenvale.hollow', name: 'The Hollow', position: { x: -62, y: 0, z: -62 } },
+      {
+        id: 'landmark.greenvale.waystone',
+        name: 'Old Waystone',
+        position: { x: -5, y: 0, z: -95 },
       },
     ],
   },

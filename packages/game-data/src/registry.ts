@@ -39,6 +39,8 @@ import type {
   WorldZone,
 } from '@mmo/schemas';
 import { chunkKey } from './rules/world';
+import { CollisionWorld, chunkColliders } from './rules/collision';
+import { ENEMY_COLLISION_RADIUS, PLAYER_COLLISION_RADIUS } from './content/props';
 
 export const RawGameDataSchema = z.object({
   rarities: z.array(ItemRarityDefinitionSchema),
@@ -204,6 +206,43 @@ export class GameData {
     for (const e of this.raw.enemies)
       if (e.lootTableId) need(this.lootTables, e.lootTableId, `enemy ${e.id}`);
     need(this.currencies, this.raw.marketplaceRules.currencyId, 'marketplaceRules');
+    for (const zone of this.raw.zones) {
+      const world = this.collisionWorld(zone.id);
+      const groups = new Set(zone.spawnGroups.map((g) => g.id));
+      for (const rp of zone.respawnPoints) {
+        if (world.overlaps(rp.position, PLAYER_COLLISION_RADIUS))
+          errors.push(`respawn point ${rp.id} is inside a collider`);
+      }
+      if (world.overlaps(zone.defaultSpawn, PLAYER_COLLISION_RADIUS))
+        errors.push(`zone ${zone.id} default spawn is inside a collider`);
+      for (const c of this.chunksForZone(zone.id)) {
+        for (const sp of c.spawnPoints) {
+          if (sp.groupId && !groups.has(sp.groupId))
+            errors.push(`spawn ${sp.id} references unknown group ${sp.groupId}`);
+          if (
+            sp.kind === 'enemy' &&
+            zone.safeZones.some(
+              (sz) =>
+                Math.hypot(sz.center.x - sp.position.x, sz.center.z - sp.position.z) < sz.radius,
+            )
+          ) {
+            errors.push(`enemy spawn ${sp.id} is inside safe zone`);
+          }
+          if (sp.kind === 'enemy' && world.overlaps(sp.position, ENEMY_COLLISION_RADIUS))
+            errors.push(`spawn ${sp.id} is inside a collider`);
+        }
+      }
+      for (const g of zone.spawnGroups) {
+        const pts = this.chunksForZone(zone.id)
+          .flatMap((c) => c.spawnPoints)
+          .filter((sp) => sp.groupId === g.id);
+        if (pts.length < g.maxAlive)
+          errors.push(
+            `spawn group ${g.id} has fewer points (${pts.length}) than maxAlive (${g.maxAlive})`,
+          );
+        if (g.respawnMs.min > g.respawnMs.max) errors.push(`spawn group ${g.id} respawn min > max`);
+      }
+    }
     const spawnIds = this.raw.chunks.flatMap((c) => c.spawnPoints.map((s) => s.id));
     if (new Set(spawnIds).size !== spawnIds.length) errors.push('duplicate spawn point ids');
   }
@@ -234,6 +273,18 @@ export class GameData {
     if (!z) throw new Error(`Unknown zone ${id}`);
     return z;
   }
+  private readonly collisionWorlds = new Map<string, CollisionWorld>();
+
+  /** Authoritative static collision for a zone (cached; built from chunk props + colliders). */
+  collisionWorld(zoneId: string): CollisionWorld {
+    let w = this.collisionWorlds.get(zoneId);
+    if (!w) {
+      w = new CollisionWorld(this.chunksForZone(zoneId).flatMap(chunkColliders));
+      this.collisionWorlds.set(zoneId, w);
+    }
+    return w;
+  }
+
   chunksForZone(zoneId: string): WorldChunk[] {
     return this.raw.chunks.filter((c) => c.zoneId === zoneId);
   }

@@ -1,5 +1,7 @@
-import type { GameData, Rng, WeaponProfile } from '@mmo/game-data';
+import type { CollisionWorld, GameData, Rng, WeaponProfile } from '@mmo/game-data';
 import {
+  ENEMY_COLLISION_RADIUS,
+  PLAYER_COLLISION_RADIUS,
   applyDamage,
   canPlayerRespawn,
   chunkCoordFor,
@@ -18,6 +20,7 @@ import type { ServerMessage } from '@mmo/networking';
 import type {
   CombatRules,
   EnemyDefinition,
+  SpawnGroup,
   SpawnPoint,
   StatBlock,
   Vec3,
@@ -25,6 +28,9 @@ import type {
   WorldZone,
 } from '@mmo/schemas';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
+import { NavGrid } from './navigation';
+
+type XZ = { x: number; z: number };
 
 /**
  * ZoneSimulation
@@ -72,6 +78,18 @@ export interface KillEvent {
   /** Character credited with the kill (first to damage it: "tagging"). */
   characterId: string;
   zoneId: string;
+  spawnPointId: string;
+  groupId: string | null;
+  diedAtMs: number;
+  /** When this death's spawn slot becomes available again (persisted with the kill). */
+  respawnAtMs: number;
+}
+
+/** A persisted, not-yet-elapsed respawn slot restored at startup (from durable kill events). */
+export interface RestoredRespawn {
+  spawnPointId: string;
+  groupId: string | null;
+  respawnAtMs: number;
 }
 
 type CombatReason = Extract<OutMessage, { t: 'combat.state' }>['d']['reason'];
@@ -102,7 +120,12 @@ interface PlayerState extends PlayerInfo {
   lastOutOfRangeNoticeMs: number;
 }
 
-type EnemyMode = 'idle' | 'engaged' | 'returning' | 'dead';
+/**
+ * 'dying': health reached 0 but the death is not yet durable. The host persists the kill event
+ * (write-ahead) and then calls confirmKill(); only then is the death announced and the respawn
+ * scheduled. A crash in between leaves no trace: the death never happened.
+ */
+type EnemyMode = 'idle' | 'engaged' | 'returning' | 'dying' | 'dead';
 
 interface EnemyState {
   entityId: string;
@@ -116,6 +139,25 @@ interface EnemyState {
   nextAttackAtMs: number;
   diedAtMs: number;
   corpseRemoved: boolean;
+  killId: string | null;
+  respawnAtMs: number;
+  // steering
+  path: XZ[] | null;
+  pathGoal: XZ;
+  repathAtMs: number;
+  bestDist: number;
+  lastProgressAtMs: number;
+  wanderTarget: XZ | null;
+  nextWanderAtMs: number;
+}
+
+interface GroupState {
+  def: SpawnGroup;
+  points: SpawnPoint[];
+  /** Enemy entity IDs counted against maxAlive (alive or dying). */
+  alive: Set<string>;
+  /** Respawn times of confirmed deaths (slot is unavailable until then). */
+  pending: number[];
 }
 
 interface PickupState {
@@ -143,6 +185,10 @@ export interface ZoneSimulationOptions {
   interactTolerance?: number;
   /** Server RNG for combat rolls (inject a seeded one in tests). */
   rng?: Rng;
+  /** Simulation start time (initial spawns, wander timers). */
+  nowMs?: number;
+  /** Respawn slots still pending from durable kill events (restart recovery). */
+  restoredRespawns?: RestoredRespawn[];
 }
 
 export class ZoneSimulation {
@@ -163,6 +209,9 @@ export class ZoneSimulation {
   private readonly enemies = new Map<string, EnemyState>(); // by entityId
   private readonly kills: KillEvent[] = [];
   private lastStepMs: number | null = null;
+  readonly collision: CollisionWorld;
+  private navGrid: NavGrid | undefined;
+  private readonly groups = new Map<string, GroupState>();
 
   constructor(
     private readonly gameData: GameData,
@@ -175,9 +224,41 @@ export class ZoneSimulation {
     this.interactTolerance = opts.interactTolerance ?? 1.0;
     this.rng = opts.rng ?? defaultRng;
     this.rules = gameData.raw.combatRules;
+    this.collision = gameData.collisionWorld(zoneId);
+    const now = opts.nowMs ?? Date.now();
+    this.lastStepMs = null;
+    const restored = opts.restoredRespawns ?? [];
+    for (const g of this.zone.spawnGroups)
+      this.groups.set(g.id, { def: g, points: [], alive: new Set(), pending: [] });
     for (const chunk of gameData.chunksForZone(zoneId)) {
-      for (const spawn of chunk.spawnPoints) this.spawnFromPoint(spawn);
+      for (const spawn of chunk.spawnPoints) {
+        const group = spawn.groupId ? this.groups.get(spawn.groupId) : undefined;
+        if (group) {
+          group.points.push(spawn);
+          continue;
+        }
+        const r = restored.find((x) => x.spawnPointId === spawn.id && x.respawnAtMs > now);
+        if (r) this.respawnQueue.push({ atMs: r.respawnAtMs, spawn });
+        else this.spawnFromPoint(spawn, now);
+      }
     }
+    for (const r of restored)
+      if (r.groupId && r.respawnAtMs > now) this.groups.get(r.groupId)?.pending.push(r.respawnAtMs);
+    this.stepGroups(now);
+  }
+
+  /** Navigation grid for this zone (built on first use; static geometry). */
+  private get nav(): NavGrid {
+    if (!this.navGrid) {
+      const b = this.zone.bounds;
+      const s = this.zone.chunkSize;
+      this.navGrid = new NavGrid(
+        this.collision,
+        { minX: b.minCx * s, minZ: b.minCz * s, maxX: (b.maxCx + 1) * s, maxZ: (b.maxCz + 1) * s },
+        ENEMY_COLLISION_RADIUS,
+      );
+    }
+    return this.navGrid;
   }
 
   get tick(): number {
@@ -190,7 +271,9 @@ export class ZoneSimulation {
 
   addPlayer(info: PlayerInfo, position: Vec3, rotationY: number, nowMs: number): string {
     if (this.players.has(info.characterId)) throw new Error('player already in zone');
-    const pos = isInsideZone(this.zone, position) ? position : { ...this.zone.defaultSpawn };
+    const raw = isInsideZone(this.zone, position) ? position : { ...this.zone.defaultSpawn };
+    const free = this.collision.nearestFree(raw, PLAYER_COLLISION_RADIUS);
+    const pos = { x: free.x, y: 0, z: free.z };
     const entity: WorldEntity = {
       id: this.newEntityId(),
       kind: 'player',
@@ -315,9 +398,14 @@ export class ZoneSimulation {
         targetCharacterId: string | null;
         taggedBy: string | null;
         defId: string;
+        spawnPointId: string;
+        groupId: string | null;
+        killId: string | null;
+        position: Vec3;
       }>
     | undefined {
     const e = this.enemies.get(entityId);
+    const ent = this.entities.get(entityId);
     return (
       e && {
         mode: e.mode,
@@ -326,8 +414,58 @@ export class ZoneSimulation {
         targetCharacterId: e.targetCharacterId,
         taggedBy: e.taggedBy,
         defId: e.def.id,
+        spawnPointId: e.spawn.id,
+        groupId: e.spawn.groupId,
+        killId: e.killId,
+        position: ent ? { ...ent.position } : { ...e.spawn.position },
       }
     );
+  }
+
+  /** All enemy entity IDs currently simulated (alive, dying or corpse). */
+  enemyIds(): string[] {
+    return [...this.enemies.keys()];
+  }
+
+  /** Live (not dying/dead) enemies per spawn group, for population checks. */
+  groupPopulation(
+    groupId: string,
+  ): { alive: number; pending: number; maxAlive: number } | undefined {
+    const g = this.groups.get(groupId);
+    return g && { alive: g.alive.size, pending: g.pending.length, maxAlive: g.def.maxAlive };
+  }
+
+  /**
+   * The host persisted this kill (write-ahead). Finalise the death: announce it, stop attackers,
+   * start the corpse timer and occupy the respawn slot until `respawnAtMs`. Idempotent.
+   */
+  confirmKill(killId: string, nowMs: number): boolean {
+    const enemy = [...this.enemies.values()].find((e) => e.killId === killId && e.mode === 'dying');
+    if (!enemy) return false;
+    enemy.mode = 'dead';
+    enemy.diedAtMs = nowMs;
+    const entity = this.entities.get(enemy.entityId);
+    if (entity) {
+      entity.dead = true;
+      entity.health = 0;
+    }
+    this.toKnowers(enemy.entityId, {
+      t: 'combat.death',
+      d: {
+        entityId: enemy.entityId,
+        kind: 'enemy',
+        killerId: this.players.get(enemy.taggedBy ?? '')?.entityId ?? null,
+      },
+    });
+    this.stopAttackingTarget(enemy.entityId, 'target_dead');
+    const group = enemy.spawn.groupId ? this.groups.get(enemy.spawn.groupId) : undefined;
+    if (group) {
+      group.alive.delete(enemy.entityId);
+      group.pending.push(enemy.respawnAtMs);
+    } else {
+      this.respawnQueue.push({ atMs: enemy.respawnAtMs, spawn: enemy.spawn });
+    }
+    return true;
   }
 
   playerCount(): number {
@@ -361,6 +499,18 @@ export class ZoneSimulation {
           rotationY: p.rotationY,
           reason: !isInsideZone(this.zone, position) ? 'out_of_bounds' : 'too_fast',
         },
+      });
+      return false;
+    }
+    // Authoritative collision: the client predicts with the same CollisionWorld (radius 0.45);
+    // the server is slightly lenient on overlap but never allows crossing an obstacle.
+    if (
+      this.collision.overlaps(position, PLAYER_COLLISION_RADIUS * 0.7) ||
+      this.collision.sweepBlocked(p.position, position, 0)
+    ) {
+      this.push(characterId, {
+        t: 'move.correction',
+        d: { position: p.position, rotationY: p.rotationY, reason: 'blocked' },
       });
       return false;
     }
@@ -450,7 +600,8 @@ export class ZoneSimulation {
     if (!p.targetId) throw new DomainError(ErrorCode.NO_TARGET, 'You have no target');
     const enemy = this.enemies.get(p.targetId);
     if (!enemy) throw new DomainError(ErrorCode.INVALID_TARGET, 'You cannot attack that');
-    if (enemy.mode === 'dead') throw new DomainError(ErrorCode.TARGET_DEAD, 'Your target is dead');
+    if (enemy.mode === 'dead' || enemy.mode === 'dying')
+      throw new DomainError(ErrorCode.TARGET_DEAD, 'Your target is dead');
     const e = this.entities.get(enemy.entityId)!;
     if (
       !isInRange(
@@ -569,10 +720,11 @@ export class ZoneSimulation {
       const r = this.respawnQueue[i]!;
       if (r.atMs <= nowMs) {
         this.respawnQueue.splice(i, 1);
-        this.spawnFromPoint(r.spawn);
+        this.spawnFromPoint(r.spawn, nowMs);
       }
     }
 
+    this.stepGroups(nowMs);
     this.stepPlayersCombat(nowMs);
     this.stepEnemies(nowMs, dtMs);
     this.stepRegenAndCombatFlags(nowMs, dtMs);
@@ -643,7 +795,10 @@ export class ZoneSimulation {
     q.push(msg);
   }
 
-  private spawnFromPoint(spawn: SpawnPoint): void {
+  private spawnFromPoint(
+    spawn: SpawnPoint,
+    nowMs: number = this.lastStepMs ?? Date.now(),
+  ): string | null {
     if (spawn.kind === 'npc') {
       const def = this.gameData.npcs.get(spawn.refId)!;
       this.addEntity({
@@ -675,12 +830,13 @@ export class ZoneSimulation {
       this.addEntity(entity);
     } else if (spawn.kind === 'enemy') {
       const def = this.gameData.enemy(spawn.refId);
-      if (!def.combat) return;
+      if (!def.combat) return null;
+      const at = this.collision.nearestFree(spawn.position, ENEMY_COLLISION_RADIUS);
       const entity: WorldEntity = {
         id: this.newEntityId(),
         kind: 'enemy',
         name: def.name,
-        position: { ...spawn.position },
+        position: { x: at.x, y: 0, z: at.z },
         rotationY: spawn.rotationY,
         refId: def.id,
         characterId: null,
@@ -702,10 +858,21 @@ export class ZoneSimulation {
         nextAttackAtMs: 0,
         diedAtMs: 0,
         corpseRemoved: false,
+        killId: null,
+        respawnAtMs: 0,
+        path: null,
+        pathGoal: { x: 0, z: 0 },
+        repathAtMs: 0,
+        bestDist: Infinity,
+        lastProgressAtMs: nowMs,
+        wanderTarget: null,
+        nextWanderAtMs: nowMs + 1000 + this.rng.next() * 5000,
       });
       this.addEntity(entity);
+      return entity.id;
     }
     // 'resource_node' spawns are defined in data but not simulated yet.
+    return null;
   }
 
   private addEntity(entity: WorldEntity): void {
@@ -734,14 +901,21 @@ export class ZoneSimulation {
     return p;
   }
 
-  /** Extension point: no collision geometry exists yet, so everything is in line of sight. */
-  private hasLineOfSight(_from: Vec3, _to: Vec3): boolean {
-    return true;
+  /** Authoritative line of sight from the zone's collision world (sight-blocking colliders only). */
+  private hasLineOfSight(from: Vec3, to: Vec3): boolean {
+    return this.collision.hasLineOfSight(from, to);
   }
 
-  /** Extension point for graveyards/checkpoints: today the zone's default spawn. */
-  private respawnPointFor(_p: PlayerState): Vec3 {
-    return this.zone.defaultSpawn;
+  /** Nearest respawn point (graveyard/waystone) to where the player died; zone default otherwise. */
+  private respawnPointFor(p: PlayerState): Vec3 {
+    const points = this.zone.respawnPoints.length
+      ? this.zone.respawnPoints.map((r) => r.position)
+      : [this.zone.defaultSpawn];
+    const best = points.reduce((a, b) =>
+      distance2D(a, p.position) <= distance2D(b, p.position) ? a : b,
+    );
+    const free = this.collision.nearestFree(best, PLAYER_COLLISION_RADIUS);
+    return { x: free.x, y: 0, z: free.z };
   }
 
   private toKnowers(entityId: string, msg: OutMessage): void {
@@ -818,6 +992,7 @@ export class ZoneSimulation {
         this.sendCombatState(p, 'target_dead');
         continue;
       }
+      if (enemy.mode === 'dying') continue; // death is being made durable; confirmKill stops attackers
       const inRange =
         isInRange(
           distance2D(p.position, entity.position),
@@ -842,10 +1017,8 @@ export class ZoneSimulation {
       );
       // Aggro + tag: the first character to damage an enemy owns the kill.
       enemy.taggedBy ??= p.characterId;
-      if (enemy.mode !== 'engaged' || !enemy.targetCharacterId) {
-        enemy.mode = 'engaged';
-        enemy.targetCharacterId = p.characterId;
-      }
+      if (enemy.mode !== 'engaged' || !enemy.targetCharacterId)
+        this.engage(enemy, p.characterId, nowMs);
       const { health, killed } = applyDamage(enemy.health, result.damage);
       enemy.health = health;
       entity.health = health;
@@ -860,36 +1033,61 @@ export class ZoneSimulation {
           targetMaxHealth: enemy.maxHealth,
         },
       });
-      if (killed) this.enemyDies(enemy, p, nowMs);
+      if (killed) this.enemyDying(enemy, p, nowMs);
     }
   }
 
-  private enemyDies(enemy: EnemyState, killer: PlayerState, nowMs: number): void {
-    enemy.mode = 'dead';
-    enemy.diedAtMs = nowMs;
+  /** Health hit 0: freeze the enemy and queue a write-ahead kill event for the host to persist. */
+  private enemyDying(enemy: EnemyState, killer: PlayerState, nowMs: number): void {
+    enemy.mode = 'dying';
     enemy.targetCharacterId = null;
-    const entity = this.entities.get(enemy.entityId)!;
-    entity.dead = true;
-    entity.health = 0;
-    this.toKnowers(enemy.entityId, {
-      t: 'combat.death',
-      d: { entityId: enemy.entityId, kind: 'enemy', killerId: killer.entityId },
-    });
-    this.stopAttackingTarget(enemy.entityId, 'target_dead');
-    const credited = enemy.taggedBy ?? killer.characterId;
+    enemy.path = null;
+    const killId = uuidv7();
+    enemy.killId = killId;
+    const group = enemy.spawn.groupId ? this.groups.get(enemy.spawn.groupId) : undefined;
+    const delay = group
+      ? group.def.respawnMs.min +
+        Math.floor(this.rng.next() * (group.def.respawnMs.max - group.def.respawnMs.min + 1))
+      : (enemy.spawn.respawnMs ?? 0);
+    enemy.respawnAtMs = nowMs + Math.max(delay, enemy.def.combat.corpseMs);
     this.kills.push({
-      killId: uuidv7(),
+      killId,
       enemyId: enemy.def.id,
       enemyName: enemy.def.name,
       enemyEntityId: enemy.entityId,
-      characterId: credited,
+      characterId: enemy.taggedBy ?? killer.characterId,
       zoneId: this.zone.id,
+      spawnPointId: enemy.spawn.id,
+      groupId: enemy.spawn.groupId,
+      diedAtMs: nowMs,
+      respawnAtMs: enemy.respawnAtMs,
     });
-    if (enemy.spawn.respawnMs !== null)
-      this.respawnQueue.push({
-        atMs: nowMs + Math.max(enemy.spawn.respawnMs, enemy.def.combat.corpseMs),
-        spawn: enemy.spawn,
-      });
+  }
+
+  /**
+   * Spawn-group population control (checked every tick, no timers): fill free capacity once a
+   * slot's respawn time has passed, on a random free point with no player too close.
+   */
+  private stepGroups(nowMs: number): void {
+    for (const g of this.groups.values()) {
+      g.pending = g.pending.filter((t) => t > nowMs);
+      let capacity = g.def.maxAlive - g.alive.size - g.pending.length;
+      if (capacity <= 0) continue;
+      const occupied = new Set([...g.alive].map((id) => this.enemies.get(id)?.spawn.id));
+      const candidates = g.points.filter(
+        (pt) =>
+          !occupied.has(pt.id) &&
+          [...this.players.values()].every(
+            (p) => distance2D(p.position, pt.position) >= g.def.minPlayerDistance,
+          ),
+      );
+      while (capacity > 0 && candidates.length > 0) {
+        const pick = candidates.splice(Math.floor(this.rng.next() * candidates.length), 1)[0]!;
+        const id = this.spawnFromPoint(pick, nowMs);
+        if (id) g.alive.add(id);
+        capacity--;
+      }
+    }
   }
 
   private playerDies(p: PlayerState, killerEntityId: string | null, nowMs: number): void {
@@ -910,33 +1108,93 @@ export class ZoneSimulation {
   }
 
   /** Enemy gives up: walk home, then reset to full health ("evade"). */
-  private disengage(e: EnemyState): void {
-    if (e.mode === 'dead') return;
+  private disengage(e: EnemyState, nowMs: number = this.lastStepMs ?? 0): void {
+    if (e.mode === 'dead' || e.mode === 'dying') return;
     e.mode = 'returning';
     e.targetCharacterId = null;
+    e.path = null;
+    e.bestDist = Infinity;
+    e.lastProgressAtMs = nowMs;
   }
 
-  private moveToward(
-    entityId: string,
-    to: Vec3,
+  /**
+   * Moves an enemy toward `goal`: straight when the swept path is clear, otherwise along an A*
+   * path (repathed at most every 750 ms or when the goal moves > 2 m). Every step goes through
+   * collide-and-slide, so enemies never enter obstacles. Returns the remaining straight-line
+   * distance, or -1 when the goal is unreachable.
+   */
+  private steer(
+    enemy: EnemyState,
+    goal: XZ,
     speed: number,
     dtMs: number,
+    nowMs: number,
     stopAt: number,
   ): number {
-    const e = this.entities.get(entityId)!;
-    const dist = distance2D(e.position, to);
-    const step = (speed * dtMs) / 1000;
-    if (dist > stopAt && step > 0) {
-      const t = Math.min(1, step / dist, (dist - stopAt) / dist);
-      e.position = {
-        x: e.position.x + (to.x - e.position.x) * t,
-        y: 0,
-        z: e.position.z + (to.z - e.position.z) * t,
-      };
-      e.rotationY = Math.atan2(to.x - e.position.x, to.z - e.position.z);
-      this.movedThisTick.add(entityId);
+    const entity = this.entities.get(enemy.entityId)!;
+    const pos = entity.position;
+    const dist = distance2D(pos, goal);
+    if (dist <= stopAt) return dist;
+    let waypoint: XZ = goal;
+    const direct = !this.collision.sweepBlocked(pos, goal, ENEMY_COLLISION_RADIUS * 0.9);
+    if (direct) {
+      enemy.path = null;
+    } else {
+      if (!enemy.path || nowMs >= enemy.repathAtMs || distance2D(enemy.pathGoal, goal) > 2) {
+        enemy.path = this.nav.findPath(pos, goal);
+        enemy.pathGoal = { x: goal.x, z: goal.z };
+        enemy.repathAtMs = nowMs + 750;
+      }
+      if (!enemy.path || enemy.path.length === 0) return -1;
+      while (enemy.path.length > 1 && distance2D(pos, enemy.path[0]!) < 0.4) enemy.path.shift();
+      waypoint = enemy.path[0]!;
     }
-    return distance2D(e.position, to);
+    const d = distance2D(pos, waypoint);
+    const move = Math.min((speed * dtMs) / 1000, direct ? Math.max(0, dist - stopAt) : d);
+    if (move <= 1e-4 || d <= 1e-6) return dist;
+    const next = {
+      x: pos.x + ((waypoint.x - pos.x) / d) * move,
+      z: pos.z + ((waypoint.z - pos.z) / d) * move,
+    };
+    const slid = this.collision.slide(pos, next, ENEMY_COLLISION_RADIUS);
+    if (slid.x !== pos.x || slid.z !== pos.z) {
+      entity.position = { x: slid.x, y: 0, z: slid.z };
+      entity.rotationY = Math.atan2(waypoint.x - pos.x, waypoint.z - pos.z);
+      this.movedThisTick.add(enemy.entityId);
+    }
+    return distance2D(entity.position, goal);
+  }
+
+  /** Tracks progress toward a goal; returns true when the enemy has been stuck for `limitMs`. */
+  private stuck(enemy: EnemyState, dist: number, nowMs: number, limitMs: number): boolean {
+    if (dist < enemy.bestDist - 0.5) {
+      enemy.bestDist = dist;
+      enemy.lastProgressAtMs = nowMs;
+    }
+    return nowMs - enemy.lastProgressAtMs > limitMs;
+  }
+
+  private engage(enemy: EnemyState, characterId: string, nowMs: number): void {
+    enemy.mode = 'engaged';
+    enemy.targetCharacterId = characterId;
+    enemy.bestDist = Infinity;
+    enemy.lastProgressAtMs = nowMs;
+    enemy.wanderTarget = null;
+  }
+
+  /** Back at (or snapped to) its spawn point: evade reset to full health. */
+  private resetHome(enemy: EnemyState, entity: WorldEntity, snap: boolean, nowMs: number): void {
+    if (snap) {
+      const home = this.collision.nearestFree(enemy.spawn.position, ENEMY_COLLISION_RADIUS);
+      entity.position = { x: home.x, y: 0, z: home.z };
+      this.movedThisTick.add(enemy.entityId);
+    }
+    enemy.mode = 'idle';
+    enemy.path = null;
+    enemy.taggedBy = null;
+    enemy.health = enemy.maxHealth;
+    enemy.nextWanderAtMs = nowMs + 3000 + this.rng.next() * 5000;
+    this.syncEntityHealth(enemy.entityId, enemy.health, enemy.maxHealth, false);
   }
 
   private stepEnemies(nowMs: number, dtMs: number): void {
@@ -947,44 +1205,73 @@ export class ZoneSimulation {
         if (!enemy.corpseRemoved && nowMs - enemy.diedAtMs >= c.corpseMs) {
           enemy.corpseRemoved = true;
           this.despawnEntity(enemy.entityId, 'died');
+          this.enemies.delete(enemy.entityId);
         }
         continue;
       }
-      if (!entity) continue;
+      if (enemy.mode === 'dying' || !entity) continue;
+
       if (enemy.mode === 'idle') {
-        if (c.aggroRange <= 0) continue;
-        let best: PlayerState | undefined;
-        let bestD = Infinity;
-        for (const p of this.players.values()) {
-          if (p.dead) continue;
-          const d = distance2D(p.position, entity.position);
-          if (d <= c.aggroRange && d < bestD) {
-            best = p;
-            bestD = d;
+        // Aggro: nearest living player within range that the enemy can actually see.
+        if (c.aggroRange > 0) {
+          let best: PlayerState | undefined;
+          let bestD = Infinity;
+          for (const p of this.players.values()) {
+            if (p.dead) continue;
+            const d = distance2D(p.position, entity.position);
+            if (
+              d <= c.aggroRange &&
+              d < bestD &&
+              this.hasLineOfSight(entity.position, p.position)
+            ) {
+              best = p;
+              bestD = d;
+            }
+          }
+          if (best) {
+            this.engage(enemy, best.characterId, nowMs);
+            continue;
           }
         }
-        if (best) {
-          enemy.mode = 'engaged';
-          enemy.targetCharacterId = best.characterId;
+        // Wander around the spawn point now and then (life, not a combat test room).
+        if (enemy.spawn.wanderRadius > 0) {
+          if (!enemy.wanderTarget && nowMs >= enemy.nextWanderAtMs) {
+            const a = this.rng.next() * Math.PI * 2;
+            const r = this.rng.next() * enemy.spawn.wanderRadius;
+            const t = {
+              x: enemy.spawn.position.x + Math.cos(a) * r,
+              z: enemy.spawn.position.z + Math.sin(a) * r,
+            };
+            if (
+              !this.collision.overlaps(t, ENEMY_COLLISION_RADIUS) &&
+              !this.collision.sweepBlocked(entity.position, t, ENEMY_COLLISION_RADIUS)
+            )
+              enemy.wanderTarget = t;
+            enemy.nextWanderAtMs = nowMs + 4000 + this.rng.next() * 6000;
+          }
+          if (enemy.wanderTarget) {
+            const left = this.steer(
+              enemy,
+              enemy.wanderTarget,
+              c.moveSpeed * 0.35,
+              dtMs,
+              nowMs,
+              0.2,
+            );
+            if (left <= 0.3) enemy.wanderTarget = null;
+          }
         }
         continue;
       }
+
       if (enemy.mode === 'returning') {
-        const left = this.moveToward(
-          enemy.entityId,
-          enemy.spawn.position,
-          c.moveSpeed * 1.5,
-          dtMs,
-          0.1,
-        );
-        if (left <= 0.15) {
-          enemy.mode = 'idle';
-          enemy.taggedBy = null;
-          enemy.health = enemy.maxHealth;
-          this.syncEntityHealth(enemy.entityId, enemy.health, enemy.maxHealth, false);
-        }
+        const left = this.steer(enemy, enemy.spawn.position, c.moveSpeed * 1.5, dtMs, nowMs, 0.2);
+        if (left >= 0 && left <= 0.5) this.resetHome(enemy, entity, false, nowMs);
+        else if (left < 0 || this.stuck(enemy, left, nowMs, 6000))
+          this.resetHome(enemy, entity, true, nowMs);
         continue;
       }
+
       // engaged
       const target = enemy.targetCharacterId
         ? this.players.get(enemy.targetCharacterId)
@@ -994,17 +1281,26 @@ export class ZoneSimulation {
         target.dead ||
         distance2D(entity.position, enemy.spawn.position) > c.leashRange
       ) {
-        this.disengage(enemy);
+        this.disengage(enemy, nowMs);
         continue;
       }
-      const dist = this.moveToward(
-        enemy.entityId,
-        target.position,
-        c.moveSpeed,
-        dtMs,
-        c.attackRange * 0.8,
-      );
-      if (!isInRange(dist, c.attackRange, this.rules.rangeTolerance)) continue;
+      const dist = distance2D(entity.position, target.position);
+      const canHit =
+        isInRange(dist, c.attackRange, this.rules.rangeTolerance) &&
+        this.hasLineOfSight(entity.position, target.position);
+      if (!canHit) {
+        const left = this.steer(
+          enemy,
+          target.position,
+          c.moveSpeed,
+          dtMs,
+          nowMs,
+          c.attackRange * 0.8,
+        );
+        if (left < 0 || this.stuck(enemy, left, nowMs, 5000)) this.disengage(enemy, nowMs);
+        continue;
+      }
+      enemy.lastProgressAtMs = nowMs;
       this.face(enemy.entityId, entity.position, target.position);
       if (!isAttackReady(enemy.nextAttackAtMs, nowMs)) continue;
       enemy.nextAttackAtMs = nextSwingAt(enemy.nextAttackAtMs, nowMs, c.attackSpeedMs);

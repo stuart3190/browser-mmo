@@ -21,6 +21,9 @@ export * from './rules/random';
 export * from './rules/marketplace';
 export * from './rules/world';
 export * from './rules/combat';
+export * from './rules/collision';
+export { propShapes, PLAYER_COLLISION_RADIUS, ENEMY_COLLISION_RADIUS } from './content/props';
+export type { PropKind, PropShape } from './content/props';
 
 /** The raw authored content bundle. */
 export const rawGameData: RawGameData = {
