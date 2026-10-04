@@ -31,6 +31,20 @@ wolf health falls monotonically, wolf hits back → wolf dies (Dead state) → l
 PostgreSQL → UI items == DB items → looted Trapper's Cap equipped via the inventory UI raises armour → 390×844 touch: tap
 wolf, tap Attack, health falls, frames don't overlap. Inventory E2E (24) and pickup E2E re-run green on the same build.
 
+Update 2026-10-04 (Claude Opus 5.5), milestone "first server-authoritative quest loop": commits `7c6ab3b` (definitions, rules,
+`character_quests`, domain), `e501a5b` (NPC interaction + quest protocol + gateway), `619d91a` (dialogue, tracker, quest log,
+`scripts/e2e/quest.cjs`), `da2c57b` (docs, ADR 0018). "`pnpm verify`" = 94 unit + 80 integration tests (domain 48, api 5,
+realtime 27) + format/lint/typecheck/build, all green. "Quest E2E" = `node scripts/e2e/quest.cjs <dir>`, 29 checks, all passing:
+desktop — walk to Elder Maren (talk prompt), E opens dialogue, Accept, tracker 0/5, row `active` in PostgreSQL, logout/login keeps
+it, real wolf hunting until the server reports 5/5 kills and 3/3 looted pelts (tracker updated live; kill count == rewarded
+`kill_events`), "Return to Elder Maren", socket drop and full page reload keep progress, walk back, dialogue shows the completed
+line, Complete quest → reward toast (+300 XP, 2s 50c, Wayfarer's Cloak, level-up), tracker cleared, no second turn-in action,
+quest log Completed tab; DB: completed with rewarded_at, exactly 3 pelts consumed, +250 gold once, one cloak, UI == DB. Phone
+390×844 — Talk/Accept/Complete by touch, tracker does not overlap the HUD, progress pushed live. Scaffolding: the desktop hunt
+"travels" between village and dens (log out, wait out the 10 s linger, move the character in the DB, log in) because walking is
+covered by the world E2E; the phone run credits its 5 kills through inserted `kill_events` rows (processed by the server's
+recovery sweep) and an admin-granted 3 pelts. The world E2E (22/22) was re-run green on the same build. Screenshots inspected.
+
 Update 2026-10-04 (Claude Opus 5.5), milestone "world population and movement quality": commits `6db82ba` (collision,
 navigation, spawn groups, write-ahead death), `c350b18` (kill_events outbox, crash recovery, mailbox), `d33fab1` (touch
 controls, client collision prediction, minimap, feedback, `scripts/e2e/world.cjs`), `b0ef3bd` (ADRs 0016/0017, docs).
@@ -334,10 +348,20 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 # Quests
 
-- [ ] Quest model
-  - Placeholder schema only.
-- [ ] Quest states
-- [ ] Rewards
+- [x] Quest model
+  - Verified 2026-10-04 · Claude Opus 5.5 · data-driven definitions (giver/turn-in NPC, level, prerequisites, repeatable flag, kill/collect objectives with stable ids, rewards, per-state dialogue) cross-validated by the registry; `character_quests` per-character state; first quest "Wolves at the Edge" (unit + domain tests, Quest E2E) · 7c6ab3b
+- [x] Quest states
+  - Verified 2026-10-04 · Claude Opus 5.5 · unavailable / available / active / ready-to-turn-in / completed (derived from 2 stored statuses + rules); persisted across reconnect, reload and server restart (unit, realtime, Quest E2E) · e501a5b
+- [x] Quest objectives (kill, collect)
+  - Verified 2026-10-04 · Claude Opus 5.5 · kills counted inside the exactly-once kill-reward transaction (duplicate kill, concurrent processors, replays: once); collect derived from bags + Recovered loot, not vaults/locked (domain tests, Quest E2E with real loot) · 7c6ab3b
+- [x] Rewards
+  - Verified 2026-10-04 · Claude Opus 5.5 · turn-in = one transaction (consume pelts, XP, gold ledger, reward item with Recovered-loot overflow, complete); 5 concurrent turn-ins → 1; crash mid turn-in rolls back; full mailbox → atomic failure (domain + realtime tests, Quest E2E DB checks) · 7c6ab3b
+- [x] NPC interaction + dialogue
+  - Verified 2026-10-04 · Claude Opus 5.5 · server validates NPC entity/zone/range/alive; dialogue per quest state with the single allowed action; desktop E, tap and touch Talk button (world sim + realtime tests, Quest E2E desktop + phone) · 619d91a
+- [x] Quest tracker and quest log UI
+  - Verified 2026-10-04 · Claude Opus 5.5 · compact tracker (counts, "Return to Elder Maren"), log window with Active/Completed, details, rewards; phone layout checked (Quest E2E) · 619d91a
+- [ ] Repeatable / daily quests, talk/explore objectives, abandoning, quest chains UI
+  - Schema flag/shapes only; rejected by content validation for live quests.
 
 # Dungeons
 
@@ -421,6 +445,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Integration tests
   - Verified 2026-10-03 · Claude Opus 5.5 · 33 tests (domain 24, API 5, realtime 4) on PostgreSQL 16 · 0f0a413
   - Re-verified 2026-10-04 · Claude Opus 5.5 · 68 tests (domain 38, API 5, realtime 25) · b0ef3bd
+- [x] Quest tests
+  - Verified 2026-10-04 · Claude Opus 5.5 · 9 unit, 10 domain integration, 2 realtime integration, 29-check browser E2E · da2c57b
 - [x] Crash-recovery tests
   - Verified 2026-10-04 · Claude Opus 5.5 · fault hooks + `simulateCrash()` restart tests at every kill-pipeline boundary (`services/realtime/test/durable-kills.test.ts`) · c350b18
 - [x] Item ownership tests
@@ -450,7 +476,7 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 ## Current Work
 
-Nothing in progress. Milestone "world population and movement quality" is complete on branch `claude/great-brahmagupta-h834j7` (commits `6db82ba`, `c350b18`, `d33fab1`, `b0ef3bd` + this PROGRESS update), awaiting owner review; not merged to `main`.
+Nothing in progress. Milestone "first server-authoritative quest loop" is complete on branch `claude/great-brahmagupta-h834j7` (commits `7c6ab3b`, `e501a5b`, `619d91a`, `da2c57b` + this PROGRESS update), awaiting owner review; not merged to `main` (main is at `be485ad`, the world population milestone).
 
 ## Known Issues
 
@@ -479,15 +505,19 @@ Nothing in progress. Milestone "world population and movement quality" is comple
 23. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 24. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 25. **Minimap labels can clip** at the circle edge, and landmark names overlap when close together (cosmetic).
+26. **Quest scope is deliberately small.** One quest; no repeatable/daily quests, abandoning, talk/explore objectives, quest items or party credit (only the tagging character's kills count). Selling/vaulting pelts lowers collect progress (intended, documented).
+27. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
+28. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
+29. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
+30. **Dialogue panel does not close automatically when walking away** (the server re-validates range on every action).
 
 ## Next Recommended Task
 
-**Milestone: first quest loop and a reason to explore** (builds on the populated zone):
+**Milestone: second activity loop — gathering and a short quest chain** (reuses the quest foundation):
 
 1. Owner enables CI (move `docs/ci/github-actions-ci.yml` into `.github/workflows/`) and fixes anything the first run finds.
-2. Quest model (data-driven: kill N wolves / collect pelts / talk to Elder Maren), quest states persisted server-side, rewards through the same exactly-once outbox pattern as kills.
-3. NPC interaction UI (dialogue + quest offer/turn-in) on desktop and touch.
-4. Gathering from the existing ore/material spawn points as a second activity; mailbox reuse for marketplace expiry overflow.
-5. `kill_events` retention job; mailbox-full notice in the UI.
+2. Gathering from the existing ore spawn points (server-timed gather action, durable like pickups) feeding a collect objective.
+3. A follow-up quest gated by `prerequisites` (e.g. "deliver ore to the smith"), adding `talk` objectives to the runtime.
+4. Small quality items: close dialogue when out of range, clearer full-Recovered-loot message, `kill_events` retention job.
 
-Keep abilities/resources, crafting, marketplace UI and social systems for later milestones.
+Keep crafting, professions, reputation, repeatable/daily quests and social systems for later milestones.
