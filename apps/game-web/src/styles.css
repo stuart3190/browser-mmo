@@ -194,7 +194,7 @@ kbd {
 /* Windows */
 .windows {
   position: absolute;
-  top: 110px;
+  top: 184px; /* below the minimap */
   right: 12px;
   bottom: 68px;
   display: flex;
@@ -646,5 +646,179 @@ kbd {
   .toasts {
     top: 110px;
     width: calc(100% - 16px);
+  }
+}
+
+/* Touch controls (phones/tablets): joystick bottom-left, combat buttons bottom-right. The middle
+   and upper screen stay free for camera drags and tap-targeting. */
+.touch-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.joystick {
+  position: absolute;
+  left: 18px;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: rgba(20, 24, 32, 0.45);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joystick.disabled {
+  opacity: 0.35;
+}
+.joystick-knob {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(230, 235, 245, 0.75);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.touch-buttons {
+  position: absolute;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'interact target'
+    'attack attack';
+  gap: 12px;
+  justify-items: end;
+  align-items: end;
+}
+.touch-btn {
+  pointer-events: auto;
+  touch-action: manipulation;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  min-height: 0;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(20, 24, 32, 0.7);
+}
+.touch-btn.interact {
+  grid-area: interact;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.touch-btn.next-target {
+  grid-area: target;
+  font-size: 22px;
+}
+.touch-btn.attack {
+  grid-area: attack;
+  width: 84px;
+  height: 84px;
+  font-size: 15px;
+  border-color: #c2483f;
+  color: #ffb3ad;
+}
+.touch-btn.attack.active {
+  background: rgba(150, 40, 35, 0.7);
+  color: #fff;
+}
+/* The big round Attack button replaces the action-bar one on touch. */
+.ui-root.touch .action.attack {
+  display: none;
+}
+/* Keep prompts clear of the thumbs. */
+.ui-root.touch .prompt {
+  bottom: auto;
+  top: 30%;
+  font-size: 13px;
+}
+.ui-root.touch .action-bar {
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Minimap */
+.minimap {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 140px;
+  pointer-events: none;
+  text-align: center;
+}
+.minimap canvas {
+  width: 140px;
+  height: 140px;
+  display: block;
+}
+.minimap-label {
+  font-size: 11px;
+  margin-top: 2px;
+  text-shadow: 0 0 3px #000;
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .minimap {
+    top: auto;
+    bottom: calc(248px + env(safe-area-inset-bottom, 0px));
+    right: 10px;
+    width: 92px;
+  }
+  .minimap canvas {
+    width: 92px;
+    height: 92px;
+  }
+  .minimap-label {
+    font-size: 10px;
+  }
+}
+
+/* Floating combat text */
+.float-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.float-text {
+  position: absolute;
+  transform: translateX(-50%);
+  font-weight: 700;
+  font-size: 16px;
+  text-shadow:
+    0 0 3px #000,
+    0 0 1px #000;
+  animation: float-up 0.9s ease-out forwards;
+  white-space: nowrap;
+}
+.float-text.dealt {
+  color: #fff3c4;
+}
+.float-text.crit {
+  color: #ffcf40;
+  font-size: 21px;
+}
+.float-text.taken {
+  color: #ff6b5e;
+}
+.float-text.miss {
+  color: #c9d1d9;
+  font-size: 13px;
+}
+@keyframes float-up {
+  from {
+    opacity: 1;
+    margin-top: 0;
+  }
+  to {
+    opacity: 0;
+    margin-top: -42px;
   }
 }

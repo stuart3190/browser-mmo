@@ -106,7 +106,7 @@ export function TargetFrame() {
 
 /** Shown while dead. The button unlocks on the server-provided time; the server re-checks anyway. */
 export function DeathOverlay() {
-  const { state, combat } = useGame();
+  const { state, combat, controls, gameData } = useGame();
   const [now, setNow] = useState(Date.now());
   const dead = state.vitals?.dead ?? false;
   useEffect(() => {
@@ -126,6 +126,23 @@ export function DeathOverlay() {
     >
       <h2>You died</h2>
       <p className="muted">No items or experience are lost.</p>
+      {(() => {
+        // Same rule as the server: the nearest respawn point to where you fell.
+        const zoneId = controls.zoneId();
+        const at = controls.position();
+        if (!zoneId || !at) return null;
+        const points = gameData.zone(zoneId).respawnPoints;
+        let best: { name: string; d: number } | null = null;
+        for (const p of points) {
+          const d = Math.hypot(p.position.x - at.x, p.position.z - at.z);
+          if (!best || d < best.d) best = { name: p.name, d };
+        }
+        return best ? (
+          <p className="small" data-testid="respawn-at">
+            You will return at {best.name}.
+          </p>
+        ) : null;
+      })()}
       <button disabled={wait > 0} onClick={() => combat.respawn()} data-testid="respawn">
         {wait > 0 ? `Respawn in ${wait}s` : 'Respawn'}
       </button>

@@ -19,6 +19,7 @@ export function ItemDetails() {
   const inVault =
     loc.kind === 'container' &&
     (loc.containerKind === 'character_vault' || loc.containerKind === 'account_vault');
+  const inMailbox = loc.kind === 'container' && loc.containerKind === 'mailbox';
   const bankOpen = state.open.has('bank');
   const canShare = canPlaceInContainerKind(
     item.template,
@@ -36,7 +37,12 @@ export function ItemDetails() {
     <aside className="details" data-testid="item-details" aria-label="Item details">
       <ItemTooltip item={item} />
       <div className="details-actions">
-        {item.template.equipment && loc.kind !== 'equipped' && (
+        {inMailbox && (
+          <button disabled={busy} onClick={() => void actions.withdraw(item)} data-action="take">
+            Take
+          </button>
+        )}
+        {item.template.equipment && loc.kind !== 'equipped' && !inMailbox && (
           <button disabled={busy} onClick={() => void actions.equip(item)} data-action="equip">
             Equip
           </button>

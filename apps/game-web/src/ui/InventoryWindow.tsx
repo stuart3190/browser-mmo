@@ -5,7 +5,9 @@ import { useGame } from './context';
 import { Tabs, Window } from './Window';
 
 export function InventoryWindow() {
-  const [tab, setTab] = useState<'backpack' | 'material_pouch'>('backpack');
+  const { state } = useGame();
+  const [tab, setTab] = useState<'backpack' | 'material_pouch' | 'mailbox'>('backpack');
+  const recovered = state.items.inContainer('mailbox').length;
   return (
     <Window id="inventory" title="Inventory">
       <Tabs
@@ -14,9 +16,15 @@ export function InventoryWindow() {
         options={[
           { id: 'backpack', label: 'Backpack' },
           { id: 'material_pouch', label: 'Materials' },
+          { id: 'mailbox', label: recovered > 0 ? `Recovered (${recovered})` : 'Recovered' },
         ]}
       />
-      <ContainerGrid kind={tab} />
+      {tab === 'mailbox' && (
+        <p className="muted small">
+          Loot that did not fit your bags is kept here safely. Select an item and choose Take.
+        </p>
+      )}
+      <ContainerGrid kind={tab} compact={tab === 'mailbox'} />
       <Wallet />
     </Window>
   );

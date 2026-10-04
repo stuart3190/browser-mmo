@@ -10,6 +10,8 @@ import { hoverTooltip } from './hover';
 import { InventoryWindow } from './InventoryWindow';
 import { ItemDetails } from './ItemDetails';
 import { ItemTooltip } from './ItemTooltip';
+import { Minimap } from './Minimap';
+import { TouchControls, useTouchControls } from './TouchControls';
 
 const SHORTCUTS: Record<string, WindowId> = {
   KeyB: 'inventory',
@@ -28,6 +30,7 @@ export function mountGameUi(root: HTMLElement, deps: UiDeps): void {
 
 function GameUI() {
   const { state, combat } = useGame();
+  const touch = useTouchControls();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.repeat) return;
@@ -54,9 +57,10 @@ function GameUI() {
   }, [state, combat]);
 
   return (
-    <div className="ui-root">
+    <div className={touch ? 'ui-root touch' : 'ui-root'}>
       <PlayerFrame />
       <TargetFrame />
+      <Minimap />
       <ConnectionBanner />
       <DeathOverlay />
       {state.prompt && <div className="panel prompt">{state.prompt}</div>}
@@ -69,6 +73,7 @@ function GameUI() {
       </div>
       <ItemDetails />
       <HoverTooltip />
+      {touch && <TouchControls />}
       <ActionBar />
     </div>
   );

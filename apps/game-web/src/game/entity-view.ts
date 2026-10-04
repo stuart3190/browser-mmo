@@ -23,6 +23,8 @@ export class EntityViews {
   private readonly views = new Map<string, View>();
   private ring: Mesh | undefined;
   private ringTarget: string | null = null;
+  private readonly flashes = new Map<string, number>();
+  private readonly baseEmissive = new Map<string, Color3>();
 
   constructor(
     private readonly scene: Scene,
@@ -75,6 +77,17 @@ export class EntityViews {
 
   update(dtSeconds: number): void {
     const k = Math.min(1, dtSeconds * 12);
+    for (const [id, left] of this.flashes) {
+      if (left - dtSeconds > 0) {
+        this.flashes.set(id, left - dtSeconds);
+        continue;
+      }
+      this.flashes.delete(id);
+      const mat = this.views.get(id)?.mesh.material as StandardMaterial | null | undefined;
+      const base = this.baseEmissive.get(id);
+      if (mat && base) mat.emissiveColor = base;
+      this.baseEmissive.delete(id);
+    }
     if (this.ring) {
       const t = this.ringTarget ? this.views.get(this.ringTarget) : undefined;
       this.ring.isVisible = t !== undefined;
@@ -88,6 +101,17 @@ export class EntityViews {
   }
 
   /** Maps a picked mesh back to its entity (null for the local player, world props, ground). */
+  /** Current (smoothed) positions of replicated entities, for the minimap. */
+  markers(): { id: string; kind: WorldEntity['kind']; x: number; z: number; dead: boolean }[] {
+    return [...this.views.values()].map((v) => ({
+      id: v.entity.id,
+      kind: v.entity.kind,
+      x: v.mesh.position.x,
+      z: v.mesh.position.z,
+      dead: v.entity.dead ?? false,
+    }));
+  }
+
   entityIdOfMesh(mesh: AbstractMesh): string | null {
     return this.views.has(mesh.name) ? mesh.name : null;
   }
@@ -121,20 +145,20 @@ export class EntityViews {
     this.ring.isVisible = entityId !== null && this.views.has(entityId);
   }
 
-  /** CSS-pixel screen coordinates of an entity (debug/automation helper). */
+  /** CSS-pixel screen coordinates of an entity (floating text, automation). */
   screenPosition(entityId: string, scene: Scene): { x: number; y: number } | null {
     const v = this.views.get(entityId);
-    const engine = scene.getEngine();
-    if (!v || !scene.activeCamera) return null;
-    const p = Vector3.Project(
-      v.mesh.getAbsolutePosition(),
-      Matrix.Identity(),
-      scene.getTransformMatrix(),
-      scene.activeCamera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()),
-    );
-    const scale = engine.getHardwareScalingLevel();
-    const rect = engine.getRenderingCanvasClientRect();
-    return { x: p.x * scale + (rect?.left ?? 0), y: p.y * scale + (rect?.top ?? 0) };
+    return v ? projectToScreen(scene, v.mesh.getAbsolutePosition()) : null;
+  }
+
+  /** Brief red flash when an entity is hit (driven by update(), no timers). */
+  flash(entityId: string): void {
+    const v = this.views.get(entityId);
+    const mat = v?.mesh.material as StandardMaterial | null | undefined;
+    if (!v || !mat) return;
+    if (!this.flashes.has(entityId)) this.baseEmissive.set(entityId, mat.emissiveColor.clone());
+    this.flashes.set(entityId, 0.15);
+    mat.emissiveColor = new Color3(0.7, 0.12, 0.08);
   }
 
   /** Nearest entity of a kind within range of a point (client-side hint only; server re-checks). */
@@ -182,4 +206,20 @@ export class EntityViews {
     mesh.material = mat;
     return mesh;
   }
+}
+
+/** Projects a world position to CSS-pixel page coordinates. */
+export function projectToScreen(scene: Scene, world: Vector3): { x: number; y: number } | null {
+  const engine = scene.getEngine();
+  if (!scene.activeCamera) return null;
+  const p = Vector3.Project(
+    world,
+    Matrix.Identity(),
+    scene.getTransformMatrix(),
+    scene.activeCamera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()),
+  );
+  if (p.z < 0 || p.z > 1) return null; // behind the camera
+  const scale = engine.getHardwareScalingLevel();
+  const rect = engine.getRenderingCanvasClientRect();
+  return { x: p.x * scale + (rect?.left ?? 0), y: p.y * scale + (rect?.top ?? 0) };
 }

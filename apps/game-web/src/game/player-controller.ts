@@ -5,12 +5,16 @@ import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import type { Scene } from '@babylonjs/core/scene';
+import { PLAYER_COLLISION_RADIUS } from '@mmo/game-data';
+import type { CollisionWorld } from '@mmo/game-data';
 import type { Vec3 } from '@mmo/schemas';
+import type { AnalogInput } from './analog-input';
 
 /**
- * Local player: WASD movement relative to the camera, third-person orbit camera (drag to rotate,
- * wheel to zoom). Movement is predicted locally and sent to the server as intent; the server may
- * answer with a correction, which snaps the player back.
+ * Local player: WASD / on-screen joystick movement relative to the camera, third-person orbit
+ * camera (drag to rotate, wheel/pinch to zoom). Movement is predicted locally with the SAME
+ * collision world and slide rule the server uses, so walking into a tree or wall slides along it
+ * instead of being corrected; the server still validates every move and may snap the player back.
  */
 export class PlayerController {
   readonly mesh: Mesh;
@@ -27,6 +31,8 @@ export class PlayerController {
     start: Vec3,
     private readonly speed: number,
     private readonly sendMove: (pos: Vec3, rotationY: number) => void,
+    private readonly collision: CollisionWorld,
+    private readonly analog: AnalogInput,
   ) {
     this.mesh = MeshBuilder.CreateCapsule('local_player', { height: 1.8, radius: 0.4 }, scene);
     const mat = new StandardMaterial('local_player_mat', scene);
@@ -63,7 +69,10 @@ export class PlayerController {
 
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
-    if (!enabled) this.keys.clear();
+    if (!enabled) {
+      this.keys.clear();
+      this.analog.clear();
+    }
   }
 
   /** Authoritative correction from the server. */
@@ -84,14 +93,30 @@ export class PlayerController {
     if (this.keys.has('KeyS')) fz -= 1;
     if (this.keys.has('KeyA')) fx -= 1;
     if (this.keys.has('KeyD')) fx += 1;
-    if (fx !== 0 || fz !== 0) {
+    // Keys are digital (full speed); the joystick is analog (partial tilt = slower walk).
+    let throttle = fx !== 0 || fz !== 0 ? 1 : 0;
+    if (throttle === 0 && (this.analog.x !== 0 || this.analog.y !== 0)) {
+      fx = this.analog.x;
+      fz = this.analog.y;
+      throttle = Math.min(1, Math.hypot(fx, fz));
+    }
+    if (throttle > 0) {
       // Camera-relative directions on the ground plane.
       const forward = this.camera.getTarget().subtract(this.camera.position);
       forward.y = 0;
       forward.normalize();
       const right = Vector3.Cross(Vector3.Up(), forward).normalize();
       const dir = forward.scale(fz).add(right.scale(fx)).normalize();
-      this.mesh.position.addInPlace(dir.scale(this.speed * dt));
+      // Clamp the frame step so a long frame (tab switch) cannot tunnel or trip the speed check.
+      const step = this.speed * throttle * Math.min(dt, 0.1);
+      const from = { x: this.mesh.position.x, z: this.mesh.position.z };
+      const to = this.collision.slide(
+        from,
+        { x: from.x + dir.x * step, z: from.z + dir.z * step },
+        PLAYER_COLLISION_RADIUS,
+      );
+      this.mesh.position.x = to.x;
+      this.mesh.position.z = to.z;
       this.mesh.rotation.y = Math.atan2(dir.x, dir.z);
     }
     this.camera.target.copyFrom(this.mesh.position);
