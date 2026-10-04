@@ -46,3 +46,5 @@ jobs:
       - run: pnpm exec tsx scripts/backup-restore-test.ts
       - run: pnpm assets:check
       - run: pnpm build
+        env:
+          NODE_ENV: production

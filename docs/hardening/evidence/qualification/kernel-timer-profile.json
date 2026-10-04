@@ -1,0 +1,18 @@
+{
+  "pid": 1784213,
+  "seconds": 10.016634854,
+  "hz": 19.267948049731313,
+  "wakeLatenessP50": 1.1920540000000983,
+  "wakeLatenessP95": 43.06542400000035,
+  "wakeLatenessP99": 88.34075799999982,
+  "kernelScheduler": {
+    "switchesObserved": 201,
+    "runqueueDelayTotalMs": 365.621,
+    "runqueueDelayP50Ms": 0.045,
+    "runqueueDelayP95Ms": 2.972,
+    "runqueueDelayP99Ms": 55.525,
+    "runqueueDelayMaxMs": 80.979,
+    "scheduledRuntimeMs": 303.558
+  },
+  "scope": "10s anchored timer control, no game/realtime process or browser. Linux perf sched instrumentation; includes process startup in kernel totals. Not a capacity run."
+}

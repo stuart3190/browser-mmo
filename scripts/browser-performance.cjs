@@ -34,7 +34,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await cdp.send('Network.enable');
       let bytes = 0,
         wsBytes = 0;
+      let requests = 0;
       const errors = [];
+      page.on('request', () => requests++);
       page.on('pageerror', (e) => errors.push(String(e)));
       cdp.on('Network.loadingFinished', (e) => (bytes += e.encodedDataLength));
       cdp.on(
@@ -42,6 +44,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         (e) => (wsBytes += Buffer.byteLength(e.response.payloadData)),
       );
       await page.addInitScript(() => {
+        window.__reactCommits = 0;
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+          supportsFiber: true,
+          inject: () => 1,
+          onCommitFiberRoot: () => window.__reactCommits++,
+          onCommitFiberUnmount: () => {},
+        };
         window.__perf = { frames: [], gaps: 0, longTasks: [], start: performance.now() };
         let last = performance.now();
         function frame(now) {
@@ -60,8 +69,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await page.goto(WEB, { waitUntil: 'networkidle' });
       const loginReadyMs = Date.now() - start;
       const suffix = String(Date.now());
-      const username = 'perf_' + suffix;
+      const username = process.env.PERF_USERNAME || 'perf_' + suffix;
       await page.locator('[name=username]').fill(username);
+      if (process.env.PERF_PASSWORD)
+        await page.locator('[name=password]').fill(process.env.PERF_PASSWORD);
       await page.locator('#login-form button').click();
       await page
         .locator('[name=name]')
@@ -82,6 +93,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         };
       });
       await page.evaluate(() => {
+        window.__reactCommits = 0;
         window.__perf.frames = [];
         window.__perf.longTasks = [];
         window.__perf.gaps = 0;
@@ -89,6 +101,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const heap = [],
         task = [];
       const initialWs = wsBytes;
+      const measurementStarted = Date.now();
       for (let i = 0; i < SECONDS / 5; i++) {
         // Alternate short movement bursts and rest, exercising networking, prediction and UI updates.
         await page.keyboard.down(i % 2 ? 'a' : 'd');
@@ -105,10 +118,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await page.screenshot({ path: path.join(OUT, profile.name + '.png') });
       const result = {
         profile,
+        requests,
+        reactCommits: await page.evaluate(() => window.__reactCommits),
         renderer,
         loginReadyMs,
         startupMsIncluding10sWarmup: startupMs,
-        seconds: SECONDS,
+        seconds: (Date.now() - measurementStarted) / 1000,
+        requestedSeconds: SECONDS,
         frameSamples: sorted.length,
         frameP50Ms: percentile(0.5),
         frameP95Ms: percentile(0.95),

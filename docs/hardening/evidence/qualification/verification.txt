@@ -1,0 +1,522 @@
+
+> browser-mmo@ verify /tmp/browser-mmo-audit
+> pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build
+
+
+> browser-mmo@ format:check /tmp/browser-mmo-audit
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+
+> browser-mmo@ lint /tmp/browser-mmo-audit
+> eslint . --max-warnings=0
+
+
+> browser-mmo@ typecheck /tmp/browser-mmo-audit
+> turbo run typecheck && tsc -p scripts/tsconfig.json
+
+
+   • turbo 2.11.7
+   • Packages in scope: @mmo/admin, @mmo/api, @mmo/config, @mmo/db, @mmo/domain, @mmo/game-data, @mmo/game-web, @mmo/networking, @mmo/realtime, @mmo/schemas, @mmo/server-kit, @mmo/shared, @mmo/ui, @mmo/world
+   • Running typecheck in 14 packages
+   • Remote caching disabled
+
+@mmo/config:typecheck: cache hit, replaying logs 0789b76cbc43926f
+@mmo/config:typecheck: 
+@mmo/config:typecheck: > @mmo/config@0.0.0 typecheck /tmp/browser-mmo-audit/packages/config
+@mmo/config:typecheck: > tsc -p tsconfig.json
+@mmo/config:typecheck: 
+@mmo/shared:typecheck: cache hit, replaying logs 0a0895bde0a898b3
+@mmo/shared:typecheck: 
+@mmo/shared:typecheck: > @mmo/shared@0.0.0 typecheck /tmp/browser-mmo-audit/packages/shared
+@mmo/shared:typecheck: > tsc -p tsconfig.json
+@mmo/shared:typecheck: 
+@mmo/server-kit:typecheck: cache miss, executing f1a1d3e4c325801e
+@mmo/schemas:typecheck: cache hit, replaying logs eac07cedad1b9d3d
+@mmo/schemas:typecheck: 
+@mmo/schemas:typecheck: > @mmo/schemas@0.0.0 typecheck /tmp/browser-mmo-audit/packages/schemas
+@mmo/schemas:typecheck: > tsc -p tsconfig.json
+@mmo/schemas:typecheck: 
+@mmo/networking:typecheck: cache hit, replaying logs b4426e22aa6ebea7
+@mmo/networking:typecheck: 
+@mmo/networking:typecheck: > @mmo/networking@0.0.0 typecheck /tmp/browser-mmo-audit/packages/networking
+@mmo/networking:typecheck: > tsc -p tsconfig.json
+@mmo/networking:typecheck: 
+@mmo/game-data:typecheck: cache hit, replaying logs b46d9ff35b1dd3ec
+@mmo/game-data:typecheck: 
+@mmo/game-data:typecheck: > @mmo/game-data@0.0.0 typecheck /tmp/browser-mmo-audit/packages/game-data
+@mmo/game-data:typecheck: > tsc -p tsconfig.json
+@mmo/game-data:typecheck: 
+@mmo/db:typecheck: cache hit, replaying logs bb0b64a49ae222f2
+@mmo/db:typecheck: 
+@mmo/db:typecheck: > @mmo/db@0.0.0 typecheck /tmp/browser-mmo-audit/packages/db
+@mmo/db:typecheck: > tsc -p tsconfig.json
+@mmo/db:typecheck: 
+@mmo/world:typecheck: cache hit, replaying logs 408ea64082f41db8
+@mmo/world:typecheck: 
+@mmo/world:typecheck: > @mmo/world@0.0.0 typecheck /tmp/browser-mmo-audit/services/world
+@mmo/world:typecheck: > tsc -p tsconfig.json
+@mmo/world:typecheck: 
+@mmo/ui:typecheck: cache hit, replaying logs dd7eb149de87db6e
+@mmo/ui:typecheck: 
+@mmo/ui:typecheck: > @mmo/ui@0.0.0 typecheck /tmp/browser-mmo-audit/packages/ui
+@mmo/ui:typecheck: > tsc -p tsconfig.json
+@mmo/ui:typecheck: 
+@mmo/admin:typecheck: cache miss, executing 8204ecabd3ac9027
+@mmo/game-web:typecheck: cache miss, executing 4dcda8eb1dc03668
+@mmo/domain:typecheck: cache hit, replaying logs dd4eb829a08edbc9
+@mmo/domain:typecheck: 
+@mmo/domain:typecheck: > @mmo/domain@0.0.0 typecheck /tmp/browser-mmo-audit/packages/domain
+@mmo/domain:typecheck: > tsc -p tsconfig.json
+@mmo/domain:typecheck: 
+@mmo/server-kit:typecheck: 
+@mmo/server-kit:typecheck: > @mmo/server-kit@0.0.0 typecheck /tmp/browser-mmo-audit/packages/server-kit
+@mmo/server-kit:typecheck: > tsc -p tsconfig.json
+@mmo/server-kit:typecheck: 
+@mmo/game-web:typecheck: 
+@mmo/game-web:typecheck: > @mmo/game-web@0.0.0 typecheck /tmp/browser-mmo-audit/apps/game-web
+@mmo/game-web:typecheck: > tsc -p tsconfig.json
+@mmo/game-web:typecheck: 
+@mmo/admin:typecheck: 
+@mmo/admin:typecheck: > @mmo/admin@0.0.0 typecheck /tmp/browser-mmo-audit/apps/admin
+@mmo/admin:typecheck: > tsc -p tsconfig.json
+@mmo/admin:typecheck: 
+@mmo/api:typecheck: cache miss, executing 32e83efb42e74b3d
+@mmo/realtime:typecheck: cache miss, executing 022accd5a39c4811
+@mmo/api:typecheck: 
+@mmo/api:typecheck: > @mmo/api@0.0.0 typecheck /tmp/browser-mmo-audit/services/api
+@mmo/api:typecheck: > tsc -p tsconfig.json
+@mmo/api:typecheck: 
+@mmo/realtime:typecheck: 
+@mmo/realtime:typecheck: > @mmo/realtime@0.0.0 typecheck /tmp/browser-mmo-audit/services/realtime
+@mmo/realtime:typecheck: > tsc -p tsconfig.json
+@mmo/realtime:typecheck: 
+
+ Tasks:    14 successful, 14 total
+Cached:    9 cached, 14 total
+  Time:    39.857s 
+
+
+> browser-mmo@ test /tmp/browser-mmo-audit
+> turbo run test
+
+
+   • turbo 2.11.7
+   • Packages in scope: @mmo/admin, @mmo/api, @mmo/config, @mmo/db, @mmo/domain, @mmo/game-data, @mmo/game-web, @mmo/networking, @mmo/realtime, @mmo/schemas, @mmo/server-kit, @mmo/shared, @mmo/ui, @mmo/world
+   • Running test in 14 packages
+   • Remote caching disabled
+
+@mmo/server-kit:test: cache miss, executing ce6610cc7c56ae2b
+@mmo/game-web:test: cache miss, executing 4f4e9def61cd5c29
+@mmo/schemas:test: cache hit, replaying logs 3b036c0e4a6e9e9a
+@mmo/schemas:test: 
+@mmo/schemas:test: > @mmo/schemas@0.0.0 test /tmp/browser-mmo-audit/packages/schemas
+@mmo/schemas:test: > vitest run
+@mmo/schemas:test: 
+@mmo/schemas:test: 
+@mmo/schemas:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/schemas
+@mmo/schemas:test: 
+@mmo/schemas:test:  ✓ src/schemas.test.ts (7 tests) 39ms
+@mmo/schemas:test: 
+@mmo/schemas:test:  Test Files  1 passed (1)
+@mmo/schemas:test:       Tests  7 passed (7)
+@mmo/schemas:test:    Start at  15:43:51
+@mmo/schemas:test:    Duration  1.87s (transform 66%, import 30%, tests 4%)
+@mmo/schemas:test: 
+@mmo/world:test: cache hit, replaying logs d6bed5986e259ad4
+@mmo/world:test: 
+@mmo/world:test: > @mmo/world@0.0.0 test /tmp/browser-mmo-audit/services/world
+@mmo/world:test: > vitest run
+@mmo/world:test: 
+@mmo/world:test: 
+@mmo/world:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/services/world
+@mmo/world:test: 
+@mmo/world:test:  ✓ src/navigation.test.ts (3 tests) 197ms
+@mmo/world:test:  ✓ src/zone-simulation.test.ts (9 tests) 79ms
+@mmo/world:test:  ✓ src/combat.test.ts (10 tests) 106ms
+@mmo/world:test:  ✓ src/abilities.test.ts (8 tests) 308ms
+@mmo/world:test:  ✓ src/world-population.test.ts (10 tests) 937ms
+@mmo/world:test:    ✓ steering (3)
+@mmo/world:test:      ✓ gives up on an unreachable target and returns home to full health (not stuck forever) 663ms
+@mmo/world:test: 
+@mmo/world:test:  Test Files  5 passed (5)
+@mmo/world:test:       Tests  40 passed (40)
+@mmo/world:test:    Start at  15:43:50
+@mmo/world:test:    Duration  4.26s (transform 61%, import 26%, tests 12%, worker 1%)
+@mmo/world:test: 
+@mmo/world:test:   Transform  transforming modules took 8.01s · 61% of tracked time, re-done on every run
+@mmo/world:test:              persist transforms across runs with fsModuleCache: true
+@mmo/world:test:              learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+@mmo/world:test: 
+@mmo/shared:test: cache hit, replaying logs 8e356ea0714cfc96
+@mmo/shared:test: 
+@mmo/shared:test: > @mmo/shared@0.0.0 test /tmp/browser-mmo-audit/packages/shared
+@mmo/shared:test: > vitest run --passWithNoTests
+@mmo/shared:test: 
+@mmo/shared:test: 
+@mmo/shared:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/shared
+@mmo/shared:test: 
+@mmo/shared:test:  ✓ src/ids.test.ts (3 tests) 222ms
+@mmo/shared:test: 
+@mmo/shared:test:  Test Files  1 passed (1)
+@mmo/shared:test:       Tests  3 passed (3)
+@mmo/shared:test:    Start at  15:43:50
+@mmo/shared:test:    Duration  1.36s (tests 40%, transform 32%, worker 18%, import 10%)
+@mmo/shared:test: 
+@mmo/config:test: cache hit, replaying logs 2cccadb021250ede
+@mmo/config:test: 
+@mmo/config:test: > @mmo/config@0.0.0 test /tmp/browser-mmo-audit/packages/config
+@mmo/config:test: > vitest run
+@mmo/config:test: 
+@mmo/config:test: 
+@mmo/config:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/config
+@mmo/config:test: 
+@mmo/config:test:  ✓ src/config.test.ts (3 tests) 13ms
+@mmo/config:test: 
+@mmo/config:test:  Test Files  1 passed (1)
+@mmo/config:test:       Tests  3 passed (3)
+@mmo/config:test:    Start at  15:43:51
+@mmo/config:test:    Duration  943ms (import 50%, transform 46%, tests 2%, worker 2%)
+@mmo/config:test: 
+@mmo/networking:test: cache hit, replaying logs 061ecd9a03be553d
+@mmo/networking:test: 
+@mmo/networking:test: > @mmo/networking@0.0.0 test /tmp/browser-mmo-audit/packages/networking
+@mmo/networking:test: > vitest run
+@mmo/networking:test: 
+@mmo/networking:test: 
+@mmo/networking:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/networking
+@mmo/networking:test: 
+@mmo/networking:test:  ✓ src/protocol.test.ts (7 tests) 54ms
+@mmo/networking:test: 
+@mmo/networking:test:  Test Files  1 passed (1)
+@mmo/networking:test:       Tests  7 passed (7)
+@mmo/networking:test:    Start at  15:43:50
+@mmo/networking:test:    Duration  2.06s (transform 53%, import 42%, tests 4%, worker 1%)
+@mmo/networking:test: 
+@mmo/ui:test: cache hit, replaying logs 6c005e566a58a2e1
+@mmo/ui:test: 
+@mmo/ui:test: > @mmo/ui@0.0.0 test /tmp/browser-mmo-audit/packages/ui
+@mmo/ui:test: > vitest run
+@mmo/ui:test: 
+@mmo/ui:test: 
+@mmo/ui:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/ui
+@mmo/ui:test: 
+@mmo/ui:test:  ✓ src/item-ui.test.ts (6 tests) 17ms
+@mmo/ui:test:  ✓ src/ui.test.ts (2 tests) 31ms
+@mmo/ui:test: 
+@mmo/ui:test:  Test Files  2 passed (2)
+@mmo/ui:test:       Tests  8 passed (8)
+@mmo/ui:test:    Start at  15:43:50
+@mmo/ui:test:    Duration  2.61s (transform 55%, import 44%, tests 1%)
+@mmo/ui:test: 
+@mmo/ui:test:   Transform  transforming modules took 2.27s · 55% of tracked time, re-done on every run
+@mmo/ui:test:              persist transforms across runs with fsModuleCache: true
+@mmo/ui:test:              learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+@mmo/ui:test: 
+@mmo/game-data:test: cache hit, replaying logs 252abed9898b08d5
+@mmo/game-data:test: 
+@mmo/game-data:test: > @mmo/game-data@0.0.0 test /tmp/browser-mmo-audit/packages/game-data
+@mmo/game-data:test: > vitest run
+@mmo/game-data:test: 
+@mmo/game-data:test: 
+@mmo/game-data:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/game-data
+@mmo/game-data:test: 
+@mmo/game-data:test:  ✓ src/quests.test.ts (9 tests) 34ms
+@mmo/game-data:test:  ✓ src/collision.test.ts (6 tests) 155ms
+@mmo/game-data:test:  ✓ src/combat.test.ts (9 tests) 31ms
+@mmo/game-data:test:  ✓ src/game-data.test.ts (13 tests) 39ms
+@mmo/game-data:test:  ✓ src/abilities.test.ts (9 tests) 106ms
+@mmo/game-data:test: 
+@mmo/game-data:test:  Test Files  5 passed (5)
+@mmo/game-data:test:       Tests  46 passed (46)
+@mmo/game-data:test:    Start at  15:43:51
+@mmo/game-data:test:    Duration  2.97s (transform 66%, import 29%, tests 4%, worker 1%)
+@mmo/game-data:test: 
+@mmo/game-data:test:   Transform  transforming modules took 5.76s · 66% of tracked time, re-done on every run
+@mmo/game-data:test:              persist transforms across runs with fsModuleCache: true
+@mmo/game-data:test:              learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+@mmo/game-data:test: 
+@mmo/game-web:test: 
+@mmo/game-web:test: > @mmo/game-web@0.0.0 test /tmp/browser-mmo-audit/apps/game-web
+@mmo/game-web:test: > vitest run --passWithNoTests
+@mmo/game-web:test: 
+@mmo/server-kit:test: 
+@mmo/server-kit:test: > @mmo/server-kit@0.0.0 test /tmp/browser-mmo-audit/packages/server-kit
+@mmo/server-kit:test: > vitest run
+@mmo/server-kit:test: 
+@mmo/game-web:test: 
+@mmo/game-web:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/apps/game-web
+@mmo/game-web:test: 
+@mmo/game-web:test: No test files found, exiting with code 0
+@mmo/game-web:test: 
+@mmo/game-web:test: include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+@mmo/game-web:test: exclude:  **/node_modules/**, **/.git/**
+@mmo/game-web:test: 
+@mmo/server-kit:test: 
+@mmo/server-kit:test:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/server-kit
+@mmo/server-kit:test: 
+@mmo/server-kit:test:  ✓ src/rate-limit.test.ts (1 test) 12ms
+@mmo/server-kit:test:  ✓ src/tick-loop.test.ts (3 tests) 18ms
+@mmo/server-kit:test:  ✓ src/metrics.test.ts (1 test) 8ms
+@mmo/server-kit:test: 
+@mmo/server-kit:test:  Test Files  3 passed (3)
+@mmo/server-kit:test:       Tests  5 passed (5)
+@mmo/server-kit:test:    Start at  17:37:49
+@mmo/server-kit:test:    Duration  830ms (transform 58%, import 33%, tests 5%, worker 4%)
+@mmo/server-kit:test: 
+
+ Tasks:    9 successful, 9 total
+Cached:    7 cached, 9 total
+  Time:    2.903s 
+
+
+> browser-mmo@ test:integration /tmp/browser-mmo-audit
+> turbo run test:integration --concurrency=1
+
+
+   • turbo 2.11.7
+   • Packages in scope: @mmo/admin, @mmo/api, @mmo/config, @mmo/db, @mmo/domain, @mmo/game-data, @mmo/game-web, @mmo/networking, @mmo/realtime, @mmo/schemas, @mmo/server-kit, @mmo/shared, @mmo/ui, @mmo/world
+   • Running test:integration in 14 packages
+   • Remote caching disabled
+
+@mmo/api:test:integration: cache bypass, force executing d5e7595bd0477227
+@mmo/api:test:integration: 
+@mmo/api:test:integration: > @mmo/api@0.0.0 test:integration /tmp/browser-mmo-audit/services/api
+@mmo/api:test:integration: > vitest run
+@mmo/api:test:integration: 
+@mmo/api:test:integration: 
+@mmo/api:test:integration:  RUN  v5.0.3 /tmp/browser-mmo-audit/services/api
+@mmo/api:test:integration: 
+@mmo/api:test:integration:  ✓ test/api.test.ts (7 tests) 3982ms
+@mmo/api:test:integration:    ✓ API (5)
+@mmo/api:test:integration:      ✓ runs the character + inventory flow over HTTP 360ms
+@mmo/api:test:integration:    ✓ production refuses dev/no auth and supports provisioned password login without dev fallback 2228ms
+@mmo/api:test:integration: 
+@mmo/api:test:integration:  Test Files  1 passed (1)
+@mmo/api:test:integration:       Tests  7 passed (7)
+@mmo/api:test:integration:    Start at  17:37:52
+@mmo/api:test:integration:    Duration  11.55s (tests 50%, import 27%, transform 23%)
+@mmo/api:test:integration: 
+@mmo/realtime:test:integration: cache bypass, force executing a9e08834d4c8fec4
+@mmo/realtime:test:integration: 
+@mmo/realtime:test:integration: > @mmo/realtime@0.0.0 test:integration /tmp/browser-mmo-audit/services/realtime
+@mmo/realtime:test:integration: > vitest run
+@mmo/realtime:test:integration: 
+@mmo/realtime:test:integration: 
+@mmo/realtime:test:integration:  RUN  v5.0.3 /tmp/browser-mmo-audit/services/realtime
+@mmo/realtime:test:integration: 
+@mmo/realtime:test:integration:  ✓ test/process-qualification.test.ts (7 tests) 60752ms
+@mmo/realtime:test:integration:    ✓ SIGKILL preserves acknowledged movement, health and cooldown through rapid concurrent takeover 7319ms
+@mmo/realtime:test:integration:    ✓ a paused owner retains its lock; terminated DB session fences it before takeover publication 9071ms
+@mmo/realtime:test:integration:    ✓ SIGKILL beforeRecord recovers exactly one reward 9231ms
+@mmo/realtime:test:integration:    ✓ SIGKILL afterRecord recovers exactly one reward 8187ms
+@mmo/realtime:test:integration:    ✓ SIGKILL afterReward recovers exactly one reward 8815ms
+@mmo/realtime:test:integration:    ✓ SIGKILL during equipment UPDATE rolls back location, version and history 3013ms
+@mmo/realtime:test:integration:    ✓ published damage survives SIGKILL and a revoked session cannot re-enter 15111ms
+@mmo/realtime:test:integration:  ✓ test/durable-kills.test.ts (7 tests) 51904ms
+@mmo/realtime:test:integration:    ✓ durable kill rewards across crashes (7)
+@mmo/realtime:test:integration:      ✓ normal path: the kill is recorded before the death is announced and rewarded once 778ms
+@mmo/realtime:test:integration:      ✓ crash after checkpoint but BEFORE the kill record: recovery finishes the pending death once) 8357ms
+@mmo/realtime:test:integration:      ✓ crash AFTER recording but before reward: startup recovery rewards exactly once and keeps the respawn timer 16111ms
+@mmo/realtime:test:integration:      ✓ crash AFTER the reward committed (before notifying): restart does not award again 1091ms
+@mmo/realtime:test:integration:      ✓ a duplicate recovery host is refused; the owner rewards each kill exactly once 8017ms
+@mmo/realtime:test:integration:      ✓ transient failures while recording are retried; the duplicate write is harmless 10779ms
+@mmo/realtime:test:integration:      ✓ a full bag never loses the drop: loot goes to the mailbox and the player is told 6766ms
+@mmo/realtime:test:integration:  ✓ test/combat.test.ts (5 tests) 39832ms
+@mmo/realtime:test:integration:    ✓ server-authoritative combat over the realtime protocol (5)
+@mmo/realtime:test:integration:      ✓ rejects invalid combat requests and replays without changing state 4913ms
+@mmo/realtime:test:integration:      ✓ full loop: target, auto-attack, wolf fights back, dies once, XP + loot persisted once and pushed 8058ms
+@mmo/realtime:test:integration:      ✓ player death: actions blocked, early respawn rejected, respawn restores health; health persisted 18485ms
+@mmo/realtime:test:integration:      ✓ reconnect during combat re-attaches to the same fight with server-side health intact 7712ms
+@mmo/realtime:test:integration:      ✓ equipping a weapon (via the API path, another process) changes the simulation combat profile 398ms
+@mmo/realtime:test:integration:  ✓ test/abilities.test.ts (4 tests) 20708ms
+@mmo/realtime:test:integration:    ✓ class abilities over the realtime protocol (4)
+@mmo/realtime:test:integration:      ✓ Warrior: Heavy Strike hits once; spam, simultaneous and replayed requests never execute twice 6463ms
+@mmo/realtime:test:integration:      ✓ Mage: Firebolt hits at range, Heavy Strike is refused, gear raises spell output inputs 1259ms
+@mmo/realtime:test:integration:      ✓ out-of-range casts are rejected; cooldowns survive logout/login (persisted) 3144ms
+@mmo/realtime:test:integration:      ✓ a level-up unlocks Battle Strike live; it was rejected before 9831ms
+@mmo/realtime:test:integration:  ✓ test/sync.test.ts (11 tests) 10528ms
+@mmo/realtime:test:integration:    ✓ server-side item changes are pushed to connected clients (7)
+@mmo/realtime:test:integration:      ✓ pushes items created by another write path (admin grant) without any client action 503ms
+@mmo/realtime:test:integration:      ✓ pushes equip/unequip with recomputed authoritative stats 517ms
+@mmo/realtime:test:integration:      ✓ pushes vault deposit and retrieval 731ms
+@mmo/realtime:test:integration:      ✓ sends nothing for a rejected (invalid) equip and leaves the database unchanged 614ms
+@mmo/realtime:test:integration:      ✓ removes items that leave the view (marketplace escrow) and pushes wallet changes 681ms
+@mmo/realtime:test:integration:      ✓ keeps two characters of one account consistent through the shared vault 1526ms
+@mmo/realtime:test:integration:      ✓ resyncs every client from the database after the change-feed connection is lost 1549ms
+@mmo/realtime:test:integration:    ✓ reconnect (2)
+@mmo/realtime:test:integration:      ✓ RealtimeClient recovers from a dropped socket and receives fresh snapshots 674ms
+@mmo/realtime:test:integration:      ✓ does not auto-reconnect after a deliberate server close (session replaced elsewhere) 1357ms
+@mmo/realtime:test:integration:    ✓ repairs simulation gear as well as inventory after missed notifications 1002ms
+@mmo/realtime:test:integration:    ✓ reconciles a failed fan-out query without needing another item event 1047ms
+@mmo/realtime:test:integration:  ✓ test/realtime.test.ts (13 tests) 11406ms
+@mmo/realtime:test:integration:    ✓ realtime gateway (4)
+@mmo/realtime:test:integration:      ✓ runs the full pickup loop: browser intent -> server validation -> DB ownership -> inventory push 2538ms
+@mmo/realtime:test:integration:      ✓ corrects teleport attempts and rejects replayed sequence numbers 330ms
+@mmo/realtime:test:integration:      ✓ broadcasts other players spawning and moving 1580ms
+@mmo/realtime:test:integration:      ✓ closes unauthenticated, forged and cross-origin connections 998ms
+@mmo/realtime:test:integration:    ✓ pre-alpha connection hardening (5)
+@mmo/realtime:test:integration:      ✓ disconnects an idle socket after logout 1362ms
+@mmo/realtime:test:integration:      ✓ disconnects an idle socket after ban 1076ms
+@mmo/realtime:test:integration:      ✓ disconnects an idle socket after expiry 966ms
+@mmo/realtime:test:integration:    ✓ persists published position, health and cooldowns before a reconnect 382ms
+@mmo/realtime:test:integration:    ✓ terminates a slow client before outbound buffering exceeds the budget 332ms
+@mmo/realtime:test:integration:    ✓ fails closed when live-session revalidation cannot query the database 1268ms
+@mmo/realtime:test:integration:  ✓ test/ownership.test.ts (5 tests) 4535ms
+@mmo/realtime:test:integration:    ✓ rejects duplicate hosts, then recovers after the owner crashes 894ms
+@mmo/realtime:test:integration:    ✓ fences the old host on database session loss and lets a new host acquire ownership 651ms
+@mmo/realtime:test:integration:    ✓ does not publish a state change when its checkpoint is blocked then fails 2797ms
+@mmo/realtime:test:integration:  ✓ test/quests.test.ts (2 tests) 4344ms
+@mmo/realtime:test:integration:    ✓ quest loop over the realtime protocol (2)
+@mmo/realtime:test:integration:      ✓ interaction is validated server-side (range, entity kind, existence) 842ms
+@mmo/realtime:test:integration:      ✓ accept -> kills + pelts progress (pushed) -> survives reconnect and restart -> turn in once 3495ms
+@mmo/realtime:test:integration: 
+@mmo/realtime:test:integration:  Test Files  8 passed (8)
+@mmo/realtime:test:integration:       Tests  54 passed (54)
+@mmo/realtime:test:integration:    Start at  17:38:06
+@mmo/realtime:test:integration:    Duration  229.30s (tests 92%, import 7%, transform 1%)
+@mmo/realtime:test:integration: 
+@mmo/domain:test:integration: cache bypass, force executing 1ff2d6da2bc126b5
+@mmo/domain:test:integration: 
+@mmo/domain:test:integration: > @mmo/domain@0.0.0 test:integration /tmp/browser-mmo-audit/packages/domain
+@mmo/domain:test:integration: > vitest run
+@mmo/domain:test:integration: 
+@mmo/domain:test:integration: 
+@mmo/domain:test:integration:  RUN  v5.0.3 /tmp/browser-mmo-audit/packages/domain
+@mmo/domain:test:integration: 
+@mmo/domain:test:integration:  ✓ test/combat.test.ts (14 tests) 8565ms
+@mmo/domain:test:integration:    ✓ kill rewards (6)
+@mmo/domain:test:integration:      ✓ cannot award the same kill twice, even concurrently (XP, gold and items stay single) 378ms
+@mmo/domain:test:integration:      ✓ persists level-ups 587ms
+@mmo/domain:test:integration:      ✓ delivers loot that does not fit the bags to the mailbox (nothing lost, no partial stacks) 1984ms
+@mmo/domain:test:integration:      ✓ creates a mailbox lazily for characters that predate it 1588ms
+@mmo/domain:test:integration:      ✓ players can take items out of the mailbox but never put items in 573ms
+@mmo/domain:test:integration:    ✓ durable kill events (outbox) (6)
+@mmo/domain:test:integration:      ✓ recording is idempotent and processing rewards exactly once 363ms
+@mmo/domain:test:integration:      ✓ a kill rewarded through the direct path is marked done instead of rewarded again 336ms
+@mmo/domain:test:integration:      ✓ a full mailbox keeps the event pending with backoff (retried later, never lost) 1962ms
+@mmo/domain:test:integration:  ✓ test/quests.test.ts (10 tests) 6031ms
+@mmo/domain:test:integration:    ✓ progress (2)
+@mmo/domain:test:integration:      ✓ each recorded wolf kill counts exactly once (duplicates, replays and concurrent processors) 872ms
+@mmo/domain:test:integration:      ✓ pelt progress is derived from the bags AND Recovered loot; locked or vaulted pelts do not count 367ms
+@mmo/domain:test:integration:    ✓ turning in (6)
+@mmo/domain:test:integration:      ✓ rejects before objectives are complete, at the wrong NPC, and when not accepted — state unchanged 409ms
+@mmo/domain:test:integration:      ✓ consumes exactly the required pelts, pays XP + gold + item once, completes permanently 424ms
+@mmo/domain:test:integration:      ✓ concurrent turn-ins pay exactly once 356ms
+@mmo/domain:test:integration:      ✓ a crash mid turn-in (after consuming, before rewards) rolls everything back 766ms
+@mmo/domain:test:integration:      ✓ full bags: the reward item goes to Recovered loot; full mailbox too: nothing happens at all 2283ms
+@mmo/domain:test:integration:  ✓ test/password-auth.test.ts (2 tests) 5444ms
+@mmo/domain:test:integration:    ✓ authenticates provisioned passwords, rejects wrong/unknown passwords, and revokes sessions on rotation 4728ms
+@mmo/domain:test:integration:    ✓ bounds expensive password work to two concurrent hashes 704ms
+@mmo/domain:test:integration:  ✓ test/storage.test.ts (9 tests) 4821ms
+@mmo/domain:test:integration:    ✓ inventory and vault transfers (4)
+@mmo/domain:test:integration:      ✓ moves backpack -> character vault -> account vault -> another character of the same account 673ms
+@mmo/domain:test:integration:      ✓ prevents other accounts and other characters from moving or taking items 368ms
+@mmo/domain:test:integration:      ✓ never duplicates an item when the same move races itself into two destinations 509ms
+@mmo/domain:test:integration:    ✓ equipment transfers (3)
+@mmo/domain:test:integration:      ✓ equips, binds on equip, swaps, and unequips 594ms
+@mmo/domain:test:integration:      ✓ validates slot, class proficiency, level and two-handed rules on the server 724ms
+@mmo/domain:test:integration:    ✓ effective character stats (1)
+@mmo/domain:test:integration:      ✓ reflects equipped items and reverts on unequip 1165ms
+@mmo/domain:test:integration:    ✓ serializes conflicting two-hand/off-hand equips from distinct containers 336ms
+@mmo/domain:test:integration:  ✓ test/items.test.ts (9 tests) 1754ms
+@mmo/domain:test:integration:    ✓ item creation and ownership (6)
+@mmo/domain:test:integration:      ✓ refuses to mint into a full container and leaves no partial state 526ms
+@mmo/domain:test:integration:    ✓ database-level invariants (last line of defence) (3)
+@mmo/domain:test:integration:      ✓ rejects enabling dormant external ownership fields 413ms
+@mmo/domain:test:integration:  ✓ test/marketplace.test.ts (8 tests) 3078ms
+@mmo/domain:test:integration:    ✓ marketplace listing state (7)
+@mmo/domain:test:integration:      ✓ escrows the item and charges the listing fee 619ms
+@mmo/domain:test:integration:      ✓ transfers item and currency atomically on purchase, with fees and history 481ms
+@mmo/domain:test:integration:      ✓ rejects buying your own listing, wrong price, and insufficient funds without side effects 359ms
+@mmo/domain:test:integration:      ✓ lets exactly one of many concurrent buyers win 732ms
+@mmo/domain:test:integration:  ✓ test/migrations.test.ts (2 tests) 762ms
+@mmo/domain:test:integration:    ✓ reapplies safely and rejects changes to an already applied migration 592ms
+@mmo/domain:test:integration: 
+@mmo/domain:test:integration:  Test Files  7 passed (7)
+@mmo/domain:test:integration:       Tests  54 passed (54)
+@mmo/domain:test:integration:    Start at  17:41:57
+@mmo/domain:test:integration:    Duration  50.42s (tests 69%, import 25%, transform 6%)
+@mmo/domain:test:integration: 
+
+ Tasks:    3 successful, 3 total
+Cached:    0 cached, 3 total
+  Time:    4m57.079s 
+
+
+> browser-mmo@ build /tmp/browser-mmo-audit
+> turbo run build && node scripts/check-production-build.cjs
+
+
+   • turbo 2.11.7
+   • Packages in scope: @mmo/admin, @mmo/api, @mmo/config, @mmo/db, @mmo/domain, @mmo/game-data, @mmo/game-web, @mmo/networking, @mmo/realtime, @mmo/schemas, @mmo/server-kit, @mmo/shared, @mmo/ui, @mmo/world
+   • Running build in 14 packages
+   • Remote caching disabled
+
+@mmo/admin:build: cache miss, executing 4eeb6a9352446cfe
+@mmo/game-web:build: cache miss, executing ca69caaf2949b865
+@mmo/realtime:build: cache miss, executing 0ba376d0a5cfa4f7
+@mmo/api:build: cache miss, executing 5694242dc26a4b02
+@mmo/api:build: 
+@mmo/api:build: > @mmo/api@0.0.0 build /tmp/browser-mmo-audit/services/api
+@mmo/api:build: > tsup
+@mmo/api:build: 
+@mmo/admin:build: 
+@mmo/admin:build: > @mmo/admin@0.0.0 build /tmp/browser-mmo-audit/apps/admin
+@mmo/admin:build: > vite build
+@mmo/admin:build: 
+@mmo/game-web:build: 
+@mmo/game-web:build: > @mmo/game-web@0.0.0 build /tmp/browser-mmo-audit/apps/game-web
+@mmo/game-web:build: > vite build
+@mmo/game-web:build: 
+@mmo/realtime:build: 
+@mmo/realtime:build: > @mmo/realtime@0.0.0 build /tmp/browser-mmo-audit/services/realtime
+@mmo/realtime:build: > tsup
+@mmo/realtime:build: 
+@mmo/admin:build: vite v8.3.2 building client environment for production...
+@mmo/game-web:build: vite v8.3.2 building client environment for production...
+@mmo/admin:build: transforming...
+@mmo/game-web:build: transforming...
+@mmo/admin:build: ✓ 153 modules transformed.
+@mmo/game-web:build: ✓ 816 modules transformed.
+@mmo/api:build: CLI Building entry: src/main.ts
+@mmo/api:build: CLI Using tsconfig: tsconfig.json
+@mmo/api:build: CLI tsup v8.5.1
+@mmo/api:build: CLI Using tsup config: /tmp/browser-mmo-audit/services/api/tsup.config.ts
+@mmo/api:build: CLI Target: node22
+@mmo/api:build: CLI Cleaning output folder
+@mmo/admin:build: rendering chunks...
+@mmo/api:build: ESM Build start
+@mmo/realtime:build: CLI Building entry: src/main.ts
+@mmo/realtime:build: CLI Using tsconfig: tsconfig.json
+@mmo/realtime:build: CLI tsup v8.5.1
+@mmo/realtime:build: CLI Using tsup config: /tmp/browser-mmo-audit/services/realtime/tsup.config.ts
+@mmo/realtime:build: CLI Target: node22
+@mmo/realtime:build: CLI Cleaning output folder
+@mmo/realtime:build: ESM Build start
+@mmo/game-web:build: rendering chunks...
+@mmo/admin:build: computing gzip size...
+@mmo/admin:build: dist/index.html                  0.80 kB │ gzip:   0.49 kB
+@mmo/admin:build: dist/assets/index-DuOVaX-9.js  372.85 kB │ gzip: 112.56 kB │ map: 1,800.38 kB
+@mmo/admin:build: 
+@mmo/admin:build: ✓ built in 1.02s
+@mmo/api:build: ESM dist/main.js     207.10 KB
+@mmo/api:build: ESM dist/main.js.map 489.00 KB
+@mmo/api:build: ESM ⚡️ Build success in 462ms
+@mmo/realtime:build: ESM dist/main.js     304.92 KB
+@mmo/realtime:build: ESM dist/main.js.map 701.07 KB
+@mmo/realtime:build: ESM ⚡️ Build success in 462ms
+@mmo/game-web:build: computing gzip size...
+@mmo/game-web:build: dist/index.html                                        0.53 kB │ gzip:   0.33 kB
+@mmo/game-web:build: dist/assets/index-Dud-GI4C.css                        13.44 kB │ gzip:   3.56 kB
+@mmo/game-web:build: dist/assets/index-D4IJ7cHU.js                        437.65 kB │ gzip: 133.68 kB │ map: 2,035.26 kB
+@mmo/game-web:build: dist/assets/babylon-E3HG0XtW.js                    1,948.66 kB │ gzip: 460.45 kB │ map: 7,954.90 kB
+@mmo/game-web:build: 
+@mmo/game-web:build: ✓ built in 2.59s
+
+ Tasks:    4 successful, 4 total
+Cached:    0 cached, 4 total
+  Time:    5.231s 
+
+Production bundle: development debug hook absent

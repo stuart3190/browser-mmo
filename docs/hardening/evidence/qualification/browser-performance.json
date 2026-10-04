@@ -1,0 +1,99 @@
+{
+  "at": "2026-10-04T15:30:48.704Z",
+  "browser": "153.0.8010.52",
+  "results": [
+    {
+      "profile": {
+        "name": "desktop",
+        "width": 1400,
+        "height": 900,
+        "touch": false
+      },
+      "requests": 10,
+      "reactCommits": 14,
+      "renderer": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "debugHookExposed": false,
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+      },
+      "loginReadyMs": 2951,
+      "startupMsIncluding10sWarmup": 13660,
+      "seconds": 73.182,
+      "requestedSeconds": 60,
+      "frameSamples": 262,
+      "frameP50Ms": 183.29999999999563,
+      "frameP95Ms": 800,
+      "frameP99Ms": 1166.5999999999913,
+      "framesOver50ms": 216,
+      "heapStart": 20450104,
+      "heapEnd": 17848592,
+      "heapMax": 22219812,
+      "taskSeconds": 4.487663,
+      "startupAndAssetBytes": 599512,
+      "realtimeBytes": 139341,
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "phone-portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "requests": 10,
+      "reactCommits": 16,
+      "renderer": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "debugHookExposed": false,
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+      },
+      "loginReadyMs": 1282,
+      "startupMsIncluding10sWarmup": 12559,
+      "seconds": 63.894,
+      "requestedSeconds": 60,
+      "frameSamples": 310,
+      "frameP50Ms": 149.90000000000146,
+      "frameP95Ms": 633.2999999999993,
+      "frameP99Ms": 916.7000000000116,
+      "framesOver50ms": 242,
+      "heapStart": 20718560,
+      "heapEnd": 17879056,
+      "heapMax": 22537344,
+      "taskSeconds": 4.262402,
+      "startupAndAssetBytes": 599355,
+      "realtimeBytes": 133887,
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "phone-landscape",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "requests": 10,
+      "reactCommits": 21,
+      "renderer": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "debugHookExposed": false,
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+      },
+      "loginReadyMs": 1829,
+      "startupMsIncluding10sWarmup": 12587,
+      "seconds": 73.491,
+      "requestedSeconds": 60,
+      "frameSamples": 260,
+      "frameP50Ms": 166.70000000000073,
+      "frameP95Ms": 850,
+      "frameP99Ms": 1216.5999999999985,
+      "framesOver50ms": 205,
+      "heapStart": 20721104,
+      "heapEnd": 17529604,
+      "heapMax": 23116372,
+      "taskSeconds": 5.452374000000001,
+      "startupAndAssetBytes": 599355,
+      "realtimeBytes": 141535,
+      "errors": []
+    }
+  ]
+}

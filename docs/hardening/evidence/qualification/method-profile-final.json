@@ -1,0 +1,221 @@
+{
+  "at": "2026-10-04T15:16:42.790Z",
+  "duration": 60,
+  "results": [
+    {
+      "profile": {
+        "elapsed": 60.086129289999995,
+        "methods": {
+          "checkpoint.commit": {
+            "count": 918,
+            "totalMs": 24003.067786999953,
+            "selfMs": 24003.067786999953,
+            "maxMs": 937.5334240000011,
+            "p50Ms": 9.71809199999916,
+            "p95Ms": 106.0945120000033,
+            "p99Ms": 264.20122000000265
+          },
+          "ws.send": {
+            "count": 5565,
+            "totalMs": 1578.117143999636,
+            "selfMs": 1578.117143999636,
+            "maxMs": 66.85431000000244,
+            "p50Ms": 0.031376999999338295,
+            "p95Ms": 1.1077579999982845,
+            "p99Ms": 4.207541000003403
+          },
+          "world.spawns": {
+            "count": 1093,
+            "totalMs": 21.136459000113973,
+            "selfMs": 21.136459000113973,
+            "maxMs": 12.349863000003097,
+            "p50Ms": 0.003876000002492219,
+            "p95Ms": 0.0105249999978696,
+            "p99Ms": 0.06274399999892921
+          },
+          "world.playerCombat": {
+            "count": 1093,
+            "totalMs": 17.777330999655533,
+            "selfMs": 17.777330999655533,
+            "maxMs": 6.286434000001464,
+            "p50Ms": 0.004066000001330394,
+            "p95Ms": 0.006398999998054933,
+            "p99Ms": 0.024186000009649433
+          },
+          "world.collision.sweepBlocked": {
+            "count": 7354,
+            "totalMs": 55.11432800010516,
+            "selfMs": 55.11432800010516,
+            "maxMs": 15.298942000008537,
+            "p50Ms": 0.001131999997596722,
+            "p95Ms": 0.010005000003729947,
+            "p99Ms": 0.017977000010432675
+          },
+          "world.collision.overlaps": {
+            "count": 5093,
+            "totalMs": 99.91696600005162,
+            "selfMs": 99.91696600005162,
+            "maxMs": 54.62116999999853,
+            "p50Ms": 0.0020230000009178184,
+            "p95Ms": 0.009664000001066597,
+            "p99Ms": 0.02336500000092201
+          },
+          "world.collision.slide": {
+            "count": 2261,
+            "totalMs": 22.731698000105098,
+            "selfMs": 9.064806000162207,
+            "maxMs": 5.267507999997179,
+            "p50Ms": 0.0028239999992365483,
+            "p95Ms": 0.009614000009605661,
+            "p99Ms": 0.03111699999863049
+          },
+          "world.steer": {
+            "count": 2262,
+            "totalMs": 275.67826300007437,
+            "selfMs": 212.64272199981497,
+            "maxMs": 159.58796599999914,
+            "p50Ms": 0.013069000000541564,
+            "p95Ms": 0.05237900000065565,
+            "p99Ms": 0.5772550000037882
+          },
+          "world.enemies": {
+            "count": 1093,
+            "totalMs": 345.64114000016707,
+            "selfMs": 69.40648500006137,
+            "maxMs": 159.69013799999811,
+            "p50Ms": 0.060729999997420236,
+            "p95Ms": 0.2766039999987697,
+            "p99Ms": 3.3735619999970368
+          },
+          "world.regen": {
+            "count": 1093,
+            "totalMs": 4.857112999812671,
+            "selfMs": 4.857112999812671,
+            "maxMs": 1.090221999998903,
+            "p50Ms": 0.0021529999939957634,
+            "p95Ms": 0.005008000000088941,
+            "p99Ms": 0.022214000004169066
+          },
+          "world.aoi": {
+            "count": 5465,
+            "totalMs": 73.49965199964208,
+            "selfMs": 73.49965199964208,
+            "maxMs": 3.8254070000002685,
+            "p50Ms": 0.004075999997439794,
+            "p95Ms": 0.018338000001676846,
+            "p99Ms": 0.05641499999910593
+          },
+          "world.step": {
+            "count": 1093,
+            "totalMs": 633.885341999714,
+            "selfMs": 170.97364700032267,
+            "maxMs": 159.86210500000016,
+            "p50Ms": 0.14687099999719067,
+            "p95Ms": 1.327158000000054,
+            "p99Ms": 7.431667999997444
+          },
+          "json.stringify": {
+            "count": 8335,
+            "totalMs": 1534.028897999695,
+            "selfMs": 1534.028897999695,
+            "maxMs": 66.36219400000118,
+            "p50Ms": 0.004086000000825152,
+            "p95Ms": 0.3696730000010575,
+            "p99Ms": 2.991801000011037
+          },
+          "checkpoint.serialize": {
+            "count": 918,
+            "totalMs": 908.4753250000686,
+            "selfMs": 908.4753250000686,
+            "maxMs": 61.62534000000596,
+            "p50Ms": 0.3029339999993681,
+            "p95Ms": 3.3745039999994333,
+            "p99Ms": 11.131929999995918
+          },
+          "world.move": {
+            "count": 2765,
+            "totalMs": 246.55552700045519,
+            "selfMs": 146.05136000042694,
+            "maxMs": 54.6524070000014,
+            "p50Ms": 0.014542000004439615,
+            "p95Ms": 0.04869400001189206,
+            "p99Ms": 1.2797449999998207
+          },
+          "db.probe": {
+            "count": 59,
+            "totalMs": 1356.1986660000257,
+            "selfMs": 1356.1986660000257,
+            "maxMs": 427.957527999999,
+            "p50Ms": 3.1265219999986584,
+            "p95Ms": 61.11478499999794,
+            "p99Ms": 427.957527999999
+          },
+          "notify.fullState": {
+            "count": 10,
+            "totalMs": 450.0253489999959,
+            "selfMs": 450.0253489999959,
+            "maxMs": 178.95737800000643,
+            "p50Ms": 20.518275000002177,
+            "p95Ms": 178.95737800000643,
+            "p99Ms": 178.95737800000643
+          }
+        },
+        "zones": [
+          {
+            "id": "zone.greenvale.meadows",
+            "tick": 18765,
+            "entities": 16,
+            "enemies": 8
+          }
+        ],
+        "diagnostics": {
+          "queuedBytes": 0,
+          "socketBytes": 0,
+          "checkpointInFlight": true,
+          "activeWork": 0,
+          "connections": 5,
+          "metrics": "# HELP combat_rewards_total Kill reward attempts by result\n# TYPE combat_rewards_total counter\ncombat_rewards_total 0\n# HELP ws_connections Open WebSocket connections\n# TYPE ws_connections gauge\nws_connections 5\n# HELP ws_messages_total Inbound WebSocket messages by type/result\n# TYPE ws_messages_total counter\nws_messages_total{result=\"accepted\",type=\"auth.hello\"} 5\nws_messages_total{result=\"accepted\",type=\"move.input\"} 2765\nws_messages_total{result=\"accepted\",type=\"ping\"} 145\n# HELP world_pickups_total Pickup attempts by result\n# TYPE world_pickups_total counter\nworld_pickups_total 0\n# HELP ability_uses_total Accepted ability uses by outcome\n# TYPE ability_uses_total counter\nability_uses_total 0\n# HELP quest_actions_total Successful quest actions\n# TYPE quest_actions_total counter\nquest_actions_total 0\n# HELP world_tick_ms Duration of the last simulation tick (ms)\n# TYPE world_tick_ms gauge\nworld_tick_ms 1.03\n# HELP world_ticks_total Completed simulation ticks\n# TYPE world_ticks_total counter\nworld_ticks_total 1408\n# HELP world_checkpoint_ms Last durable checkpoint latency\n# TYPE world_checkpoint_ms gauge\nworld_checkpoint_ms 65.32259800001339\n# HELP world_tick_slots_skipped_total Missed tick deadlines; no catch-up simulation\n# TYPE world_tick_slots_skipped_total counter\nworld_tick_slots_skipped_total 120\n# HELP process_rss_bytes Resident process memory\n# TYPE process_rss_bytes gauge\nprocess_rss_bytes 161423360\n# HELP process_cpu_seconds Accumulated user and system CPU\n# TYPE process_cpu_seconds gauge\nprocess_cpu_seconds 27.785684\n"
+        },
+        "players": 5,
+        "cpuCores": 0.3423292570690403,
+        "rss": 161423360,
+        "eventLoopUtilization": 0.2718255559745587,
+        "eventLoop": {
+          "p50Ms": 10.543103,
+          "p95Ms": 29.261823,
+          "p99Ms": 81.657855,
+          "maxMs": 428.081151
+        }
+      },
+      "wal": {
+        "wal_write": 938,
+        "wal_sync": 937,
+        "wal_write_time": 96.57800000000043,
+        "wal_sync_time": 11944.112999999983
+      },
+      "peakQueuedBytes": 4255,
+      "peakSocketBytes": 0,
+      "skippedSlots": 109,
+      "effectiveTickHz": 18.19484479397504,
+      "serverCpuCores": 0.3424935434960094,
+      "serverRssBytes": 161423360,
+      "players": 5,
+      "seconds": 60.017,
+      "rttP50Ms": 62,
+      "rttP95Ms": 359,
+      "rttP99Ms": 509,
+      "httpP95Ms": 146.14817599999515,
+      "tickP95Ms": 21.56,
+      "checkpointP95Ms": 166.9172350000008,
+      "bytes": 941890,
+      "bytesPerPlayerSecond": 3138.7440225269506,
+      "messages": 5590,
+      "corrections": 0,
+      "errors": 0,
+      "httpErrors": 0,
+      "disconnects": 0,
+      "pingSamples": 145,
+      "httpSamples": 145
+    }
+  ]
+}

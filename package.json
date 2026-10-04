@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "turbo run dev --filter=@mmo/api --filter=@mmo/realtime --filter=@mmo/game-web --filter=@mmo/admin",
-    "build": "turbo run build",
+    "build": "turbo run build && node scripts/check-production-build.cjs",
     "typecheck": "turbo run typecheck && tsc -p scripts/tsconfig.json",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",

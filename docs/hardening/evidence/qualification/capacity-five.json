@@ -1,0 +1,77 @@
+{
+  "at": "2026-10-04T15:14:25.145Z",
+  "duration": 120,
+  "results": [
+    {
+      "profile": {
+        "elapsed": 120.049524853,
+        "methods": {
+          "db.probe": {
+            "count": 117,
+            "totalMs": 1555.8473789999261,
+            "selfMs": 1555.8473789999261,
+            "maxMs": 197.18339599999308,
+            "p50Ms": 4.608947999993688,
+            "p95Ms": 52.33686800000578,
+            "p99Ms": 181.32117299998936
+          }
+        },
+        "zones": [
+          {
+            "id": "zone.greenvale.meadows",
+            "tick": 16294,
+            "entities": 16,
+            "enemies": 8
+          }
+        ],
+        "diagnostics": {
+          "queuedBytes": 0,
+          "socketBytes": 0,
+          "checkpointInFlight": false,
+          "activeWork": 0,
+          "connections": 5,
+          "metrics": "# HELP combat_rewards_total Kill reward attempts by result\n# TYPE combat_rewards_total counter\ncombat_rewards_total 0\n# HELP ws_connections Open WebSocket connections\n# TYPE ws_connections gauge\nws_connections 5\n# HELP ws_messages_total Inbound WebSocket messages by type/result\n# TYPE ws_messages_total counter\nws_messages_total{result=\"accepted\",type=\"auth.hello\"} 5\nws_messages_total{result=\"accepted\",type=\"move.input\"} 5515\nws_messages_total{result=\"accepted\",type=\"ping\"} 295\n# HELP world_pickups_total Pickup attempts by result\n# TYPE world_pickups_total counter\nworld_pickups_total 0\n# HELP ability_uses_total Accepted ability uses by outcome\n# TYPE ability_uses_total counter\nability_uses_total 0\n# HELP quest_actions_total Successful quest actions\n# TYPE quest_actions_total counter\nquest_actions_total 0\n# HELP world_tick_ms Duration of the last simulation tick (ms)\n# TYPE world_tick_ms gauge\nworld_tick_ms 1.83\n# HELP world_ticks_total Completed simulation ticks\n# TYPE world_ticks_total counter\nworld_ticks_total 2530\n# HELP world_checkpoint_ms Last durable checkpoint latency\n# TYPE world_checkpoint_ms gauge\nworld_checkpoint_ms 3.8326970000052825\n# HELP world_tick_slots_skipped_total Missed tick deadlines; no catch-up simulation\n# TYPE world_tick_slots_skipped_total counter\nworld_tick_slots_skipped_total 234\n# HELP process_rss_bytes Resident process memory\n# TYPE process_rss_bytes gauge\nprocess_rss_bytes 160714752\n# HELP process_cpu_seconds Accumulated user and system CPU\n# TYPE process_cpu_seconds gauge\nprocess_cpu_seconds 38.287888\n"
+        },
+        "players": 5,
+        "cpuCores": 0.26800076917752164,
+        "rss": 160714752,
+        "eventLoopUtilization": 0.20903002630440826,
+        "eventLoop": {
+          "p50Ms": 10.518527,
+          "p95Ms": 25.133055,
+          "p99Ms": 80.674815,
+          "maxMs": 491.782143
+        }
+      },
+      "wal": {
+        "wal_write": 1959,
+        "wal_sync": 1958,
+        "wal_write_time": 508.8299999999999,
+        "wal_sync_time": 19497.627999999997
+      },
+      "peakQueuedBytes": 5645,
+      "peakSocketBytes": 0,
+      "skippedSlots": 216,
+      "effectiveTickHz": 18.198635102367323,
+      "serverCpuCores": 0.26796310276729246,
+      "serverRssBytes": 160714752,
+      "players": 5,
+      "seconds": 120.009,
+      "rttP50Ms": 60,
+      "rttP95Ms": 274,
+      "rttP99Ms": 341,
+      "httpP95Ms": 123.4079180000117,
+      "tickP95Ms": 36.59,
+      "checkpointP95Ms": 191.2273400000122,
+      "bytes": 1992228,
+      "bytesPerPlayerSecond": 3320.1309901757368,
+      "messages": 11098,
+      "corrections": 0,
+      "errors": 0,
+      "httpErrors": 0,
+      "disconnects": 0,
+      "pingSamples": 295,
+      "httpSamples": 295
+    }
+  ]
+}

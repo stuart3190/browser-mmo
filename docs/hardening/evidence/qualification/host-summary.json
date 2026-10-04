@@ -1,0 +1,14 @@
+{
+  "samples": 139,
+  "note": "1s vmstat interval includes admission and cooldown; not exact load-only boundary; first since-boot line excluded.",
+  "cpuMeanPercent": {
+    "user": 3.96,
+    "system": 3.58,
+    "idle": 90.79,
+    "iowait": 1.65,
+    "steal": 0
+  },
+  "runQueueMax": 15,
+  "swapInTotal": 0,
+  "swapOutTotal": 0
+}

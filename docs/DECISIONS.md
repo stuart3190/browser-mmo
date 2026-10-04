@@ -550,3 +550,38 @@ Operators verify identity out of band and provision/rotate credentials; public a
 intentionally absent. Production needs actual TLS, private metrics, provisioned accounts, hosted CI
 and off-host backups. Local restore and software-rendered browser measurements cannot certify those
 external operations or real mobile devices. No gameplay or monetization changes are included.
+
+## 2026-10-04 — Measured simulation deadlines and release qualification
+
+**Date**: 2026-10-04
+
+**Decision**
+Anchor simulation scheduling to monotonic 50 ms deadlines. Count expired slots and skip them;
+do not manufacture catch-up ticks, relax movement validation, or publish before durable commit.
+Keep CPU/method profiling and destructive process fault injection in isolated qualification scripts.
+The existing development-only browser debug view may expose read-only scene counts; production
+must continue to omit it. Require hosted CI evidence separately from local checks.
+
+**Reason**
+An idle 50 ms interval on this VM achieved only 18.25 Hz. A simultaneous timer control measured
+17.90 Hz with an accumulating interval versus 18.90 Hz with anchored deadlines. The sampled world
+step was about 2 ms at p95 at five players; measurements did not justify rewriting AI, collision,
+AOI, or navigation. Database completion and scheduling tails remain qualification concerns.
+
+**Alternatives considered**
+Keep accumulating timer drift; backfill many simulation steps after stalls; weaken durable
+publication; add a broker; rewrite navigation without measured attribution. These either conceal
+missed deadlines, change gameplay/security guarantees, or target an unproven bottleneck.
+
+**Consequences**
+A skipped-slot counter exposes overload; this change does not promise 20 Hz on unsuitable hosting.
+Capacity requires quiet, controlled measurements with declared limits, not zero error counts alone.
+Process-level SIGKILL/SIGSTOP tests complement in-process crash hooks. A paused zone owner retains
+its PostgreSQL lock: takeover requires confirmed session termination, never a guessed lease expiry.
+No additional distributed ownership service or gameplay feature is introduced.
+
+The CI build step explicitly overrides its test environment with `NODE_ENV=production`. The root
+build command checks the emitted game entrypoint for development/debug code and fails closed.
+Qualification reproduced a `NODE_ENV=test` release build containing `__mmo` and development React;
+the negative check rejected it and the production rebuild passed. This is a release-artifact gate,
+not a replacement for production server auth/configuration checks.

@@ -1,0 +1,11 @@
+{
+  "scope": "Development build, read-only scene counts only; no production timing or phone FPS claim",
+  "scene": {
+    "meshes": 266,
+    "materials": 36,
+    "textures": 0,
+    "activeMeshes": 13,
+    "entities": 11
+  },
+  "renderer": "780x1688"
+}

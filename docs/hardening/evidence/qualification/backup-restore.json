@@ -1,0 +1,60 @@
+{
+  "result": "PASS",
+  "checks": [
+    {
+      "result": "backup_verified",
+      "counts": {
+        "drizzle.__drizzle_migrations": 7,
+        "public.accounts": 2,
+        "public.audit_log": 4,
+        "public.auth_identities": 2,
+        "public.character_quests": 1,
+        "public.characters": 2,
+        "public.containers": 10,
+        "public.currency_balances": 2,
+        "public.currency_ledger": 7,
+        "public.item_history": 10,
+        "public.item_instances": 5,
+        "public.item_templates": 15,
+        "public.kill_events": 1,
+        "public.kill_rewards": 1,
+        "public.marketplace_listings": 2,
+        "public.marketplace_transactions": 1,
+        "public.sessions": 1,
+        "public.zone_checkpoints": 0
+      }
+    },
+    {
+      "result": "restore_verified",
+      "counts": {
+        "drizzle.__drizzle_migrations": 7,
+        "public.accounts": 2,
+        "public.audit_log": 4,
+        "public.auth_identities": 2,
+        "public.character_quests": 1,
+        "public.characters": 2,
+        "public.containers": 10,
+        "public.currency_balances": 2,
+        "public.currency_ledger": 7,
+        "public.item_history": 10,
+        "public.item_instances": 5,
+        "public.item_templates": 15,
+        "public.kill_events": 1,
+        "public.kill_rewards": 1,
+        "public.marketplace_listings": 2,
+        "public.marketplace_transactions": 1,
+        "public.sessions": 1,
+        "public.zone_checkpoints": 0
+      },
+      "checks": ["constraints", "ledger", "escrow", "balances", "session_revocation"]
+    }
+  ],
+  "additionalAssertions": [
+    "final migrations rerun",
+    "all populated domain tables nonempty",
+    "one equipped item",
+    "all restored sessions revoked",
+    "second restore into occupied target refused"
+  ],
+  "zoneCheckpointFixture": "empty: crash-state checkpoint recovery is qualified separately by process tests"
+}

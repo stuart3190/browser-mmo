@@ -1,0 +1,81 @@
+{
+  "scope": "Whole process capture includes startup, idle and profiling overhead; not tick-only CPU time. Wall-time weighting includes scheduler stalls and must not be equated to CPU utilization.",
+  "sampleCount": 58178,
+  "top": [
+    {
+      "function": "(idle)",
+      "weightedTimePercent": 78.31,
+      "sampleCountPercent": 86.397
+    },
+    {
+      "function": "JSON.stringify",
+      "weightedTimePercent": 2.985,
+      "sampleCountPercent": 1.459
+    },
+    {
+      "function": "writev",
+      "weightedTimePercent": 2.413,
+      "sampleCountPercent": 1.59
+    },
+    {
+      "function": "",
+      "weightedTimePercent": 1.439,
+      "sampleCountPercent": 1.031
+    },
+    {
+      "function": "(garbage collector)",
+      "weightedTimePercent": 1.135,
+      "sampleCountPercent": 0.981
+    },
+    {
+      "function": "(program)",
+      "weightedTimePercent": 0.947,
+      "sampleCountPercent": 0.815
+    },
+    {
+      "function": "readFileUtf8",
+      "weightedTimePercent": 0.651,
+      "sampleCountPercent": 0.199
+    },
+    {
+      "function": "read",
+      "weightedTimePercent": 0.574,
+      "sampleCountPercent": 0.193
+    },
+    {
+      "function": "proto.<computed>",
+      "weightedTimePercent": 0.503,
+      "sampleCountPercent": 0.22
+    },
+    {
+      "function": "runCallSync",
+      "weightedTimePercent": 0.445,
+      "sampleCountPercent": 0.474
+    },
+    {
+      "function": "get exports",
+      "weightedTimePercent": 0.37,
+      "sampleCountPercent": 0.493
+    },
+    {
+      "function": "readPackageJSON",
+      "weightedTimePercent": 0.327,
+      "sampleCountPercent": 0.055
+    },
+    {
+      "function": "processTimers",
+      "weightedTimePercent": 0.313,
+      "sampleCountPercent": 0.091
+    },
+    {
+      "function": "flush",
+      "weightedTimePercent": 0.299,
+      "sampleCountPercent": 0.06
+    },
+    {
+      "function": "encode",
+      "weightedTimePercent": 0.271,
+      "sampleCountPercent": 0.019
+    }
+  ]
+}

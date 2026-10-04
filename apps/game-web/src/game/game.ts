@@ -102,6 +102,13 @@ export async function startGame(args: {
     (id) => entities?.screenPosition(id, scene) ?? null,
     () => player,
     () => entities?.markers() ?? [],
+    () => ({
+      meshes: scene.meshes.length,
+      materials: scene.materials.length,
+      textures: scene.textures.length,
+      activeMeshes: scene.getActiveMeshes().length,
+      entities: entities?.markers().length ?? 0,
+    }),
   );
 
   const info = (e: WorldEntity): EntityInfo => ({
@@ -424,9 +431,19 @@ function exposeDebug(
   screenPos: (entityId: string) => { x: number; y: number } | null,
   player: () => PlayerController | undefined,
   markers: () => { id: string; x: number; z: number }[],
+  sceneCounts: () => {
+    meshes: number;
+    materials: number;
+    textures: number;
+    activeMeshes: number;
+    entities: number;
+  },
 ) {
   if (!import.meta.env.DEV) return;
   (window as unknown as { __mmo: unknown }).__mmo = {
+    get sceneCounts() {
+      return sceneCounts();
+    },
     get connected() {
       return state.connection === 'open';
     },

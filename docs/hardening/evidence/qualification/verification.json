@@ -1,0 +1,26 @@
+{
+  "result": "PASS_LOCAL_CORRECTNESS",
+  "hostedCI": "UNVERIFIED_AUTH_ACCESS_BLOCKER",
+  "command": "env -u NODE_ENV TEST_DATABASE_URL=<isolated> VITE_API_URL=http://127.0.0.1:4400 VITE_REALTIME_URL=ws://127.0.0.1:4401 pnpm verify",
+  "exitCode": 0,
+  "unitTests": 119,
+  "integrationTests": {
+    "realtime": 54,
+    "domain": 54,
+    "api": 7
+  },
+  "builds": 4,
+  "format": "PASS",
+  "lint": "PASS",
+  "typecheck": "PASS",
+  "productionArtifactGate": "PASS",
+  "incorrectDevelopmentArtifact": "REJECTED_EXPECTED",
+  "actionlint": "PASS",
+  "workflowTemplateMatches": true,
+  "assets": "PASS",
+  "backupRestore": "PASS",
+  "browserHealth": "PASS",
+  "capacityGate": "FAIL",
+  "physicalPhone": "NOT_TESTED",
+  "releaseDecision": "DO_NOT_MERGE"
+}

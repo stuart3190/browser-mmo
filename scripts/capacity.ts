@@ -27,6 +27,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const percentile = (a: number[], p: number) =>
   [...a].sort((x, y) => x - y)[Math.min(a.length - 1, Math.floor(a.length * p))] ?? 0;
 const results = [];
+const profileUrl = process.env.LOAD_PROFILE_URL;
 try {
   for (const count of sizes) {
     let bytes = 0,
@@ -101,6 +102,14 @@ try {
     }
     bytes = messages = corrections = errors = 0;
     rtts.length = 0;
+    if (profileUrl) await fetch(`${profileUrl}/reset`);
+    const walBefore = (
+      await handle.pool.query(
+        'select wal_write,wal_sync,wal_write_time,wal_sync_time from pg_stat_wal',
+      )
+    ).rows[0];
+    let peakQueuedBytes = 0,
+      peakSocketBytes = 0;
     const move = setInterval(() => {
       for (const c of clients)
         if (c.ws.readyState === WebSocket.OPEN) {
@@ -139,11 +148,25 @@ try {
         });
     }, 2000);
     const samples = setInterval(() => {
+      if (profileUrl)
+        void fetch(profileUrl)
+          .then((r) => r.json())
+          .then((value) => {
+            const p = value as { diagnostics: { queuedBytes: number; socketBytes: number } };
+            peakQueuedBytes = Math.max(peakQueuedBytes, p.diagnostics.queuedBytes);
+            peakSocketBytes = Math.max(peakSocketBytes, p.diagnostics.socketBytes);
+          })
+          .catch(() => {
+            errors++;
+          });
       void fetch(rt.replace('ws:', 'http:').replace('/ws', '/metrics'))
         .then((r) => r.text())
         .then((txt) => {
           ticks.push(Number(/^world_tick_ms (.+)$/m.exec(txt)?.[1] ?? 0));
           checkpoints.push(Number(/^world_checkpoint_ms (.+)$/m.exec(txt)?.[1] ?? 0));
+        })
+        .catch(() => {
+          errors++;
         });
     }, 1000);
     const beforeMetrics = await (
@@ -160,24 +183,42 @@ try {
     const afterMetrics = await (
       await fetch(rt.replace('ws:', 'http:').replace('/ws', '/metrics'))
     ).text();
+    const seconds = (Date.now() - started) / 1000;
+    const profile = profileUrl ? await (await fetch(profileUrl)).json() : undefined;
+    const walAfter = (
+      await handle.pool.query(
+        'select wal_write,wal_sync,wal_write_time,wal_sync_time from pg_stat_wal',
+      )
+    ).rows[0];
+    const wal = Object.fromEntries(
+      Object.keys(walBefore).map((k) => [k, Number(walAfter[k]) - Number(walBefore[k])]),
+    );
     const result = {
+      profile,
+      wal,
+      peakQueuedBytes,
+      peakSocketBytes,
+      skippedSlots:
+        metric(afterMetrics, 'world_tick_slots_skipped_total') -
+        metric(beforeMetrics, 'world_tick_slots_skipped_total'),
       effectiveTickHz:
         (metric(afterMetrics, 'world_ticks_total') - metric(beforeMetrics, 'world_ticks_total')) /
-        duration,
+        seconds,
       serverCpuCores:
         (metric(afterMetrics, 'process_cpu_seconds') -
           metric(beforeMetrics, 'process_cpu_seconds')) /
-        duration,
+        seconds,
       serverRssBytes: metric(afterMetrics, 'process_rss_bytes'),
       players: count,
-      seconds: (Date.now() - started) / 1000,
+      seconds,
+      rttP50Ms: percentile(rtts, 0.5),
       rttP95Ms: percentile(rtts, 0.95),
       rttP99Ms: percentile(rtts, 0.99),
       httpP95Ms: percentile(httpTimes, 0.95),
       tickP95Ms: percentile(ticks, 0.95),
       checkpointP95Ms: percentile(checkpoints, 0.95),
       bytes,
-      bytesPerPlayerSecond: bytes / count / duration,
+      bytesPerPlayerSecond: bytes / count / seconds,
       messages,
       corrections,
       errors,

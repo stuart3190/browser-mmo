@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "matchedHits": true,
+  "hudBeforeDroppedMessages": 125,
+  "hits": [140, 134, 129],
+  "missedHud": 125,
+  "authoritativePersistedHealth": 0,
+  "finalHud": 0,
+  "reconciliation": true,
+  "reconnect": true,
+  "productionDebugHook": false
+}

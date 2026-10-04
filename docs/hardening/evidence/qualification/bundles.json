@@ -1,0 +1,19 @@
+{
+  "allJsBytes": 2388609,
+  "allJsGzipBytes": 589213,
+  "jsChunks": 32,
+  "entry": [
+    {
+      "name": "index-D4IJ7cHU.js",
+      "rawBytes": 437656,
+      "gzipBytes": 131961
+    },
+    {
+      "name": "babylon-E3HG0XtW.js",
+      "rawBytes": 1948669,
+      "gzipBytes": 454545
+    }
+  ],
+  "gzipLevel": 9,
+  "note": "Standalone gzip level 9; report/build log uses Vite gzip estimate at its default level, so sizes differ slightly."
+}

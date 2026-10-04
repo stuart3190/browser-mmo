@@ -29,7 +29,7 @@ import {
   parseClientMessage,
   MAX_CLIENT_FRAME_BYTES,
 } from '@mmo/networking';
-import { RateLimit } from '@mmo/server-kit';
+import { RateLimit, startTickLoop } from '@mmo/server-kit';
 import type { Logger, Metrics } from '@mmo/server-kit';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
@@ -171,7 +171,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     logger.error({ err }, 'zone ownership lost; host fenced, restart required');
     crashed = true;
     shuttingDown = true;
-    clearInterval(tickTimer);
+    tickTimer?.stop();
     clearInterval(saveTimer);
     clearInterval(sessionTimer);
     clearInterval(heartbeatTimer);
@@ -1149,7 +1149,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       })
     : undefined;
 
-  let tickTimer: NodeJS.Timeout | undefined;
+  let tickTimer: ReturnType<typeof startTickLoop> | undefined;
   let heartbeatTimer: NodeJS.Timeout | undefined;
   let saveTimer: NodeJS.Timeout | undefined;
   let sessionTimer: NodeJS.Timeout | undefined;
@@ -1161,6 +1161,15 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     sync,
     /** Number of authenticated connections (tests/health). */
     playerCount: () => byCharacter.size,
+    /** Read-only diagnostics for isolated qualification harnesses. No public debug endpoint. */
+    diagnostics: () => ({
+      queuedBytes: [...pendingSend.values()].reduce((n, q) => n + q.bytes, 0),
+      socketBytes: [...connections].reduce((n, c) => n + c.ws.bufferedAmount, 0),
+      checkpointInFlight: Boolean(checkpoint),
+      activeWork,
+      connections: connections.size,
+      metrics: deps.metrics.render(),
+    }),
     /** Characters present in zone simulations (connected or lingering). */
     inWorldCount: () => inWorld.size,
     /** Resolves when all queued kill rewards have been processed (tests). */
@@ -1235,7 +1244,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             conn.ws.ping();
           }
         }, deps.heartbeatMs ?? 30_000);
-        tickTimer = setInterval(
+        tickTimer = startTickLoop(
           () => {
             if (crashed || !ownership.active) return;
             const t0 = performance.now();
@@ -1255,6 +1264,13 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             tickDuration.set(Math.round((performance.now() - t0) * 100) / 100);
           },
           Math.round(1000 / deps.tickHz),
+          (count) =>
+            deps.metrics
+              .counter(
+                'world_tick_slots_skipped_total',
+                'Missed tick deadlines; no catch-up simulation',
+              )
+              .inc({}, count),
         );
         saveTimer = setInterval(() => {
           for (const id of departures.keys()) void persistDeparture(id).catch(() => undefined);
@@ -1267,7 +1283,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
           });
         });
       } catch (err) {
-        clearInterval(tickTimer);
+        tickTimer?.stop();
         clearInterval(saveTimer);
         clearInterval(sessionTimer);
         clearInterval(heartbeatTimer);
@@ -1283,7 +1299,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     async simulateCrash(): Promise<void> {
       crashed = true;
       shuttingDown = true;
-      clearInterval(tickTimer);
+      tickTimer?.stop();
       clearInterval(saveTimer);
       clearInterval(sessionTimer);
       clearInterval(heartbeatTimer);
@@ -1295,7 +1311,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     },
     async stop(): Promise<void> {
       shuttingDown = true;
-      clearInterval(tickTimer);
+      tickTimer?.stop();
       clearInterval(saveTimer);
       clearInterval(sessionTimer);
       clearInterval(heartbeatTimer);
