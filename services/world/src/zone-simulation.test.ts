@@ -217,3 +217,36 @@ describe('NPC interaction validation', () => {
     );
   });
 });
+
+describe('movement distance budget', () => {
+  it('does not mint credit per packet or after rejected packets', () => {
+    const s = sim();
+    const a = player('Burst');
+    s.addPlayer(a, { x: 0, y: 0, z: 0 }, 0, 0);
+    let moved = 0;
+    for (let i = 0; i < 40; i++) {
+      if (s.handleMove(a.characterId, { x: moved + 0.699, y: 0, z: 0 }, 0, 50)) moved += 0.699;
+    }
+    expect(moved).toBeLessThanOrEqual(1.05);
+    // The old validator allowed 13.98m/s at 20Hz. Oscillate to avoid map obstacles.
+    let distance = moved;
+    for (let now = 100; now <= 10_000; now += 50) {
+      const x = s.getPlayer(a.characterId)!.position.x;
+      const next = x > 0 ? x - 0.699 : x + 0.699;
+      if (s.handleMove(a.characterId, { x: next, y: 0, z: 0 }, 0, now)) distance += 0.699;
+    }
+    expect(distance).toBeLessThanOrEqual(60.75);
+  });
+  it('accepts normal 10Hz movement and bounds idle/jitter credit', () => {
+    const s = sim();
+    const a = player('Normal');
+    s.addPlayer(a, { x: 0, y: 0, z: 0 }, 0, 0);
+    for (let n = 1; n <= 100; n++)
+      expect(s.handleMove(a.characterId, { x: n % 2 ? 0.6 : 0, y: 0, z: 0 }, 0, n * 100)).toBe(
+        true,
+      );
+    expect(s.handleMove(a.characterId, { x: 4, y: 0, z: 0 }, 0, 100_000)).toBe(false);
+    expect(s.handleMove(a.characterId, { x: 3, y: 0, z: 0 }, 0, 100_000)).toBe(true);
+    expect(s.handleMove(a.characterId, { x: 0, y: 0, z: 0 }, 0, 100_000)).toBe(false);
+  });
+});

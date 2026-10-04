@@ -98,3 +98,32 @@ export async function saveCharacterPosition(
     .set({ zoneId, posX: pos.x, posY: pos.y, posZ: pos.z, rotationY, updatedAt: new Date() })
     .where(eq(schema.characters.id, characterId));
 }
+
+/** One atomic snapshot; callers serialize writes per character. */
+export async function saveCharacterState(
+  db: DbOrTx,
+  characterId: string,
+  zoneId: string,
+  state: {
+    position: Vec3;
+    rotationY: number;
+    health: number;
+    abilityCooldowns: Record<string, number>;
+  },
+): Promise<void> {
+  await db
+    .update(schema.characters)
+    .set({
+      zoneId,
+      posX: state.position.x,
+      posY: state.position.y,
+      posZ: state.position.z,
+      rotationY: state.rotationY,
+      currentHealth: Math.max(0, Math.round(state.health)),
+      abilityCooldowns: Object.fromEntries(
+        Object.entries(state.abilityCooldowns).filter(([, until]) => until > Date.now()),
+      ),
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.characters.id, characterId));
+}

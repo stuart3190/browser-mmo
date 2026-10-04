@@ -241,3 +241,18 @@ describe('effective character stats', () => {
     expect(await getCharacterStats(ctx.db, ctx, p.characterId)).toEqual(base);
   });
 });
+
+it('serializes conflicting two-hand/off-hand equips from distinct containers', async () => {
+  const p = await makePlayer(ctx, 'class.cleric');
+  const staff = await give(p, 'weapon.staff.oak_staff');
+  const shield = await give(p, 'armor.shield.oak_buckler');
+  const vault = await containerId(ctx, p, 'character_vault');
+  const [stored] = await move(p, shield, { kind: 'container', containerId: vault });
+  const results = await Promise.allSettled([
+    move(p, staff, { kind: 'equipped', slotId: 'main_hand' }),
+    move(p, stored!, { kind: 'equipped', slotId: 'off_hand' }),
+  ]);
+  expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+  const inventory = await getCharacterItems(ctx.db, ctx, p.accountId, p.characterId);
+  expect(Object.keys(inventory.equipment.slots)).toHaveLength(1);
+});

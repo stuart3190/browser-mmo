@@ -5,7 +5,7 @@ import type { ApiEnv } from '@mmo/config';
 import { splitList } from '@mmo/config';
 import type { AuthProvider, DomainContext, SessionService } from '@mmo/domain';
 import type { Logger, Metrics } from '@mmo/server-kit';
-import { httpStatusFor } from '@mmo/server-kit';
+import { httpStatusFor, RateLimit } from '@mmo/server-kit';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { bearerToken } from './http';
 import { adminRoutes } from './routes/admin';
@@ -21,6 +21,7 @@ export interface AppDeps {
   sessions: SessionService;
   /** Enabled auth providers keyed by id (only 'dev' today). */
   authProviders: ReadonlyMap<string, AuthProvider>;
+  limits?: { burst?: number; perSecond?: number; concurrent?: number };
 }
 
 const REQUEST_ID_RE = /^[A-Za-z0-9-]{8,64}$/;
@@ -51,11 +52,44 @@ export async function buildApp(deps: AppDeps) {
     exposedHeaders: ['x-request-id'],
   });
 
+  const byIp = new RateLimit(deps.limits?.burst ?? 120, deps.limits?.perSecond ?? 30);
+  const byAccount = new RateLimit(60, 15);
+  const login = new RateLimit(10, 0.5);
+  let inFlight = 0;
+  // Bound actual work, not socket lifetimes: aborted uploads cannot leak admission slots.
+  app.addHook('onRoute', (route) => {
+    const handler = route.handler;
+    route.handler = async function (req, reply) {
+      if (inFlight >= (deps.limits?.concurrent ?? 16))
+        throw new DomainError(ErrorCode.RATE_LIMITED, 'Request work limit reached');
+      inFlight++;
+      try {
+        return await handler.call(this, req, reply);
+      } finally {
+        inFlight--;
+      }
+    };
+  });
   app.decorateRequest('session', null);
   app.addHook('onRequest', async (req, reply) => {
     reply.header('x-request-id', req.id);
-    const token = bearerToken(req);
-    req.session = token ? await deps.sessions.resolve(deps.ctx, token) : null;
+    if (
+      !byIp.take(req.ip) ||
+      inFlight >= (deps.limits?.concurrent ?? 16) ||
+      (req.url.startsWith('/v1/auth/') && req.method === 'POST' && !login.take(req.ip))
+    ) {
+      reply.header('retry-after', '2');
+      throw new DomainError(ErrorCode.RATE_LIMITED, 'Request limit reached');
+    }
+    inFlight++;
+    try {
+      const token = bearerToken(req);
+      req.session = token ? await deps.sessions.resolve(deps.ctx, token) : null;
+      if (req.session && !byAccount.take(req.session.account.id))
+        throw new DomainError(ErrorCode.RATE_LIMITED, 'Account request limit reached');
+    } finally {
+      inFlight--;
+    }
   });
   app.addHook('onResponse', async (req, reply) => {
     httpRequests.inc({

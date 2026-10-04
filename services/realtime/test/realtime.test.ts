@@ -1,7 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { AddressInfo } from 'node:net';
 import { WebSocket } from 'ws';
 import { eq } from 'drizzle-orm';
+import * as domain from '@mmo/domain';
 import { loadDotEnv } from '@mmo/config';
 import { createDb, schema } from '@mmo/db';
 import { DevAuthProvider, SessionService, createCharacter, createDomainContext } from '@mmo/domain';
@@ -213,4 +214,212 @@ describe('realtime gateway', () => {
     const evil = new TestClient('https://evil.example');
     await expect(evil.opened).rejects.toThrow();
   });
+});
+
+describe('pre-alpha connection hardening', () => {
+  it('admits at most one controller during simultaneous logins', async () => {
+    const p = await newPlayer();
+    const a = new TestClient();
+    const b = new TestClient();
+    try {
+      await Promise.all([a.opened, b.opened]);
+      for (const c of [a, b])
+        c.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+      await vi.waitFor(() =>
+        expect([a, b].filter((c) => c.messages.some((m) => m.t === 'auth.ok'))).toHaveLength(1),
+      );
+      await vi.waitFor(() => expect([a, b].filter((c) => c.closed)).toHaveLength(1));
+      const live = [a, b].find((c) => !c.closed)!;
+      const seq = live.send('ping', { clientTime: 123 });
+      expect((await live.waitFor('pong', (m) => m.ack === seq)).d.clientTime).toBe(123);
+    } finally {
+      a.ws.close();
+      b.ws.close();
+    }
+  });
+  it.each(['logout', 'ban', 'expiry'] as const)(
+    'disconnects an idle socket after %s',
+    async (kind) => {
+      const p = await newPlayer();
+      const c = new TestClient();
+      try {
+        await c.opened;
+        c.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+        await c.waitFor('auth.ok');
+        if (kind === 'ban')
+          await ctx.db
+            .update(schema.accounts)
+            .set({ status: 'banned' })
+            .where(eq(schema.accounts.id, p.accountId));
+        else {
+          const resolved = (await sessions.resolve(ctx, p.token))!;
+          if (kind === 'logout') await sessions.revoke(ctx, resolved.sessionId);
+          else
+            await ctx.db
+              .update(schema.sessions)
+              .set({ expiresAt: new Date(0) })
+              .where(eq(schema.sessions.id, resolved.sessionId));
+        }
+        await vi.waitFor(() => expect(c.closed).not.toBeNull(), { timeout: 3000 });
+      } finally {
+        c.ws.close();
+      }
+    },
+  );
+  it('rejects overlapping database actions instead of accumulating promises', async () => {
+    const p = await newPlayer();
+    const c = new TestClient();
+    try {
+      await c.opened;
+      c.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+      await c.waitFor('zone.snapshot');
+      const snap = c.messages.find((m) => m.t === 'zone.snapshot');
+      if (snap?.t !== 'zone.snapshot') throw new Error('snapshot absent');
+      const npc = snap.d.entities.find((e) => e.kind === 'npc')!;
+      for (let i = 0; i < 20; i++) c.send('npc.interact', { entityId: npc.id });
+      expect((await c.waitFor('error', (m) => m.d.code === 'RATE_LIMITED')).d.code).toBe(
+        'RATE_LIMITED',
+      );
+    } finally {
+      c.ws.close();
+    }
+  });
+});
+
+it('waits for a blocked departure write before restoring position, health and cooldowns', async () => {
+  const p = await newPlayer();
+  const until = Date.now() + 60_000;
+  await ctx.db
+    .update(schema.characters)
+    .set({ currentHealth: 73, abilityCooldowns: { 'ability.warrior.heavy_strike': until } })
+    .where(eq(schema.characters.id, p.character.id));
+  const a = new TestClient();
+  const b = new TestClient();
+  let release!: () => void;
+  let locked!: () => void;
+  const lockReady = new Promise<void>((r) => {
+    locked = r;
+  });
+  let transaction: Promise<void> | undefined;
+  try {
+    await Promise.all([a.opened, b.opened]);
+    a.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+    await a.waitFor('zone.snapshot');
+    const zone = server.zones.get(DEMO_ZONE_ID)!;
+    const pos = zone.getPlayer(p.character.id)!.position;
+    const next = { ...pos, x: pos.x + 0.5 };
+    a.send('move.input', { position: next, rotationY: 0.3 });
+    await vi.waitFor(() => expect(zone.getPlayer(p.character.id)!.position).toEqual(next));
+    const removed = vi.spyOn(zone, 'removePlayer');
+    transaction = ctx.db.transaction(async (tx) => {
+      await tx
+        .select()
+        .from(schema.characters)
+        .where(eq(schema.characters.id, p.character.id))
+        .for('update');
+      locked();
+      await new Promise<void>((r) => {
+        release = r;
+      });
+    });
+    await lockReady;
+    a.ws.close();
+    await vi.waitFor(() => expect(zone.getPlayer(p.character.id)).toBeUndefined());
+    const expected = removed.mock.results.find((r) => r.type === 'return' && r.value)?.value;
+    removed.mockRestore();
+    expect(expected).toBeDefined();
+    b.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+    await sleep(150);
+    expect(b.messages.some((m) => m.t === 'auth.ok')).toBe(false);
+    release();
+    await transaction;
+    await b.waitFor('zone.snapshot');
+    expect(zone.persistentState(p.character.id)).toMatchObject(expected);
+  } finally {
+    release?.();
+    await transaction;
+    a.ws.close();
+    b.ws.close();
+  }
+});
+
+it('terminates a connection before an outbound frame exceeds its configured queue budget', async () => {
+  const bounded = createRealtimeServer({
+    ctx,
+    sessions,
+    logger: createLogger({ service: 'slow-test', level: 'silent' }),
+    metrics: new Metrics(),
+    zoneIds: [DEMO_ZONE_ID],
+    tickHz: 20,
+    allowedOrigins: ['http://localhost:5173'],
+    maxBufferedBytes: 64,
+    lingerMs: 0,
+  });
+  await bounded.start('127.0.0.1', 0);
+  const p = await newPlayer();
+  const socket = new WebSocket(
+    `ws://127.0.0.1:${(bounded.http.address() as AddressInfo).port}/ws`,
+    { origin: 'http://localhost:5173' },
+  );
+  try {
+    await new Promise<void>((resolve) => socket.once('open', resolve));
+    const closed = new Promise<number>((resolve) => socket.once('close', resolve));
+    socket.send(
+      encodeClientMessage('auth.hello', 1, {
+        token: p.token,
+        characterId: p.character.id,
+        client: 'game_web',
+      }),
+    );
+    expect(await closed).toBe(1006);
+  } finally {
+    socket.terminate();
+    await bounded.stop();
+  }
+});
+
+it('retains a failed departure snapshot and retries it before re-entry', async () => {
+  const p = await newPlayer();
+  const a = new TestClient();
+  const b = new TestClient();
+  let save: ReturnType<typeof vi.spyOn> | undefined;
+  try {
+    await Promise.all([a.opened, b.opened]);
+    a.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+    await a.waitFor('zone.snapshot');
+    const zone = server.zones.get(DEMO_ZONE_ID)!;
+    const pos = zone.getPlayer(p.character.id)!.position;
+    const next = { ...pos, x: pos.x + 0.5 };
+    a.send('move.input', { position: next, rotationY: 0.7 });
+    await vi.waitFor(() => expect(zone.getPlayer(p.character.id)!.position).toEqual(next));
+    save = vi
+      .spyOn(domain, 'saveCharacterState')
+      .mockRejectedValueOnce(new Error('temporary write failure'));
+    a.ws.close();
+    await vi.waitFor(() => expect(save).toHaveBeenCalled());
+    b.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+    const ok = await b.waitFor('auth.ok');
+    expect(ok.d.character.position).toEqual(next);
+    expect(save).toHaveBeenCalledTimes(2);
+  } finally {
+    save?.mockRestore();
+    a.ws.close();
+    b.ws.close();
+  }
+});
+
+it('fails closed when live-session revalidation cannot query the database', async () => {
+  const p = await newPlayer();
+  const c = new TestClient();
+  let resolve: ReturnType<typeof vi.spyOn> | undefined;
+  try {
+    await c.opened;
+    c.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+    await c.waitFor('zone.snapshot');
+    resolve = vi.spyOn(sessions, 'resolve').mockRejectedValue(new Error('database unavailable'));
+    await vi.waitFor(() => expect(c.closed).not.toBeNull(), { timeout: 3000 });
+  } finally {
+    resolve?.mockRestore();
+    c.ws.close();
+  }
 });

@@ -310,6 +310,12 @@ export async function moveItem(ctx: DomainContext, input: MoveItemInput): Promis
   };
 
   return inTransaction(ctx, async (tx) => {
+    // Lock the equipment owner even when no slots exist yet (row locks alone miss phantoms).
+    await tx
+      .select({ id: schema.characters.id })
+      .from(schema.characters)
+      .where(eq(schema.characters.id, characterId))
+      .for('update');
     const character = await requireOwnedCharacter(tx, accountId, characterId);
     const item = await lockItem(tx, request.itemInstanceId);
     if (item.ownerAccountId !== accountId)

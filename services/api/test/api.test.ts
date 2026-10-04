@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { loadDotEnv } from '@mmo/config';
 import { createDb } from '@mmo/db';
 import { DevAuthProvider, SessionService, createDomainContext } from '@mmo/domain';
@@ -146,4 +146,48 @@ describe('API', () => {
     ).toBe(204);
     expect((await app.inject({ url: '/v1/me', headers: auth(token) })).statusCode).toBe(401);
   });
+});
+
+it('limits requests before session/database lookup, and releases failed request leases', async () => {
+  const sessions = new SessionService(1);
+  const resolve = vi.spyOn(sessions, 'resolve').mockResolvedValue(null);
+  const limited = await buildApp({
+    ctx: createDomainContext({ db: handle.db, gameData: getGameData() }),
+    env: { CORS_ORIGINS: '', NODE_ENV: 'test' },
+    logger: createLogger({ service: 'limit-test', level: 'silent' }),
+    metrics: new Metrics(),
+    sessions,
+    authProviders: new Map(),
+    limits: { burst: 2, perSecond: 0.001, concurrent: 1 },
+  });
+  try {
+    for (let i = 0; i < 2; i++)
+      expect((await limited.inject({ url: '/v1/me', headers: auth('invalid') })).statusCode).toBe(
+        401,
+      );
+    const rejected = await limited.inject({ url: '/v1/me', headers: auth('invalid') });
+    expect(rejected.statusCode).toBe(429);
+    expect(resolve).toHaveBeenCalledTimes(2);
+    let finish!: (value: null) => void;
+    resolve.mockImplementationOnce(
+      () =>
+        new Promise((r) => {
+          finish = r;
+        }),
+    );
+    const pending = limited
+      .inject({ url: '/v1/me', headers: auth('held'), remoteAddress: '127.0.0.2' })
+      .then((r) => r);
+    await vi.waitFor(() => expect(finish).toBeTypeOf('function'));
+    expect((await limited.inject({ url: '/v1/me', remoteAddress: '127.0.0.3' })).statusCode).toBe(
+      429,
+    );
+    finish(null);
+    expect((await pending).statusCode).toBe(401);
+    expect(
+      (await limited.inject({ url: '/health/live', remoteAddress: '127.0.0.3' })).statusCode,
+    ).toBe(200);
+  } finally {
+    await limited.close();
+  }
 });

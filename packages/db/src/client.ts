@@ -24,6 +24,9 @@ export function createDb(opts: { url: string; max?: number; applicationName?: st
   const pool = new pg.Pool({
     connectionString: opts.url,
     max: opts.max ?? 10,
+    connectionTimeoutMillis: 5_000,
+    statement_timeout: 10_000,
+    lock_timeout: 3_000,
     application_name: opts.applicationName ?? 'mmo',
   });
   const db = drizzle(pool, { schema });

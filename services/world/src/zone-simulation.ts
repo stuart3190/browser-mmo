@@ -109,6 +109,7 @@ interface PlayerState extends PlayerInfo {
   position: Vec3;
   rotationY: number;
   lastMoveAtMs: number;
+  movementCredit: number;
   /** Entity IDs this player currently knows about (its AOI view). */
   known: Set<string>;
   // --- combat ---
@@ -195,7 +196,6 @@ export interface PickupReservation {
 export interface ZoneSimulationOptions {
   interestRadiusChunks?: number;
   /** Extra allowance on top of max speed for latency/jitter (multiplier). */
-  speedTolerance?: number;
   /** Extra metres allowed for interaction range checks. */
   interactTolerance?: number;
   /** Server RNG for combat rolls (inject a seeded one in tests). */
@@ -217,7 +217,6 @@ export class ZoneSimulation {
   private readonly movedThisTick = new Set<string>();
   private readonly outbox = new Map<string, OutMessage[]>(); // by characterId
   private readonly interestRadius: number;
-  private readonly speedTolerance: number;
   private readonly npcSpawns = new Map<string, SpawnPoint>();
   private readonly interactTolerance: number;
   private readonly rng: Rng;
@@ -236,7 +235,6 @@ export class ZoneSimulation {
   ) {
     this.zone = gameData.zone(zoneId);
     this.interestRadius = opts.interestRadiusChunks ?? 2;
-    this.speedTolerance = opts.speedTolerance ?? 1.5;
     this.interactTolerance = opts.interactTolerance ?? 1.0;
     this.rng = opts.rng ?? defaultRng;
     this.rules = gameData.raw.combatRules;
@@ -312,6 +310,7 @@ export class ZoneSimulation {
       position: pos,
       rotationY,
       lastMoveAtMs: nowMs,
+      movementCredit: 0.75,
       known: new Set(),
       level: info.combat.level,
       stats: info.combat.stats,
@@ -374,6 +373,18 @@ export class ZoneSimulation {
     this.sendVitals(p, nowMs);
     this.sendCombatState(p, p.targetId ? 'target_set' : 'target_cleared');
     this.sendAbilityState(p, nowMs);
+  }
+
+  persistentState(characterId: string) {
+    const p = this.players.get(characterId);
+    return p
+      ? {
+          position: { ...p.position },
+          rotationY: p.rotationY,
+          health: Math.round(p.health),
+          abilityCooldowns: { ...Object.fromEntries(p.cooldowns), '*': p.globalReadyAtMs },
+        }
+      : undefined;
   }
 
   removePlayer(characterId: string):
@@ -525,8 +536,11 @@ export class ZoneSimulation {
       });
       return false;
     }
-    const elapsedS = Math.max(0.05, (nowMs - p.lastMoveAtMs) / 1000);
-    const allowed = p.maxSpeed * this.speedTolerance * Math.min(elapsedS, 1.0) + 0.25;
+    // A single bounded credit absorbs packet jitter. Sending more packets cannot mint distance.
+    const elapsedS = Math.max(0, (nowMs - p.lastMoveAtMs) / 1000);
+    p.movementCredit = Math.min(p.maxSpeed * 0.5 + 0.75, p.movementCredit + elapsedS * p.maxSpeed);
+    p.lastMoveAtMs = Math.max(p.lastMoveAtMs, nowMs);
+    const allowed = p.movementCredit + 1e-8;
     const dist = distance2D(p.position, position);
     const verticalOk = Math.abs(position.y - p.position.y) < 5;
     if (!isInsideZone(this.zone, position) || dist > allowed || !verticalOk) {
@@ -552,9 +566,10 @@ export class ZoneSimulation {
       });
       return false;
     }
+    p.movementCredit = Math.max(0, p.movementCredit - dist);
     p.position = { x: position.x, y: 0, z: position.z }; // flat placeholder ground: server owns Y
     p.rotationY = rotationY;
-    p.lastMoveAtMs = nowMs;
+    p.lastMoveAtMs = Math.max(p.lastMoveAtMs, nowMs);
     const entity = this.entities.get(p.entityId)!;
     entity.position = p.position;
     entity.rotationY = rotationY;
@@ -690,7 +705,7 @@ export class ZoneSimulation {
     p.dead = false;
     p.health = Math.max(1, Math.round(p.maxHealth * this.rules.playerRespawnHealthFraction));
     p.position = { ...point };
-    p.lastMoveAtMs = nowMs;
+    p.lastMoveAtMs = Math.max(p.lastMoveAtMs, nowMs);
     p.lastCombatAtMs = 0;
     const entity = this.entities.get(p.entityId)!;
     entity.position = p.position;

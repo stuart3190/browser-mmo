@@ -1,7 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { AddressInfo } from 'node:net';
 import { WebSocket } from 'ws';
 import { and, eq, sql } from 'drizzle-orm';
+import * as domain from '@mmo/domain';
 import { loadDotEnv } from '@mmo/config';
 import { createDb, schema } from '@mmo/db';
 import {
@@ -464,4 +465,64 @@ describe('reconnect', () => {
     expect(first.reconnects).toBe(0);
     second.ws.close();
   });
+});
+
+it('repairs simulation gear as well as inventory after missed notifications', async () => {
+  const acc = await newAccount();
+  const ch = await createCharacter(ctx, {
+    accountId: acc.accountId,
+    name: name('Gear'),
+    classId: 'class.warrior',
+  });
+  const c = await join(acc.token, ch.id);
+  try {
+    const mark = c.mark();
+    await ctx.db.execute(
+      sql`select pg_terminate_backend(pid) from pg_stat_activity where application_name = 'mmo-change-feed' and datname = current_database()`,
+    );
+    const sword = await grant(ch.id, 'weapon.sword.iron_longsword');
+    await move(acc.accountId, ch.id, sword, { kind: 'equipped', slotId: 'main_hand' });
+    await c.waitFor(
+      'inventory.snapshot',
+      (m) => m.d.items.equipment.slots['main_hand']?.instance.id === sword.instance.id,
+      mark,
+      8000,
+    );
+    const expected = await domain.getCombatProfile(ctx.db, ctx, ch.id);
+    await vi.waitFor(() =>
+      expect(server.zones.get(DEMO_ZONE_ID)!.getPlayer(ch.id)!.weapon).toEqual(expected.weapon),
+    );
+  } finally {
+    c.ws.close();
+  }
+});
+
+it('reconciles a failed fan-out query without needing another item event', async () => {
+  const acc = await newAccount();
+  const ch = await createCharacter(ctx, {
+    accountId: acc.accountId,
+    name: name('Retry'),
+    classId: 'class.warrior',
+  });
+  const c = await join(acc.token, ch.id);
+  const query = vi
+    .spyOn(domain, 'getCharacterStats')
+    .mockRejectedValueOnce(new Error('temporary query failure'));
+  try {
+    const mark = c.mark();
+    const potion = await grant(ch.id, 'consumable.potion.minor_healing');
+    await c.waitFor(
+      'inventory.snapshot',
+      (m) =>
+        m.d.items.containers.some((bag) =>
+          bag.items.some((i) => i.instance.id === potion.instance.id),
+        ),
+      mark,
+      8000,
+    );
+    expect(query).toHaveBeenCalled();
+  } finally {
+    query.mockRestore();
+    c.ws.close();
+  }
 });

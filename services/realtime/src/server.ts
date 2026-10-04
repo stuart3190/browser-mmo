@@ -16,9 +16,7 @@ import {
   processKillEvent,
   recordKill,
   requireOwnedCharacter,
-  saveAbilityCooldowns,
-  saveCharacterHealth,
-  saveCharacterPosition,
+  saveCharacterState,
   turnInQuest,
 } from '@mmo/domain';
 import type { CombatProfile, KillReward } from '@mmo/domain';
@@ -30,6 +28,7 @@ import {
   parseClientMessage,
   MAX_CLIENT_FRAME_BYTES,
 } from '@mmo/networking';
+import { RateLimit } from '@mmo/server-kit';
 import type { Logger, Metrics } from '@mmo/server-kit';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
@@ -37,7 +36,7 @@ import type { KillEvent, OutMessage } from '@mmo/world';
 import type { QuestView } from '@mmo/schemas';
 import type { Rng } from '@mmo/game-data';
 import { TokenBucket } from './rate-limit';
-import { AccountSync, loadContainerIds, sendFullState } from './sync';
+import { AccountSync, loadContainerIds } from './sync';
 import type { SyncTarget } from './sync';
 
 export interface RealtimeDeps {
@@ -50,6 +49,9 @@ export interface RealtimeDeps {
   allowedOrigins: string[];
   /** How often dirty positions are flushed to the database. */
   positionSaveIntervalMs?: number;
+  sessionCheckIntervalMs?: number;
+  maxBufferedBytes?: number;
+  maxConnections?: number;
   authTimeoutMs?: number;
   /**
    * PostgreSQL URL for the LISTEN/NOTIFY change feed (ADR 0014). When set, item and wallet
@@ -110,6 +112,11 @@ interface Connection {
   seq: SequenceGuard;
   bucket: TokenBucket;
   rateViolations: number;
+  workBucket: TokenBucket;
+  working: boolean;
+  token?: string;
+  sessionUntil: number;
+  sessionCheckedAt: number;
   authTimer: NodeJS.Timeout | undefined;
   /** Set once authenticated. */
   player?: {
@@ -125,7 +132,9 @@ interface Connection {
   /** Last quest log sent (to compute change events); null before the first one. */
   questLog: QuestView[] | null;
   /** Serialises quest log pushes so they arrive in order. */
-  questChain: Promise<void>;
+  questChain: Promise<void> | null;
+  questDirty: boolean;
+  questFull: boolean;
 }
 
 /**
@@ -139,6 +148,16 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   const zones = new Map<string, ZoneSimulation>();
   const byCharacter = new Map<string, Connection>();
   const inWorld = new Map<string, InWorld>();
+  const admitting = new Set<string>();
+  const departures = new Map<
+    string,
+    { zoneId: string; state: NonNullable<ReturnType<ZoneSimulation['removePlayer']>> }
+  >();
+  const departureWrites = new Map<string, Promise<void>>();
+  let saving: Promise<void> | undefined;
+  let activeWork = 0;
+  let checkingSessions = false;
+  const sessionCheckMs = deps.sessionCheckIntervalMs ?? 1_000;
   const recordQueue: PendingRecord[] = [];
   let recordsInFlight = 0;
   /** Kill events currently being rewarded by this process (DB SKIP LOCKED covers other processes). */
@@ -167,12 +186,18 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     'Duration of the last simulation tick (ms)',
   );
 
+  let readiness: Promise<unknown> | undefined;
+  let readinessAt = 0;
   const http: Server = createServer((req, res) => {
     void (async () => {
       if (req.url === '/health/live') return json(res, 200, { status: 'ok' });
       if (req.url === '/health/ready') {
         try {
-          await ctx.db.execute(sql`select 1`);
+          if (!readiness || Date.now() - readinessAt >= 1_000) {
+            readinessAt = Date.now();
+            readiness = ctx.db.execute(sql`select 1`);
+          }
+          await readiness;
           return json(res, 200, {
             status: 'ok',
             zones: [...zones.keys()],
@@ -191,6 +216,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     })();
   });
 
+  const upgrades = new RateLimit(20, 2);
   const wss = new WebSocketServer({
     noServer: true,
     maxPayload: MAX_CLIENT_FRAME_BYTES,
@@ -200,7 +226,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   http.on('upgrade', (req: IncomingMessage, socket, head) => {
     const origin = req.headers.origin;
     // Browsers always send Origin; reject cross-site pages (CSWSH). Non-browser clients (mobile, tools) may omit it.
-    if (req.url !== '/ws' || (origin !== undefined && !deps.allowedOrigins.includes(origin))) {
+    if (
+      !upgrades.take(req.socket.remoteAddress ?? 'unknown') ||
+      connections.size >= (deps.maxConnections ?? 256) ||
+      req.url !== '/ws' ||
+      (origin !== undefined && !deps.allowedOrigins.includes(origin))
+    ) {
       socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
       socket.destroy();
       return;
@@ -210,7 +241,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   function send(conn: Connection, msg: OutMessage, ack?: number) {
     if (conn.ws.readyState !== conn.ws.OPEN) return;
-    conn.ws.send(encodeServerMessage(msg.t, msg.d as never, ack ?? (msg as { ack?: number }).ack));
+    const frame = encodeServerMessage(msg.t, msg.d as never, ack ?? (msg as { ack?: number }).ack);
+    if (conn.ws.bufferedAmount + Buffer.byteLength(frame) > (deps.maxBufferedBytes ?? 256 * 1024)) {
+      conn.ws.terminate();
+      return;
+    }
+    conn.ws.send(frame);
   }
 
   function sendError(
@@ -233,10 +269,16 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       seq: new SequenceGuard(),
       bucket: new TokenBucket(40, 20, now),
       rateViolations: 0,
+      workBucket: new TokenBucket(8, 2, now),
+      working: false,
+      sessionUntil: 0,
+      sessionCheckedAt: 0,
       authTimer: undefined,
       authenticating: false,
       questLog: null,
-      questChain: Promise.resolve(),
+      questChain: null,
+      questDirty: false,
+      questFull: false,
       alive: true,
     };
     conn.log = logger.child({ connectionId: conn.id });
@@ -265,6 +307,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   async function handleFrame(conn: Connection, raw: string) {
     const now = Date.now();
+    if (conn.ws.readyState !== conn.ws.OPEN) return;
     if (!conn.bucket.take(now)) {
       wsMessages.inc({ type: 'any', result: 'rate_limited' });
       if (++conn.rateViolations > 100)
@@ -288,15 +331,41 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       );
     }
     wsMessages.inc({ type: msg.t, result: 'accepted' });
+    const expensive = [
+      'auth.hello',
+      'interact.pickup',
+      'npc.interact',
+      'quest.accept',
+      'quest.turn_in',
+    ].includes(msg.t);
+    if (expensive && (conn.working || activeWork >= 8 || !conn.workBucket.take(now))) {
+      return sendError(conn, ErrorCode.RATE_LIMITED, 'Database work limit reached', msg.seq);
+    }
+    if (expensive) {
+      if (msg.t !== 'auth.hello') conn.working = true;
+      activeWork++;
+    }
     try {
       if (msg.t === 'auth.hello') return await handleAuth(conn, msg);
       if (!conn.player)
         return sendError(conn, ErrorCode.UNAUTHENTICATED, 'Authenticate first', msg.seq, true);
+      if (
+        byCharacter.get(conn.player.characterId) !== conn ||
+        now >= conn.sessionUntil ||
+        now - conn.sessionCheckedAt > Math.max(5_000, sessionCheckMs * 3)
+      ) {
+        return sendError(conn, ErrorCode.UNAUTHENTICATED, 'Session no longer valid', msg.seq, true);
+      }
       await handleGameMessage(conn, conn.player, msg, now);
     } catch (err) {
       if (err instanceof DomainError) return sendError(conn, err.code, err.message, msg.seq);
       conn.log.error({ err, type: msg.t }, 'message handler failed');
       sendError(conn, ErrorCode.INTERNAL, 'Internal error', msg.seq);
+    } finally {
+      if (expensive) {
+        if (msg.t !== 'auth.hello') conn.working = false;
+        activeWork--;
+      }
     }
   }
 
@@ -307,102 +376,118 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     const session = await deps.sessions.resolve(ctx, msg.d.token);
     if (!session)
       return sendError(conn, ErrorCode.UNAUTHENTICATED, 'Invalid session', msg.seq, true);
-    const row = await requireOwnedCharacter(ctx.db, session.account.id, msg.d.characterId).catch(
-      () => null,
-    );
-    if (!row) return sendError(conn, ErrorCode.FORBIDDEN, 'Not your character', msg.seq, true);
-    const zone = zones.get(row.zoneId);
-    if (!zone)
-      return sendError(
+    if (admitting.has(msg.d.characterId))
+      return sendError(conn, ErrorCode.CONFLICT, 'Character is reconnecting', msg.seq, true);
+    admitting.add(msg.d.characterId);
+    try {
+      await persistDeparture(msg.d.characterId);
+      let row = await requireOwnedCharacter(ctx.db, session.account.id, msg.d.characterId).catch(
+        () => null,
+      );
+      if (!row) return sendError(conn, ErrorCode.FORBIDDEN, 'Not your character', msg.seq, true);
+      const zone = zones.get(row.zoneId);
+      if (!zone)
+        return sendError(
+          conn,
+          ErrorCode.NOT_FOUND,
+          `Zone ${row.zoneId} is not hosted here`,
+          msg.seq,
+          true,
+        );
+      if (conn.ws.readyState !== conn.ws.OPEN) return;
+
+      // One live connection per character: the newest login wins.
+      const existing = byCharacter.get(row.id);
+      if (existing) {
+        sendError(existing, ErrorCode.CONFLICT, 'Logged in from another session', undefined, true);
+        await onClose(existing);
+        await persistDeparture(row.id);
+      }
+
+      // A zero-linger close can have persisted a newer snapshot than the first read.
+      row = await requireOwnedCharacter(ctx.db, session.account.id, row.id);
+      const cls = ctx.gameData.characterClass(row.classId);
+      const maxSpeed = cls.baseStats.movement_speed ?? 6;
+      const now = Date.now();
+      const containerIds = await loadContainerIds(ctx, session.account.id, row.id);
+      if (conn.ws.readyState !== conn.ws.OPEN) return;
+      const profile = await getCombatProfile(ctx.db, ctx, row.id);
+      if (conn.ws.readyState !== conn.ws.OPEN) return;
+      if (!(await deps.sessions.resolve(ctx, msg.d.token)))
+        return sendError(conn, ErrorCode.UNAUTHENTICATED, 'Invalid session', msg.seq, true);
+      if (conn.ws.readyState !== conn.ws.OPEN) return;
+      clearTimeout(conn.authTimer);
+      conn.token = msg.d.token;
+      conn.sessionUntil = session.expiresAt.getTime();
+      conn.sessionCheckedAt = Date.now();
+      conn.player = { accountId: session.account.id, characterId: row.id, zone, containerIds };
+      conn.log = conn.log.child({ accountId: session.account.id, characterId: row.id });
+      byCharacter.set(row.id, conn);
+
+      const lingering = inWorld.get(row.id);
+      const reattached =
+        lingering !== undefined && lingering.zone === zone && zone.getPlayer(row.id) !== undefined;
+      if (reattached) {
+        lingering.lingerUntil = null;
+        const { health: _health, ...rest } = combatantFrom(profile);
+        zone.updateCombatProfile(row.id, rest, now);
+        zone.resyncPlayer(row.id, now);
+      } else {
+        zone.addPlayer(
+          { characterId: row.id, name: row.name, maxSpeed, combat: combatantFrom(profile) },
+          { x: row.posX, y: row.posY, z: row.posZ },
+          row.rotationY,
+          now,
+        );
+        inWorld.set(row.id, {
+          accountId: session.account.id,
+          characterId: row.id,
+          name: row.name,
+          zone,
+          lingerUntil: null,
+        });
+      }
+      const placed = zone.getPlayer(row.id)!;
+      const entityId = placed.entityId;
+      send(
         conn,
-        ErrorCode.NOT_FOUND,
-        `Zone ${row.zoneId} is not hosted here`,
-        msg.seq,
-        true,
-      );
-    if (conn.ws.readyState !== conn.ws.OPEN) return;
-
-    // One live connection per character: the newest login wins.
-    const existing = byCharacter.get(row.id);
-    if (existing) {
-      sendError(existing, ErrorCode.CONFLICT, 'Logged in from another session', undefined, true);
-      await onClose(existing);
-    }
-
-    clearTimeout(conn.authTimer);
-    const cls = ctx.gameData.characterClass(row.classId);
-    const maxSpeed = cls.baseStats.movement_speed ?? 6;
-    const now = Date.now();
-    const containerIds = await loadContainerIds(ctx, session.account.id, row.id);
-    if (conn.ws.readyState !== conn.ws.OPEN) return;
-    conn.player = { accountId: session.account.id, characterId: row.id, zone, containerIds };
-    conn.log = conn.log.child({ accountId: session.account.id, characterId: row.id });
-    byCharacter.set(row.id, conn);
-
-    const profile = await getCombatProfile(ctx.db, ctx, row.id);
-    if (conn.ws.readyState !== conn.ws.OPEN) {
-      byCharacter.delete(row.id);
-      return;
-    }
-    const lingering = inWorld.get(row.id);
-    const reattached =
-      lingering !== undefined && lingering.zone === zone && zone.getPlayer(row.id) !== undefined;
-    if (reattached) {
-      lingering.lingerUntil = null;
-      zone.resyncPlayer(row.id, now);
-    } else {
-      zone.addPlayer(
-        { characterId: row.id, name: row.name, maxSpeed, combat: combatantFrom(profile) },
-        { x: row.posX, y: row.posY, z: row.posZ },
-        row.rotationY,
-        now,
-      );
-      inWorld.set(row.id, {
-        accountId: session.account.id,
-        characterId: row.id,
-        name: row.name,
-        zone,
-        lingerUntil: null,
-      });
-    }
-    const placed = zone.getPlayer(row.id)!;
-    const entityId = placed.entityId;
-    send(
-      conn,
-      {
-        t: 'auth.ok',
-        d: {
-          connectionId: conn.id,
-          entityId,
-          character: { ...characterFromRow(row), position: placed.position },
-          zoneId: zone.zone.id,
-          tickHz: deps.tickHz,
-          serverTime: now,
+        {
+          t: 'auth.ok',
+          d: {
+            connectionId: conn.id,
+            entityId,
+            character: { ...characterFromRow(row), position: placed.position },
+            zoneId: zone.zone.id,
+            tickHz: deps.tickHz,
+            serverTime: now,
+          },
         },
-      },
-      msg.seq,
-    );
-    await sendFullState(ctx, syncTarget(conn));
-    conn.questLog = null;
-    await pushQuestLog(conn, true);
-    send(conn, {
-      t: 'character.progress',
-      d: {
-        level: profile.level,
-        xp: profile.xp,
-        xpToNext: profile.xpToNext,
-        xpGained: 0,
-        levelsGained: 0,
-      },
-    });
-    if (!reattached) {
-      broadcastZone(zone, {
-        t: 'presence.update',
-        d: { event: 'joined', characterId: row.id, name: row.name, zoneId: zone.zone.id },
+        msg.seq,
+      );
+      await sync.fullState(syncTarget(conn));
+      conn.questLog = null;
+      await pushQuestLog(conn, true);
+      send(conn, {
+        t: 'character.progress',
+        d: {
+          level: profile.level,
+          xp: profile.xp,
+          xpToNext: profile.xpToNext,
+          xpGained: 0,
+          levelsGained: 0,
+        },
       });
+      if (!reattached) {
+        broadcastZone(zone, {
+          t: 'presence.update',
+          d: { event: 'joined', characterId: row.id, name: row.name, zoneId: zone.zone.id },
+        });
+      }
+      flush();
+      conn.log.info({ reattached }, 'player joined');
+    } finally {
+      admitting.delete(msg.d.characterId);
     }
-    flush();
-    conn.log.info({ reattached }, 'player joined');
   }
 
   async function handleGameMessage(
@@ -551,18 +636,32 @@ export function createRealtimeServer(deps: RealtimeDeps) {
    * the change events since the previous one. Pushes per connection are serialised.
    */
   function pushQuestLog(conn: Connection, full = false): Promise<void> {
-    conn.questChain = conn.questChain
+    conn.questDirty = true;
+    conn.questFull ||= full;
+    if (conn.questChain) return conn.questChain;
+    conn.questChain = Promise.resolve()
       .then(async () => {
-        const p = conn.player;
-        if (!p || conn.ws.readyState !== conn.ws.OPEN) return;
-        const quests = await getQuestLog(ctx.db, ctx, p.characterId);
-        const prev = conn.questLog;
-        const events = prev ? questEvents(prev, quests) : [];
-        if (!full && prev && JSON.stringify(prev) === JSON.stringify(quests)) return;
-        conn.questLog = quests;
-        send(conn, { t: 'quest.log', d: { quests, events } });
+        while (conn.questDirty) {
+          conn.questDirty = false;
+          const sendFull = conn.questFull;
+          conn.questFull = false;
+          const p = conn.player;
+          if (!p || conn.ws.readyState !== conn.ws.OPEN) return;
+          const quests = await getQuestLog(ctx.db, ctx, p.characterId);
+          const prev = conn.questLog;
+          const events = prev ? questEvents(prev, quests) : [];
+          if (!sendFull && prev && JSON.stringify(prev) === JSON.stringify(quests)) continue;
+          conn.questLog = quests;
+          send(conn, { t: 'quest.log', d: { quests, events } });
+        }
       })
-      .catch((err: unknown) => conn.log.error({ err }, 'quest log push failed'));
+      .catch((err: unknown) => {
+        reconcileNeeded = true;
+        conn.log.error({ err }, 'quest log push failed');
+      })
+      .finally(() => {
+        conn.questChain = null;
+      });
     return conn.questChain;
   }
 
@@ -601,22 +700,50 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     });
     flush();
     if (last) {
-      await saveCharacterPosition(
-        ctx.db,
-        entry.characterId,
-        entry.zone.zone.id,
-        last.position,
-        last.rotationY,
-      )
-        .then(() => saveCharacterHealth(ctx.db, entry.characterId, last.health))
-        .then(() =>
-          saveAbilityCooldowns(ctx.db, entry.characterId, last.abilityCooldowns, Date.now()),
-        )
-        .catch((err: unknown) =>
-          logger.error({ err, characterId: entry.characterId }, 'failed to save character state'),
-        );
+      departures.set(entry.characterId, { zoneId: entry.zone.zone.id, state: last });
+      await persistDeparture(entry.characterId).catch((err: unknown) =>
+        logger.error(
+          { err, characterId: entry.characterId },
+          'state retained; departure save will retry',
+        ),
+      );
     }
     logger.info({ characterId: entry.characterId }, 'player left');
+  }
+
+  // Failed departures remain authoritative in memory. Re-entry waits for a successful atomic
+  // write and then reads it back; periodic snapshots can never overtake the final snapshot.
+  function persistDeparture(characterId: string): Promise<void> {
+    const running = departureWrites.get(characterId);
+    if (running) return running;
+    const pending = departures.get(characterId);
+    if (!pending) return Promise.resolve();
+    const write = (async () => {
+      await saving;
+      await saveCharacterState(ctx.db, characterId, pending.zoneId, pending.state);
+      departures.delete(characterId);
+    })().finally(() => departureWrites.delete(characterId));
+    departureWrites.set(characterId, write);
+    return write;
+  }
+
+  async function checkSessions() {
+    if (checkingSessions) return;
+    checkingSessions = true;
+    try {
+      for (const conn of byCharacter.values()) {
+        try {
+          const session = conn.token ? await deps.sessions.resolve(ctx, conn.token) : null;
+          if (!session) throw new Error('session invalid');
+          conn.sessionUntil = session.expiresAt.getTime();
+          conn.sessionCheckedAt = Date.now();
+        } catch {
+          sendError(conn, ErrorCode.UNAUTHENTICATED, 'Session no longer valid', undefined, true);
+        }
+      }
+    } finally {
+      checkingSessions = false;
+    }
   }
 
   function combatantFrom(profile: CombatProfile) {
@@ -632,14 +759,28 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   }
 
   /** Re-reads the character's combat profile (gear/level changed) and applies it to the simulation. */
-  async function refreshCombat(characterId: string) {
-    const entry = inWorld.get(characterId);
-    if (!entry) return;
-    const profile = await getCombatProfile(ctx.db, ctx, characterId);
-    if (inWorld.get(characterId) !== entry) return;
-    const { health: _ignored, ...rest } = combatantFrom(profile);
-    entry.zone.updateCombatProfile(characterId, rest, Date.now());
-    flush();
+  const refreshingCombat = new Map<string, { dirty: boolean; promise: Promise<void> }>();
+  function refreshCombat(characterId: string): Promise<void> {
+    const current = refreshingCombat.get(characterId);
+    if (current) {
+      current.dirty = true;
+      return current.promise;
+    }
+    const job = { dirty: true, promise: Promise.resolve() };
+    job.promise = (async () => {
+      while (job.dirty) {
+        job.dirty = false;
+        const entry = inWorld.get(characterId);
+        if (!entry) return;
+        const profile = await getCombatProfile(ctx.db, ctx, characterId);
+        if (inWorld.get(characterId) !== entry) return;
+        const { health: _ignored, ...rest } = combatantFrom(profile);
+        entry.zone.updateCombatProfile(characterId, rest, Date.now());
+        flush();
+      }
+    })().finally(() => refreshingCombat.delete(characterId));
+    refreshingCombat.set(characterId, job);
+    return job.promise;
   }
 
   /**
@@ -654,7 +795,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         recordQueue.push({ kill, zone, attempts: 0, nextAttemptAt: now });
     for (let i = recordQueue.length - 1; i >= 0; i--) {
       const r = recordQueue[i]!;
-      if (r.nextAttemptAt > now) continue;
+      if (r.nextAttemptAt > now || recordsInFlight >= 4) continue;
       recordQueue.splice(i, 1);
       recordsInFlight++;
       void recordAndConfirm(r).finally(() => recordsInFlight--);
@@ -790,7 +931,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   function expireLingering(now: number) {
     for (const entry of inWorld.values()) {
-      if (entry.lingerUntil !== null && entry.lingerUntil <= now) void leaveWorld(entry);
+      if (
+        !admitting.has(entry.characterId) &&
+        entry.lingerUntil !== null &&
+        entry.lingerUntil <= now
+      )
+        void leaveWorld(entry);
     }
   }
 
@@ -822,31 +968,44 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     ctx,
     (accountId) =>
       [...byCharacter.values()].filter((c) => c.player?.accountId === accountId).map(syncTarget),
-    (err) => logger.error({ err }, 'change-feed fan-out failed'),
+    (err) => {
+      reconcileNeeded = true;
+      logger.error({ err }, 'change-feed fan-out failed');
+    },
   );
   // Gear changes (from any process) change combat output: refresh the simulation's profile.
-  sync.onCharacterItemsChanged = (characterId) => {
+  sync.onCharacterItemsChanged = async (characterId) => {
     // Collect objectives are derived from inventory: pelts gained/lost change quest progress.
     pushQuestLogFor(characterId);
-    void refreshCombat(characterId).catch((err: unknown) =>
-      logger.error({ err, characterId }, 'combat refresh failed'),
-    );
+    await refreshCombat(characterId);
   };
+  let reconcileNeeded = false;
+  let reconciling = false;
+  async function reconcile() {
+    if (reconciling || shuttingDown) return;
+    reconciling = true;
+    reconcileNeeded = false;
+    try {
+      for (const conn of byCharacter.values()) {
+        if (conn.player) {
+          await sync.fullState(syncTarget(conn));
+          await refreshCombat(conn.player.characterId);
+          await pushQuestLog(conn, true);
+        }
+      }
+    } catch (err) {
+      reconcileNeeded = true;
+      logger.warn({ err }, 'reconciliation failed; will retry');
+    } finally {
+      reconciling = false;
+    }
+  }
   const changeFeed = deps.changeFeedUrl
     ? new ChangeFeedListener({
         url: deps.changeFeedUrl,
         onEvent: (e) => sync.push(e),
         onResync: () => {
-          // NOTIFY is not durable: after (re)connecting, rebuild every client's view from the DB.
-          for (const conn of byCharacter.values()) {
-            if (conn.player) {
-              void sendFullState(ctx, syncTarget(conn)).catch((err: unknown) =>
-                conn.log.error({ err }, 'resync failed'),
-              );
-              void pushQuestLog(conn, true);
-            }
-          }
-          logger.info({ connections: byCharacter.size }, 'change feed connected; clients resynced');
+          reconcileNeeded = true;
         },
         onError: (err) => logger.warn({ err }, 'change feed error'),
       })
@@ -855,19 +1014,13 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   let tickTimer: NodeJS.Timeout | undefined;
   let heartbeatTimer: NodeJS.Timeout | undefined;
   let saveTimer: NodeJS.Timeout | undefined;
+  let sessionTimer: NodeJS.Timeout | undefined;
+  let lastReconcileAt = 0;
 
   async function savePositions() {
     for (const entry of inWorld.values()) {
-      const p = entry.zone.getPlayer(entry.characterId);
-      if (!p) continue;
-      await saveCharacterPosition(
-        ctx.db,
-        entry.characterId,
-        entry.zone.zone.id,
-        p.position,
-        p.rotationY,
-      );
-      await saveCharacterHealth(ctx.db, entry.characterId, p.health);
+      const p = entry.zone.persistentState(entry.characterId);
+      if (p) await saveCharacterState(ctx.db, entry.characterId, entry.zone.zone.id, p);
     }
   }
 
@@ -906,6 +1059,13 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       await this.sweepKills();
       nextSweepAt = Date.now() + (deps.killRecoveryIntervalMs ?? 5_000);
       await changeFeed?.start();
+      sessionTimer = setInterval(() => {
+        void checkSessions();
+        if (reconcileNeeded || Date.now() - lastReconcileAt >= 30_000) {
+          lastReconcileAt = Date.now();
+          void reconcile();
+        }
+      }, sessionCheckMs);
       heartbeatTimer = setInterval(() => {
         for (const conn of connections) {
           if (!conn.alive) {
@@ -921,6 +1081,13 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         () => {
           const t0 = performance.now();
           const now = Date.now();
+          for (const conn of byCharacter.values()) {
+            if (
+              now >= conn.sessionUntil ||
+              now - conn.sessionCheckedAt > Math.max(5_000, sessionCheckMs * 3)
+            )
+              conn.ws.terminate();
+          }
           for (const zone of zones.values()) zone.step(now);
           pumpKills(now);
           expireLingering(now);
@@ -930,7 +1097,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         Math.round(1000 / deps.tickHz),
       );
       saveTimer = setInterval(() => {
-        savePositions().catch((err: unknown) => logger.error({ err }, 'position save failed'));
+        saving ??= savePositions()
+          .catch((err: unknown) => logger.error({ err }, 'position save failed'))
+          .finally(() => {
+            saving = undefined;
+          });
+        for (const id of departures.keys()) void persistDeparture(id).catch(() => undefined);
       }, deps.positionSaveIntervalMs ?? 15_000);
       return new Promise((resolve) => http.listen(port, host, () => resolve()));
     },
@@ -943,6 +1115,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       shuttingDown = true;
       clearInterval(tickTimer);
       clearInterval(saveTimer);
+      clearInterval(sessionTimer);
       clearInterval(heartbeatTimer);
       await changeFeed?.stop();
       for (const conn of [...connections]) conn.ws.terminate();
@@ -953,6 +1126,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       shuttingDown = true;
       clearInterval(tickTimer);
       clearInterval(saveTimer);
+      clearInterval(sessionTimer);
       clearInterval(heartbeatTimer);
       await changeFeed?.stop();
       for (const conn of [...connections]) {

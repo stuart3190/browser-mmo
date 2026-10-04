@@ -64,6 +64,7 @@ const hashToken = (token: string) => createHash('sha256').update(token).digest('
 
 export interface ResolvedSession {
   sessionId: string;
+  expiresAt: Date;
   account: PlayerAccount;
   clientKind: string;
 }
@@ -118,6 +119,7 @@ export class SessionService {
       sessionId: row.session.id,
       account: accountFromRow(row.account),
       clientKind: row.session.clientKind,
+      expiresAt: row.session.expiresAt,
     };
   }
 

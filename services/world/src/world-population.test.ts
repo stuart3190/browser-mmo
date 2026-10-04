@@ -327,8 +327,8 @@ describe('steering', () => {
     // run south; server-validated legal moves
     let z = 8;
     for (let i = 0; i < 80 && sim.getEnemy(wolf)!.mode === 'engaged'; i++) {
-      z -= 0.8;
-      sim.handleMove(p.id, { x: 2, y: 0, z }, 0, h.now);
+      z -= 0.6;
+      expect(sim.handleMove(p.id, { x: 2, y: 0, z }, 0, h.now)).toBe(true);
       h.step(100);
     }
     expect(sim.getEnemy(wolf)!.mode).toBe('returning');

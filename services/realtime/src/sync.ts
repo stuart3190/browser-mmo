@@ -73,9 +73,10 @@ export class AccountSync {
   private readonly pendingItems = new Map<string, Set<string>>(); // itemId -> accounts to notify
   private readonly pendingWallets = new Set<string>();
   private timer: NodeJS.Timeout | undefined;
+  private scheduled = false;
   private flushing: Promise<void> = Promise.resolve();
   /** Called after a character received item changes (e.g. to refresh its combat profile). */
-  onCharacterItemsChanged: ((characterId: string) => void) | undefined;
+  onCharacterItemsChanged: ((characterId: string) => void | Promise<void>) | undefined;
 
   constructor(
     private readonly ctx: DomainContext,
@@ -84,7 +85,18 @@ export class AccountSync {
     private readonly debounceMs = 25,
   ) {}
 
+  fullState(target: SyncTarget): Promise<void> {
+    const result = this.flushing.then(() => sendFullState(this.ctx, target));
+    this.flushing = result.catch(this.onError);
+    return result;
+  }
+
   push(event: ChangeEvent): void {
+    if (this.pendingItems.size + this.pendingWallets.size >= 4096) {
+      this.pendingItems.clear();
+      this.pendingWallets.clear();
+      this.onError(new Error('Change backlog exceeded; full reconciliation required'));
+    }
     if (event.k === 'item') {
       const accounts = this.pendingItems.get(event.i) ?? new Set<string>();
       accounts.add(event.a);
@@ -93,15 +105,27 @@ export class AccountSync {
     } else {
       this.pendingWallets.add(event.a);
     }
-    this.timer ??= setTimeout(() => {
+    this.schedule();
+  }
+
+  private schedule(): void {
+    if (this.scheduled) return;
+    this.scheduled = true;
+    this.timer = setTimeout(() => {
       this.timer = undefined;
-      this.flushing = this.flushing.then(() => this.flush()).catch(this.onError);
+      this.flushing = this.flushing
+        .then(() => this.flush())
+        .catch(this.onError)
+        .finally(() => {
+          this.scheduled = false;
+          if (this.pendingItems.size || this.pendingWallets.size) this.schedule();
+        });
     }, this.debounceMs);
   }
 
   /** Resolves when everything queued so far has been delivered (tests, shutdown). */
   async idle(): Promise<void> {
-    while (this.timer || this.pendingItems.size || this.pendingWallets.size) {
+    while (this.scheduled || this.timer || this.pendingItems.size || this.pendingWallets.size) {
       await new Promise((r) => setTimeout(r, this.debounceMs));
     }
     await this.flushing;
@@ -145,7 +169,7 @@ export class AccountSync {
               stats: await getCharacterStats(this.ctx.db, this.ctx, target.characterId),
             },
           });
-          this.onCharacterItemsChanged?.(target.characterId);
+          await this.onCharacterItemsChanged?.(target.characterId);
         }
         if (wallets.has(accountId)) {
           target.send({
