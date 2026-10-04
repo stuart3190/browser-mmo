@@ -93,9 +93,10 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · root tsconfig/ESLint/Prettier; `@mmo/config` env schemas with unit tests · 8454ea0
 - [x] Environment setup documented
   - Verified 2026-10-03 · Claude Opus 5.5 · `.env.example`, docs/architecture/local-development.md; followed to run the stack · 7fa2d8e
-- [ ] CI foundation
-  - 2026-10-04: enabling re-attempted via `git push` and via the GitHub App — both refused for missing `workflow` scope. The exact CI command sequence passes locally with only the workflow's env (no `.env`). Template updated (runs on `main`, `claude/**`, PRs).
-  - Workflow written (mirrors `pnpm verify` with a Postgres service) but kept as a template in `docs/ci/github-actions-ci.yml`: the pushing token lacked the GitHub `workflow` scope. Never run. See docs/ci/README.md to enable.
+- [x] CI workflow installed and locally validated
+  - Verified 2026-10-04 · Codex · actionlint 1.7.7; successful GitHub push of `.github/workflows/ci.yml`, including backup/restore step · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`
+- [ ] Hosted CI result for the latest hardening commit
+  - Actions status could not be retrieved (connector returned Unknown tool). Do not claim a hosted pass; owner must check Actions before merging.
 
 # Browser Game
 
@@ -483,15 +484,18 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 - [ ] Development deployment
   - Runs locally only (`pnpm dev`, or bundled `node services/*/dist/main.js` — verified). No hosted dev environment.
-- [ ] Production strategy
-  - Documented in docs/architecture/overview.md; nothing implemented.
+- [x] Production startup guards and deployment/recovery runbook
+  - Verified 2026-10-04 · Codex · production auth/config tests; `docs/deployment/PRE_ALPHA.md` and TLS ingress template · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`
+- [ ] Actual production deployment and TLS/ingress verification
 - [x] Health endpoints
   - Verified 2026-10-03 · Claude Opus 5.5 · /health/live + /health/ready on API and realtime (API test; curl against running services) · 0f0a413
 - [x] Logging
   - Verified 2026-10-03 · Claude Opus 5.5 · pino JSON with requestId/connectionId/accountId/characterId (observed in realtime logs) · 0f0a413
 - [x] Metrics-ready architecture
   - Verified 2026-10-03 · Claude Opus 5.5 · Prometheus-text /metrics on both services (unit + API test) · 0f0a413
-- [ ] Backups
+- [x] Backup/restore tooling and disposable restore proof
+  - Verified 2026-10-04 · Codex · consistent snapshot, 18 matching table counts, ledger/escrow/constraint checks, session revocation, occupied-target refusal · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`
+- [ ] Scheduled encrypted off-host backups, retention, monitoring and deployment restore drill
 
 ## Pre-alpha hardening — 2026-10-04
 
@@ -524,62 +528,93 @@ tests are now verified. `pnpm build` passed for all four apps/services. Final ad
 realtime typechecking and targeted lint/format checks. No browser E2E, load test, hardware/mobile
 benchmark, production-auth replacement, CI activation or backup work was performed.
 
+## Pre-alpha hardening continuation — 2026-10-04
+
+Implementation commit: `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`. Agent: Codex. Continued the existing clean branch at
+`80b99e9903e359ebe40d5db0f895c62128e36246`; remote main remained
+`d564ab785069047c97062368f42019856738d0c6`. No gameplay/content or merge.
+Each checked entry below was verified on 2026-10-04 by Codex at the implementation commit above.
+
+- [x] Exclusive zone ownership, fail-closed publication and safe recovery.
+  - Proof: duplicate-host rejection, actual PostgreSQL owner-session termination, stopped ticks/readiness 503, blocked checkpoint with no unpublished pong, startup migration lock and corrupt-checkpoint rejection; ownership suite 5/5 · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`.
+- [x] Durable published character/world state and pending-kill recovery.
+  - Proof: crash/restart restores position/health/cooldowns; failed checkpoint recovers last committed position; all seven crash/reward scenarios pass, including a checkpointed kill before its separate kill record; normal departure/reconnect tests · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`.
+- [x] Repeated-hit authoritative health reaches local HUD state.
+  - Proof: consecutive-hit world regression, real-protocol damage/vitals matching, existing death/respawn/regen/reconnect checks; client reconciles damage and vitals · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`.
+- [x] Provisioned production password authentication; dev auth gated out of production.
+  - Proof: password HTTP login, wrong/unknown credentials, rotation/revocation, two-hash concurrency ceiling, insecure production startup rejection; browser/admin provider-aware builds · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`.
+- [x] Remaining queue/ingress/migration hardening.
+  - Proof: slow-client direct-error bound, previous rate/reconciliation/equipment suites; opt-in loopback trusted forwarding; applied migration tamper/concurrent runner rejection and migration/zone startup exclusion · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`.
+- [x] CI workflow installed; backup/restore tooling actually exercised.
+  - Proof: workflow push succeeded, actionlint passed; isolated source/restore databases with real account/session/character/escrow/ledger/history data passed integrity checks and were cleaned up · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`.
+- [x] Realtime/API/database capacity observations and sustained production-browser measurements recorded.
+  - Proof: real PostgreSQL + WS + authenticated HTTP at 5/10/25/50 players; three 120-second browser profiles and screenshots, no debug hook/page errors; raw evidence in `docs/hardening/evidence` · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`.
+- [ ] Production-host capacity/headroom qualification and physical-phone performance acceptance.
+  - The shared-host runs averaged 17.1–18.05 Hz, below the 20 Hz target. Five-player default is a pilot ceiling, not certified safe capacity. SwiftShader frame tails were poor; no phone FPS/battery/thermal claim.
+- [ ] Latest hosted CI green, real TLS/ingress/account provisioning, off-host backups and deployment restore drill.
+
+Verification: one full `pnpm verify` run passed formatting, lint, typechecking, all 116 unit tests,
+54 domain + 7 API integrations and 46/47 realtime tests. One new test incorrectly treated socket
+closure as proof that PostgreSQL had released ownership. Corrected it to assert confirmed lock
+release before replacement; the full ownership suite then passed 5/5. All 108 integration tests are
+verified across these runs. The aggregate verify command did **not** exit green; no second expensive
+full run was performed. All four builds and assets check then passed. Final touched-test typecheck,
+lint and formatting passed. Full evidence and limitations: `docs/hardening/2026-10-04.md`.
+
 ## Current Work
 
-Pre-alpha hardening is complete on `codex/pre-alpha-hardening`, awaiting owner review; do not merge automatically.
-The branch started from verified remote `main` at `d564ab785069047c97062368f42019856738d0c6`.
-The earlier statement that class abilities were still unmerged was stale: they are already present on this main commit.
+Hardening code is implemented, tested and pushed on `codex/pre-alpha-hardening`; do not merge
+automatically. Workflow installation succeeded in this continuation. Hosted Actions status could
+not be read because the connector returned Unknown tool; it is not a claimed pass. Local recovery,
+authentication and exploit regressions are verified. Production readiness remains gated on the
+external operations/device/hosting checks below. Do not begin new gameplay work yet.
 
 ## Known Issues
 
-1. **CI not enabled and never executed on GitHub.** The workflow is a template at `docs/ci/github-actions-ci.yml`; on 2026-10-04 both `git push` and the GitHub App were refused for missing `workflow` scope. A maintainer must move it into place (see docs/ci/README.md); its command sequence passes locally.
-2. **WebGPU unverified.** `?renderer=webgpu` path compiles but was never run on real GPU hardware; WebGL2 is the default.
-3. **Single realtime process per zone remains a deployment requirement.** Controller exclusivity is enforced inside one process, not across duplicate zone hosts. There is no database-backed zone ownership fence. Two hosts still run divergent simulations; never deploy overlapping ownership.
-4. **Change feed is not durable.** Reconnection and failed queries now request full reconciliation, including simulation gear; a 30 s reconciliation sweep covers otherwise missed notifications. Delivery is eventually consistent, not instantaneous. Needs a direct DB connection (not PgBouncer transaction mode).
-5. **Reconnect = full snapshot.** No session resume/replay buffer; an expired session cannot reconnect (client shows "Disconnected"; reload to log in). The game client keeps the token in memory only.
-6. **Bank opens anywhere.** No banker NPC/proximity rule yet (server would need the player's position from the realtime service).
-7. **No drag-and-drop, sorting, search, split-stack or loadout UI.** Actions are via the details sheet. Icons are text placeholders.
-8. **Main game JS chunk grew ~44 → ~181 KB gzip** with React + UI (measured, not analysed); Babylon chunk ≈1.9 MB minified still dominates; lazy shader chunks are merged into it by `manualChunks`.
-9. **One-handed weapons always equip to the main hand.** Off-hand one-handers are possible via the API but not from the UI; dual-wield rules are undesigned.
-10. **Expired listings with a full bag** stay in escrow until the seller has space (the mailbox exists now but the marketplace does not use it yet). The expiry sweep runs in every API process (safe, wasteful with replicas).
-11. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
-12. **`item_instances.listing_id` has no foreign key** (circular with listings); escrow consistency is enforced in domain code and checked on cancel/buy.
-13. **State crash durability remains limited.** Position, health and cooldowns are saved atomically every 15 s and on departure, with tested ordering on re-entry. Unsaved state and failed departure snapshots retained only in memory can still be lost if the process crashes before persistence succeeds.
-14. **Stack-merge rows accumulate** (`destroyed/stack_merged`); archiving needed eventually.
-15. **Dev auth only.** Anyone can log in as any username when `AUTH_DEV_LOGIN_ENABLED=true`. Usernames in `AUTH_DEV_ADMIN_USERNAMES` become admins on first login.
-16. **Mouse camera drag and zoom** still not covered by an automated check (touch drag is).
-17. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
-18. **A full mailbox delays the whole kill reward** (XP included) until there is room; the event retries with backoff (capped at 5 min). No UI tells the player their mailbox is full.
-19. **Navigation limits.** 2D collision only (no terrain height/levels), static obstacles only, enemies do not collide with each other or with players; NavGrid is rebuilt per zone load (fine at 256 m, not for very large zones).
-20. **`kill_events` grows forever.** Needs a retention/archive job for rewarded rows older than the longest respawn window.
-21. **Deaths are announced one DB write later** (enemy is `dying` meanwhile); if the DB is down, enemies stay `dying` until it recovers. Kill credit goes to the first damager only (no parties).
-22. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
-23. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
-24. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
-25. **Minimap labels can clip** at the circle edge, and landmark names overlap when close together (cosmetic).
-26. **Quest scope is deliberately small.** One quest; no repeatable/daily quests, abandoning, talk/explore objectives, quest items or party credit (only the tagging character's kills count). Selling/vaulting pelts lowers collect progress (intended, documented).
-27. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
-28. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
-29. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
-30. **Dialogue panel does not close automatically when walking away** (the server re-validates range on every action).
-31. **Abilities are first pass.** Instant, single-target, hostile only; no casts, AoE, heals, buffs/debuffs, resources or talents; numbers unbalanced (a Mage out-damages a Warrior at range). Validation rejects unsupported features in data.
-32. **Cooldowns not yet saved can still be lost on a crash.** They now participate in periodic and departure snapshots (the longest current cooldown is 12 s). Lingering reconnects preserve in-memory cooldowns; no per-ability durable write was added.
-33. **Ranger and Cleric characters created before this milestone** (dev data only) still load but their bars show placeholder abilities that the server refuses.
-34. **Scripted hunting in the quest/ability E2Es is timing-sensitive** when dens were just cleared (respawn needs no player within 18 m); one quest E2E run timed out and passed on re-run.
+### External pre-alpha gates
 
-35. **Hardening limits are process-local and unbenchmarked.** Default gateway cap is 256 sockets; this is a safety limit, not a capacity claim. API trusts no proxy headers: a reverse proxy currently shares its source-IP allowance across clients. Review trusted ingress configuration and tune limits before external deployment; do not simply enable arbitrary forwarded IPs.
-36. **Local combat-health feedback needs a follow-up.** Consecutive nonlethal enemy hits emit damage messages but do not always refresh the local `player.vitals` HUD state. This batch did not change combat or client presentation.
-37. **External-player readiness remains blocked.** Production authentication, enabled CI, backup/restore proof and representative browser/mobile/capacity measurements remain follow-ups; none were implemented in this batch.
+1. **Hosted CI must be checked on the latest branch commit before merge.** The actual workflow is now installed; no manual copy or credential-scope fix is required. Open the repository's Actions page and confirm the latest run is green.
+2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. Repeat on the intended host with combat/economy traffic, sustained load and explicit headroom before invitations.
+3. **Physical phone/GPU acceptance remains unverified.** Software-rendered desktop/phone viewports had poor frame times. Real iOS Safari/Android Chrome, touch conflicts, WebGPU fallback, cellular startup, thermal and battery tests remain required.
+4. **Deployment operations remain external.** Configure and verify TLS/private ingress, provision real accounts, schedule encrypted off-host backups, monitor failures and perform a restore drill on actual hosting. The local disposable restore is not a production backup service.
+
+### Remaining debt and product limitations (not newly claimed high-risk fixes)
+
+1. **WebGPU unverified.** `?renderer=webgpu` path compiles but was never run on real GPU hardware; WebGL2 is the default.
+2. **Change feed is not durable.** Reconnection and failed queries now request full reconciliation, including simulation gear; a 30 s reconciliation sweep covers otherwise missed notifications. Delivery is eventually consistent, not instantaneous. Needs a direct DB connection (not PgBouncer transaction mode).
+3. **Reconnect = full snapshot.** No session resume/replay buffer; an expired session cannot reconnect (client shows "Disconnected"; reload to log in). The game client keeps the token in memory only.
+4. **Bank opens anywhere.** No banker NPC/proximity rule yet (server would need the player's position from the realtime service).
+5. **No drag-and-drop, sorting, search, split-stack or loadout UI.** Actions are via the details sheet. Icons are text placeholders.
+6. **Client bundle remains substantial.** Current measured main chunk 437.65 kB raw / 133.68 kB gzip; Babylon 1,948.66 kB raw / 460.45 kB gzip. See the sustained browser evidence; no hardware-phone performance pass is claimed.
+7. **One-handed weapons always equip to the main hand.** Off-hand one-handers are possible via the API but not from the UI; dual-wield rules are undesigned.
+8. **Expired listings with a full bag** stay in escrow until the seller has space (the mailbox exists now but the marketplace does not use it yet). The expiry sweep runs in every API process (safe, wasteful with replicas).
+9. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
+10. **`item_instances.listing_id` has no foreign key** (circular with listings); escrow consistency is enforced in domain code and checked on cancel/buy.
+11. **Stack-merge rows accumulate** (`destroyed/stack_merged`); archiving needed eventually.
+12. **Mouse camera drag and zoom** still not covered by an automated check (touch drag is).
+13. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
+14. **A full mailbox delays the whole kill reward** (XP included) until there is room; the event retries with backoff (capped at 5 min). No UI tells the player their mailbox is full.
+15. **Navigation limits.** 2D collision only (no terrain height/levels), static obstacles only, enemies do not collide with each other or with players; NavGrid is rebuilt per zone load (fine at 256 m, not for very large zones).
+16. **`kill_events` grows forever.** Needs a retention/archive job for rewarded rows older than the longest respawn window.
+17. **Durable feedback includes database latency.** Death/reward feedback waits for checkpoint/kill writes; failed ownership/checkpoint writes fence the gateway and require recovery. Kill credit still goes to the first damager only (no parties).
+18. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
+19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
+20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
+21. **Minimap labels can clip** at the circle edge, and landmark names overlap when close together (cosmetic).
+22. **Quest scope is deliberately small.** One quest; no repeatable/daily quests, abandoning, talk/explore objectives, quest items or party credit (only the tagging character's kills count). Selling/vaulting pelts lowers collect progress (intended, documented).
+23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
+24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
+25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
+26. **Dialogue panel does not close automatically when walking away** (the server re-validates range on every action).
+27. **Abilities are first pass.** Instant, single-target, hostile only; no casts, AoE, heals, buffs/debuffs, resources or talents; numbers unbalanced (a Mage out-damages a Warrior at range). Validation rejects unsupported features in data.
+28. **Ranger and Cleric characters created before this milestone** (dev data only) still load but their bars show placeholder abilities that the server refuses.
+29. **Scripted hunting in the quest/ability E2Es is timing-sensitive** when dens were just cleared (respawn needs no player within 18 m); one quest E2E run timed out and passed on re-run.
 
 ## Next Recommended Task
 
-**Next hardening batch: zone ownership and crash-state correctness, then combat-health feedback.**
-
-1. Prevent a second live process from owning an already-hosted zone, including ownership-loss behavior. Keep the current single-process zone simulation; no distributed world rewrite.
-2. Decide and test the acceptable crash rollback window for position/health/cooldowns, especially death and ability reuse. Preserve the existing durable reward pipeline.
-3. Correct repeated-hit local health feedback and verify it against server state over the real protocol/client.
-
-Separate external-player follow-ups: production auth, CI activation, backup/restore validation,
-trusted ingress/rate-limit configuration, and targeted capacity plus phone profiling. These were
-explicitly out of scope for this implementation. Do not start gathering, crafting, new classes,
-quests or other gameplay while these hardening gates remain unresolved.
+**Finish release qualification, not new gameplay.** Check hosted CI for the final branch commit,
+review this hardening diff, then qualify the intended host and real phones under the measured
+limits. Set up actual TLS, invited accounts and off-host backup/restore operations. Diagnose any
+reproduced tick/frame failures before raising the five-connection ceiling. Do not add a broker,
+new classes, crafting, quests or content to work around unresolved release gates. A reviewed merge
+can follow green hosted CI; external invitations require the separate deployment/device gates.

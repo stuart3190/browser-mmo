@@ -13,3 +13,5 @@ If credentials refuse workflow-file changes, the sole CI-enablement owner action
 exact file to `.github/workflows/ci.yml` and commit/push it on `codex/pre-alpha-hardening` using a
 credential allowed to update workflows. This action also triggers the branch's first hosted run.
 Do not merge until that hosted run is green. No cloud secret is needed by this test workflow.
+
+Installed successfully on GitHub on 2026-10-04 in `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`. The previous workflow-scope block no longer applies to this branch. The Actions connector returned Unknown tool when queried, so hosted execution/result is unverified. The owner action is to check the latest branch run in Actions before merging; copying the template is not currently necessary.
