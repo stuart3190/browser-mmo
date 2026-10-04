@@ -31,6 +31,20 @@ wolf health falls monotonically, wolf hits back → wolf dies (Dead state) → l
 PostgreSQL → UI items == DB items → looted Trapper's Cap equipped via the inventory UI raises armour → 390×844 touch: tap
 wolf, tap Attack, health falls, frames don't overlap. Inventory E2E (24) and pickup E2E re-run green on the same build.
 
+Update 2026-10-04 (Claude Opus 5.5), milestone "world population and movement quality": commits `6db82ba` (collision,
+navigation, spawn groups, write-ahead death), `c350b18` (kill_events outbox, crash recovery, mailbox), `d33fab1` (touch
+controls, client collision prediction, minimap, feedback, `scripts/e2e/world.cjs`), `b0ef3bd` (ADRs 0016/0017, docs).
+"`pnpm verify`" now = 84 unit + 68 integration tests (api 5, domain 38, realtime 25) + format/lint/typecheck/build, all green.
+"World E2E" = `node scripts/e2e/world.cjs <dir>` against the real stack, 22 checks, all passing: desktop 1400×900 — walk into
+the village fence (blocked by client prediction), slide along it and past its end with zero server corrections, 8 wolves
+replicated around the dens, minimap names the area, Tab-target + F kill with XP pushed and the `kill_events` row
+`rewarded`, bags filled via admin API → next kill's loot lands in the mailbox with a "Recovered loot" toast → Recovered tab →
+Take moves it into the bags once there is room; phone 390×844 (touch, CDP multi-touch) — joystick/buttons/minimap/frames/
+action bar inside the viewport and non-overlapping, finger 1 holds the joystick while finger 2 drags the camera (player
+moved 16 m and camera yaw changed), finger 3 taps a wolf while finger 1 is still down (targeted), Attack button, wolf
+killed, no page errors. Screenshots were inspected. The earlier inventory E2E (17 checks in this run) and pickup E2E still
+pass on the same build; the old combat E2E script is superseded (it assumed the single wolf at (2,14)).
+
 Update 2026-10-03 (Claude Opus 5.5), milestone "playable inventory + equipment loop": commit `418b1fd`.
 "Inventory E2E" = headless Chromium against the real stack (bundled API + realtime, Vite client, PostgreSQL), 24 checks:
 admin grants pushed live → hover tooltip → equip → visible stat change → comparison tooltip → level/class-restricted equips
@@ -54,6 +68,7 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Environment setup documented
   - Verified 2026-10-03 · Claude Opus 5.5 · `.env.example`, docs/architecture/local-development.md; followed to run the stack · 7fa2d8e
 - [ ] CI foundation
+  - 2026-10-04: enabling re-attempted via `git push` and via the GitHub App — both refused for missing `workflow` scope. The exact CI command sequence passes locally with only the workflow's env (no `.env`). Template updated (runs on `main`, `claude/**`, PRs).
   - Workflow written (mirrors `pnpm verify` with a Postgres service) but kept as a template in `docs/ci/github-actions-ci.yml`: the pushing token lacked the GitHub `workflow` scope. Never run. See docs/ci/README.md to enable.
 
 # Browser Game
@@ -65,11 +80,17 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Basic world renders
   - Verified 2026-10-03 · Claude Opus 5.5 · Browser E2E screenshots: 4 chunk grounds + placeholder props · 0f0a413
 - [ ] Camera controls
-  - Orbit camera (drag rotate, wheel zoom, follows player) implemented; follow seen in E2E screenshots, drag/zoom not exercised by any automated check.
+  - Orbit camera (drag rotate, wheel/pinch zoom, follows player). Touch drag-rotate verified in World E2E (yaw changes while moving); mouse drag and zoom still not exercised by any automated check.
 - [x] Character renders
   - Verified 2026-10-03 · Claude Opus 5.5 · Placeholder capsule visible in Browser E2E screenshots · 0f0a413
 - [x] Movement
   - Verified 2026-10-03 · Claude Opus 5.5 · Browser E2E: WASD moves player ~10 m, server accepts (no correction); realtime test checks speed-hack correction · 0f0a413
+- [x] Touch movement (virtual joystick)
+  - Verified 2026-10-04 · Claude Opus 5.5 · joystick feeds the same analog input/prediction/server path as WASD; works simultaneously with camera drag and tap-targeting (per-pointer tracking); World E2E at 390×844 with CDP multi-touch; desktop shows no touch controls · d33fab1
+- [x] Client movement prediction with collision
+  - Verified 2026-10-04 · Claude Opus 5.5 · same `CollisionWorld.slide` as the server; World E2E: blocked by and slides along a fence with 0 corrections · d33fab1
+- [x] Minimap / landmarks / combat feedback
+  - Verified 2026-10-04 · Claude Opus 5.5 · minimap (landmarks, safe zone, replicated entities, area name), floating damage numbers, hit flash, death overlay names the respawn point; seen in World E2E screenshots (minimap area asserted) · d33fab1
 - [x] NPC spawning
   - Verified 2026-10-03 · Claude Opus 5.5 · NPC spawned from chunk spawn point (world unit test) and rendered (E2E screenshot) · 0f0a413
 - [x] Item pickup
@@ -173,7 +194,14 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Player death and respawn
   - Verified 2026-10-03 · Claude Opus 5.5 · death blocks movement/attacks/pickups, server-gated respawn at the zone respawn point, no penalty; health persisted (simulation + realtime tests) · 4899c54
 - [x] Kill rewards (XP, loot, gold)
-  - Verified 2026-10-03 · Claude Opus 5.5 · exactly-once via `kill_rewards` PK + item `source_ref`; loot through `grantItemInTx` with provenance; full bags → items reported lost, no partial stacks (domain tests); loot reaches inventory via change feed (realtime test, Combat E2E) · 14d19cf
+  - Verified 2026-10-03 · Claude Opus 5.5 · exactly-once via `kill_rewards` PK + item `source_ref`; loot through `grantItemInTx` with provenance; loot reaches inventory via change feed (realtime test, Combat E2E) · 14d19cf
+  - Re-verified 2026-10-04 · Claude Opus 5.5 · full bags now deliver to the mailbox instead of losing items (domain + realtime tests, World E2E) · c350b18
+- [x] Durable, crash-safe kill rewards
+  - Verified 2026-10-04 · Claude Opus 5.5 · write-ahead `kill_events` + `confirmKill`; `processKillEvent` under SKIP LOCKED; startup recovery + sweep; persisted respawn slots restored. Tests: domain (idempotent record, 6 concurrent processors → 1 reward, backoff on full mailbox, void on deleted character, respawn listing) and `durable-kills.test.ts` (crash before record, after record, after reward, two nodes recovering, lost write acks, full bags) · c350b18
+- [x] Line of sight
+  - Verified 2026-10-04 · Claude Opus 5.5 · attacks and idle aggro need LOS through `CollisionWorld`; trees/rocks/buildings block, fences don't (world-population tests: wall blocks swings) · 6db82ba
+- [x] Enemy pathfinding / steering
+  - Verified 2026-10-04 · Claude Opus 5.5 · straight-line when clear, else cached A* on a 1 m NavGrid; leash, stuck detection, give-up on unreachable, return home (navigation + world-population tests: around a fence, unreachable enclosure, leash) · 6db82ba
 - [ ] Ranged combat
   - Bows/crossbows exist as items; only melee auto-attack is implemented.
 - [ ] Magic combat
@@ -228,6 +256,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · character panel paper-doll from game-data slots with equipped markers + effective stats table; equip/unequip/swap via API (Inventory E2E) · 418b1fd
 - [x] Vault/bank UI
   - Verified 2026-10-03 · Claude Opus 5.5 · bank window (personal + shared vault tabs, backpack below); deposit/retrieve verified in Inventory E2E and DB. Placeholder: bank opens anywhere (no banker proximity check) · 418b1fd
+- [x] Recovered loot (mailbox)
+  - Verified 2026-10-04 · Claude Opus 5.5 · system-only `mailbox` container (200 slots, created lazily for old characters); overflow loot keeps provenance; players can Take but never place items in (domain tests; World E2E Recovered tab + Take) · c350b18
 - [ ] Sorting
 - [ ] Filtering
   - Client helper `filterItems` exists in @mmo/ui; untested, unused.
@@ -291,8 +321,12 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · schema + demo zone, bounds enforced by movement validation · 8454ea0
 - [x] Chunk model
   - Verified 2026-10-03 · Claude Opus 5.5 · 2×2 demo chunks; spawn-in-chunk validation; chunk-based interest (tests) · 8454ea0
+- [x] Collision / obstacle data
+  - Verified 2026-10-04 · Claude Opus 5.5 · prop-shape table drives visuals + colliders; explicit chunk colliders; registry validation (no spawns/respawns inside geometry, no enemies in safe zones); server rejects moves into/through geometry (collision + world-population tests) · 6db82ba
+- [x] Enemy population (spawn groups)
+  - Verified 2026-10-04 · Claude Opus 5.5 · Greenvale: 3 wolf dens + roamers, maxAlive limits, randomised respawn windows, min player distance, tick-driven (no timers); restart restores pending slots (world-population tests; 8 wolves in World E2E) · 6db82ba
 - [ ] Streaming
-  - Per-chunk build/dispose exists; all chunks of the zone load at once.
+  - Per-chunk build/dispose exists; all chunks of the zone (now 4×4 × 64 m) load at once.
 - [ ] Towns
 - [ ] Wilderness
 - [ ] Caves
@@ -383,8 +417,12 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 - [x] Unit tests
   - Verified 2026-10-03 · Claude Opus 5.5 · 40 tests across 8 packages · 0f0a413
+  - Re-verified 2026-10-04 · Claude Opus 5.5 · 84 tests (`pnpm verify`) · b0ef3bd
 - [x] Integration tests
   - Verified 2026-10-03 · Claude Opus 5.5 · 33 tests (domain 24, API 5, realtime 4) on PostgreSQL 16 · 0f0a413
+  - Re-verified 2026-10-04 · Claude Opus 5.5 · 68 tests (domain 38, API 5, realtime 25) · b0ef3bd
+- [x] Crash-recovery tests
+  - Verified 2026-10-04 · Claude Opus 5.5 · fault hooks + `simulateCrash()` restart tests at every kill-pipeline boundary (`services/realtime/test/durable-kills.test.ts`) · c350b18
 - [x] Item ownership tests
   - Verified 2026-10-03 · Claude Opus 5.5 · items.test.ts · 8454ea0
 - [x] Inventory transfer tests
@@ -412,11 +450,11 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 ## Current Work
 
-Nothing in progress. Milestone "server-authoritative combat foundation" is complete on branch `claude/great-brahmagupta-h834j7` (commits `14d19cf`, `4899c54`, `5eb4651`), awaiting owner review; not merged to `main`.
+Nothing in progress. Milestone "world population and movement quality" is complete on branch `claude/great-brahmagupta-h834j7` (commits `6db82ba`, `c350b18`, `d33fab1`, `b0ef3bd` + this PROGRESS update), awaiting owner review; not merged to `main`.
 
 ## Known Issues
 
-1. **CI not enabled and never executed.** The workflow is a template at `docs/ci/github-actions-ci.yml` (automation could not push `.github/workflows/` files). A maintainer must move it into place; it may need fixes on first run.
+1. **CI not enabled and never executed on GitHub.** The workflow is a template at `docs/ci/github-actions-ci.yml`; on 2026-10-04 both `git push` and the GitHub App were refused for missing `workflow` scope. A maintainer must move it into place (see docs/ci/README.md); its command sequence passes locally.
 2. **WebGPU unverified.** `?renderer=webgpu` path compiles but was never run on real GPU hardware; WebGL2 is the default.
 3. **Single realtime process per zone.** Two realtime processes hosting the same zone would run divergent simulations. No zone registry yet. (The change feed itself works with several processes.)
 4. **Change feed is not durable.** NOTIFY events emitted while the listener is disconnected are lost; correctness relies on the full resync after reconnect (tested). Needs a direct DB connection (not PgBouncer transaction mode).
@@ -425,29 +463,31 @@ Nothing in progress. Milestone "server-authoritative combat foundation" is compl
 7. **No drag-and-drop, sorting, search, split-stack or loadout UI.** Actions are via the details sheet. Icons are text placeholders.
 8. **Main game JS chunk grew ~44 → ~181 KB gzip** with React + UI (measured, not analysed); Babylon chunk ≈1.9 MB minified still dominates; lazy shader chunks are merged into it by `manualChunks`.
 9. **One-handed weapons always equip to the main hand.** Off-hand one-handers are possible via the API but not from the UI; dual-wield rules are undesigned.
-10. **Expired listings with a full bag** stay in escrow until the seller has space (no mailbox). The expiry sweep runs in every API process (safe, wasteful with replicas).
+10. **Expired listings with a full bag** stay in escrow until the seller has space (the mailbox exists now but the marketplace does not use it yet). The expiry sweep runs in every API process (safe, wasteful with replicas).
 11. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
 12. **`item_instances.listing_id` has no foreign key** (circular with listings); escrow consistency is enforced in domain code and checked on cancel/buy.
 13. **Position persistence untested.** Positions are saved every 15 s and on disconnect, but no test asserts it.
 14. **Stack-merge rows accumulate** (`destroyed/stack_merged`); archiving needed eventually.
 15. **Dev auth only.** Anyone can log in as any username when `AUTH_DEV_LOGIN_ENABLED=true`. Usernames in `AUTH_DEV_ADMIN_USERNAMES` become admins on first login.
-16. **Camera drag/zoom** still not covered by an automated check.
+16. **Mouse camera drag and zoom** still not covered by an automated check (touch drag is).
 17. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
-18. **Kill rewards are in memory until persisted.** A realtime process crash between an enemy's death and `awardKill` committing loses that reward (retries cover transient DB errors only).
-19. **No line of sight or pathfinding.** The world has no collision data; `hasLineOfSight` is a stub; enemies move in straight lines and entities can overlap.
-20. **No touch movement controls.** Phones can target and attack (verified) but cannot walk; needs an on-screen joystick.
-21. **Loot that does not fit is lost** (player is notified); no corpse looting or mailbox yet. Kill credit goes to the first damager only (no parties).
+18. **A full mailbox delays the whole kill reward** (XP included) until there is room; the event retries with backoff (capped at 5 min). No UI tells the player their mailbox is full.
+19. **Navigation limits.** 2D collision only (no terrain height/levels), static obstacles only, enemies do not collide with each other or with players; NavGrid is rebuilt per zone load (fine at 256 m, not for very large zones).
+20. **`kill_events` grows forever.** Needs a retention/archive job for rewarded rows older than the longest respawn window.
+21. **Deaths are announced one DB write later** (enemy is `dying` meanwhile); if the DB is down, enemies stay `dying` until it recovers. Kill credit goes to the first damager only (no parties).
 22. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
-23. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning).
+23. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
+24. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
+25. **Minimap labels can clip** at the circle edge, and landmark names overlap when close together (cosmetic).
 
 ## Next Recommended Task
 
-**Milestone: world population and movement quality** (make the combat loop a small playable area):
+**Milestone: first quest loop and a reason to explore** (builds on the populated zone):
 
-1. Enable CI (move `docs/ci/github-actions-ci.yml` to `.github/workflows/ci.yml`) and fix anything it finds.
-2. On-screen touch movement (virtual joystick) so phones can play the full loop.
-3. Several wolf spawn points / a small camp; durable kill-reward outbox (persist kill events before acknowledging death) to close the crash window.
-4. Simple collision/obstacle data for chunks (used for line of sight and enemy steering), plus enemy–player spacing.
-5. Corpse looting or a mailbox for loot that does not fit.
+1. Owner enables CI (move `docs/ci/github-actions-ci.yml` into `.github/workflows/`) and fixes anything the first run finds.
+2. Quest model (data-driven: kill N wolves / collect pelts / talk to Elder Maren), quest states persisted server-side, rewards through the same exactly-once outbox pattern as kills.
+3. NPC interaction UI (dialogue + quest offer/turn-in) on desktop and touch.
+4. Gathering from the existing ore/material spawn points as a second activity; mailbox reuse for marketplace expiry overflow.
+5. `kill_events` retention job; mailbox-full notice in the UI.
 
-Keep abilities/resources, quests, crafting, marketplace UI and social systems for later milestones.
+Keep abilities/resources, crafting, marketplace UI and social systems for later milestones.
