@@ -487,7 +487,7 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Production startup guards and deployment/recovery runbook
   - Verified 2026-10-04 · Codex · production auth/config tests; `docs/deployment/PRE_ALPHA.md` and TLS ingress template · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`
 - [x] Isolated production-mode TLS/ingress qualification
-  - Verified 2026-10-04 · Codex · production password login, private metrics/health, restricted DB role, actual process takeover/session checks; sanitized evidence under `docs/hardening/evidence/production-qualification` · implementation SHA recorded after verification below
+  - Verified 2026-10-04 · Codex · production password login, private metrics/health, restricted DB role, actual process takeover/session checks; sanitized evidence under `docs/hardening/evidence/production-qualification` · `7748e7e4722edbf683ed2a3a4f9f14c3623af994`
 - [ ] Public production deployment, DNS/certificates and persistent monitored service operation
 - [x] Health endpoints
   - Verified 2026-10-03 · Claude Opus 5.5 · /health/live + /health/ready on API and realtime (API test; curl against running services) · 0f0a413
@@ -586,6 +586,24 @@ Detailed results and raw evidence: [release qualification](hardening/release-qua
 - [ ] Hosted GitHub Actions green for the final branch SHA.
 - [ ] Capacity gate with safety headroom on the intended production host.
 - [ ] Physical Android/iOS acceptance and operated production ingress/recovery.
+
+## Production-mode qualification verification — 2026-10-04
+
+Implementation/evidence commit: `7748e7e4722edbf683ed2a3a4f9f14c3623af994`. Verified by Codex.
+
+- [x] Password-only production TLS deployment, restricted runtime DB permissions, private health/metrics, and actual owner/session/crash checks.
+  - Proof: `deployment-faults.json`, `database-role.json`, `http-security.json`, startup guards; exactly one of three takeover candidates owns the zone; cooldowns and damaged state survive.
+- [x] Populated 0005→0006 migration and encrypted local deployed-database restore/startup.
+  - Proof: unchanged fixture counts, economy integrity, revoked restored sessions, restored checkpoint and healthy replacement world; off-host storage remains unconfigured.
+- [x] Final full local verification and production-browser health regression.
+  - Proof: one `pnpm verify` exit 0, 119 unit + 116 PostgreSQL integration tests, four builds/artifact gate; HUD repeated-hit, missed-message and reconnect proof. Asset validation and local actionlint passed separately.
+- [x] Representative production combat/economy measurements recorded honestly.
+  - Proof: final restricted-role five-player run, 120 s, 19.37 Hz / p95 RTT 252 ms / 76 skipped slots; 195 equipment/vault transfers and five sales. This is a failed capacity gate, not a certified player cap.
+- [ ] Hosted CI green for the final branch SHA (Actions read access unavailable).
+- [ ] Capacity with safety headroom, physical Android acceptance, and operated off-host disaster recovery.
+
+All proof files are under `docs/hardening/evidence/production-qualification`; full limitations and
+external actions are in `docs/hardening/production-qualification-2026-10-04.md`. Main is unchanged.
 
 ## Current Work
 

@@ -3,7 +3,7 @@
 **FAIL / DO NOT MERGE.** Continue `codex/pre-alpha-hardening`; no gameplay added.
 Starting SHA `44c0e5e8014ec490c0778eb4078fcd813f886585`, containing `998b806`, `80b99e9`
 and all earlier hardening. Remote main remained `d564ab785069047c97062368f42019856738d0c6`.
-AGENTS.md and MASTER_PLAN.md are unchanged. Agent: Codex.
+AGENTS.md and MASTER_PLAN.md are unchanged. Agent: Codex. Verified implementation/evidence commit: `7748e7e4722edbf683ed2a3a4f9f14c3623af994`.
 
 This supplements [the previous qualification](release-qualification-2026-10-04.md), including its
 complete CRITICAL/HIGH findings matrix. It does not overwrite earlier failed measurements.
