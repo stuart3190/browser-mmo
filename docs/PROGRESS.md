@@ -31,6 +31,18 @@ wolf health falls monotonically, wolf hits back → wolf dies (Dead state) → l
 PostgreSQL → UI items == DB items → looted Trapper's Cap equipped via the inventory UI raises armour → 390×844 touch: tap
 wolf, tap Attack, health falls, frames don't overlap. Inventory E2E (24) and pickup E2E re-run green on the same build.
 
+Update 2026-10-04 (Claude Opus 5.5), milestone "first playable class + ability system": commits `3c2ddca` (data, rules,
+simulation, persistence, protocol, gateway), `9ea8315` (ability bar, touch buttons, effects, `scripts/e2e/abilities.cjs`),
+`5cf938d` (docs, ADR 0019). "`pnpm verify`" = 111 unit + 85 integration tests (domain 49, api 5, realtime 31) +
+format/lint/typecheck/build, all green. "Ability E2E" = `node scripts/e2e/abilities.cjs <dir>`, 36 checks, all passing: for a
+Warrior (Heavy Strike in melee) and a Mage (Firebolt at ~10 m): class persisted in DB and drives the bar, level-2 ability shown
+locked, target a real wolf, ability damage applied by the server, cooldown overlay, 5 spammed uses during cooldown execute
+nothing ("not ready"), locked ability refused, socket drop rebuilds the bar, a kill levels to 2 → "New ability unlocked" toast,
+DB level 2, the new ability is then used; phone 390×844: ability buttons ≥ 44 px and not overlapping joystick/target/minimap/
+frames/action bar, Firebolt cast by touch while another finger holds the joystick (player moved), cooldown overlay. Scaffolding:
+characters start next to a den with XP 3 short of level 2. World E2E (22/22) and Quest E2E (29/29; one earlier run timed out in
+the scripted hunt, re-run green) pass on the same build. Screenshots inspected.
+
 Update 2026-10-04 (Claude Opus 5.5), milestone "first server-authoritative quest loop": commits `7c6ab3b` (definitions, rules,
 `character_quests`, domain), `e501a5b` (NPC interaction + quest protocol + gateway), `619d91a` (dialogue, tracker, quest log,
 `scripts/e2e/quest.cjs`), `da2c57b` (docs, ADR 0018). "`pnpm verify`" = 94 unit + 80 integration tests (domain 48, api 5,
@@ -192,8 +204,14 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Levels
   - Verified 2026-10-03 · Claude Opus 5.5 · level-up persisted in the reward transaction and pushed (`character.progress`), max health raised live (domain + realtime tests) · 4899c54
 
-- [ ] Abilities
-  - Data definitions only; no combat.
+- [x] Abilities (Warrior, Mage)
+  - Verified 2026-10-04 · Claude Opus 5.5 · data-driven abilities (class, unlock level, range, cooldown, damage scaling); Warrior Attack/Heavy Strike/Battle Strike (L2), Mage Attack/Firebolt/Flame Burst (L2); server validates class, level, alive, cooldown + 1 s GCD (server clock), target, range, LOS; level-up unlocks pushed live (unit, simulation, realtime tests; Ability E2E) · 3c2ddca
+- [x] Playable class persistence
+  - Verified 2026-10-04 · Claude Opus 5.5 · class set at creation (only `playable` classes), drives profile + bar, never client-supplied during play (domain + realtime tests, Ability E2E DB check) · 3c2ddca
+- [x] Ability bar UI (desktop + touch)
+  - Verified 2026-10-04 · Claude Opus 5.5 · keys 1–3/click, locked state, cooldown countdown; touch buttons usable while moving (pointerdown) (Ability E2E) · 9ea8315
+- [ ] Ranger / Cleric, specialisations, talents
+  - Placeholder data only; not creatable.
 
 # Combat
 
@@ -220,7 +238,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Bows/crossbows exist as items; only melee auto-attack is implemented.
 - [ ] Magic combat
 - [ ] Healing
-- [ ] Abilities / resources (mana, rage)
+- [ ] Resources (mana, rage)
+  - Deliberately not built: cooldowns pace combat (ADR 0019).
 
 # Items
 
@@ -476,7 +495,7 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 ## Current Work
 
-Nothing in progress. Milestone "first server-authoritative quest loop" is complete on branch `claude/great-brahmagupta-h834j7` (commits `7c6ab3b`, `e501a5b`, `619d91a`, `da2c57b` + this PROGRESS update), awaiting owner review; not merged to `main` (main is at `be485ad`, the world population milestone).
+Nothing in progress. Milestone "first playable class + ability system" is complete on branch `claude/great-brahmagupta-h834j7` (commits `3c2ddca`, `9ea8315`, `5cf938d` + this PROGRESS update), awaiting owner review; not merged to `main` (main is at `a96721a`, the quest milestone).
 
 ## Known Issues
 
@@ -510,14 +529,18 @@ Nothing in progress. Milestone "first server-authoritative quest loop" is comple
 28. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 29. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
 30. **Dialogue panel does not close automatically when walking away** (the server re-validates range on every action).
+31. **Abilities are first pass.** Instant, single-target, hostile only; no casts, AoE, heals, buffs/debuffs, resources or talents; numbers unbalanced (a Mage out-damages a Warrior at range). Validation rejects unsupported features in data.
+32. **Cooldowns not yet saved are lost on a server crash** (≤ 12 s, saved on leaving the world only). Players reconnecting within the 10 s linger keep their in-memory cooldowns.
+33. **Ranger and Cleric characters created before this milestone** (dev data only) still load but their bars show placeholder abilities that the server refuses.
+34. **Scripted hunting in the quest/ability E2Es is timing-sensitive** when dens were just cleared (respawn needs no player within 18 m); one quest E2E run timed out and passed on re-run.
 
 ## Next Recommended Task
 
-**Milestone: second activity loop — gathering and a short quest chain** (reuses the quest foundation):
+**Milestone: second activity loop — gathering and a short quest chain** (unchanged recommendation, now with class identity):
 
 1. Owner enables CI (move `docs/ci/github-actions-ci.yml` into `.github/workflows/`) and fixes anything the first run finds.
 2. Gathering from the existing ore spawn points (server-timed gather action, durable like pickups) feeding a collect objective.
-3. A follow-up quest gated by `prerequisites` (e.g. "deliver ore to the smith"), adding `talk` objectives to the runtime.
-4. Small quality items: close dialogue when out of range, clearer full-Recovered-loot message, `kill_events` retention job.
+3. A follow-up quest gated by `prerequisites` with a `talk` objective and class-appropriate reward choices (sword for Warrior, staff for Mage).
+4. Small items: close dialogue out of range, clearer full-Recovered-loot message, `kill_events` retention, a first balance pass on ability numbers.
 
-Keep crafting, professions, reputation, repeatable/daily quests and social systems for later milestones.
+Keep resources, talents, specialisations, more classes, crafting and social systems for later milestones.
