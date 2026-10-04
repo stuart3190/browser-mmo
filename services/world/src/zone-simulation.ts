@@ -203,6 +203,7 @@ export class ZoneSimulation {
   private readonly outbox = new Map<string, OutMessage[]>(); // by characterId
   private readonly interestRadius: number;
   private readonly speedTolerance: number;
+  private readonly npcSpawns = new Map<string, SpawnPoint>();
   private readonly interactTolerance: number;
   private readonly rng: Rng;
   private readonly rules: CombatRules;
@@ -528,6 +529,22 @@ export class ZoneSimulation {
   // Pickups (two-phase: reserve in memory -> persist in DB -> commit or release)
   // -------------------------------------------------------------------------
 
+  /**
+   * Validates a request to interact with an NPC: the entity exists in THIS zone and is an NPC, the
+   * player is alive and within the spawn's interact radius (+ tolerance). Returns the NPC
+   * definition id; the client can never name an NPC it is not standing next to.
+   */
+  npcInteraction(characterId: string, entityId: string): { entityId: string; npcId: string } {
+    const p = this.players.get(characterId);
+    if (!p) throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Not in zone');
+    if (p.dead) throw new DomainError(ErrorCode.YOU_ARE_DEAD, 'You are dead');
+    const spawn = this.npcSpawns.get(entityId);
+    if (!spawn) throw new DomainError(ErrorCode.INVALID_TARGET, 'There is nobody to talk to');
+    if (distance2D(p.position, spawn.position) > spawn.interactRadius + this.interactTolerance)
+      throw new DomainError(ErrorCode.OUT_OF_RANGE, 'Too far away');
+    return { entityId, npcId: spawn.refId };
+  }
+
   reservePickup(characterId: string, entityId: string): PickupReservation {
     const p = this.players.get(characterId);
     if (!p) throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Not in zone');
@@ -801,8 +818,10 @@ export class ZoneSimulation {
   ): string | null {
     if (spawn.kind === 'npc') {
       const def = this.gameData.npcs.get(spawn.refId)!;
+      const id = this.newEntityId();
+      this.npcSpawns.set(id, spawn);
       this.addEntity({
-        id: this.newEntityId(),
+        id,
         kind: 'npc',
         name: def.name,
         position: spawn.position,

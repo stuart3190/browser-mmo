@@ -5,16 +5,20 @@ import type { WebSocket } from 'ws';
 import { sql } from 'drizzle-orm';
 import type { DomainContext, SessionService } from '@mmo/domain';
 import {
+  acceptQuest,
   activeRespawns,
   characterFromRow,
   claimWorldPickup,
   dueKillEvents,
   getCombatProfile,
+  getQuestLog,
+  npcDialogue,
   processKillEvent,
   recordKill,
   requireOwnedCharacter,
   saveCharacterHealth,
   saveCharacterPosition,
+  turnInQuest,
 } from '@mmo/domain';
 import type { CombatProfile, KillReward } from '@mmo/domain';
 import { ChangeFeedListener } from '@mmo/db';
@@ -29,6 +33,7 @@ import type { Logger, Metrics } from '@mmo/server-kit';
 import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
 import type { KillEvent, OutMessage } from '@mmo/world';
+import type { QuestView } from '@mmo/schemas';
 import type { Rng } from '@mmo/game-data';
 import { TokenBucket } from './rate-limit';
 import { AccountSync, loadContainerIds, sendFullState } from './sync';
@@ -116,6 +121,10 @@ interface Connection {
   alive: boolean;
   /** Serialises auth so a client cannot race two hellos. */
   authenticating: boolean;
+  /** Last quest log sent (to compute change events); null before the first one. */
+  questLog: QuestView[] | null;
+  /** Serialises quest log pushes so they arrive in order. */
+  questChain: Promise<void>;
 }
 
 /**
@@ -147,6 +156,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     'Inbound WebSocket messages by type/result',
   );
   const pickups = deps.metrics.counter('world_pickups_total', 'Pickup attempts by result');
+  const questsMetric = deps.metrics.counter('quest_actions_total', 'Successful quest actions');
   const tickDuration = deps.metrics.gauge(
     'world_tick_ms',
     'Duration of the last simulation tick (ms)',
@@ -220,6 +230,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       rateViolations: 0,
       authTimer: undefined,
       authenticating: false,
+      questLog: null,
+      questChain: Promise.resolve(),
       alive: true,
     };
     conn.log = logger.child({ connectionId: conn.id });
@@ -366,6 +378,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       msg.seq,
     );
     await sendFullState(ctx, syncTarget(conn));
+    conn.questLog = null;
+    await pushQuestLog(conn, true);
     send(conn, {
       t: 'character.progress',
       d: {
@@ -429,6 +443,67 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         flush();
         return;
       }
+      case 'npc.interact': {
+        const { npcId } = player.zone.npcInteraction(player.characterId, msg.d.entityId);
+        await sendDialogue(conn, msg.d.entityId, npcId, msg.seq);
+        return;
+      }
+      case 'quest.accept': {
+        const { npcId } = player.zone.npcInteraction(player.characterId, msg.d.entityId);
+        await acceptQuest(ctx, { characterId: player.characterId, questId: msg.d.questId, npcId });
+        questsMetric.inc({ action: 'accept' });
+        await pushQuestLog(conn);
+        await sendDialogue(conn, msg.d.entityId, npcId, msg.seq);
+        return;
+      }
+      case 'quest.turn_in': {
+        const { npcId } = player.zone.npcInteraction(player.characterId, msg.d.entityId);
+        const reward = await turnInQuest(ctx, {
+          characterId: player.characterId,
+          questId: msg.d.questId,
+          npcId,
+        });
+        questsMetric.inc({ action: 'turn_in' });
+        conn.log.info(
+          {
+            questId: reward.questId,
+            xp: reward.xpGained,
+            gold: reward.gold,
+            turnInId: reward.turnInId,
+          },
+          'quest turned in',
+        );
+        send(conn, {
+          t: 'character.progress',
+          d: {
+            level: reward.level,
+            xp: reward.xp,
+            xpToNext: reward.xpToNext,
+            xpGained: reward.xpGained,
+            levelsGained: reward.levelsGained,
+          },
+        });
+        // Items also arrive through the change feed; sending them here makes the UI update at once.
+        send(conn, {
+          t: 'inventory.updated',
+          d: { reason: 'sync', items: [...reward.consumed, ...reward.items], removed: [] },
+        });
+        send(conn, {
+          t: 'quest.completed',
+          d: {
+            questId: reward.questId,
+            name: reward.name,
+            xpGained: reward.xpGained,
+            gold: reward.gold,
+            items: reward.items,
+            mailedItems: reward.mailedItems,
+          },
+        });
+        if (reward.levelsGained > 0) await refreshCombat(player.characterId);
+        await pushQuestLog(conn);
+        await sendDialogue(conn, msg.d.entityId, npcId, msg.seq);
+        return;
+      }
       case 'chat.send':
         player.zone.chat(player.characterId, msg.d.channel, msg.d.text, now);
         return;
@@ -451,6 +526,38 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       case 'auth.hello':
         return;
     }
+  }
+
+  async function sendDialogue(conn: Connection, entityId: string, npcId: string, ack?: number) {
+    const p = conn.player;
+    if (!p) return;
+    const d = await npcDialogue(ctx.db, ctx, p.characterId, npcId);
+    send(conn, { t: 'npc.dialogue', d: { entityId, ...d } }, ack);
+  }
+
+  /**
+   * Re-reads the authoritative quest log and sends it when it changed (always when `full`), with
+   * the change events since the previous one. Pushes per connection are serialised.
+   */
+  function pushQuestLog(conn: Connection, full = false): Promise<void> {
+    conn.questChain = conn.questChain
+      .then(async () => {
+        const p = conn.player;
+        if (!p || conn.ws.readyState !== conn.ws.OPEN) return;
+        const quests = await getQuestLog(ctx.db, ctx, p.characterId);
+        const prev = conn.questLog;
+        const events = prev ? questEvents(prev, quests) : [];
+        if (!full && prev && JSON.stringify(prev) === JSON.stringify(quests)) return;
+        conn.questLog = quests;
+        send(conn, { t: 'quest.log', d: { quests, events } });
+      })
+      .catch((err: unknown) => conn.log.error({ err }, 'quest log push failed'));
+    return conn.questChain;
+  }
+
+  function pushQuestLogFor(characterId: string): void {
+    const conn = byCharacter.get(characterId);
+    if (conn) void pushQuestLog(conn);
   }
 
   async function onClose(conn: Connection) {
@@ -634,6 +741,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       });
     }
     if (reward.levelsGained > 0) await refreshCombat(reward.characterId);
+    if (reward.questsProgressed.length > 0) pushQuestLogFor(reward.characterId);
     logger.info(
       {
         killId: reward.killId,
@@ -702,6 +810,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   );
   // Gear changes (from any process) change combat output: refresh the simulation's profile.
   sync.onCharacterItemsChanged = (characterId) => {
+    // Collect objectives are derived from inventory: pelts gained/lost change quest progress.
+    pushQuestLogFor(characterId);
     void refreshCombat(characterId).catch((err: unknown) =>
       logger.error({ err, characterId }, 'combat refresh failed'),
     );
@@ -713,10 +823,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         onResync: () => {
           // NOTIFY is not durable: after (re)connecting, rebuild every client's view from the DB.
           for (const conn of byCharacter.values()) {
-            if (conn.player)
+            if (conn.player) {
               void sendFullState(ctx, syncTarget(conn)).catch((err: unknown) =>
                 conn.log.error({ err }, 'resync failed'),
               );
+              void pushQuestLog(conn, true);
+            }
           }
           logger.info({ connections: byCharacter.size }, 'change feed connected; clients resynced');
         },
@@ -852,4 +964,37 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 function json(res: ServerResponse, status: number, body: unknown) {
   res.writeHead(status, { 'content-type': 'application/json' });
   res.end(JSON.stringify(body));
+}
+
+/** Change events between two quest logs (for client notifications). */
+export function questEvents(
+  prev: QuestView[],
+  next: QuestView[],
+): {
+  kind: 'accepted' | 'progress' | 'objective_complete' | 'ready' | 'completed';
+  questId: string;
+  objectiveId: string | null;
+}[] {
+  const out: ReturnType<typeof questEvents> = [];
+  const before = new Map(prev.map((q) => [q.questId, q]));
+  for (const q of next) {
+    const old = before.get(q.questId);
+    const wasOn = old?.state === 'active' || old?.state === 'ready_to_turn_in';
+    const isOn = q.state === 'active' || q.state === 'ready_to_turn_in';
+    if (isOn && !wasOn) out.push({ kind: 'accepted', questId: q.questId, objectiveId: null });
+    if (isOn && wasOn) {
+      for (const o of q.objectives) {
+        const was = old.objectives.find((x) => x.id === o.id);
+        if (!was || was.current === o.current) continue;
+        out.push({ kind: 'progress', questId: q.questId, objectiveId: o.id });
+        if (o.done && !was.done)
+          out.push({ kind: 'objective_complete', questId: q.questId, objectiveId: o.id });
+      }
+    }
+    if (q.state === 'ready_to_turn_in' && old?.state !== 'ready_to_turn_in')
+      out.push({ kind: 'ready', questId: q.questId, objectiveId: null });
+    if (q.state === 'completed' && old?.state !== 'completed')
+      out.push({ kind: 'completed', questId: q.questId, objectiveId: null });
+  }
+  return out;
 }

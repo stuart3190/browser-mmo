@@ -4,11 +4,13 @@ import {
   CharacterStatsSchema,
   CurrencyBalanceSchema,
   ChatChannelKindSchema,
+  ContentIdSchema,
   ChatMessageTextSchema,
   ClientKindSchema,
   EntityIdSchema,
   ItemSchema,
   PlayerCharacterSchema,
+  QuestViewSchema,
   UuidSchema,
   Vec3Schema,
   WorldEntitySchema,
@@ -95,7 +97,28 @@ export const CombatAttackMsg = clientMsg('combat.attack', z.object({ start: z.bo
 /** Ask to respawn after death. Granted only once the server-side respawn delay has passed. */
 export const CombatRespawnMsg = clientMsg('combat.respawn', z.object({}));
 
+/**
+ * Talk to an NPC entity. The server checks the entity is an NPC in the player's zone, the player
+ * is alive and in range, and answers with `npc.dialogue` (or an error).
+ */
+export const NpcInteractMsg = clientMsg('npc.interact', z.object({ entityId: EntityIdSchema }));
+
+/** Accept a quest offered by the NPC entity the player is standing next to. */
+export const QuestAcceptMsg = clientMsg(
+  'quest.accept',
+  z.object({ entityId: EntityIdSchema, questId: ContentIdSchema }),
+);
+
+/** Turn a quest in at the NPC entity the player is standing next to. */
+export const QuestTurnInMsg = clientMsg(
+  'quest.turn_in',
+  z.object({ entityId: EntityIdSchema, questId: ContentIdSchema }),
+);
+
 export const ClientMessageSchema = z.discriminatedUnion('t', [
+  NpcInteractMsg,
+  QuestAcceptMsg,
+  QuestTurnInMsg,
   AuthHelloMsg,
   MoveInputMsg,
   PickupRequestMsg,
@@ -336,7 +359,62 @@ export const PongMsg = serverMsg(
   z.object({ clientTime: z.number(), serverTime: z.number() }),
 );
 
+/** What an NPC says now, with the quest actions the server would accept. */
+export const NpcDialogueMsg = serverMsg(
+  'npc.dialogue',
+  z.object({
+    entityId: EntityIdSchema,
+    npcId: ContentIdSchema,
+    name: z.string(),
+    title: z.string().nullable(),
+    greeting: z.string(),
+    quests: z.array(
+      z.object({
+        quest: QuestViewSchema,
+        line: z.string(),
+        action: z.enum(['accept', 'turn_in']).nullable(),
+      }),
+    ),
+  }),
+);
+
+/**
+ * The character's full quest log (authoritative; replaces the client's copy). Sent on join,
+ * after resyncs and whenever something changed; `events` says what changed since the last one.
+ */
+export const QuestLogMsg = serverMsg(
+  'quest.log',
+  z.object({
+    quests: z.array(QuestViewSchema),
+    events: z.array(
+      z.object({
+        kind: z.enum(['accepted', 'progress', 'objective_complete', 'ready', 'completed']),
+        questId: ContentIdSchema,
+        objectiveId: z.string().nullable(),
+      }),
+    ),
+  }),
+);
+
+/** Reward notification for a turned-in quest (XP also arrives as `character.progress`). */
+export const QuestCompletedMsg = serverMsg(
+  'quest.completed',
+  z.object({
+    questId: ContentIdSchema,
+    name: z.string(),
+    xpGained: z.number().int().nonnegative(),
+    gold: z.number().int().nonnegative(),
+    items: z.array(ItemSchema),
+    mailedItems: z.array(
+      z.object({ itemTemplateId: z.string(), quantity: z.number().int().positive() }),
+    ),
+  }),
+);
+
 export const ServerMessageSchema = z.discriminatedUnion('t', [
+  NpcDialogueMsg,
+  QuestLogMsg,
+  QuestCompletedMsg,
   AuthOkMsg,
   ErrorMsg,
   ZoneSnapshotMsg,

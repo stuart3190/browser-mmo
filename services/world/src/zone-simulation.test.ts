@@ -139,3 +139,81 @@ describe('ZoneSimulation', () => {
     expect(() => s.reservePickup(b.characterId, sword.id)).not.toThrow();
   });
 });
+
+describe('NPC interaction validation', () => {
+  it('requires a real NPC entity in this zone, range and a living player', async () => {
+    const { ARENA, arenaGameData } = await import('./test-arena');
+    const { seededRng } = await import('@mmo/game-data');
+    const { uuidv7 } = await import('@mmo/shared');
+    const sim = new ZoneSimulation(arenaGameData(), ARENA, { rng: seededRng(1), nowMs: 0 });
+    const npc = sim.listEntities().find((e) => e.kind === 'npc')!;
+    const pickup = sim.listEntities().find((e) => e.kind === 'pickup')!;
+    const near = uuidv7();
+    sim.addPlayer(
+      {
+        characterId: near,
+        name: 'A',
+        maxSpeed: 6,
+        combat: {
+          level: 1,
+          stats: {},
+          maxHealth: 100,
+          health: 100,
+          weapon: { min: 1, max: 2, attackSpeedMs: 2000 },
+        },
+      },
+      { x: npc.position.x + 2, y: 0, z: npc.position.z },
+      0,
+      0,
+    );
+    expect(sim.npcInteraction(near, npc.id)).toEqual({ entityId: npc.id, npcId: npc.refId });
+    expect(() => sim.npcInteraction(near, pickup.id)).toThrow(
+      expect.objectContaining({ code: 'INVALID_TARGET' }),
+    );
+    expect(() => sim.npcInteraction(near, 'e:999')).toThrow(
+      expect.objectContaining({ code: 'INVALID_TARGET' }),
+    );
+    const far = uuidv7();
+    sim.addPlayer(
+      {
+        characterId: far,
+        name: 'B',
+        maxSpeed: 6,
+        combat: {
+          level: 1,
+          stats: {},
+          maxHealth: 100,
+          health: 100,
+          weapon: { min: 1, max: 2, attackSpeedMs: 2000 },
+        },
+      },
+      { x: npc.position.x + 20, y: 0, z: npc.position.z },
+      0,
+      0,
+    );
+    expect(() => sim.npcInteraction(far, npc.id)).toThrow(
+      expect.objectContaining({ code: 'OUT_OF_RANGE' }),
+    );
+    const dead = uuidv7();
+    sim.addPlayer(
+      {
+        characterId: dead,
+        name: 'C',
+        maxSpeed: 6,
+        combat: {
+          level: 1,
+          stats: {},
+          maxHealth: 100,
+          health: 0,
+          weapon: { min: 1, max: 2, attackSpeedMs: 2000 },
+        },
+      },
+      { x: npc.position.x + 1, y: 0, z: npc.position.z },
+      0,
+      0,
+    );
+    expect(() => sim.npcInteraction(dead, npc.id)).toThrow(
+      expect.objectContaining({ code: 'YOU_ARE_DEAD' }),
+    );
+  });
+});
