@@ -14,6 +14,7 @@ import { DomainError, ErrorCode } from '@mmo/shared';
 import type { DomainContext } from './context';
 import { ensureMailbox } from './containers';
 import { adjustBalanceInTx } from './currency';
+import { applyKillToQuestsInTx } from './quests';
 import { grantItemInTx } from './items';
 import type { ItemRow } from './items';
 import { itemViews } from './mappers';
@@ -115,6 +116,8 @@ export interface KillReward {
   gold: number;
   /** Drops that did not fit the bags and were delivered to the mailbox ("Recovered loot"). */
   mailedItems: { itemTemplateId: string; quantity: number }[];
+  /** Quests whose kill progress this kill advanced (same transaction, so exactly once). */
+  questsProgressed: string[];
 }
 
 export interface AwardKillInput {
@@ -213,6 +216,9 @@ export async function awardKillInTx(
     }
   }
 
+  // Quest kill objectives advance in the same exactly-once transaction.
+  const questsProgressed = await applyKillToQuestsInTx(tx, ctx, character.id, enemy.id);
+
   // Exactly-once marker (PK violation => whole transaction rolls back).
   await tx.insert(schema.killRewards).values({
     killId: input.killId,
@@ -240,6 +246,7 @@ export async function awardKillInTx(
     items: await itemViews(tx, ctx.gameData, changed),
     gold,
     mailedItems,
+    questsProgressed,
   };
 }
 

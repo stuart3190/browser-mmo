@@ -99,37 +99,120 @@ export type CosmeticDefinition = z.infer<typeof CosmeticDefinitionSchema>;
 
 export const QuestObjectiveSchema = z.discriminatedUnion('kind', [
   z.object({
+    /** Stable within the quest; keys persisted progress. */
+    id: ContentIdSchema,
     kind: z.literal('kill'),
     enemyId: ContentIdSchema,
     count: z.number().int().positive(),
+    label: z.string().min(1).max(80),
   }),
   z.object({
+    id: ContentIdSchema,
     kind: z.literal('collect'),
     itemTemplateId: ContentIdSchema,
     count: z.number().int().positive(),
+    /** Remove the items from the character when the quest is turned in. */
+    consumeOnTurnIn: z.boolean(),
+    label: z.string().min(1).max(80),
   }),
-  z.object({ kind: z.literal('talk'), npcId: ContentIdSchema }),
-  z.object({ kind: z.literal('explore'), zoneId: ContentIdSchema, areaId: ContentIdSchema }),
+  // Placeholder kinds (shape only; not supported by the quest runtime yet).
+  z.object({
+    id: ContentIdSchema,
+    kind: z.literal('talk'),
+    npcId: ContentIdSchema,
+    label: z.string().min(1).max(80),
+  }),
+  z.object({
+    id: ContentIdSchema,
+    kind: z.literal('explore'),
+    zoneId: ContentIdSchema,
+    areaId: ContentIdSchema,
+    label: z.string().min(1).max(80),
+  }),
 ]);
+export type QuestObjective = z.infer<typeof QuestObjectiveSchema>;
+
+const DialogueLineSchema = z.string().min(1).max(600);
 
 export const QuestDefinitionSchema = z.object({
   id: ContentIdSchema,
   name: LocalizedNameSchema,
+  description: z.string().max(1000).default(''),
   giverNpcId: ContentIdSchema.nullable(),
+  /** NPC that accepts the turn-in; null = the giver. */
+  turnInNpcId: ContentIdSchema.nullable().default(null),
   minLevel: z.number().int().min(1),
+  /** Quests that must be completed first. */
+  prerequisites: z.array(ContentIdSchema).default([]),
+  /** Only non-repeatable quests are supported by the runtime today. */
+  repeatable: z.boolean().default(false),
   objectives: z.array(QuestObjectiveSchema),
   rewards: z.object({
     xp: z.number().int().nonnegative(),
     currency: z.array(
       z.object({ currencyId: ContentIdSchema, amount: z.number().int().nonnegative() }),
     ),
-    itemTemplateIds: z.array(ContentIdSchema),
+    items: z
+      .array(z.object({ itemTemplateId: ContentIdSchema, quantity: z.number().int().positive() }))
+      .default([]),
   }),
-  placeholder: z.literal(true),
+  /** What the quest NPC says in each state (no branching trees yet). */
+  dialogue: z
+    .object({
+      offer: DialogueLineSchema,
+      inProgress: DialogueLineSchema,
+      readyToTurnIn: DialogueLineSchema,
+      completed: DialogueLineSchema,
+    })
+    .nullable()
+    .default(null),
+  /** Placeholder quests exist only so references validate; they are never offered. */
+  placeholder: z.boolean().default(false),
 });
 export type QuestDefinition = z.infer<typeof QuestDefinitionSchema>;
+export type QuestDefinitionInput = z.input<typeof QuestDefinitionSchema>;
 
-export const QuestStateSchema = z.enum(['available', 'active', 'completed', 'turned_in', 'failed']);
+/**
+ * Player-facing quest state. Persisted rows only store `active` / `completed`; the others are
+ * derived (availability rules, objective progress). "Objectives complete" and "ready to turn in"
+ * are the same server condition: every objective is satisfied, the player must return to the NPC.
+ */
+export const QuestStateSchema = z.enum([
+  'unavailable',
+  'available',
+  'active',
+  'ready_to_turn_in',
+  'completed',
+]);
+export type QuestState = z.infer<typeof QuestStateSchema>;
+
+/** One quest as the server presents it to a character (quest log, tracker, dialogue). */
+export const QuestViewSchema = z.object({
+  questId: ContentIdSchema,
+  name: z.string(),
+  description: z.string(),
+  state: QuestStateSchema,
+  giverNpcId: ContentIdSchema.nullable(),
+  turnInNpcId: ContentIdSchema.nullable(),
+  objectives: z.array(
+    z.object({
+      id: z.string(),
+      kind: z.enum(['kill', 'collect', 'talk', 'explore']),
+      label: z.string(),
+      current: z.number().int().nonnegative(),
+      required: z.number().int().positive(),
+      done: z.boolean(),
+    }),
+  ),
+  rewards: z.object({
+    xp: z.number().int().nonnegative(),
+    currency: z.array(z.object({ currencyId: z.string(), amount: z.number().int() })),
+    items: z.array(z.object({ itemTemplateId: z.string(), quantity: z.number().int() })),
+  }),
+  acceptedAt: z.string().nullable(),
+  completedAt: z.string().nullable(),
+});
+export type QuestView = z.infer<typeof QuestViewSchema>;
 
 /** Quest items are item templates with category `quest`; this is their quest link. */
 export const QuestItemSchema = z.object({

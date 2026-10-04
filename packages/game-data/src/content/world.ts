@@ -3,7 +3,7 @@ import type {
   DungeonDefinition,
   EnemyDefinition,
   NpcDefinition,
-  QuestDefinition,
+  QuestDefinitionInput,
   SpawnPoint,
   WorldChunk,
   WorldRegion,
@@ -447,14 +447,61 @@ export const enemies: EnemyDefinition[] = [
   },
 ];
 
-export const quests: QuestDefinition[] = [
+export const quests: QuestDefinitionInput[] = [
   {
+    id: 'quest.greenvale.wolves_at_the_edge',
+    name: 'Wolves at the Edge',
+    description:
+      'Grey wolves have grown bold around Greenvale. Thin their numbers in the dens outside the ' +
+      'village and bring Elder Maren proof of the hunt.',
+    giverNpcId: 'npc.greenvale.elder_maren',
+    minLevel: 1,
+    objectives: [
+      {
+        id: 'kill_wolves',
+        kind: 'kill',
+        enemyId: 'enemy.greenvale.grey_wolf',
+        count: 5,
+        label: 'Grey Wolves slain',
+      },
+      {
+        id: 'wolf_pelts',
+        kind: 'collect',
+        itemTemplateId: 'material.hide.wolf_pelt',
+        count: 3,
+        consumeOnTurnIn: true,
+        label: 'Wolf Pelts',
+      },
+    ],
+    rewards: {
+      xp: 300,
+      currency: [{ currencyId: 'gold', amount: 250 }],
+      items: [{ itemTemplateId: 'accessory.cloak.wayfarer_cloak', quantity: 1 }],
+    },
+    dialogue: {
+      offer:
+        'The wolves come closer to the fences every night. Slay five of them and bring me three ' +
+        'of their pelts — the villagers need proof they can sleep easy.',
+      inProgress: 'The wolves still prowl. Five slain, three pelts — then come back to me.',
+      readyToTurnIn: "You have done it! Hand me those pelts and take this with Greenvale's thanks.",
+      completed: 'The nights are quieter thanks to you, friend.',
+    },
+  },
+  {
+    // Placeholder: referenced by the Elder's Letter quest item; never offered yet.
     id: 'quest.greenvale.letter_to_captain',
     name: 'A Letter for the Captain',
     giverNpcId: 'npc.greenvale.elder_maren',
     minLevel: 1,
-    objectives: [{ kind: 'talk', npcId: 'npc.greenvale.elder_maren' }],
-    rewards: { xp: 100, currency: [{ currencyId: 'gold', amount: 50 }], itemTemplateIds: [] },
+    objectives: [
+      {
+        id: 'deliver',
+        kind: 'talk',
+        npcId: 'npc.greenvale.elder_maren',
+        label: 'Deliver the letter',
+      },
+    ],
+    rewards: { xp: 100, currency: [{ currencyId: 'gold', amount: 50 }] },
     placeholder: true,
   },
 ];

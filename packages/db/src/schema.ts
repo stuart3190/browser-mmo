@@ -524,6 +524,44 @@ export const killEvents = pgTable(
 );
 
 // ===========================================================================
+// Quests
+// ===========================================================================
+
+/**
+ * Per-character quest state (definitions live in game data). One row per (character, quest):
+ * the primary key makes accepting a non-repeatable quest twice impossible. Only `active` and
+ * `completed` are stored; availability and "ready to turn in" are derived. `progress` holds kill
+ * counters keyed by objective id; collect objectives are derived from inventory. `rewarded_at` is
+ * set in the same transaction that pays rewards and completes the quest.
+ */
+export const characterQuests = pgTable(
+  'character_quests',
+  {
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    questId: text('quest_id').notNull(),
+    status: text('status').notNull(),
+    progress: jsonb('progress').$type<Record<string, number>>().notNull().default({}),
+    acceptedAt: timestamp('accepted_at', { withTimezone: true }).notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    rewardedAt: timestamp('rewarded_at', { withTimezone: true }),
+    /** Correlation id of the turn-in (item history, currency ledger). */
+    turnInId: uuid('turn_in_id'),
+    version: integer('version').notNull().default(1),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.characterId, t.questId] }),
+    check('character_quests_status_ck', sql`${t.status} IN ('active', 'completed')`),
+    check(
+      'character_quests_completed_ck',
+      sql`(${t.status} = 'completed') = (${t.completedAt} IS NOT NULL AND ${t.rewardedAt} IS NOT NULL)`,
+    ),
+  ],
+);
+
+// ===========================================================================
 // Audit
 // ===========================================================================
 

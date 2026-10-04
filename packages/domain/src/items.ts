@@ -591,6 +591,132 @@ export async function revokeItemInTx(
   return updated;
 }
 
+/**
+ * Removes `quantity` units of a template from a character's containers inside an existing
+ * transaction (quest turn-in). Containers are locked first (same order as every slot-changing
+ * operation), then the stacks; stacks are consumed in the order of `containerKinds` and slot
+ * order. Locked items are never consumed. Throws INSUFFICIENT_ITEMS (rolling everything back) if
+ * there are not enough. Every consumed row gets history (`destroyed` or `modified`).
+ */
+export async function consumeItemsInTx(
+  tx: Tx,
+  ctx: DomainContext,
+  input: {
+    characterId: string;
+    templateId: string;
+    quantity: number;
+    containerKinds: ContainerKind[];
+    actor: Actor;
+    reason: string;
+    correlationId: string;
+  },
+): Promise<ItemRow[]> {
+  const containers = await tx
+    .select({ id: schema.containers.id, kind: schema.containers.kind })
+    .from(schema.containers)
+    .where(
+      and(
+        eq(schema.containers.ownerCharacterId, input.characterId),
+        inArray(schema.containers.kind, input.containerKinds),
+      ),
+    );
+  const locked = await lockContainers(
+    tx,
+    containers.map((c) => c.id),
+  );
+  const rank = (containerId: string | null) =>
+    input.containerKinds.indexOf(locked.get(containerId ?? '')!.kind);
+  const rows = (
+    await tx
+      .select()
+      .from(schema.itemInstances)
+      .where(
+        and(
+          eq(schema.itemInstances.locationKind, 'container'),
+          inArray(schema.itemInstances.containerId, [...locked.keys()]),
+          eq(schema.itemInstances.templateId, input.templateId),
+          eq(schema.itemInstances.isLocked, false),
+        ),
+      )
+      .orderBy(asc(schema.itemInstances.id))
+      .for('update')
+  ).sort(
+    (a, b) => rank(a.containerId) - rank(b.containerId) || (a.slotIndex ?? 0) - (b.slotIndex ?? 0),
+  );
+  const available = rows.reduce((n, r) => n + r.quantity, 0);
+  if (locked.size === 0 || available < input.quantity)
+    throw new DomainError(
+      ErrorCode.INSUFFICIENT_ITEMS,
+      `Not enough ${ctx.gameData.itemTemplates.get(input.templateId)?.name ?? input.templateId}`,
+      { required: input.quantity, available },
+    );
+  const now = ctx.now();
+  const changed: ItemRow[] = [];
+  const history: HistoryEvent[] = [];
+  let remaining = input.quantity;
+  for (const row of rows) {
+    if (remaining === 0) break;
+    const take = Math.min(row.quantity, remaining);
+    remaining -= take;
+    const from = await resolveLocation(tx, row);
+    if (take === row.quantity) {
+      const to: ItemLocation = { kind: 'destroyed', reason: input.reason };
+      changed.push(await updateItem(tx, row, now, locationColumns(to)));
+      history.push({
+        itemInstanceId: row.id,
+        eventType: 'destroyed',
+        actor: input.actor,
+        fromLocation: from,
+        toLocation: to,
+        quantity: take,
+        correlationId: input.correlationId,
+        details: { reason: input.reason },
+        occurredAt: now,
+      });
+    } else {
+      changed.push(await updateItem(tx, row, now, { quantity: row.quantity - take }));
+      history.push({
+        itemInstanceId: row.id,
+        eventType: 'modified',
+        actor: input.actor,
+        fromLocation: from,
+        toLocation: from,
+        quantity: take,
+        correlationId: input.correlationId,
+        details: { reason: input.reason, consumed: take, remaining: row.quantity - take },
+        occurredAt: now,
+      });
+    }
+  }
+  await recordItemHistory(tx, history);
+  return changed;
+}
+
+/** Units of a template in the given containers of a character (excluding locked items). */
+export async function countCharacterItems(
+  db: DbOrTx,
+  characterId: string,
+  containerKinds: ContainerKind[],
+): Promise<Map<string, number>> {
+  const rows = await db
+    .select({
+      templateId: schema.itemInstances.templateId,
+      n: sql<number>`sum(${schema.itemInstances.quantity})::int`,
+    })
+    .from(schema.itemInstances)
+    .innerJoin(schema.containers, eq(schema.containers.id, schema.itemInstances.containerId))
+    .where(
+      and(
+        eq(schema.itemInstances.locationKind, 'container'),
+        eq(schema.containers.ownerCharacterId, characterId),
+        inArray(schema.containers.kind, containerKinds),
+        eq(schema.itemInstances.isLocked, false),
+      ),
+    )
+    .groupBy(schema.itemInstances.templateId);
+  return new Map(rows.map((r) => [r.templateId, r.n]));
+}
+
 // ---------------------------------------------------------------------------
 // Read models
 // ---------------------------------------------------------------------------

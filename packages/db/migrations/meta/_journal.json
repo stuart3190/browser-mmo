@@ -29,6 +29,13 @@
       "when": 1791097361961,
       "tag": "0003_durable_kills",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791102824377,
+      "tag": "0004_quests",
+      "breakpoints": true
     }
   ]
 }

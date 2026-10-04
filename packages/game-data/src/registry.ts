@@ -34,6 +34,7 @@ import type {
   ItemTemplate,
   LootTable,
   NpcDefinition,
+  QuestDefinition,
   WorldChunk,
   WorldRegion,
   WorldZone,
@@ -97,6 +98,7 @@ export class GameData {
   readonly zones: ReadonlyMap<string, WorldZone>;
   readonly npcs: ReadonlyMap<string, NpcDefinition>;
   readonly enemies: ReadonlyMap<string, EnemyDefinition>;
+  readonly quests: ReadonlyMap<string, QuestDefinition>;
   /** key: `${zoneId}|${cx},${cz}` */
   readonly chunks: ReadonlyMap<string, WorldChunk>;
 
@@ -115,6 +117,7 @@ export class GameData {
     this.zones = indexById('zone', raw.zones, errors);
     this.npcs = indexById('npc', raw.npcs, errors);
     this.enemies = indexById('enemy', raw.enemies, errors);
+    this.quests = indexById('quest', raw.quests, errors);
     const chunks = new Map<string, WorldChunk>();
     for (const c of raw.chunks) {
       const key = `${c.zoneId}|${chunkKey(c.coord)}`;
@@ -245,6 +248,53 @@ export class GameData {
     }
     const spawnIds = this.raw.chunks.flatMap((c) => c.spawnPoints.map((s) => s.id));
     if (new Set(spawnIds).size !== spawnIds.length) errors.push('duplicate spawn point ids');
+    this.validateQuests(errors);
+  }
+
+  private validateQuests(errors: string[]): void {
+    for (const q of this.quests.values()) {
+      const npc = (id: string | null, what: string) => {
+        if (id !== null && !this.npcs.has(id)) errors.push(`quest ${q.id}: unknown ${what} ${id}`);
+      };
+      npc(q.giverNpcId, 'giver NPC');
+      npc(q.turnInNpcId, 'turn-in NPC');
+      for (const pre of q.prerequisites) {
+        if (!this.quests.has(pre) || pre === q.id)
+          errors.push(`quest ${q.id}: bad prerequisite ${pre}`);
+      }
+      const objIds = new Set<string>();
+      for (const o of q.objectives) {
+        if (objIds.has(o.id)) errors.push(`quest ${q.id}: duplicate objective ${o.id}`);
+        objIds.add(o.id);
+        if (o.kind === 'kill' && !this.enemies.has(o.enemyId))
+          errors.push(`quest ${q.id}: unknown enemy ${o.enemyId}`);
+        if (o.kind === 'collect' && !this.itemTemplates.has(o.itemTemplateId))
+          errors.push(`quest ${q.id}: unknown item ${o.itemTemplateId}`);
+        if (!q.placeholder && o.kind !== 'kill' && o.kind !== 'collect')
+          errors.push(`quest ${q.id}: objective kind ${o.kind} is not supported yet`);
+      }
+      for (const c of q.rewards.currency)
+        if (!this.currencies.has(c.currencyId))
+          errors.push(`quest ${q.id}: unknown currency ${c.currencyId}`);
+      for (const i of q.rewards.items) {
+        const t = this.itemTemplates.get(i.itemTemplateId);
+        if (!t) errors.push(`quest ${q.id}: unknown reward item ${i.itemTemplateId}`);
+        else if (i.quantity > t.maxStack)
+          errors.push(`quest ${q.id}: reward ${i.itemTemplateId} exceeds max stack`);
+      }
+      if (!q.placeholder) {
+        if (q.repeatable) errors.push(`quest ${q.id}: repeatable quests are not supported yet`);
+        if (!q.giverNpcId) errors.push(`quest ${q.id}: needs a giver NPC`);
+        else if (this.npcs.get(q.giverNpcId)?.role !== 'quest_giver')
+          errors.push(`quest ${q.id}: giver ${q.giverNpcId} is not a quest giver`);
+        if (!q.dialogue) errors.push(`quest ${q.id}: needs dialogue`);
+        if (q.objectives.length === 0) errors.push(`quest ${q.id}: needs objectives`);
+      }
+    }
+    for (const t of this.itemTemplates.values()) {
+      if (t.questId && !this.quests.has(t.questId))
+        errors.push(`item ${t.id}: unknown quest ${t.questId}`);
+    }
   }
 
   /** Lookup helpers that throw — use when the ID came from trusted persisted data. */
@@ -262,6 +312,11 @@ export class GameData {
     const c = this.classes.get(id);
     if (!c) throw new Error(`Unknown class ${id}`);
     return c;
+  }
+  quest(id: string): QuestDefinition {
+    const q = this.quests.get(id);
+    if (!q) throw new Error(`Unknown quest ${id}`);
+    return q;
   }
   enemy(id: string): EnemyDefinition {
     const e = this.enemies.get(id);
