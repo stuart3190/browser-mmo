@@ -48,7 +48,14 @@ set -a
 source /etc/brokenodyssey/runtime.env
 set +a
 install -d -m 700 /srv/brokenodyssey/backups
-PGDATABASE="$DATABASE_URL" /usr/lib/postgresql/17/bin/pg_dump -Fc -f "/srv/brokenodyssey/backups/pre-${revision}-$(date +%s).dump"
+python3 - "/srv/brokenodyssey/backups/pre-${revision}-$(date +%s).dump" <<'PYBACKUP'
+import os, subprocess, sys, urllib.parse
+url = urllib.parse.urlparse(os.environ['DATABASE_URL'])
+env = dict(os.environ, PGHOST=url.hostname, PGPORT=str(url.port or 5432),
+           PGUSER=urllib.parse.unquote(url.username), PGPASSWORD=urllib.parse.unquote(url.password),
+           PGDATABASE=urllib.parse.unquote(url.path[1:]))
+subprocess.run(['/usr/lib/postgresql/17/bin/pg_dump', '-Fc', '-f', sys.argv[1]], env=env, check=True)
+PYBACKUP
 (
   cd "$release"
   pnpm db:migrate
