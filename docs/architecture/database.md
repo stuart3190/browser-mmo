@@ -6,23 +6,24 @@ committed, never edited after being applied).
 
 ## Tables
 
-| Table                      | Purpose                                                                                                                                         |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `accounts`                 | Player accounts: username (case-insensitive unique), role, status                                                                               |
-| `auth_identities`          | One row per login method `(provider, provider_subject)`; future password/OAuth                                                                  |
-| `sessions`                 | Opaque bearer sessions (SHA-256 token hash), client kind, expiry, revocation                                                                    |
-| `characters`               | Characters: class/spec, level/xp, zone + last validated position, `current_health` (NULL = full)                                                |
-| `item_templates`           | Mirror of authored templates (synced from `@mmo/game-data`) for FKs/queries                                                                     |
-| `containers`               | Every slot store: `backpack`, `material_pouch`, `character_vault`, `account_vault`, `guild_vault`                                               |
-| `item_instances`           | Every concrete item with its single authoritative location                                                                                      |
-| `item_history`             | Append-only provenance events per item                                                                                                          |
-| `currency_balances`        | Wallets (character- or account-scoped), `amount >= 0`                                                                                           |
-| `currency_ledger`          | Append-only record of every balance change                                                                                                      |
-| `marketplace_listings`     | Listings (active/sold/cancelled/expired)                                                                                                        |
-| `marketplace_transactions` | Completed sales (unique per listing)                                                                                                            |
-| `kill_events`              | Write-ahead kill outbox: one row per enemy death (spawn slot, respawn time, credited character, status pending/rewarded/void, attempts/backoff) |
-| `kill_rewards`             | One row per (enemy death, rewarded character); its primary key makes XP/loot/gold for a kill exactly-once                                       |
-| `audit_log`                | Privileged/economy-sensitive actions with request IDs                                                                                           |
+| Table                      | Purpose                                                                                                                                                                |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accounts`                 | Player accounts: username (case-insensitive unique), role, status                                                                                                      |
+| `auth_identities`          | One row per login method `(provider, provider_subject)`; future password/OAuth                                                                                         |
+| `sessions`                 | Opaque bearer sessions (SHA-256 token hash), client kind, expiry, revocation                                                                                           |
+| `characters`               | Characters: class/spec, level/xp, zone + last validated position, `current_health` (NULL = full)                                                                       |
+| `item_templates`           | Mirror of authored templates (synced from `@mmo/game-data`) for FKs/queries                                                                                            |
+| `containers`               | Every slot store: `backpack`, `material_pouch`, `character_vault`, `account_vault`, `guild_vault`                                                                      |
+| `item_instances`           | Every concrete item with its single authoritative location                                                                                                             |
+| `item_history`             | Append-only provenance events per item                                                                                                                                 |
+| `currency_balances`        | Wallets (character- or account-scoped), `amount >= 0`                                                                                                                  |
+| `currency_ledger`          | Append-only record of every balance change                                                                                                                             |
+| `marketplace_listings`     | Listings (active/sold/cancelled/expired)                                                                                                                               |
+| `marketplace_transactions` | Completed sales (unique per listing)                                                                                                                                   |
+| `character_quests`         | Per-character quest state: status active/completed, kill counters (jsonb), accepted/completed/rewarded timestamps, turn-in correlation id; PK (character_id, quest_id) |
+| `kill_events`              | Write-ahead kill outbox: one row per enemy death (spawn slot, respawn time, credited character, status pending/rewarded/void, attempts/backoff)                        |
+| `kill_rewards`             | One row per (enemy death, rewarded character); its primary key makes XP/loot/gold for a kill exactly-once                                                              |
+| `audit_log`                | Privileged/economy-sensitive actions with request IDs                                                                                                                  |
 
 ### How the requested tables map
 

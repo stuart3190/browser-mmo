@@ -71,7 +71,7 @@ function GameUI() {
       <QuestTracker />
       <ConnectionBanner />
       <DeathOverlay />
-      {state.prompt && <div className="panel prompt">{state.prompt}</div>}
+      {state.prompt && !state.dialogue && <div className="panel prompt">{state.prompt}</div>}
       <LogPanel />
       <Toasts />
       <div className="windows">

@@ -359,6 +359,22 @@ Deaths are announced one DB write later; a full mailbox delays the whole reward;
 
 ---
 
+## 2026-10-04 — Quest foundation
+
+**Decision**
+Quest definitions are game data; `character_quests` stores one row per character and quest (`active` / `completed`, kill counters, timestamps). Kill objectives advance inside the existing exactly-once kill-reward transaction; collect objectives are derived from authoritative inventory (backpack, material pouch and Recovered loot; unlocked items only) and consumed at turn-in; turn-in (consume, XP, currency, items with Recovered-loot overflow, completion) is one transaction. NPC interaction and quest actions go through the realtime gateway, which validates the NPC entity and range from the zone simulation. `docs/adr/0018-quest-foundation.md`, `docs/gameplay/quests.md`.
+
+**Reason**
+Exactly-once progress and rewards without a second kill path or an item-acquisition ledger; range checks need the simulation's authoritative position.
+
+**Alternatives considered**
+Acquisition-event counting for collect objectives; a generic quest engine; quest actions over HTTP.
+
+**Consequences**
+Selling or vaulting quest items lowers progress (intended); a full Recovered loot box blocks turn-in until there is room; repeatable quests need a schema extension.
+
+---
+
 ## Open questions
 
 These are not yet decided. Record a dated entry above when one is.

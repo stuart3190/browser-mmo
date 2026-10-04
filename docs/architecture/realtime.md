@@ -120,6 +120,10 @@ gets a full snapshot because NOTIFY is not durable.
 - **Kills** are write-ahead: `drainKills` → `recordKill` (retried) → `confirmKill` →
   `processKillEvent`; startup restores respawn slots (`activeRespawns`) and processes due kill
   events, and a 5 s sweep repeats that (ADR 0017). Test-only `faults` hooks and `simulateCrash()`.
+- **NPCs and quests**: `npc.interact` / `quest.accept` / `quest.turn_in` are validated by
+  `ZoneSimulation.npcInteraction` (NPC entity in this zone, alive, in range) and then the domain;
+  `quest.log` is pushed on join, quest actions, kill progress, inventory changes and resyncs
+  (`docs/gameplay/quests.md`).
 - **Pickups** are two-phase: reserve in memory (range check, single reserver) → persist via
   `claimWorldPickup` with `source_ref = world_pickup:<spawnPoint>:<spawnInstanceUuid>` (unique
   index) → commit (despawn, schedule respawn) or release on failure. Duplicate claims are
