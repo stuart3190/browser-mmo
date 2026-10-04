@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { schema } from '@mmo/db';
 import { xpToNextLevel } from '@mmo/game-data';
 import { uuidv7 } from '@mmo/shared';
 import {
+  activeRespawns,
   awardKill,
+  dueKillEvents,
+  processKillEvent,
+  recordKill,
   getBalances,
   getCharacterItems,
   getCombatProfile,
@@ -13,7 +17,8 @@ import {
   moveItem,
   saveCharacterHealth,
 } from '../src/index';
-import { expectCode, makePlayer, setupContext } from './helpers';
+import type { KillEventRecord } from '../src/index';
+import { containerId, expectCode, makePlayer, setupContext } from './helpers';
 
 const ctx = setupContext();
 const WOLF = 'enemy.greenvale.grey_wolf';
@@ -155,30 +160,9 @@ describe('kill rewards', () => {
     expect(profile.maxHealth).toBeGreaterThan(144); // level growth raises health
   });
 
-  it('keeps XP and gold but reports items as lost when bags are full (no partial stacks)', async () => {
+  it('delivers loot that does not fit the bags to the mailbox (nothing lost, no partial stacks)', async () => {
     const p = await makePlayer(ctx, 'class.warrior');
-    const fill = (templateId: string) =>
-      inTransaction(ctx, (tx) =>
-        grantItemInTx(tx, ctx, {
-          ...p,
-          templateId,
-          quantity: 1,
-          method: 'system',
-          actor: { accountId: null, characterId: null },
-        }),
-      );
-    for (let i = 0; i < 24; i++) await fill('weapon.sword.iron_longsword');
-    for (let i = 0; i < 40; i++) {
-      await inTransaction(ctx, (tx) =>
-        grantItemInTx(tx, ctx, {
-          ...p,
-          templateId: 'material.hide.wolf_pelt',
-          quantity: 200,
-          method: 'system',
-          actor: { accountId: null, characterId: null },
-        }),
-      );
-    }
+    await fillBags(p);
     const killId = uuidv7();
     const r = await awardKill(ctx, {
       killId,
@@ -186,8 +170,15 @@ describe('kill rewards', () => {
       enemyId: WOLF,
       zoneId: ZONE,
     });
-    expect(r.items).toHaveLength(0);
-    expect(r.lostItems).toHaveLength(2);
+    expect(r.mailedItems).toHaveLength(2);
+    expect(r.items).toHaveLength(2);
+    expect(
+      r.items.every(
+        (i) =>
+          i.instance.location.kind === 'container' &&
+          i.instance.location.containerKind === 'mailbox',
+      ),
+    ).toBe(true);
     expect(r.xpGained).toBeGreaterThan(0);
     const inv = await getCharacterItems(ctx.db, ctx, p.accountId, p.characterId);
     expect(
@@ -195,5 +186,228 @@ describe('kill rewards', () => {
         .find((c) => c.container.kind === 'material_pouch')!
         .items.every((i) => i.instance.quantity === 200),
     ).toBe(true);
+    const mailbox = inv.containers.find((c) => c.container.kind === 'mailbox')!;
+    expect(mailbox.items).toHaveLength(2);
+    // provenance is the same as any other drop
+    expect(
+      mailbox.items.every((i) => i.instance.acquisition.sourceRef?.startsWith(`kill:${killId}:`)),
+    ).toBe(true);
+  });
+
+  it('creates a mailbox lazily for characters that predate it', async () => {
+    const p = await makePlayer(ctx, 'class.warrior');
+    await ctx.db
+      .delete(schema.containers)
+      .where(
+        and(
+          eq(schema.containers.ownerCharacterId, p.characterId),
+          eq(schema.containers.kind, 'mailbox'),
+        ),
+      );
+    await fillBags(p);
+    const r = await awardKill(ctx, {
+      killId: uuidv7(),
+      characterId: p.characterId,
+      enemyId: WOLF,
+      zoneId: ZONE,
+    });
+    expect(r.mailedItems).toHaveLength(2);
+  });
+
+  it('players can take items out of the mailbox but never put items in', async () => {
+    const p = await makePlayer(ctx, 'class.warrior');
+    await fillBags(p, false);
+    const r = await awardKill(ctx, {
+      killId: uuidv7(),
+      characterId: p.characterId,
+      enemyId: WOLF,
+      zoneId: ZONE,
+    });
+    const mailed = r.items.find(
+      (i) =>
+        i.instance.location.kind === 'container' && i.instance.location.containerKind === 'mailbox',
+    )!;
+    const backpack = await containerId(ctx, p, 'backpack');
+    const mailbox = await containerId(ctx, p, 'mailbox');
+    // backpack is full: retrieving fails cleanly and the item stays in the mailbox
+    await expectCode(
+      moveItem(ctx, {
+        ...p,
+        request: {
+          itemInstanceId: mailed.instance.id,
+          expectedVersion: mailed.instance.version,
+          to: { kind: 'container', containerId: backpack },
+        },
+      }),
+      'CONTAINER_FULL',
+    );
+    const inv = await getCharacterItems(ctx.db, ctx, p.accountId, p.characterId);
+    const sword = inv.containers.find((c) => c.container.kind === 'backpack')!.items[0]!;
+    await expectCode(
+      moveItem(ctx, {
+        ...p,
+        request: {
+          itemInstanceId: sword.instance.id,
+          expectedVersion: sword.instance.version,
+          to: { kind: 'container', containerId: mailbox },
+        },
+      }),
+      'CONTAINER_KIND_MISMATCH',
+    );
+  });
+});
+
+/** Fills the backpack (24 swords) and, optionally, the material pouch (40 full pelt stacks). */
+async function fillBags(p: { accountId: string; characterId: string }, pouch = true) {
+  const grant = (templateId: string, quantity: number) =>
+    inTransaction(ctx, (tx) =>
+      grantItemInTx(tx, ctx, {
+        ...p,
+        templateId,
+        quantity,
+        method: 'system',
+        actor: { accountId: null, characterId: null },
+      }),
+    );
+  for (let i = 0; i < 24; i++) await grant('weapon.sword.iron_longsword', 1);
+  if (pouch) for (let i = 0; i < 40; i++) await grant('material.hide.wolf_pelt', 200);
+}
+
+describe('durable kill events (outbox)', () => {
+  const event = (
+    p: { characterId: string },
+    over: Partial<KillEventRecord> = {},
+  ): KillEventRecord => ({
+    killId: uuidv7(),
+    zoneId: ZONE,
+    enemyId: WOLF,
+    spawnPointId: 'spawn.greenvale.wolf_den_north_a',
+    groupId: 'group.greenvale.wolf_den_north',
+    characterId: p.characterId,
+    diedAt: new Date(),
+    respawnAt: new Date(Date.now() + 30_000),
+    ...over,
+  });
+  const xpOf = async (characterId: string) =>
+    (await ctx.db.select().from(schema.characters).where(eq(schema.characters.id, characterId)))[0]!
+      .xp;
+  const eventRow = async (killId: string) =>
+    (await ctx.db.select().from(schema.killEvents).where(eq(schema.killEvents.killId, killId)))[0]!;
+
+  it('recording is idempotent and processing rewards exactly once', async () => {
+    const p = await makePlayer(ctx);
+    const e = event(p);
+    await recordKill(ctx.db, e);
+    await recordKill(ctx.db, e); // retried write after a lost ack
+    expect(
+      (await dueKillEvents(ctx.db, { now: new Date() })).filter((k) => k === e.killId),
+    ).toHaveLength(1);
+    const first = await processKillEvent(ctx, e.killId);
+    expect(first.status).toBe('rewarded');
+    expect(await processKillEvent(ctx, e.killId)).toEqual({ status: 'done' });
+    expect(await xpOf(p.characterId)).toBe(Math.round(45 * 1.1));
+    expect(await eventRow(e.killId)).toMatchObject({ status: 'rewarded', attempts: 1 });
+    expect(await dueKillEvents(ctx.db, { now: new Date() })).not.toContain(e.killId);
+    expect(await processKillEvent(ctx, uuidv7())).toEqual({ status: 'missing' });
+  });
+
+  it('concurrent processors (live pipeline vs recovery sweep) reward once', async () => {
+    const p = await makePlayer(ctx);
+    const e = event(p);
+    await recordKill(ctx.db, e);
+    const results = await Promise.all(
+      Array.from({ length: 6 }, () => processKillEvent(ctx, e.killId)),
+    );
+    expect(results.filter((r) => r.status === 'rewarded')).toHaveLength(1);
+    expect(results.every((r) => ['rewarded', 'busy', 'done'].includes(r.status))).toBe(true);
+    expect(await xpOf(p.characterId)).toBe(Math.round(45 * 1.1));
+    const [{ n }] = (await ctx.db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(schema.itemInstances)
+      .where(sql`${schema.itemInstances.sourceRef} like ${`kill:${e.killId}:%`}`)) as [
+      { n: number },
+    ];
+    expect(n).toBe(2);
+  });
+
+  it('a kill rewarded through the direct path is marked done instead of rewarded again', async () => {
+    const p = await makePlayer(ctx);
+    const e = event(p);
+    await recordKill(ctx.db, e);
+    await awardKill(ctx, {
+      killId: e.killId,
+      characterId: p.characterId,
+      enemyId: WOLF,
+      zoneId: ZONE,
+    });
+    expect(await processKillEvent(ctx, e.killId)).toEqual({ status: 'done' });
+    expect(await eventRow(e.killId)).toMatchObject({ status: 'rewarded' });
+    expect(await xpOf(p.characterId)).toBe(Math.round(45 * 1.1));
+  });
+
+  it('a full mailbox keeps the event pending with backoff (retried later, never lost)', async () => {
+    const p = await makePlayer(ctx);
+    await fillBags(p);
+    const mailbox = await containerId(ctx, p, 'mailbox');
+    await ctx.db
+      .update(schema.containers)
+      .set({ capacity: 1 })
+      .where(eq(schema.containers.id, mailbox));
+    await inTransaction(ctx, (tx) =>
+      grantItemInTx(tx, ctx, {
+        ...p,
+        templateId: 'weapon.sword.iron_longsword',
+        quantity: 1,
+        method: 'system',
+        actor: { accountId: null, characterId: null },
+        containerKind: 'mailbox',
+      }),
+    ); // the one mailbox slot is now taken
+    const xpBefore = await xpOf(p.characterId);
+    const e = event(p);
+    await recordKill(ctx.db, e);
+    const r = await processKillEvent(ctx, e.killId);
+    expect(r.status).toBe('retry');
+    const row = await eventRow(e.killId);
+    expect(row).toMatchObject({ status: 'pending', attempts: 1 });
+    expect(row.nextAttemptAt.getTime()).toBeGreaterThan(Date.now());
+    expect(await xpOf(p.characterId)).toBe(xpBefore); // nothing partially applied
+    expect(await dueKillEvents(ctx.db, { now: new Date() })).not.toContain(e.killId);
+    // room is made: the retry succeeds
+    await ctx.db
+      .update(schema.containers)
+      .set({ capacity: 200 })
+      .where(eq(schema.containers.id, mailbox));
+    expect((await processKillEvent(ctx, e.killId)).status).toBe('rewarded');
+    expect(await eventRow(e.killId)).toMatchObject({ status: 'rewarded', attempts: 2 });
+  });
+
+  it('voids events for deleted characters instead of retrying forever', async () => {
+    const p = await makePlayer(ctx);
+    const e = event(p);
+    await recordKill(ctx.db, e);
+    await ctx.db
+      .update(schema.characters)
+      .set({ deletedAt: new Date() })
+      .where(eq(schema.characters.id, p.characterId));
+    expect((await processKillEvent(ctx, e.killId)).status).toBe('void');
+    expect(await eventRow(e.killId)).toMatchObject({ status: 'void' });
+  });
+
+  it('lists not-yet-elapsed respawn slots per zone (pending or rewarded)', async () => {
+    const p = await makePlayer(ctx);
+    const zoneId = `zone.test.${uuidv7()}`;
+    const live = event(p, { zoneId, respawnAt: new Date(Date.now() + 60_000) });
+    const elapsed = event(p, { zoneId, respawnAt: new Date(Date.now() - 1_000) });
+    await recordKill(ctx.db, live);
+    await recordKill(ctx.db, elapsed);
+    const slots = await activeRespawns(ctx.db, zoneId, new Date());
+    expect(slots).toEqual([
+      {
+        spawnPointId: live.spawnPointId,
+        groupId: live.groupId,
+        respawnAtMs: live.respawnAt.getTime(),
+      },
+    ]);
   });
 });

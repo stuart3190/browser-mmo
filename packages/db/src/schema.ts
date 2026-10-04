@@ -40,6 +40,8 @@ export const containerKind = pgEnum('container_kind', [
   'character_vault',
   'account_vault',
   'guild_vault',
+  /** System-only overflow storage ("Recovered loot"): loot that did not fit is delivered here. */
+  'mailbox',
 ]);
 export const itemLocationKind = pgEnum('item_location_kind', [
   'container',
@@ -481,6 +483,43 @@ export const killRewards = pgTable(
   (t) => [
     primaryKey({ columns: [t.killId, t.characterId] }),
     index('kill_rewards_character_idx').on(t.characterId, t.occurredAt),
+  ],
+);
+
+/**
+ * Durable kill outbox. A zone writes one row per enemy death BEFORE the death becomes visible
+ * (write-ahead), then rewards are applied from this row exactly once. A crash at any point either
+ * leaves no row (the death never happened) or a `pending` row that startup recovery / the sweep
+ * finishes. The row also remembers the spawn slot's respawn time so a restart cannot resurrect a
+ * dead enemy early or corrupt group population.
+ */
+export const killEvents = pgTable(
+  'kill_events',
+  {
+    killId: uuid('kill_id').primaryKey(),
+    zoneId: text('zone_id').notNull(),
+    enemyId: text('enemy_id').notNull(),
+    spawnPointId: text('spawn_point_id').notNull(),
+    groupId: text('group_id'),
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    diedAt: timestamp('died_at', { withTimezone: true }).notNull(),
+    respawnAt: timestamp('respawn_at', { withTimezone: true }).notNull(),
+    /** pending -> rewarded | void (permanently unrewardable, e.g. character deleted). */
+    status: text('status').notNull().default('pending'),
+    attempts: integer('attempts').notNull().default(0),
+    nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }).notNull().defaultNow(),
+    lastError: text('last_error'),
+    processedAt: timestamp('processed_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check('kill_events_status_ck', sql`${t.status} IN ('pending', 'rewarded', 'void')`),
+    index('kill_events_pending_idx')
+      .on(t.nextAttemptAt)
+      .where(sql`${t.status} = 'pending'`),
+    index('kill_events_respawn_idx').on(t.zoneId, t.respawnAt),
   ],
 );
 

@@ -94,6 +94,7 @@ describe('API', () => {
       'account_vault',
       'backpack',
       'character_vault',
+      'mailbox',
       'material_pouch',
     ]);
 

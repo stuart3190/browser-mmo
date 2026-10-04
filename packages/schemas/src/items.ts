@@ -308,6 +308,8 @@ export const ContainerKindSchema = z.enum([
   'character_vault',
   'account_vault',
   'guild_vault',
+  /** System-only overflow storage ("Recovered loot"); players can only take items out. */
+  'mailbox',
 ]);
 export type ContainerKind = z.infer<typeof ContainerKindSchema>;
 

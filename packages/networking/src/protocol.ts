@@ -322,9 +322,12 @@ export const CombatLootMsg = serverMsg(
     enemyName: z.string(),
     items: z.array(ItemSchema),
     gold: z.number().int().nonnegative(),
-    lostItems: z.array(
+    /** Drops that did not fit the bags and were delivered to the mailbox ("Recovered loot"). */
+    mailedItems: z.array(
       z.object({ itemTemplateId: z.string(), quantity: z.number().int().positive() }),
     ),
+    /** True when the reward was completed by crash/failure recovery rather than immediately. */
+    recovered: z.boolean(),
   }),
 );
 

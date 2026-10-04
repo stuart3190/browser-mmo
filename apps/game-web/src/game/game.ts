@@ -193,9 +193,13 @@ export async function startGame(args: {
     );
     const gold = gameData.currencies.get('gold');
     if (m.d.gold > 0 && gold) parts.push(`${m.d.gold}c`);
-    if (parts.length) state.toast(`Loot from ${m.d.enemyName}: ${parts.join(', ')}`);
-    if (m.d.lostItems.length)
-      state.toast(`Your bags are full — ${m.d.lostItems.length} item(s) lost`, 'error');
+    const from = m.d.recovered ? `${m.d.enemyName} (recovered)` : m.d.enemyName;
+    if (parts.length) state.toast(`Loot from ${from}: ${parts.join(', ')}`);
+    if (m.d.mailedItems.length)
+      state.toast(
+        `Bags full — ${m.d.mailedItems.length} item(s) sent to Recovered loot (open your bags)`,
+        'info',
+      );
     state.addLog(`Looted ${parts.join(', ') || 'nothing'}`);
   });
   net.on('world.moves', (m) =>

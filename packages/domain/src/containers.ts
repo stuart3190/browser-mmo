@@ -12,6 +12,8 @@ export const DEFAULT_CAPACITY: Record<Exclude<ContainerKind, 'guild_vault'>, num
   material_pouch: 40,
   character_vault: 48,
   account_vault: 48,
+  /** Overflow loot. Large so a full bag essentially never blocks a reward. */
+  mailbox: 200,
 };
 
 export async function createCharacterContainers(
@@ -19,7 +21,7 @@ export async function createCharacterContainers(
   accountId: string,
   characterId: string,
 ): Promise<void> {
-  const kinds = ['backpack', 'material_pouch', 'character_vault'] as const;
+  const kinds = ['backpack', 'material_pouch', 'character_vault', 'mailbox'] as const;
   await tx.insert(schema.containers).values(
     kinds.map((kind) => ({
       id: uuidv7(),
@@ -44,7 +46,28 @@ export async function ensureAccountVault(tx: Tx, accountId: string): Promise<voi
     .onConflictDoNothing();
 }
 
-/** Containers visible to a character: its own three plus its account's shared vault. */
+/**
+ * Idempotently ensures a character's mailbox exists (characters created before the mailbox was
+ * introduced get one lazily on first join / first overflow delivery).
+ */
+export async function ensureMailbox(
+  db: DbOrTx,
+  accountId: string,
+  characterId: string,
+): Promise<void> {
+  await db
+    .insert(schema.containers)
+    .values({
+      id: uuidv7(),
+      kind: 'mailbox',
+      ownerAccountId: accountId,
+      ownerCharacterId: characterId,
+      capacity: DEFAULT_CAPACITY.mailbox,
+    })
+    .onConflictDoNothing();
+}
+
+/** Containers visible to a character: its own (incl. mailbox) plus its account's shared vault. */
 export async function containersForCharacter(
   db: DbOrTx,
   accountId: string,

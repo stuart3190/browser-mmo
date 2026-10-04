@@ -5,7 +5,8 @@
   "description": "Authoritative zone simulation: entities, spawns, movement validation, interest management, pickups. Hosted in-process by @mmo/realtime today; designed to be split into its own process later.",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testing": "./src/test-arena.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

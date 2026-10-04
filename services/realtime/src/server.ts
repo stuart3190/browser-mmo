@@ -5,15 +5,18 @@ import type { WebSocket } from 'ws';
 import { sql } from 'drizzle-orm';
 import type { DomainContext, SessionService } from '@mmo/domain';
 import {
-  awardKill,
+  activeRespawns,
   characterFromRow,
   claimWorldPickup,
+  dueKillEvents,
   getCombatProfile,
+  processKillEvent,
+  recordKill,
   requireOwnedCharacter,
   saveCharacterHealth,
   saveCharacterPosition,
 } from '@mmo/domain';
-import type { CombatProfile } from '@mmo/domain';
+import type { CombatProfile, KillReward } from '@mmo/domain';
 import { ChangeFeedListener } from '@mmo/db';
 import type { ClientMessage } from '@mmo/networking';
 import {
@@ -57,6 +60,23 @@ export interface RealtimeDeps {
   lingerMs?: number;
   /** Simulation RNG (combat rolls). Inject a seeded one in tests. */
   rng?: Rng;
+  /** How often pending (failed or orphaned) kill events are swept from the database. */
+  killRecoveryIntervalMs?: number;
+  /**
+   * Test-only fault injection at the durable-kill boundaries. A hook may throw (a failed step) or
+   * return a promise that never settles (the process "freezes" there); combined with
+   * `simulateCrash()` this reproduces a crash at exactly that point.
+   */
+  faults?: KillFaults;
+}
+
+export interface KillFaults {
+  /** Kill drained from the zone, nothing written yet. */
+  beforeRecord?: (kill: KillEvent) => void | Promise<void>;
+  /** Kill event durable, death not yet confirmed in the zone, reward not yet applied. */
+  afterRecord?: (kill: KillEvent) => void | Promise<void>;
+  /** Reward committed, player not yet notified. */
+  afterReward?: (killId: string) => void | Promise<void>;
 }
 
 /** A character present in a zone simulation, with or without a live connection. */
@@ -69,8 +89,10 @@ interface InWorld {
   lingerUntil: number | null;
 }
 
-interface PendingKill {
+/** A zone death waiting for its write-ahead kill event to become durable. */
+interface PendingRecord {
   kill: KillEvent;
+  zone: ZoneSimulation;
   attempts: number;
   nextAttemptAt: number;
 }
@@ -103,16 +125,18 @@ interface Connection {
  */
 export function createRealtimeServer(deps: RealtimeDeps) {
   const { ctx, logger } = deps;
-  const zones = new Map(
-    deps.zoneIds.map((id) => [
-      id,
-      new ZoneSimulation(ctx.gameData, id, deps.rng ? { rng: deps.rng } : {}),
-    ]),
-  );
+  /** Zone simulations are created in start(), after durable respawn state has been loaded. */
+  const zones = new Map<string, ZoneSimulation>();
   const byCharacter = new Map<string, Connection>();
   const inWorld = new Map<string, InWorld>();
-  const pendingKills: PendingKill[] = [];
-  let killsInFlight = 0;
+  const recordQueue: PendingRecord[] = [];
+  let recordsInFlight = 0;
+  /** Kill events currently being rewarded by this process (DB SKIP LOCKED covers other processes). */
+  const rewarding = new Set<string>();
+  let sweeping: Promise<void> | null = null;
+  let nextSweepAt = 0;
+  let crashed = false;
+  const faults = deps.faults ?? {};
   let shuttingDown = false;
   const lingerMs = deps.lingerMs ?? 10_000;
   const rewards = deps.metrics.counter('combat_rewards_total', 'Kill reward attempts by result');
@@ -434,7 +458,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     clearTimeout(conn.authTimer);
     wsConnections.set(connections.size);
     const player = conn.player;
-    if (!player) return;
+    if (!player || crashed) return; // a crashed process saves nothing
     if (byCharacter.get(player.characterId) === conn) byCharacter.delete(player.characterId);
     const entry = inWorld.get(player.characterId);
     if (!entry || byCharacter.has(player.characterId)) return; // already re-attached elsewhere
@@ -495,82 +519,148 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     flush();
   }
 
-  /** Persists one kill reward (exactly once, enforced by the DB) and notifies the player. */
-  async function processKill(p: PendingKill) {
-    const { kill } = p;
-    try {
-      const reward = await awardKill(ctx, {
-        killId: kill.killId,
-        characterId: kill.characterId,
-        enemyId: kill.enemyId,
-        zoneId: kill.zoneId,
-      });
-      rewards.inc({ result: 'ok' });
-      const conn = byCharacter.get(kill.characterId);
-      if (conn) {
-        send(conn, {
-          t: 'character.progress',
-          d: {
-            level: reward.level,
-            xp: reward.xp,
-            xpToNext: reward.xpToNext,
-            xpGained: reward.xpGained,
-            levelsGained: reward.levelsGained,
-          },
-        });
-        send(conn, {
-          t: 'combat.loot',
-          d: {
-            killId: kill.killId,
-            enemyName: kill.enemyName,
-            items: reward.items,
-            gold: reward.gold,
-            lostItems: reward.lostItems,
-          },
-        });
-      }
-      if (reward.levelsGained > 0) await refreshCombat(kill.characterId);
-      logger.info(
-        {
-          killId: kill.killId,
-          characterId: kill.characterId,
-          xp: reward.xpGained,
-          items: reward.items.length,
-          gold: reward.gold,
-        },
-        'kill rewarded',
-      );
-    } catch (err) {
-      if (err instanceof DomainError && err.code === ErrorCode.ALREADY_CLAIMED) {
-        rewards.inc({ result: 'duplicate' });
-        return;
-      }
-      rewards.inc({ result: 'error' });
-      if (p.attempts < 5) {
-        p.attempts++;
-        p.nextAttemptAt = Date.now() + 500 * 2 ** p.attempts;
-        pendingKills.push(p);
-        logger.warn(
-          { err, killId: kill.killId, attempt: p.attempts },
-          'kill reward failed; will retry',
-        );
-      } else {
-        logger.error({ err, kill }, 'kill reward failed permanently');
-      }
-    }
-  }
-
-  /** Called every tick: collects new kills and starts due reward jobs (bounded queue, no per-kill timers). */
+  /**
+   * Durable kill pipeline (ADR 0017):
+   *   zone death ('dying') -> recordKill (write-ahead) -> zone.confirmKill -> processKillEvent.
+   * A crash before the record leaves no trace (the wolf simply never died); a crash after it leaves
+   * a pending kill event that startup recovery / the periodic sweep rewards exactly once.
+   */
   function pumpKills(now: number) {
     for (const zone of zones.values())
       for (const kill of zone.drainKills())
-        pendingKills.push({ kill, attempts: 0, nextAttemptAt: now });
-    for (let i = pendingKills.length - 1; i >= 0; i--) {
-      const p = pendingKills[i]!;
-      if (p.nextAttemptAt > now) continue;
-      pendingKills.splice(i, 1);
-      killsInFlight++;
-      void processKill(p).finally(() => killsInFlight--);
+        recordQueue.push({ kill, zone, attempts: 0, nextAttemptAt: now });
+    for (let i = recordQueue.length - 1; i >= 0; i--) {
+      const r = recordQueue[i]!;
+      if (r.nextAttemptAt > now) continue;
+      recordQueue.splice(i, 1);
+      recordsInFlight++;
+      void recordAndConfirm(r).finally(() => recordsInFlight--);
+    }
+    if (now >= nextSweepAt && !sweeping) {
+      nextSweepAt = now + (deps.killRecoveryIntervalMs ?? 5_000);
+      sweeping = sweepKillEvents().finally(() => (sweeping = null));
+    }
+  }
+
+  async function recordAndConfirm(r: PendingRecord) {
+    const { kill } = r;
+    try {
+      await faults.beforeRecord?.(kill);
+      await recordKill(ctx.db, {
+        killId: kill.killId,
+        zoneId: kill.zoneId,
+        enemyId: kill.enemyId,
+        spawnPointId: kill.spawnPointId,
+        groupId: kill.groupId,
+        characterId: kill.characterId,
+        diedAt: new Date(kill.diedAtMs),
+        respawnAt: new Date(kill.respawnAtMs),
+      });
+      await faults.afterRecord?.(kill);
+    } catch (err) {
+      if (crashed) return;
+      // The enemy stays 'dying' (untargetable, harmless) until the write succeeds.
+      r.attempts++;
+      r.nextAttemptAt = Date.now() + Math.min(10_000, 250 * 2 ** r.attempts);
+      recordQueue.push(r);
+      rewards.inc({ result: 'record_error' });
+      logger.warn(
+        { err, killId: kill.killId, attempt: r.attempts },
+        'kill record failed; retrying',
+      );
+      return;
+    }
+    if (crashed) return;
+    r.zone.confirmKill(kill.killId, Date.now());
+    flush();
+    await rewardKill(kill.killId, false);
+  }
+
+  /** Applies one recorded kill's rewards (exactly once) and notifies the character if online. */
+  async function rewardKill(killId: string, recovered: boolean) {
+    if (rewarding.has(killId) || crashed) return;
+    rewarding.add(killId);
+    try {
+      const result = await processKillEvent(ctx, killId);
+      if (crashed) return;
+      if (result.status === 'rewarded') {
+        await faults.afterReward?.(killId);
+        if (crashed) return;
+        rewards.inc({ result: recovered ? 'recovered' : 'ok' });
+        await notifyReward(result.reward, recovered);
+      } else if (result.status === 'retry') {
+        rewards.inc({ result: 'error' });
+        logger.warn(
+          { killId, error: result.error, next: result.nextAttemptAt },
+          'kill reward failed; will retry',
+        );
+      } else if (result.status === 'void') {
+        rewards.inc({ result: 'void' });
+        logger.error({ killId, error: result.error }, 'kill reward voided');
+      } else {
+        rewards.inc({ result: result.status });
+      }
+    } catch (err) {
+      // processKillEvent already persisted the failure where it could; the sweep retries.
+      if (!crashed) logger.error({ err, killId }, 'kill reward processing crashed');
+    } finally {
+      rewarding.delete(killId);
+    }
+  }
+
+  async function notifyReward(reward: KillReward, recovered: boolean) {
+    const conn = byCharacter.get(reward.characterId);
+    if (conn) {
+      send(conn, {
+        t: 'character.progress',
+        d: {
+          level: reward.level,
+          xp: reward.xp,
+          xpToNext: reward.xpToNext,
+          xpGained: reward.xpGained,
+          levelsGained: reward.levelsGained,
+        },
+      });
+      send(conn, {
+        t: 'combat.loot',
+        d: {
+          killId: reward.killId,
+          enemyName: ctx.gameData.enemies.get(reward.enemyId)?.name ?? 'Enemy',
+          items: reward.items,
+          gold: reward.gold,
+          mailedItems: reward.mailedItems,
+          recovered,
+        },
+      });
+    }
+    if (reward.levelsGained > 0) await refreshCombat(reward.characterId);
+    logger.info(
+      {
+        killId: reward.killId,
+        characterId: reward.characterId,
+        xp: reward.xpGained,
+        items: reward.items.length,
+        mailed: reward.mailedItems.length,
+        gold: reward.gold,
+        recovered,
+      },
+      'kill rewarded',
+    );
+  }
+
+  /** Finishes pending kill events of this node's zones (failed rewards, kills orphaned by a crash). */
+  async function sweepKillEvents() {
+    try {
+      for (;;) {
+        const due = (
+          await dueKillEvents(ctx.db, { now: new Date(), zoneIds: deps.zoneIds, limit: 50 })
+        ).filter((id) => !rewarding.has(id));
+        if (due.length === 0 || crashed) return;
+        for (const killId of due) await rewardKill(killId, true);
+        if (due.length < 50) return;
+      }
+    } catch (err) {
+      if (!crashed) logger.error({ err }, 'kill recovery sweep failed');
     }
   }
 
@@ -663,10 +753,30 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     inWorldCount: () => inWorld.size,
     /** Resolves when all queued kill rewards have been processed (tests). */
     async rewardsIdle(): Promise<void> {
-      while (pendingKills.length > 0 || killsInFlight > 0)
+      while (recordQueue.length > 0 || recordsInFlight > 0 || rewarding.size > 0 || sweeping)
         await new Promise((r) => setTimeout(r, 20));
     },
+    /** Runs one recovery sweep now (tests). */
+    async sweepKills(): Promise<void> {
+      await (sweeping ?? (sweeping = sweepKillEvents().finally(() => (sweeping = null))));
+    },
     async start(host: string, port: number): Promise<void> {
+      // Rebuild zones with the respawn slots of recorded deaths, so a restart neither resurrects a
+      // dead enemy early nor overfills a spawn group; then finish any kill orphaned by a crash.
+      const now = Date.now();
+      for (const id of deps.zoneIds) {
+        const restoredRespawns = await activeRespawns(ctx.db, id, new Date(now));
+        zones.set(
+          id,
+          new ZoneSimulation(ctx.gameData, id, {
+            ...(deps.rng ? { rng: deps.rng } : {}),
+            nowMs: now,
+            restoredRespawns,
+          }),
+        );
+      }
+      await this.sweepKills();
+      nextSweepAt = Date.now() + (deps.killRecoveryIntervalMs ?? 5_000);
       await changeFeed?.start();
       heartbeatTimer = setInterval(() => {
         for (const conn of connections) {
@@ -696,6 +806,21 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       }, deps.positionSaveIntervalMs ?? 15_000);
       return new Promise((resolve) => http.listen(port, host, () => resolve()));
     },
+    /**
+     * Test-only: dies like a killed process. Timers stop, sockets are dropped, and nothing is
+     * flushed or saved; in-flight work is abandoned at whatever point it reached.
+     */
+    async simulateCrash(): Promise<void> {
+      crashed = true;
+      shuttingDown = true;
+      clearInterval(tickTimer);
+      clearInterval(saveTimer);
+      clearInterval(heartbeatTimer);
+      await changeFeed?.stop();
+      for (const conn of [...connections]) conn.ws.terminate();
+      wss.close();
+      await new Promise<void>((resolve) => http.close(() => resolve()));
+    },
     async stop(): Promise<void> {
       shuttingDown = true;
       clearInterval(tickTimer);
@@ -707,8 +832,17 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         await onClose(conn);
       }
       for (const entry of [...inWorld.values()]) await leaveWorld(entry);
+      // Graceful: make queued deaths durable and finish rewards (bounded; anything left over is
+      // recovered on the next start).
+      const deadline = Date.now() + 5_000;
       pumpKills(Date.now());
-      while (killsInFlight > 0) await new Promise((r) => setTimeout(r, 20));
+      while (
+        (recordQueue.length > 0 || recordsInFlight > 0 || rewarding.size > 0 || sweeping) &&
+        Date.now() < deadline
+      ) {
+        await new Promise((r) => setTimeout(r, 20));
+        if (recordQueue.length > 0) pumpKills(Date.now());
+      }
       wss.close();
       await new Promise<void>((resolve) => http.close(() => resolve()));
     },

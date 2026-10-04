@@ -4,6 +4,7 @@ import type { ChangeEvent } from '@mmo/db';
 import type { DomainContext } from '@mmo/domain';
 import {
   containersForCharacter,
+  ensureMailbox,
   getBalances,
   getCharacterItems,
   getCharacterStats,
@@ -38,6 +39,9 @@ export async function loadContainerIds(
   accountId: string,
   characterId: string,
 ): Promise<Set<string>> {
+  // Characters created before the mailbox existed get it here, so overflow loot delivered to it
+  // is part of this connection's view from the start.
+  await ensureMailbox(ctx.db, accountId, characterId);
   return new Set((await containersForCharacter(ctx.db, accountId, characterId)).map((c) => c.id));
 }
 

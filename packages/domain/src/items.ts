@@ -11,6 +11,7 @@ import {
 import type {
   AcquisitionMethod,
   CharacterItems,
+  ContainerKind,
   Item,
   ItemLocation,
   MoveItemRequest,
@@ -113,6 +114,8 @@ export interface GrantItemInput {
   sourceRef?: string | null;
   actor: Actor;
   correlationId?: string;
+  /** Deliver into this container kind instead of the template default (e.g. overflow mailbox). */
+  containerKind?: ContainerKind;
 }
 
 export interface GrantResult {
@@ -151,7 +154,7 @@ export async function grantItemInTx(
   const container = await lockCharacterContainer(
     tx,
     input.characterId,
-    defaultContainerKindFor(template),
+    input.containerKind ?? defaultContainerKindFor(template),
   );
   const binding = bindingOnAcquire(
     template,

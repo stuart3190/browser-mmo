@@ -13,7 +13,8 @@ import {
   createDomainContext,
   moveItem,
 } from '@mmo/domain';
-import { DEMO_ZONE_ID, getGameData, seededRng, xpToNextLevel } from '@mmo/game-data';
+import { seededRng, xpToNextLevel } from '@mmo/game-data';
+import { ARENA, arenaGameData } from '@mmo/world/testing';
 import type { ServerMessage } from '@mmo/networking';
 import { encodeClientMessage, parseServerMessage } from '@mmo/networking';
 import { Metrics, createLogger } from '@mmo/server-kit';
@@ -23,7 +24,12 @@ import { createRealtimeServer } from '../src/server';
 loadDotEnv();
 const TEST_URL = process.env.TEST_DATABASE_URL!;
 const handle = createDb({ url: TEST_URL, max: 5 });
-const ctx = createDomainContext({ db: handle.db, gameData: getGameData(), rng: seededRng(42) });
+// A small deterministic zone (one wolf near the player) keeps these protocol tests independent of
+// the live Greenvale population layout.
+const gameData = arenaGameData();
+const getGameData = () => gameData;
+const DEMO_ZONE_ID = ARENA;
+const ctx = createDomainContext({ db: handle.db, gameData, rng: seededRng(42) });
 const sessions = new SessionService(1);
 const server = createRealtimeServer({
   ctx,
@@ -134,6 +140,7 @@ async function fighter(
   await handle.db
     .update(schema.characters)
     .set({
+      zoneId: ARENA,
       posX: pos.x,
       posZ: pos.z,
       ...(opts.health !== undefined ? { currentHealth: opts.health } : {}),
@@ -227,7 +234,8 @@ describe('server-authoritative combat over the realtime protocol', () => {
       expect(zone().getPlayer(p.characterId)!.maxHealth).toBe(raised.d.maxHealth);
       const loot = await c.waitFor('combat.loot');
       expect(loot.d.enemyName).toBe('Grey Wolf');
-      expect(loot.d.items.length + loot.d.lostItems.length).toBeGreaterThan(0);
+      expect(loot.d.items.length).toBeGreaterThan(0);
+      expect(loot.d).toMatchObject({ mailedItems: [], recovered: false });
       // loot also arrives through the inventory pipeline (change feed)
       const lootIds = new Set(loot.d.items.map((i) => i.instance.id));
       await c.waitFor('inventory.updated', (m) =>

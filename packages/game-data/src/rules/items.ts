@@ -117,6 +117,9 @@ export function canPlaceInContainerKind(
       if (!template.tradeable || binding.kind !== 'unbound')
         return { ok: false, reason: 'ITEM_BOUND' };
       return { ok: true };
+    case 'mailbox':
+      // Only the server delivers into the mailbox (overflow loot); players may only take out.
+      return { ok: false, reason: 'CONTAINER_KIND_MISMATCH' };
   }
 }
 
