@@ -1,0 +1,28 @@
+{
+	admin off
+	auto_https off
+}
+http://127.0.0.1:4460 {
+	bind 127.0.0.1
+	encode zstd gzip
+	header X-Robots-Tag "noindex, nofollow"
+	@private path /api/v1/admin* /api/metrics* /realtime/metrics*
+	respond @private 404
+	handle_path /api/* {
+		reverse_proxy 127.0.0.1:4461 {
+			header_up X-Real-IP {http.request.header.X-Real-IP}
+			header_up X-Forwarded-For {http.request.header.X-Real-IP}
+		}
+	}
+	handle_path /realtime/* {
+		reverse_proxy 127.0.0.1:4462 {
+			header_up X-Real-IP {http.request.header.X-Real-IP}
+		}
+	}
+	handle {
+		root * /srv/brokenodyssey/current/apps/game-web/dist
+		header Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}

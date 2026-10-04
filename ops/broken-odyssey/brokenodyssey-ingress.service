@@ -1,0 +1,12 @@
+[Unit]
+Description=Broken Odyssey bridge to loopback web ingress
+After=brokenodyssey-web.service
+Requires=brokenodyssey-web.service
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:4460
+DynamicUser=yes
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true

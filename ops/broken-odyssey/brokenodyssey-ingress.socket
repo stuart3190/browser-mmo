@@ -1,0 +1,10 @@
+[Unit]
+Description=Broken Odyssey private shared-Caddy bridge
+After=docker.service
+
+[Socket]
+ListenStream=10.83.7.1:4463
+NoDelay=true
+
+[Install]
+WantedBy=sockets.target

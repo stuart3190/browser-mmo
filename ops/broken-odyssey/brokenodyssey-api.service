@@ -1,0 +1,22 @@
+[Unit]
+Description=Broken Odyssey development preview api
+After=network-online.target postgresql@17-brokenodyssey.service
+Wants=postgresql@17-brokenodyssey.service
+
+[Service]
+User=brokenodyssey
+Group=brokenodyssey
+WorkingDirectory=/srv/brokenodyssey/current
+EnvironmentFile=/etc/brokenodyssey/runtime.env
+ExecStart=/usr/bin/node services/api/dist/main.js
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=45
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

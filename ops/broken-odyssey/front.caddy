@@ -1,0 +1,12 @@
+# BEGIN BROKEN ODYSSEY
+brokenodyssey.com {
+	bind 10.83.7.2
+	reverse_proxy 10.83.7.1:4463 {
+		header_up X-Real-IP {remote_host}
+	}
+}
+www.brokenodyssey.com {
+	bind 10.83.7.2
+	redir https://brokenodyssey.com{uri} permanent
+}
+# END BROKEN ODYSSEY

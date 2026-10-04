@@ -1,0 +1,22 @@
+[Unit]
+Description=Broken Odyssey development preview web
+After=network-online.target brokenodyssey-api.service brokenodyssey-realtime.service
+Wants=brokenodyssey-api.service brokenodyssey-realtime.service
+
+[Service]
+User=brokenodyssey
+Group=brokenodyssey
+WorkingDirectory=/srv/brokenodyssey/current
+EnvironmentFile=/etc/brokenodyssey/runtime.env
+ExecStart=/usr/local/bin/brokenodyssey-caddy run --config /etc/brokenodyssey/Caddyfile
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=45
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
