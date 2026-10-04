@@ -76,6 +76,39 @@ export class WorldView {
     this.sign(8, -16, 'THE OLD ARMOURY', 'Take a sword · open Bag to equip');
     this.sign(-6, 8, 'ELDER MAREN', 'Speak with E · Wolves at the Edge');
     this.sign(-5, -97, 'OLD WAYSTONE', 'A place to begin again');
+    this.sign(-23, -91, 'THE PALE TRAIL', 'Claw marks lead west');
+    this.sign(-43, -94, 'BROKEN ROOTS', 'A low growl from the Hollow');
+    // Non-blocking story dressing: preserve all authoritative terrain/colliders.
+    for (const [x, z] of [
+      [-15, -92],
+      [-25, -90],
+      [-34, -91],
+      [-45, -93],
+      [-51, -94],
+    ]) {
+      const stone = MeshBuilder.CreateIcoSphere(
+        'trail_stone',
+        { radius: 0.4, subdivisions: 1 },
+        this.scene,
+      );
+      stone.position.set(x!, 0.12, z!);
+      stone.scaling.y = 0.45;
+      stone.material = this.material('#d0c3a2');
+      stone.isPickable = false;
+      stone.freezeWorldMatrix();
+    }
+    for (let i = 0; i < 5; i++) {
+      const root = MeshBuilder.CreateBox(
+        'scarred_root',
+        { width: 0.25, height: 0.16, depth: 4 },
+        this.scene,
+      );
+      root.position.set(-61 + i * 1.6, 0.08, -96);
+      root.rotation.y = i * 0.7;
+      root.material = this.material(i % 2 ? '#846a9c' : '#4e4539');
+      root.isPickable = false;
+      root.freezeWorldMatrix();
+    }
   }
 
   private sign(x: number, z: number, title: string, subtitle: string): void {

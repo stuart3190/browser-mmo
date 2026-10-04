@@ -86,6 +86,11 @@ export function TargetFrame() {
       {t.maxHealth !== undefined && (
         <Bar value={t.health ?? 0} max={t.maxHealth} kind="hp" testId="target-hp" />
       )}
+      {t.attackCue && !t.dead && (
+        <div className="attack-warning" role="status">
+          Heavy bite — step outside the amber ring!
+        </div>
+      )}
       {hostile && !t.dead && (
         <button
           className={state.target.attacking ? 'attack-toggle active' : 'attack-toggle'}

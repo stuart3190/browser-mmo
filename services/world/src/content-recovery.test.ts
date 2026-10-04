@@ -5,7 +5,9 @@ import { ZoneSimulation } from './zone-simulation';
 it('additive Waystone recovery preserves old entities and live player state and adds Rill exactly once', () => {
   const current = getGameData();
   const raw = structuredClone(current.raw);
-  raw.quests = raw.quests.filter((q) => q.id !== 'quest.greenvale.old_waystone');
+  raw.quests = raw.quests.filter(
+    (q) => q.id !== 'quest.greenvale.old_waystone' && q.id !== 'quest.greenvale.hollow_trail',
+  );
   raw.npcs = raw.npcs.filter((n) => n.id !== 'npc.greenvale.keeper_rill');
   for (const c of raw.chunks)
     c.spawnPoints = c.spawnPoints.filter((s) => s.id !== 'spawn.greenvale.waystone_keeper');

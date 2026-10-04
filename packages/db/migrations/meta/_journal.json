@@ -64,6 +64,13 @@
       "when": 1791145385607,
       "tag": "0008_waystone_content",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791145385608,
+      "tag": "0009_hollow_content",
+      "breakpoints": true
     }
   ]
 }

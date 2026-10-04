@@ -1288,3 +1288,11 @@ body:has(.login) {
     top: 174px;
   }
 }
+
+.attack-warning {
+  color: #ffe4a0;
+  background: #533819;
+  padding: 6px;
+  font-weight: 700;
+  font-size: 12px;
+}

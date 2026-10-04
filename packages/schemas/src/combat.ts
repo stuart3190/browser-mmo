@@ -12,6 +12,8 @@ export const DamageRangeSchema = z
 
 /** Per-enemy combat block. Enemies without one are not simulated as combatants. */
 export const EnemyCombatSchema = z.object({
+  /** Optional stationary, dodgeable wind-up before each melee swing. */
+  windupMs: z.number().int().min(500).max(5000).optional(),
   damage: DamageRangeSchema,
   attackSpeedMs: z.number().int().positive(),
   /** Metres between centres at which the enemy can hit. */

@@ -47,6 +47,22 @@ const gear = (g: GearInput): ItemTemplate => {
 
 export const itemTemplates: ItemTemplate[] = [
   gear({
+    id: 'accessory.trinket.keepers_token',
+    name: "Keeper's Ward-Token",
+    description: "Rill's small carved ward. The roots beneath the Hollow still stir.",
+    category: 'accessory',
+    rarityId: 'uncommon',
+    itemLevel: 3,
+    requiredLevel: 2,
+    binding: 'on_pickup',
+    equipment: {
+      slotType: 'trinket',
+      equipmentTypeId: 'trinket',
+      baseStats: { stamina: { min: 3, max: 3 }, armor: { min: 4, max: 4 } },
+      maxDurability: null,
+    },
+  }),
+  gear({
     id: 'weapon.sword.iron_longsword',
     name: 'Iron Longsword',
     description: 'A plain but dependable blade.',

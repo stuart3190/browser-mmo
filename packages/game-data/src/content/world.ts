@@ -340,6 +340,21 @@ chunks
     wanderRadius: 0,
   });
 
+chunks
+  .find((c) => c.coord.cx === -1 && c.coord.cz === -2)!
+  .spawnPoints.push({
+    id: 'spawn.greenvale.brackenmaw',
+    kind: 'enemy',
+    refId: 'enemy.greenvale.brackenmaw',
+    position: { x: -57, y: 0, z: -92 },
+    rotationY: 1.5,
+    quantity: 1,
+    respawnMs: 60_000,
+    interactRadius: 3,
+    groupId: null,
+    wanderRadius: 2,
+  });
+
 export const zones: WorldZone[] = [
   {
     id: ZONE_ID,
@@ -429,7 +444,7 @@ export const npcs: NpcDefinition[] = [
     id: 'npc.greenvale.keeper_rill',
     name: 'Keeper Rill',
     title: 'Watcher of the Old Waystone',
-    role: 'ambient',
+    role: 'quest_giver',
     modelId: null,
     dialogue: [
       'The stone is warm again. Last night its old markings lit toward the Hollow. Tell Maren: the wolves are fleeing something beneath the roots. I will keep watch here.',
@@ -449,6 +464,29 @@ export const npcs: NpcDefinition[] = [
 ];
 
 export const enemies: EnemyDefinition[] = [
+  {
+    id: 'enemy.greenvale.brackenmaw',
+    name: 'Brackenmaw, Hollow Packleader',
+    level: 3,
+    maxHealth: 260,
+    family: 'beast',
+    lootTableId: 'loot.greenvale.brackenmaw',
+    xpReward: 160,
+    modelId: null,
+    isBoss: true,
+    isWorldBoss: false,
+    combat: {
+      damage: { min: 12, max: 18 },
+      attackSpeedMs: 3000,
+      windupMs: 1400,
+      attackRange: 3,
+      aggroRange: 9,
+      leashRange: 20,
+      moveSpeed: 4.5,
+      armor: 12,
+      corpseMs: 6000,
+    },
+  },
   {
     id: 'enemy.greenvale.grey_wolf',
     name: 'Grey Wolf',
@@ -474,6 +512,39 @@ export const enemies: EnemyDefinition[] = [
 ];
 
 export const quests: QuestDefinitionInput[] = [
+  {
+    id: 'quest.greenvale.hollow_trail',
+    name: 'Teeth Beneath the Roots',
+    description:
+      "Rill's warning leads west from the Old Waystone. Follow the pale trail stones past the clawed marker into the Hollow. Defeat Brackenmaw, then return to Rill. When the packleader braces inside an amber ring, step out before its bite lands.",
+    giverNpcId: 'npc.greenvale.keeper_rill',
+    minLevel: 2,
+    prerequisites: ['quest.greenvale.old_waystone'],
+    objectives: [
+      {
+        id: 'slay_brackenmaw',
+        kind: 'kill',
+        enemyId: 'enemy.greenvale.brackenmaw',
+        count: 1,
+        label: 'Brackenmaw slain (west of Old Waystone)',
+      },
+    ],
+    rewards: {
+      xp: 350,
+      currency: [{ currencyId: 'gold', amount: 125 }],
+      items: [{ itemTemplateId: 'accessory.trinket.keepers_token', quantity: 1 }],
+    },
+    dialogue: {
+      offer:
+        'Maren believes me, then. Follow the pale stones west. Something has scarred the roots — Brackenmaw guards them now. Watch its paws: when it braces in amber, step back from its bite. Hunt together if you can, and return to me when the trail is safe.',
+      inProgress:
+        'West, along the pale stones. Brackenmaw waits beyond the clawed marker. Step out of the amber ring while it winds up; then strike back.',
+      readyToTurnIn:
+        'The howling has stopped, but the roots still glow. Brackenmaw was guarding the wound, not making it. Take my ward-token. You have given us time to learn what lies below.',
+      completed:
+        'The trail is quiet again. I will watch the roots. Whatever woke them is deeper than one wolf can go.',
+    },
+  },
   {
     id: 'quest.greenvale.old_waystone',
     name: 'A Whisper at the Waystone',

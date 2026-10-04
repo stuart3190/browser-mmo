@@ -64,7 +64,10 @@ describe('Greenvale population (spawn groups)', () => {
         pending: 0,
         maxAlive: g.maxAlive,
       });
-    const wolves = sim.enemyIds().map((id) => sim.getEnemy(id)!);
+    const wolves = sim
+      .enemyIds()
+      .map((id) => sim.getEnemy(id)!)
+      .filter((e) => e.groupId !== null);
     expect(wolves).toHaveLength(zone.spawnGroups.reduce((n, g) => n + g.maxAlive, 0));
     for (const w of wolves) {
       expect(w.groupId).not.toBeNull();

@@ -131,6 +131,7 @@ export async function startGame(args: {
     maxHealth: e.maxHealth,
     dead: e.dead,
     hostile: e.hostile,
+    attackCue: e.attackCue,
   });
   const patchEntity = (id: string, patch: Partial<EntityInfo>) => {
     const cur = state.world.get(id);

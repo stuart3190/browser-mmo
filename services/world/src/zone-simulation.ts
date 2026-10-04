@@ -360,6 +360,16 @@ export class ZoneSimulation {
     restore(this.groups, state.groups);
     this.respawnQueue.splice(0, this.respawnQueue.length, ...state.respawnQueue);
     this.kills.splice(0, this.kills.length, ...state.kills);
+    // Narrow additive ungrouped enemy migration; never resurrect a live/corpse/pending spawn.
+    for (const chunk of this.gameData.chunksForZone(this.zone.id))
+      for (const spawn of chunk.spawnPoints)
+        if (
+          spawn.kind === 'enemy' &&
+          !spawn.groupId &&
+          ![...this.enemies.values()].some((e) => e.spawn.id === spawn.id) &&
+          !this.respawnQueue.some((r) => r.spawn.id === spawn.id)
+        )
+          this.spawnFromPoint(spawn, Date.now());
     for (const pickup of this.pickups.values()) pickup.reservedBy = null;
     for (const p of this.players.values()) {
       p.known.clear();
@@ -1343,6 +1353,7 @@ export class ZoneSimulation {
 
   /** Health hit 0: freeze the enemy and queue a write-ahead kill event for the host to persist. */
   private enemyDying(enemy: EnemyState, killer: PlayerState, nowMs: number): void {
+    if (this.entities.get(enemy.entityId)?.attackCue) this.cue(enemy, null);
     enemy.mode = 'dying';
     enemy.targetCharacterId = null;
     enemy.path = null;
@@ -1419,8 +1430,19 @@ export class ZoneSimulation {
   }
 
   /** Enemy gives up: walk home, then reset to full health ("evade"). */
+  private cue(enemy: EnemyState, endsAtMs: number | null): void {
+    const entity = this.entities.get(enemy.entityId);
+    if (!entity) return;
+    entity.attackCue =
+      endsAtMs === null
+        ? null
+        : { endsAtMs, range: enemy.def.combat.attackRange + this.rules.rangeTolerance };
+    this.toKnowers(enemy.entityId, { t: 'entity.spawn', d: { entity: { ...entity } } });
+  }
+
   private disengage(e: EnemyState, nowMs: number = this.lastStepMs ?? 0): void {
     if (e.mode === 'dead' || e.mode === 'dying') return;
+    if (this.entities.get(e.entityId)?.attackCue) this.cue(e, null);
     e.mode = 'returning';
     e.targetCharacterId = null;
     e.path = null;
@@ -1600,6 +1622,15 @@ export class ZoneSimulation {
       const canHit =
         isInRange(dist, c.attackRange, this.rules.rangeTolerance) &&
         this.hasLineOfSight(entity.position, target.position);
+      // A committed wind-up holds position. At resolution recheck range/LOS; moving away dodges.
+      // The cue is in the durable entity image, so reconnect/recovery cannot skip the warning.
+      const cue = entity.attackCue;
+      if (cue && nowMs < cue.endsAtMs) continue;
+      if (cue) {
+        this.cue(enemy, null);
+        enemy.nextAttackAtMs = nowMs + c.attackSpeedMs;
+        if (!canHit) continue;
+      }
       if (!canHit) {
         const left = this.steer(
           enemy,
@@ -1614,8 +1645,14 @@ export class ZoneSimulation {
       }
       enemy.lastProgressAtMs = nowMs;
       this.face(enemy.entityId, entity.position, target.position);
-      if (!isAttackReady(enemy.nextAttackAtMs, nowMs)) continue;
-      enemy.nextAttackAtMs = nextSwingAt(enemy.nextAttackAtMs, nowMs, c.attackSpeedMs);
+      if (!cue) {
+        if (!isAttackReady(enemy.nextAttackAtMs, nowMs)) continue;
+        if (c.windupMs) {
+          this.cue(enemy, nowMs + c.windupMs);
+          continue;
+        }
+        enemy.nextAttackAtMs = nextSwingAt(enemy.nextAttackAtMs, nowMs, c.attackSpeedMs);
+      }
       const result = resolveAttack(
         this.rules,
         {

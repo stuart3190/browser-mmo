@@ -735,3 +735,32 @@ Each party member talks/turns in individually. The quest is non-repeatable and h
 special quest inventory. This is a narrow additive migration, not automatic arbitrary content
 compatibility. Unknown content hashes still fail closed. Stop hosts for migrations and roll forward;
 pre-party binaries cannot safely process new group reward events.
+
+## 2026-10-05 — Hollow packleader with a persistent melee warning
+
+**Date**: 2026-10-05
+
+**Decision**
+Continue Rill's warning with one prerequisite-gated kill-and-return quest, a short marked trail,
+and Brackenmaw. Add only an optional per-enemy melee wind-up. The enemy holds position, publishes
+an entity attack cue through existing AOI/upserts, and rechecks range/line of sight at resolution.
+The cue survives in the existing checkpoint/snapshot. Death or disengagement clears it. No new
+ability engine, reward path or party rules. Use an existing cap as the single rotating kill drop
+and a modest class-neutral bound trinket as each character's one-time quest reward.
+
+**Reason**
+A readable, avoidable bite gives the small encounter a player decision without expanding the
+combat architecture. Persistent cues keep reconnect and ordinary replication consistent. The
+existing kill outbox and quest transaction already enforce group credit and reward deduplication.
+
+**Alternatives considered**
+An instant high-damage wolf (no new decision); a scripted multi-phase boss/AoE engine (excess scope);
+client-timed damage (untrusted); clearing world saves to add a spawn (unacceptable state loss).
+
+**Consequences**
+The cue is optional; existing enemies behave unchanged. This is a single-target encounter, not
+an AoE/raid framework. Balance needs player feedback. Explicit content migration preserves the
+checkpoint and terrain; recovery adds an ungrouped spawn only if neither its enemy state nor
+pending respawn exists. Deploy client/server content together after stopping owners and migrating.
+The new quest requires each member to accept and turn in individually; existing shared eligibility
+and one-roll loot rules apply. Physical-device and hosting follow-ups remain external.

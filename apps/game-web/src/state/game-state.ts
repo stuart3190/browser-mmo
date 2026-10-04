@@ -34,6 +34,7 @@ export interface EntityInfo {
   maxHealth?: number | undefined;
   dead?: boolean | undefined;
   hostile?: boolean | undefined;
+  attackCue?: { endsAtMs: number; range: number } | null | undefined;
 }
 
 export interface Vitals {

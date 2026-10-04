@@ -2,6 +2,21 @@ import type { LootTable } from '@mmo/schemas';
 
 export const lootTables: LootTable[] = [
   {
+    id: 'loot.greenvale.brackenmaw',
+    rolls: 1,
+    emptyChance: 0,
+    entries: [
+      {
+        itemTemplateId: 'armor.leather.trapper_cap',
+        weight: 1,
+        minQuantity: 1,
+        maxQuantity: 1,
+        rarityId: null,
+      },
+    ],
+    currency: { currencyId: 'gold', min: 60, max: 90 },
+  },
+  {
     id: 'loot.greenvale.wolf',
     rolls: 2,
     emptyChance: 0,

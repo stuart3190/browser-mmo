@@ -237,6 +237,8 @@ export const WorldEntitySchema = z.object({
   maxHealth: z.number().int().positive().optional(),
   dead: z.boolean().optional(),
   hostile: z.boolean().optional(),
+  /** Persistent attack cue; null clears it. Snapshots also carry active cues. */
+  attackCue: z.object({ endsAtMs: z.number(), range: z.number().positive() }).nullable().optional(),
 });
 export type WorldEntity = z.infer<typeof WorldEntitySchema>;
 

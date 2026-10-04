@@ -23,6 +23,7 @@ interface View {
 export class EntityViews {
   private readonly views = new Map<string, View>();
   private readonly actors = new Map<string, ActorModel>();
+  private readonly cues = new Map<string, Mesh>();
   private ring: Mesh | undefined;
   private ringTarget: string | null = null;
   private readonly flashes = new Map<string, number>();
@@ -41,6 +42,24 @@ export class EntityViews {
 
   upsert(entity: WorldEntity): void {
     if (entity.id === this.localEntityId) return; // local player is rendered by PlayerController
+    const previousCue = this.cues.get(entity.id);
+    if (!entity.attackCue || entity.dead) {
+      previousCue?.material?.dispose();
+      previousCue?.dispose();
+      this.cues.delete(entity.id);
+    } else if (!previousCue) {
+      const cue = MeshBuilder.CreateTorus(
+        `bite_${entity.id}`,
+        { diameter: entity.attackCue.range * 2, thickness: 0.14, tessellation: 40 },
+        this.scene,
+      );
+      const mat = new StandardMaterial(`bite_mat_${entity.id}`, this.scene);
+      mat.emissiveColor = new Color3(1, 0.65, 0.1);
+      mat.disableLighting = true;
+      cue.material = mat;
+      cue.isPickable = false;
+      this.cues.set(entity.id, cue);
+    }
     const existing = this.views.get(entity.id);
     if (existing) {
       if (existing.entity.dead !== entity.dead) this.setDead(entity.id, entity.dead ?? false);
@@ -80,6 +99,10 @@ export class EntityViews {
       v.mesh.material?.dispose();
       v.mesh.dispose();
     }
+    const cue = this.cues.get(entityId);
+    cue?.material?.dispose();
+    cue?.dispose();
+    this.cues.delete(entityId);
     this.flashes.delete(entityId);
     this.baseEmissive.delete(entityId);
     this.views.delete(entityId);
@@ -102,6 +125,10 @@ export class EntityViews {
       const t = this.ringTarget ? this.views.get(this.ringTarget) : undefined;
       this.ring.isVisible = t !== undefined;
       if (t) this.ring.position.set(t.mesh.position.x, 0.05, t.mesh.position.z);
+    }
+    for (const [id, cue] of this.cues) {
+      const v = this.views.get(id);
+      if (v) cue.position.set(v.target.x, 0.07, v.target.z);
     }
     for (const v of this.views.values()) {
       const distance = Vector3.Distance(v.mesh.position, v.target);
@@ -215,6 +242,11 @@ export class EntityViews {
         e.kind === 'enemy' ? 'wolf' : 'hero',
         e.kind === 'npc' ? '#94744c' : '#526b98',
       );
+      if (e.refId === 'enemy.greenvale.brackenmaw') {
+        actor.mesh.scaling.setAll(1.45);
+        const mat = actor.mesh.material as StandardMaterial;
+        mat.diffuseColor = Color3.FromHexString('#554537');
+      }
       this.actors.set(e.id, actor);
       return actor.mesh;
     }
