@@ -403,3 +403,63 @@ These are not yet decided. Record a dated entry above when one is.
 Resolved on 2026-10-03 (see entries above): in-game UI framework (React DOM overlay), browser 3D engine (Babylon.js), ORM (Drizzle), realtime server design (ws + versioned JSON protocol, in-process zone simulations), authentication approach (provider abstraction + opaque sessions), stackable items (instances with quantity).
 
 The preferred technical direction (TypeScript, Node.js, pnpm workspace monorepo, PostgreSQL, Redis where useful, WebSockets, Zod or equivalent, Vitest or equivalent, ESLint, Prettier) is listed in `docs/MASTER_PLAN.md` as a preference. All of these except Redis were adopted on 2026-10-03.
+
+---
+
+## 2026-10-04 — Pre-alpha admission, state ordering and bounded reconciliation
+
+**Date**
+2026-10-04
+
+**Decision**
+Keep the current PostgreSQL + Fastify + WebSocket + in-process zone architecture. Replace
+per-message movement tolerance with cumulative distance credit: class speed replenishes the
+budget, initial credit is 0.75 m and total stored credit is capped at half a second of movement
+plus 0.75 m. Collisions and zone bounds remain authoritative.
+
+Guard asynchronous character admission per character. Sequential replacement still closes the
+previous controller; overlapping admissions are rejected. Validate map ownership before gameplay
+messages. Revalidate active sessions every second, enforce the recorded expiry on ticks/messages,
+and disconnect on failed checks or a validation age over five seconds at default settings.
+Disconnected characters retain the existing combat linger behavior.
+
+Persist position, rotation, health and unexpired cooldowns with one UPDATE. Non-overlapping periodic
+saves include cooldowns. Departure writes follow any running periodic save; failed snapshots stay
+in memory and must persist before re-entry reloads the character. Reattachment refreshes gear while
+preserving live health and cooldowns.
+
+Bound outbound WebSocket buffering to 256 KiB including the next encoded frame; terminate slow
+clients. Cap gateway sockets at 256 and upgrades per source IP at a 20 burst / 2 per second.
+Keep the existing 40 burst / 20 per second frame bucket; database actions additionally use an
+8 burst / 2 per second bucket, one action at a time per connection and eight concurrent incoming
+DB handlers per gateway. HTTP uses source-IP (120 burst / 30 per second), account (60 / 15),
+auth POST (10 / 0.5) limits and 16 concurrent authentication/route work slots. Limiter key tables
+are bounded and fail closed at capacity. Database connection acquisition, statements and locks
+have 5 s, 10 s and 3 s timeouts respectively. Kill record work is capped at four concurrent jobs.
+These are starting safety limits, not measured production capacity.
+
+Serialize full snapshots with change-feed fan-out, coalesce refresh requests and bound pending
+notification keys. Listener reconnection, query failures and overflow request full reconciliation;
+a 30 s sweep also repairs inventory/wallet/quest views and live combat profiles. Keep LISTEN/NOTIFY
+as an invalidation hint, not a durable log. Lock the character before item movement/equipment slot
+validation, so an empty equipment set is protected against concurrent incompatible equips.
+
+**Reason**
+The audit identified exploitable movement allowances, async controller races, missing session
+revocation, stale departure reads, unbounded work, lost refreshes and an empty-equipment locking
+race. These boundaries need concrete invariants before inviting external players.
+
+**Alternatives considered**
+Input-only movement resimulation; per-frame database auth; a new message broker; distributed
+session/zone coordination; per-ability durable event sourcing; unrestricted promise queues.
+None is necessary for this focused single-host hardening batch. A zone ownership fence remains
+a separate required deployment improvement.
+
+**Consequences**
+No new gameplay, schema migration, broker or auth provider. Concurrent expensive actions can return
+RATE_LIMITED and must be retried after completion/backoff. Session revocation is bounded polling,
+not immediate push; an unhealthy database can disconnect valid sessions. Controller and admission
+guarantees remain process-local. Reconciliation is eventually consistent. Failed in-memory saves
+are not crash-durable; no per-action persistence guarantee is claimed. IP limits require an explicit
+trusted ingress review before proxy deployment. Existing grant/move lock-order inversions remain
+protected by transaction retries, not eliminated. See PROGRESS for tests and implementation SHA.

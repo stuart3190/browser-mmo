@@ -493,16 +493,49 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · Prometheus-text /metrics on both services (unit + API test) · 0f0a413
 - [ ] Backups
 
+## Pre-alpha hardening — 2026-10-04
+
+Implementation commit: `7eae981189ef5b95f4a8cbc16751878e6ec63191`. Branch: `codex/pre-alpha-hardening`.
+Verified by Codex against Node 22.23.2, pnpm 10.28.0 and an isolated PostgreSQL 17.11 database.
+
+- [x] Movement credit is elapsed-time based; message frequency cannot generate extra distance.
+  - Verified 2026-10-04 · Codex · world tests: same-timestamp burst, sustained 20 Hz exploit, legal 10 Hz movement, bounded idle credit · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+- [x] One controller per character within a realtime process, including overlapping asynchronous admissions.
+  - Verified 2026-10-04 · Codex · simultaneous real WebSocket logins; existing replacement/reconnect tests · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+- [x] Live connections enforce logout, bans and session expiry; failed/stale session checks fail closed.
+  - Verified 2026-10-04 · Codex · idle socket revocation/ban/expiry and failed-query tests · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+- [x] Position, health and cooldowns persist in one atomic statement; re-entry waits for departure persistence and retries retained failed saves.
+  - Verified 2026-10-04 · Codex · real PostgreSQL row-lock test blocks departure/re-entry, checks restored state; injected failed-save retry; existing combat/ability reconnect tests · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+- [x] Outbound WebSocket buffers and connection admission are bounded.
+  - Verified 2026-10-04 · Codex · socket terminates before an outbound frame exceeds its configured budget; bounded keyed rate-limiter unit test · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+- [x] HTTP and WebSocket expensive-work admission is limited before database work; database waits have timeouts.
+  - Verified 2026-10-04 · Codex · API rate/concurrency tests assert rejected requests never resolve sessions; WS action burst test; all database integration suites · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+- [x] Failed or missed change notifications trigger reconciliation of inventory, wallet, quests and simulation combat profile.
+  - Verified 2026-10-04 · Codex · terminated LISTEN connection plus gear change; injected fan-out query failure without a subsequent item event; serialized snapshots/deltas and coalesced work · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+- [x] Equipment operations lock the character before inspecting slots, including an empty equipment set.
+  - Verified 2026-10-04 · Codex · concurrent two-handed/off-hand equips from distinct containers: exactly one succeeds · `7eae981189ef5b95f4a8cbc16751878e6ec63191`
+
+Verification: full `pnpm verify` run completed format, lint, typecheck, 114 unit tests, API (6)
+and domain (50) integration tests. Realtime initially passed 41/42: its duplicate quest-turn-in
+assertion expected a domain rejection where the new work guard correctly returns `RATE_LIMITED`.
+Updated that assertion and added a subsequent retry asserting `QUEST_ALREADY_COMPLETED`, retaining
+all wallet/item single-reward assertions. The affected quest suite then passed 2/2; all 98 integration
+tests are now verified. `pnpm build` passed for all four apps/services. Final added tests received
+realtime typechecking and targeted lint/format checks. No browser E2E, load test, hardware/mobile
+benchmark, production-auth replacement, CI activation or backup work was performed.
+
 ## Current Work
 
-Nothing in progress. Milestone "first playable class + ability system" is complete on branch `claude/great-brahmagupta-h834j7` (commits `3c2ddca`, `9ea8315`, `5cf938d` + this PROGRESS update), awaiting owner review; not merged to `main` (main is at `a96721a`, the quest milestone).
+Pre-alpha hardening is complete on `codex/pre-alpha-hardening`, awaiting owner review; do not merge automatically.
+The branch started from verified remote `main` at `d564ab785069047c97062368f42019856738d0c6`.
+The earlier statement that class abilities were still unmerged was stale: they are already present on this main commit.
 
 ## Known Issues
 
 1. **CI not enabled and never executed on GitHub.** The workflow is a template at `docs/ci/github-actions-ci.yml`; on 2026-10-04 both `git push` and the GitHub App were refused for missing `workflow` scope. A maintainer must move it into place (see docs/ci/README.md); its command sequence passes locally.
 2. **WebGPU unverified.** `?renderer=webgpu` path compiles but was never run on real GPU hardware; WebGL2 is the default.
-3. **Single realtime process per zone.** Two realtime processes hosting the same zone would run divergent simulations. No zone registry yet. (The change feed itself works with several processes.)
-4. **Change feed is not durable.** NOTIFY events emitted while the listener is disconnected are lost; correctness relies on the full resync after reconnect (tested). Needs a direct DB connection (not PgBouncer transaction mode).
+3. **Single realtime process per zone remains a deployment requirement.** Controller exclusivity is enforced inside one process, not across duplicate zone hosts. There is no database-backed zone ownership fence. Two hosts still run divergent simulations; never deploy overlapping ownership.
+4. **Change feed is not durable.** Reconnection and failed queries now request full reconciliation, including simulation gear; a 30 s reconciliation sweep covers otherwise missed notifications. Delivery is eventually consistent, not instantaneous. Needs a direct DB connection (not PgBouncer transaction mode).
 5. **Reconnect = full snapshot.** No session resume/replay buffer; an expired session cannot reconnect (client shows "Disconnected"; reload to log in). The game client keeps the token in memory only.
 6. **Bank opens anywhere.** No banker NPC/proximity rule yet (server would need the player's position from the realtime service).
 7. **No drag-and-drop, sorting, search, split-stack or loadout UI.** Actions are via the details sheet. Icons are text placeholders.
@@ -511,7 +544,7 @@ Nothing in progress. Milestone "first playable class + ability system" is comple
 10. **Expired listings with a full bag** stay in escrow until the seller has space (the mailbox exists now but the marketplace does not use it yet). The expiry sweep runs in every API process (safe, wasteful with replicas).
 11. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
 12. **`item_instances.listing_id` has no foreign key** (circular with listings); escrow consistency is enforced in domain code and checked on cancel/buy.
-13. **Position persistence untested.** Positions are saved every 15 s and on disconnect, but no test asserts it.
+13. **State crash durability remains limited.** Position, health and cooldowns are saved atomically every 15 s and on departure, with tested ordering on re-entry. Unsaved state and failed departure snapshots retained only in memory can still be lost if the process crashes before persistence succeeds.
 14. **Stack-merge rows accumulate** (`destroyed/stack_merged`); archiving needed eventually.
 15. **Dev auth only.** Anyone can log in as any username when `AUTH_DEV_LOGIN_ENABLED=true`. Usernames in `AUTH_DEV_ADMIN_USERNAMES` become admins on first login.
 16. **Mouse camera drag and zoom** still not covered by an automated check (touch drag is).
@@ -530,17 +563,23 @@ Nothing in progress. Milestone "first playable class + ability system" is comple
 29. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
 30. **Dialogue panel does not close automatically when walking away** (the server re-validates range on every action).
 31. **Abilities are first pass.** Instant, single-target, hostile only; no casts, AoE, heals, buffs/debuffs, resources or talents; numbers unbalanced (a Mage out-damages a Warrior at range). Validation rejects unsupported features in data.
-32. **Cooldowns not yet saved are lost on a server crash** (≤ 12 s, saved on leaving the world only). Players reconnecting within the 10 s linger keep their in-memory cooldowns.
+32. **Cooldowns not yet saved can still be lost on a crash.** They now participate in periodic and departure snapshots (the longest current cooldown is 12 s). Lingering reconnects preserve in-memory cooldowns; no per-ability durable write was added.
 33. **Ranger and Cleric characters created before this milestone** (dev data only) still load but their bars show placeholder abilities that the server refuses.
 34. **Scripted hunting in the quest/ability E2Es is timing-sensitive** when dens were just cleared (respawn needs no player within 18 m); one quest E2E run timed out and passed on re-run.
 
+35. **Hardening limits are process-local and unbenchmarked.** Default gateway cap is 256 sockets; this is a safety limit, not a capacity claim. API trusts no proxy headers: a reverse proxy currently shares its source-IP allowance across clients. Review trusted ingress configuration and tune limits before external deployment; do not simply enable arbitrary forwarded IPs.
+36. **Local combat-health feedback needs a follow-up.** Consecutive nonlethal enemy hits emit damage messages but do not always refresh the local `player.vitals` HUD state. This batch did not change combat or client presentation.
+37. **External-player readiness remains blocked.** Production authentication, enabled CI, backup/restore proof and representative browser/mobile/capacity measurements remain follow-ups; none were implemented in this batch.
+
 ## Next Recommended Task
 
-**Milestone: second activity loop — gathering and a short quest chain** (unchanged recommendation, now with class identity):
+**Next hardening batch: zone ownership and crash-state correctness, then combat-health feedback.**
 
-1. Owner enables CI (move `docs/ci/github-actions-ci.yml` into `.github/workflows/`) and fixes anything the first run finds.
-2. Gathering from the existing ore spawn points (server-timed gather action, durable like pickups) feeding a collect objective.
-3. A follow-up quest gated by `prerequisites` with a `talk` objective and class-appropriate reward choices (sword for Warrior, staff for Mage).
-4. Small items: close dialogue out of range, clearer full-Recovered-loot message, `kill_events` retention, a first balance pass on ability numbers.
+1. Prevent a second live process from owning an already-hosted zone, including ownership-loss behavior. Keep the current single-process zone simulation; no distributed world rewrite.
+2. Decide and test the acceptable crash rollback window for position/health/cooldowns, especially death and ability reuse. Preserve the existing durable reward pipeline.
+3. Correct repeated-hit local health feedback and verify it against server state over the real protocol/client.
 
-Keep resources, talents, specialisations, more classes, crafting and social systems for later milestones.
+Separate external-player follow-ups: production auth, CI activation, backup/restore validation,
+trusted ingress/rate-limit configuration, and targeted capacity plus phone profiling. These were
+explicitly out of scope for this implementation. Do not start gathering, crafting, new classes,
+quests or other gameplay while these hardening gates remain unresolved.
