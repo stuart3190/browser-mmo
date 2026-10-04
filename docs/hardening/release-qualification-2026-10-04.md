@@ -6,6 +6,8 @@
 be read and this host does not meet the declared five-player performance gate. No new gameplay.
 The five-connection configuration remains an internal pilot ceiling, not certified capacity.
 
+Implementation/evidence commit: `1315c8a56af6b6567430fb42c285ddb00a6894ae`.
+
 Branch: `codex/pre-alpha-hardening`. Base candidate: `998b806ec26f0e25454fda7f7261d1914a52bcc9`.
 The branch began clean and contains `7eae981`, `80b99e9`, `cf3bc1e`, and `998b806`.
 `AGENTS.md` and `docs/MASTER_PLAN.md` are unchanged from main. Review found hardening, tests,

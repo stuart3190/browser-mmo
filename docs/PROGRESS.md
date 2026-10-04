@@ -561,22 +561,47 @@ verified across these runs. The aggregate verify command did **not** exit green;
 full run was performed. All four builds and assets check then passed. Final touched-test typecheck,
 lint and formatting passed. Full evidence and limitations: `docs/hardening/2026-10-04.md`.
 
+## Release qualification — 2026-10-04
+
+Branch: `codex/pre-alpha-hardening`. Implementation/evidence commit: `1315c8a56af6b6567430fb42c285ddb00a6894ae`.
+All checked entries below were verified 2026-10-04 by Codex; each proof refers to that commit.
+Detailed results and raw evidence: [release qualification](hardening/release-qualification-2026-10-04.md).
+
+- [x] Correct accumulated tick-timer drift without catch-up simulation or weaker validation.
+  - Proof: three scheduler regressions; paired timer control; skipped-slot metric; full world/realtime suites.
+- [x] Qualify exclusive ownership and crash durability with actual OS process termination.
+  - Proof: seven SIGKILL/SIGSTOP tests, concurrent takeovers, stale-owner fencing, movement/health/cooldowns, three reward boundaries, equipment rollback and session revocation.
+- [x] Verify browser health reconciliation and reconnect against the production client.
+  - Proof: consecutive hits have matching vitals; dropped health leaves HUD stale, periodic reconciliation and reconnect restore authoritative zero; no production debug hook.
+- [x] Reject development-mode release artifacts and correct CI's build environment.
+  - Proof: actual NODE_ENV=test artifact rejected; production artifact check passed; actionlint passed and workflow/template match. Hosted execution is still unverified.
+- [x] Expand and repeat the disposable restore integrity exercise.
+  - Proof: equipped items/materials, quests, wallets/ledger, escrow and completed sale, kill/rewards, final migrations and revoked sessions; occupied target refused. Checkpoint fixture is empty; process tests cover populated checkpoint recovery separately.
+- [x] Profile tick work, kernel scheduling, DB latency and final browser resources.
+  - Proof: method timings, Linux perf sched control, quiet five-player load, three production-browser traces and separate development scene counts; raw evidence retained.
+- [x] Complete final local verification after the release-build fix.
+  - Proof: complete pnpm verify exited 0; format/lint/typecheck, 119 unit and 115 PostgreSQL integration tests, four builds and production-artifact gate. Assets/restore/browser checks passed separately.
+- [ ] Hosted GitHub Actions green for the final branch SHA.
+- [ ] Capacity gate with safety headroom on the intended production host.
+- [ ] Physical Android/iOS acceptance and operated production ingress/recovery.
+
 ## Current Work
 
-Hardening code is implemented, tested and pushed on `codex/pre-alpha-hardening`; do not merge
-automatically. Workflow installation succeeded in this continuation. Hosted Actions status could
-not be read because the connector returned Unknown tool; it is not a claimed pass. Local recovery,
-authentication and exploit regressions are verified. Production readiness remains gated on the
-external operations/device/hosting checks below. Do not begin new gameplay work yet.
+Release qualification is complete: **FAIL / DO NOT MERGE**. The hardening branch includes focused
+timer and production-build fixes, passing correctness verification, measured performance evidence,
+and a per-finding status matrix. Hosted Actions cannot be read (invalid saved CLI credential / HTTP
+404; SSH git access works). Five players measured 18.20 Hz and p95 RTT 274 ms, failing the declared
+gate despite zero errors. Kernel tracing confirms run-queue delay beyond a tick period. Main remains
+unchanged. Do not start gameplay work or external invitations while these release gates are open.
 
 ## Known Issues
 
 ### External pre-alpha gates
 
-1. **Hosted CI must be checked on the latest branch commit before merge.** The actual workflow is now installed; no manual copy or credential-scope fix is required. Open the repository's Actions page and confirm the latest run is green.
-2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. Repeat on the intended host with combat/economy traffic, sustained load and explicit headroom before invitations.
+1. **Hosted CI must be checked on the latest branch commit before merge.** The actual workflow is now installed; no manual copy or credential-scope fix is required. Open the repository's Actions page and confirm the latest run is green. The available CLI credential is reported invalid and the private Actions endpoint returns HTTP 404; SSH push does not establish CI success. CI now builds with NODE_ENV=production and rejects development/debug artifacts.
+2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. The final quiet five-player run was 18.20 Hz / p95 RTT 274 ms with 216 skipped slots in 120 s, so higher stages were intentionally stopped. Kernel timer-only tracing measured 55.5 ms p99 run-queue delay. Repeat on stable intended hosting with combat/economy traffic and explicit headroom before invitations; no safe cap is certified.
 3. **Physical phone/GPU acceptance remains unverified.** Software-rendered desktop/phone viewports had poor frame times. Real iOS Safari/Android Chrome, touch conflicts, WebGPU fallback, cellular startup, thermal and battery tests remain required.
-4. **Deployment operations remain external.** Configure and verify TLS/private ingress, provision real accounts, schedule encrypted off-host backups, monitor failures and perform a restore drill on actual hosting. The local disposable restore is not a production backup service.
+4. **Deployment operations remain external.** Configure and verify TLS/private ingress, provision real accounts, schedule encrypted off-host backups, monitor failures and perform a restore drill on actual hosting. The local disposable restore is not a production backup service. Reconcile bans/credential changes newer than a restored backup before reopening ingress.
 
 ### Remaining debt and product limitations (not newly claimed high-risk fixes)
 
@@ -612,9 +637,10 @@ external operations/device/hosting checks below. Do not begin new gameplay work 
 
 ## Next Recommended Task
 
-**Finish release qualification, not new gameplay.** Check hosted CI for the final branch commit,
-review this hardening diff, then qualify the intended host and real phones under the measured
-limits. Set up actual TLS, invited accounts and off-host backup/restore operations. Diagnose any
-reproduced tick/frame failures before raising the five-connection ceiling. Do not add a broker,
-new classes, crafting, quests or content to work around unresolved release gates. A reviewed merge
-can follow green hosted CI; external invitations require the separate deployment/device gates.
+**Resolve the measured release blockers, not new gameplay.** Restore Actions visibility and obtain
+a genuine green run for the final SHA. Qualify a host with predictable CPU scheduling and durable
+PostgreSQL latency; do not raise the five-connection pilot ceiling until the 19.5 Hz / <250 ms p95
+RTT gate passes with headroom and representative combat/economy load. Test physical phones using
+the separate checklist, and operate TLS/ingress, invited accounts, monitoring and encrypted off-host
+backup/restore. No AI rewrite, broker, distributed zone infrastructure or new content is justified
+by the current profile. Keep main unchanged until merge gates are satisfied.
