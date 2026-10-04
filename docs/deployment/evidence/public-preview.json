@@ -1,0 +1,21 @@
+{
+  "url": "https://brokenodyssey.com/",
+  "title": "Broken Odyssey — Development Preview",
+  "debugHookAbsent": true,
+  "entities": 14,
+  "vitals": true,
+  "errors": [],
+  "developmentLabel": true,
+  "before": {
+    "x": 0,
+    "y": 0,
+    "z": -8
+  },
+  "after": {
+    "x": -1.1216540033828576e-16,
+    "y": 0,
+    "z": -6.168199999928476
+  },
+  "movementPersisted": true,
+  "browserErrors": []
+}

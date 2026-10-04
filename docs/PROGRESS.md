@@ -769,9 +769,31 @@ and final evidence are in the following verification commit. Continued verified 
     Five hunt checks plus nine return/equipment checks, screenshots and limits:
     [Hollow evidence](gameplay/evidence/hollow/results.json), [playable route](gameplay/hollow.md).
 
-Preview remains `http://127.0.0.1:5178/` on this VPS only. Software-rendered functional evidence is
+The gameplay implementation also remains available in the local development preview at `http://127.0.0.1:5178/`. Software-rendered functional evidence is
 not physical Android performance or public hosting qualification. No unrelated gameplay/infrastructure
 systems added; external follow-ups remain separate from development and merge gates.
+
+## Persistent public development preview — 2026-10-05
+
+- [x] **https://brokenodyssey.com** serves the built playable client through shared buildr-caddy;
+      www redirects to apex; valid Let's Encrypt TLS for both names.
+  - Verified 2026-10-05 · Codex · public HTTPS browser login, character creation, WebSocket snapshot
+    (14 entities), health HUD, real keyboard movement and persisted position after re-login.
+    No browser exceptions, no production debug hook. Development banner and SHA release manifest visible.
+  - Proof: [public preview](deployment/evidence/public-preview.json), screenshot in the same directory.
+    Deployment implementation: `27727fb5ce0b914c03206f1744230afc5260e769` plus ingress/verification commits.
+- [x] Isolated persistent PostgreSQL 17 preview cluster; unprivileged systemd API/realtime/web;
+      loopback services and a private socket bridge to the existing Docker front.
+  - Production runtime/password auth, dev auth disabled; fresh player-only operator account, no demo admins.
+    Existing local preview DB/services unchanged. All prior shared Caddy configuration bytes retained;
+    graceful signal reload kept the original container; Buildr/Thrallo returned 200 before and after.
+- [x] Repeatable verified-main deployment: `sudo bash scripts/deploy-broken-odyssey.sh`.
+  - Builds before downtime, locks concurrent deploys, dumps isolated DB, applies migrations/content sync,
+    switches release symlink, restarts only this preview and checks public release SHA/readiness.
+    Actual candidate builds, populated redeploy/migrations, Caddy validation, shell syntax, formatting and
+    public browser smoke passed. Initial backup connection and Host-header mistakes were corrected.
+    No gameplay changes and no claim of capacity certification/physical-device testing.
+  - Operation, ports, credential location and bootstrap: [deployment instructions](../ops/broken-odyssey/README.md).
 
 ## Known Issues
 
@@ -780,7 +802,7 @@ systems added; external follow-ups remain separate from development and merge ga
 1. **Hosted CI visibility remains an external follow-up.** The actual workflow is now installed; no manual copy or credential-scope fix is required. Open the repository's Actions page and confirm the latest run is green. The available CLI credential is reported invalid and the private Actions endpoint returns HTTP 404; SSH push does not establish CI success. CI now builds with NODE_ENV=production and rejects development/debug artifacts.
 2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. The latest restricted-role production-mode combat/economy run was 19.44 Hz / p95 RTT 152 ms with 100 skipped slots in 180 s. Earlier corrected runs failed at one and five players too; higher stages were intentionally stopped. Kernel timer-only tracing measured 55.5 ms p99 run-queue delay. Repeat on stable intended hosting with combat/economy traffic and explicit headroom before invitations; no safe cap is certified.
 3. **Physical phone/GPU acceptance remains unverified.** Software-rendered desktop/phone viewports had poor frame times. Real iOS Safari/Android Chrome, touch conflicts, WebGPU fallback, cellular startup, thermal and battery tests remain required.
-4. **Public deployment operations remain external.** Isolated production-mode TLS/private ingress, password accounts, a restricted runtime role, and a real-checkpoint encrypted local restore/startup have now been exercised. Public DNS/certificates, persistent supervision, scheduled encrypted off-host backups and alert delivery still need operation. The local restore is not an off-host backup service. Reconcile bans/credential changes newer than a restored backup before reopening ingress.
+4. **Public development preview is now deployed.** DNS/TLS, password login and persistent supervision work at brokenodyssey.com on an isolated DB. Scheduled encrypted off-host backups, alert delivery and production launch qualification remain follow-ups. Deployment dumps are local recovery copies, not an off-host backup service. Reconcile bans/credential changes newer than a restored backup before reopening ingress.
 
 ### Remaining debt and product limitations (not newly claimed high-risk fixes)
 

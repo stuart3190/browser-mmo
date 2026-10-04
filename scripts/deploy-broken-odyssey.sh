@@ -72,5 +72,12 @@ for port in 4461 4462; do
   done
   $ready || { echo "Service on $port is not ready; inspect journalctl." >&2; exit 1; }
 done
-curl -fsS http://127.0.0.1:4460/release.json
+curl -fsS -H 'Host: brokenodyssey.com' http://127.0.0.1:4460/release.json
+public_release=$(curl -fsS --retry 5 --retry-delay 1 https://brokenodyssey.com/release.json)
+python3 - "$revision" "$public_release" <<'PYCHECK'
+import json, sys
+assert json.loads(sys.argv[2])['commit'] == sys.argv[1], 'Public release does not match deployment'
+PYCHECK
+curl -fsS https://brokenodyssey.com/api/health/ready
+curl -fsS https://brokenodyssey.com/realtime/health/ready
 printf '\nDeployed %s. Public front: https://brokenodyssey.com\n' "$revision"

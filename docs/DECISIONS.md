@@ -771,3 +771,32 @@ key prevented turn-in, and the transaction rolled back without partial rewards. 
 `syncItemTemplates` function as `pnpm db:sync-content`, safe in production and separate from demo seeding.
 Run after migrations before restarting hosts. Actual retry/reconnect/equipment proof passed for both
 characters. This adds a deployment entry point, not a new content or economy architecture.
+
+## 2026-10-05 — Persistent public development preview behind the shared front
+
+**Date**: 2026-10-05
+
+**Decision**
+Serve Broken Odyssey at its apex domain using the existing shared buildr-caddy, explicit apex/www
+sites and automatic TLS. Add only this site's block and reload gracefully. Built releases live
+under /srv/brokenodyssey; unprivileged systemd API/RT and private static ingress bind to loopback.
+A socket proxy on the existing Docker bridge connects shared Caddy to private ingress. Keep an
+isolated persistent PostgreSQL cluster and password accounts; production runtime guards remain on.
+The client is clearly labelled DEVELOPMENT PREVIEW. Routine deploys fetch verified main, build,
+dump the preview DB, migrate/sync content and restart only these services, then check the public SHA.
+
+**Reason**
+Gameplay needs a stable public preview without transient Vite processes, public username impersonation,
+or disruption to other apps. Existing auth, migration, checkpoint and Caddy systems already suffice.
+
+**Alternatives considered**
+Expose the local Vite/dev-login instance (transient and unsafe publicly); move shared Caddy to host
+networking (affects unrelated services); reuse the temporary test PostgreSQL cluster (not persistent
+hosting); introduce containers/orchestration for the whole game (unnecessary for this deployment).
+
+**Consequences**
+The preview is persistent but is not a production launch/capacity claim. Five connections remain the
+configured limit. Password accounts are operator-provisioned, no public signup or admin demo account.
+Preview data is separate from prior local playthroughs. Local deployment dumps/releases need periodic
+pruning; off-host backup and alert operations remain follow-ups. Failed migrations leave only this
+preview stopped for inspection. No automatic backward database/checkpoint rollback.
