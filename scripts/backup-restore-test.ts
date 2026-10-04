@@ -1,9 +1,10 @@
 /** Repeatable non-production backup/restore exercise with real economy rows. */
 import { spawn } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, cp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { createDb, runMigrations, syncItemTemplates } from '../packages/db/src/index';
+import { MIGRATIONS_FOLDER } from '../packages/db/src/migrate';
 import { getGameData } from '../packages/game-data/src/index';
 import {
   createDomainContext,
@@ -46,7 +47,16 @@ try {
   await admin.pool.query(`create database "${targetName}"`);
   const source = createDb({ url: urlFor(sourceName) });
   try {
-    await runMigrations(source.db);
+    // Upgrade a populated pre-hardening schema, not only an empty database.
+    const previous = resolve(out, 'previous-migrations');
+    await cp(MIGRATIONS_FOLDER, previous, { recursive: true });
+    const journalPath = resolve(previous, 'meta/_journal.json');
+    const journal = JSON.parse(await readFile(journalPath, 'utf8')) as {
+      entries: { tag: string }[];
+    };
+    journal.entries = journal.entries.filter((e) => e.tag !== '0006_sudden_killraven');
+    await writeFile(journalPath, JSON.stringify(journal));
+    await runMigrations(source.db, previous);
     await syncItemTemplates(source.db, getGameData());
     const ctx = createDomainContext({ db: source.db, gameData: getGameData() });
     const accountId = await provisionPasswordAccount(
@@ -135,6 +145,24 @@ try {
       listingId: listing.id,
       expectedPrice: 100,
     });
+    const before = await source.pool.query(
+      'select (select count(*) from accounts)::int accounts, (select count(*) from item_instances)::int items, (select count(*) from currency_ledger)::int ledger, (select count(*) from kill_rewards)::int rewards',
+    );
+    await runMigrations(source.db);
+    const after = await source.pool.query(
+      'select (select count(*) from accounts)::int accounts, (select count(*) from item_instances)::int items, (select count(*) from currency_ledger)::int ledger, (select count(*) from kill_rewards)::int rewards',
+    );
+    if (JSON.stringify(before.rows) !== JSON.stringify(after.rows))
+      throw new Error('Populated migration changed durable counts');
+    if (!(await source.pool.query("select to_regclass('zone_checkpoints') name")).rows[0].name)
+      throw new Error('Final migration missing');
+    console.log(
+      JSON.stringify({
+        populatedMigration: '0005 -> 0006',
+        before: before.rows[0],
+        after: after.rows[0],
+      }),
+    );
   } finally {
     await source.close();
   }

@@ -1,0 +1,14 @@
+{
+  "dev_in_production": {
+    "exit": 1,
+    "refusedBeforeListen": true
+  },
+  "no_password_provider": {
+    "exit": 1,
+    "refusedBeforeListen": true
+  },
+  "public_api_bind": {
+    "exit": 1,
+    "refusedBeforeListen": true
+  }
+}

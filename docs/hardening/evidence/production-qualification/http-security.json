@@ -1,0 +1,8 @@
+{
+  "playerAdminAccess": 403,
+  "forgedForwardHeadersMetrics": 403,
+  "wrongPassword": 401,
+  "passwordAndSampleBearerAbsentFromLogs": true,
+  "requestIdObserved": true,
+  "connectionIdObserved": true
+}

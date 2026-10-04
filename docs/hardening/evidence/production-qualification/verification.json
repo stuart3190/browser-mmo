@@ -1,0 +1,12 @@
+{
+  "command": "pnpm verify",
+  "exitCode": 0,
+  "unitTests": 119,
+  "postgresIntegrationTests": 116,
+  "realtime": 55,
+  "domain": 54,
+  "api": 7,
+  "builds": 4,
+  "productionArtifactGate": "pass",
+  "hostedCI": "unavailable: HTTP 404"
+}

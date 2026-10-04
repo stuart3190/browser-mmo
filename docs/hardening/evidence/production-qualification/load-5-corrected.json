@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-04T16:18:12.082Z",
+  "players": 5,
+  "intendedSeconds": 120,
+  "transport": "TLS, production password auth",
+  "errors": {},
+  "httpErrors": {},
+  "disconnects": 0,
+  "corrections": 0,
+  "bytesIn": 2485692,
+  "bytesOut": 767212,
+  "damage": 572,
+  "playerHits": 50,
+  "kills": 55,
+  "vitals": 696,
+  "economyWrites": 195,
+  "sales": 5,
+  "skippedHttpCycles": 0,
+  "productionGates": {
+    "onlyPassword": true,
+    "devLogin404": true,
+    "privateMetrics403": true,
+    "logoutDisconnectAndBearerRejection": true
+  },
+  "measuredAt": "2026-10-04T16:18:31.975Z",
+  "elapsedSeconds": 120.20554505,
+  "simulationHz": 18.692981251949327,
+  "skippedSlots": 157,
+  "cpuCores": 0.2806793312734952,
+  "rssBytes": 138551296,
+  "rttMs": {
+    "p50": 58,
+    "p95": 344,
+    "p99": 424,
+    "samples": 195
+  },
+  "httpMs": {
+    "p95": 587.948126000003,
+    "samples": 400
+  },
+  "dbProbeMs": {
+    "p95": 21.8994160000002,
+    "p99": 46.01396000000386
+  },
+  "sampledTickP95Ms": 9.59,
+  "sampledCheckpointP95Ms": 192.30955199999153,
+  "sampledQueuePeak": 11856,
+  "sampledSocketPeak": 0,
+  "db": {
+    "rewarded": 30,
+    "rewards": 30,
+    "sales": 12,
+    "history": 548
+  },
+  "revocationCloseCode": 4000
+}

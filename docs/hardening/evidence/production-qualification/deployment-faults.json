@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-04T16:25:38.408Z",
+  "production": true,
+  "duplicateOwnerRefused": true,
+  "pausedOwnerRetainsLock": true,
+  "SIGKILL": true,
+  "concurrentTakeovers": 3,
+  "winners": 1,
+  "recoveredPositionMatches": true,
+  "recoveredHealthWithinNormalRegen": true,
+  "cooldownDeadlinePreserved": true,
+  "singleController": true,
+  "expiryDisconnect": true,
+  "banDisconnect": true,
+  "savedHealth": 73,
+  "recoveredHealth": 75,
+  "regenBound": 12
+}

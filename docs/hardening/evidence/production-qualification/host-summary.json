@@ -1,0 +1,20 @@
+{
+  "scope": "shared host; includes load and cooldown",
+  "samples": 129,
+  "averageIdlePercent": 89.88372093023256,
+  "averageIoWaitPercent": 1.2635658914728682,
+  "maxRunQueue": 21,
+  "swapIn": 0,
+  "swapOut": 0,
+  "reportedStealPercentMax": 0,
+  "processAverageCpuCores": {
+    "api": 0.0761,
+    "realtime": 0.2576,
+    "tlsIngress": 0.1167
+  },
+  "processAverageRssKiB": {
+    "api": 103321,
+    "realtime": 134272,
+    "tlsIngress": 54526
+  }
+}

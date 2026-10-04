@@ -231,6 +231,15 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       }
       if (req.url === '/metrics') {
         deps.metrics
+          .gauge(
+            'world_outbound_queue_bytes',
+            'Pending durable output bytes, excluding in-flight batch',
+          )
+          .set([...pendingSend.values()].reduce((n, q) => n + q.bytes, 0));
+        deps.metrics
+          .gauge('world_socket_buffer_bytes', 'WebSocket buffered bytes')
+          .set([...wss.clients].reduce((n, ws) => n + ws.bufferedAmount, 0));
+        deps.metrics
           .gauge('process_rss_bytes', 'Resident process memory')
           .set(process.memoryUsage().rss);
         const cpu = process.cpuUsage();

@@ -16,12 +16,16 @@ const sql = (query) => execFileSync('psql', [DB, '-tAc', query], { encoding: 'ut
     args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
   });
   try {
-    const name = 'hud_' + Date.now();
-    const response = await fetch(API + '/v1/auth/dev-login', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ username: name, client: 'game_web' }),
-    });
+    const name = process.env.PERF_USERNAME || 'hud_' + Date.now();
+    const password = process.env.PERF_PASSWORD;
+    const response = await fetch(
+      API + (password ? '/v1/auth/password-login' : '/v1/auth/dev-login'),
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ username: name, password, client: 'game_web' }),
+      },
+    );
     const { token } = await response.json();
     const created = await fetch(API + '/v1/characters', {
       method: 'POST',
@@ -47,7 +51,9 @@ const sql = (query) => execFileSync('psql', [DB, '-tAc', query], { encoding: 'ut
     sql(
       `update characters set pos_x=${wolf.position.x},pos_z=${wolf.position.z} where id='${character.id}'`,
     );
-    const page = await browser.newPage();
+    const page = await browser.newPage({
+      ignoreHTTPSErrors: process.env.QUAL_LOCAL_TLS === 'true',
+    });
     await page.addInitScript(() => {
       window.__healthProof = { messages: [], drop: false, sockets: [] };
       const Native = WebSocket;
@@ -73,6 +79,7 @@ const sql = (query) => execFileSync('psql', [DB, '-tAc', query], { encoding: 'ut
     });
     await page.goto(WEB);
     await page.locator('[name=username]').fill(name);
+    if (password) await page.locator('[name=password]').fill(password);
     await page.locator('#login-form button').click();
     await page.locator('#char-list button').click();
     await page.locator('[data-testid=player-hp]').waitFor();

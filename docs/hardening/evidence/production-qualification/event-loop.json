@@ -1,0 +1,22 @@
+{
+  "resolutionMs": 10,
+  "interpretation": "Per-second histogram intervals include 10 ms resolution; p95 of interval p95 is not an aggregate event-loop percentile.",
+  "1": {
+    "samples": 59,
+    "medianIntervalP95Ms": 18.464767,
+    "p95OfIntervalP95Ms": 40.304639,
+    "maxIntervalMs": 227.672063
+  },
+  "5-corrected": {
+    "samples": 119,
+    "medianIntervalP95Ms": 20.316159,
+    "p95OfIntervalP95Ms": 74.055679,
+    "maxIntervalMs": 276.824063
+  },
+  "5-final-runtime-role": {
+    "samples": 119,
+    "medianIntervalP95Ms": 19.152895,
+    "p95OfIntervalP95Ms": 40.271871,
+    "maxIntervalMs": 344.457215
+  }
+}

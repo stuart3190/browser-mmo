@@ -486,7 +486,9 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Runs locally only (`pnpm dev`, or bundled `node services/*/dist/main.js` — verified). No hosted dev environment.
 - [x] Production startup guards and deployment/recovery runbook
   - Verified 2026-10-04 · Codex · production auth/config tests; `docs/deployment/PRE_ALPHA.md` and TLS ingress template · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`
-- [ ] Actual production deployment and TLS/ingress verification
+- [x] Isolated production-mode TLS/ingress qualification
+  - Verified 2026-10-04 · Codex · production password login, private metrics/health, restricted DB role, actual process takeover/session checks; sanitized evidence under `docs/hardening/evidence/production-qualification` · implementation SHA recorded after verification below
+- [ ] Public production deployment, DNS/certificates and persistent monitored service operation
 - [x] Health endpoints
   - Verified 2026-10-03 · Claude Opus 5.5 · /health/live + /health/ready on API and realtime (API test; curl against running services) · 0f0a413
 - [x] Logging
@@ -587,21 +589,21 @@ Detailed results and raw evidence: [release qualification](hardening/release-qua
 
 ## Current Work
 
-Release qualification is complete: **FAIL / DO NOT MERGE**. The hardening branch includes focused
-timer and production-build fixes, passing correctness verification, measured performance evidence,
-and a per-finding status matrix. Hosted Actions cannot be read (invalid saved CLI credential / HTTP
-404; SSH git access works). Five players measured 18.20 Hz and p95 RTT 274 ms, failing the declared
-gate despite zero errors. Kernel tracing confirms run-queue delay beyond a tick period. Main remains
-unchanged. Do not start gameplay work or external invitations while these release gates are open.
+**Production-mode qualification remains FAIL / DO NOT MERGE.** See
+[production qualification](hardening/production-qualification-2026-10-04.md) for the isolated TLS
+production deployment, password-only auth, restricted runtime DB role, real combat/economy load,
+deployed crash/session tests, populated migration, encrypted local restore and physical-phone checklist.
+Hosted Actions still returns HTTP 404. Corrected representative load failed at one and five players;
+no safe capacity is certified. Main remains unchanged. No gameplay work or external invitations.
 
 ## Known Issues
 
 ### External pre-alpha gates
 
 1. **Hosted CI must be checked on the latest branch commit before merge.** The actual workflow is now installed; no manual copy or credential-scope fix is required. Open the repository's Actions page and confirm the latest run is green. The available CLI credential is reported invalid and the private Actions endpoint returns HTTP 404; SSH push does not establish CI success. CI now builds with NODE_ENV=production and rejects development/debug artifacts.
-2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. The final quiet five-player run was 18.20 Hz / p95 RTT 274 ms with 216 skipped slots in 120 s, so higher stages were intentionally stopped. Kernel timer-only tracing measured 55.5 ms p99 run-queue delay. Repeat on stable intended hosting with combat/economy traffic and explicit headroom before invitations; no safe cap is certified.
+2. **Capacity is not certified.** No measured size maintained 20 Hz on this shared VM. Five is the default connection ceiling; larger zero-error runs do not prove capacity. The final restricted-role production-mode combat/economy run was 19.37 Hz / p95 RTT 252 ms with 76 skipped slots in 120 s. Earlier corrected runs failed at one and five players too; higher stages were intentionally stopped. Kernel timer-only tracing measured 55.5 ms p99 run-queue delay. Repeat on stable intended hosting with combat/economy traffic and explicit headroom before invitations; no safe cap is certified.
 3. **Physical phone/GPU acceptance remains unverified.** Software-rendered desktop/phone viewports had poor frame times. Real iOS Safari/Android Chrome, touch conflicts, WebGPU fallback, cellular startup, thermal and battery tests remain required.
-4. **Deployment operations remain external.** Configure and verify TLS/private ingress, provision real accounts, schedule encrypted off-host backups, monitor failures and perform a restore drill on actual hosting. The local disposable restore is not a production backup service. Reconcile bans/credential changes newer than a restored backup before reopening ingress.
+4. **Public deployment operations remain external.** Isolated production-mode TLS/private ingress, password accounts, a restricted runtime role, and a real-checkpoint encrypted local restore/startup have now been exercised. Public DNS/certificates, persistent supervision, scheduled encrypted off-host backups and alert delivery still need operation. The local restore is not an off-host backup service. Reconcile bans/credential changes newer than a restored backup before reopening ingress.
 
 ### Remaining debt and product limitations (not newly claimed high-risk fixes)
 
@@ -641,6 +643,7 @@ unchanged. Do not start gameplay work or external invitations while these releas
 a genuine green run for the final SHA. Qualify a host with predictable CPU scheduling and durable
 PostgreSQL latency; do not raise the five-connection pilot ceiling until the 19.5 Hz / <250 ms p95
 RTT gate passes with headroom and representative combat/economy load. Test physical phones using
-the separate checklist, and operate TLS/ingress, invited accounts, monitoring and encrypted off-host
-backup/restore. No AI rewrite, broker, distributed zone infrastructure or new content is justified
+the [physical Android checklist](deployment/ANDROID_ACCEPTANCE.md), and operate public TLS/ingress,
+invited accounts, monitoring and encrypted off-host backup/restore. Isolated production-mode
+ingress, populated migration and local encrypted restore are now tested. No AI rewrite, broker, distributed zone infrastructure or new content is justified
 by the current profile. Keep main unchanged until merge gates are satisfied.

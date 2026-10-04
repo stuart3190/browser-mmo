@@ -1,0 +1,32 @@
+# Separate local TLS qualification instance; never reload the existing live ingress.
+# Set MMO_QUAL_DIR to private certificate directory, MMO_ROOT to this checkout.
+# Validate/run with a separate Caddy binary. Requires a certificate valid for 127.0.0.1.
+{
+	admin off
+	auto_https off
+}
+https://127.0.0.1:4443 {
+	bind 127.0.0.1
+	tls {$MMO_QUAL_DIR}/cert.pem {$MMO_QUAL_DIR}/key.pem
+	@private path /health/* /metrics
+	handle @private {
+		respond 403
+	}
+	handle /v1/* {
+		reverse_proxy 127.0.0.1:4400 {
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+		}
+	}
+	handle /ws {
+		reverse_proxy 127.0.0.1:4401 {
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+		}
+	}
+	handle {
+		root * {$MMO_ROOT}/apps/game-web/dist
+		try_files {path} /index.html
+		file_server
+	}
+}

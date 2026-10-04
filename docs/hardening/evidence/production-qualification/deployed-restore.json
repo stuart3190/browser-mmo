@@ -1,0 +1,18 @@
+{
+  "encryptedLocally": "GnuPG AES256 symmetric",
+  "decryptedArchiveSha256Matches": true,
+  "restoreFromDecryptedArchive": true,
+  "restored": {
+    "checkpoints": 1,
+    "activeSessions": 0,
+    "migrations": 7
+  },
+  "offHost": false,
+  "scheduled": false,
+  "restoredWorldReady": {
+    "status": "ok",
+    "zones": ["zone.greenvale.meadows"],
+    "players": 0,
+    "changeFeed": "ok"
+  }
+}

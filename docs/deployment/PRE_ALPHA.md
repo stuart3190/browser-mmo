@@ -36,6 +36,17 @@ follows the [OWASP password storage guidance](https://cheatsheetseries.owasp.org
 Sessions remain opaque, hashed, revocable database tokens. Browser and admin login screens discover
 the enabled provider; production has no dev fallback.
 
+## Runtime database privileges
+
+Use a distinct runtime login, separate from the schema owner/migration/backup operator. Grant
+CONNECT on the game database, USAGE on its application schema, SELECT/INSERT/UPDATE/DELETE on
+existing application tables, and USAGE/SELECT on their sequences. Do not grant superuser, CREATEDB,
+CREATEROLE or schema CREATE. Set matching default privileges under the migration owner for future
+tables/sequences, or grant them explicitly during each rollout. Use SCRAM credentials and keep
+ownership/LISTEN connections direct. The isolated qualification deployment exercised this role
+and confirmed a runtime CREATE TABLE attempt is denied; production still needs its own configured
+pg_hba/secret store. Do not copy the disposable test cluster's administrator access policy.
+
 ## Zone ownership and recovery
 
 Each host acquires session-level PostgreSQL advisory locks for all assigned zones, on a pinned

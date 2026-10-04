@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-04T16:36:24.407Z",
+  "players": 5,
+  "intendedSeconds": 120,
+  "transport": "TLS, production password auth",
+  "errors": {
+    "TARGET_DEAD: Your target is dead": 2
+  },
+  "httpErrors": {},
+  "disconnects": 0,
+  "corrections": 0,
+  "bytesIn": 2594344,
+  "bytesOut": 788435,
+  "damage": 770,
+  "playerHits": 73,
+  "kills": 67,
+  "vitals": 853,
+  "economyWrites": 195,
+  "sales": 5,
+  "skippedHttpCycles": 0,
+  "productionGates": {
+    "onlyPassword": true,
+    "devLogin404": true,
+    "privateMetrics403": true,
+    "logoutDisconnectAndBearerRejection": true
+  },
+  "measuredAt": "2026-10-04T16:36:45.800Z",
+  "elapsedSeconds": 120.00561013500001,
+  "simulationHz": 19.365761295539617,
+  "skippedSlots": 76,
+  "cpuCores": 0.27927948503655176,
+  "rssBytes": 137515008,
+  "rttMs": {
+    "p50": 52,
+    "p95": 252,
+    "p99": 328,
+    "samples": 195
+  },
+  "httpMs": {
+    "p95": 341.9603070000012,
+    "samples": 400
+  },
+  "dbProbeMs": {
+    "p95": 16.03378199999861,
+    "p99": 106.84855900000548
+  },
+  "sampledTickP95Ms": 5.54,
+  "sampledCheckpointP95Ms": 69.6914620000025,
+  "sampledQueuePeak": 10186,
+  "sampledSocketPeak": 0,
+  "db": {
+    "rewarded": 46,
+    "rewards": 46,
+    "sales": 17,
+    "history": 801
+  },
+  "revocationCloseCode": 4000
+}

@@ -585,3 +585,28 @@ build command checks the emitted game entrypoint for development/debug code and 
 Qualification reproduced a `NODE_ENV=test` release build containing `__mmo` and development React;
 the negative check rejected it and the production rebuild passed. This is a release-artifact gate,
 not a replacement for production server auth/configuration checks.
+
+## 2026-10-04 — Production-mode qualification remains separate from release approval
+
+**Date**: 2026-10-04
+
+**Decision**
+Qualify the existing production bundles through a separate loopback TLS ingress, password-only
+authentication and a restricted database runtime role. Keep destructive fixtures and process-fault
+controls in disposable-database scripts, outside production entrypoints. Export only read-only queue
+pressure gauges. Test populated migration upgrades and restore a real checkpoint before release.
+
+**Reason**
+Development-mode load tests alone did not exercise production authentication/ingress. Real combat,
+equipment/vault and marketplace traffic still missed the declared tick/RTT gate. Tests established
+correctness for deployed ownership, sessions, recovery and restore without justifying a world rewrite.
+
+**Alternatives considered**
+Reuse dev login or expose debug controls in production; treat zero errors as capacity certification;
+change AI, weaken durable publication or add a broker without measured attribution.
+
+**Consequences**
+An isolated TLS certificate, locally encrypted restore and passing local tests do not prove public
+hosting, off-host disaster recovery, physical-phone performance or hosted CI. All remain separate
+release gates. Keep main unchanged while Actions results are unreadable or capacity gates fail.
+See `docs/hardening/production-qualification-2026-10-04.md` for evidence and limitations.

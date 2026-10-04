@@ -1,0 +1,216 @@
+{
+  "durationSeconds": 339.297016,
+  "scope": "whole production process including idle, provisioning and shakedown; CPU samples are not tick wall-time",
+  "topSelfSamples": [
+    {
+      "function": "(idle)",
+      "file": "",
+      "line": 0,
+      "weightedMs": 288859.8,
+      "percent": 85.13478939643844
+    },
+    {
+      "function": "writev",
+      "file": "",
+      "line": 0,
+      "weightedMs": 10880.259,
+      "percent": 3.206706362545788
+    },
+    {
+      "function": "checkpoint",
+      "file": "main.js",
+      "line": 6245,
+      "weightedMs": 4742.61,
+      "percent": 1.3977753343990504
+    },
+    {
+      "function": "(garbage collector)",
+      "file": "",
+      "line": 0,
+      "weightedMs": 3165.388,
+      "percent": 0.9329253871186418
+    },
+    {
+      "function": "(program)",
+      "file": "",
+      "line": 0,
+      "weightedMs": 3035.548,
+      "percent": 0.8946580302374366
+    },
+    {
+      "function": "commit",
+      "file": "main.js",
+      "line": 727,
+      "weightedMs": 1730.559,
+      "percent": 0.5100425050599325
+    },
+    {
+      "function": "",
+      "file": "main.js",
+      "line": 8339,
+      "weightedMs": 1435.245,
+      "percent": 0.42300548850096575
+    },
+    {
+      "function": "get exports",
+      "file": "package_json_reader",
+      "line": 86,
+      "weightedMs": 788.15,
+      "percent": 0.23228910448183843
+    },
+    {
+      "function": "is",
+      "file": "entity.js",
+      "line": 3,
+      "weightedMs": 771.328,
+      "percent": 0.227331206473092
+    },
+    {
+      "function": "",
+      "file": "index.js",
+      "line": 449,
+      "weightedMs": 551.571,
+      "percent": 0.16256287971598313
+    },
+    {
+      "function": "processTimers",
+      "file": "timers",
+      "line": 506,
+      "weightedMs": 550.343,
+      "percent": 0.1622009549297068
+    },
+    {
+      "function": "persistAndPublish",
+      "file": "main.js",
+      "line": 8328,
+      "weightedMs": 537.065,
+      "percent": 0.15828756949633768
+    },
+    {
+      "function": "step",
+      "file": "main.js",
+      "line": 6815,
+      "weightedMs": 534.532,
+      "percent": 0.15754102594288658
+    },
+    {
+      "function": "parseWith",
+      "file": "main.js",
+      "line": 5931,
+      "weightedMs": 517.458,
+      "percent": 0.1525088567239271
+    },
+    {
+      "function": "runMicrotasks",
+      "file": "",
+      "line": 0,
+      "weightedMs": 500.99,
+      "percent": 0.14765529208190856
+    },
+    {
+      "function": "",
+      "file": "main.js",
+      "line": 8525,
+      "weightedMs": 496.838,
+      "percent": 0.146431585475541
+    },
+    {
+      "function": "onStreamRead",
+      "file": "stream_base_commons",
+      "line": 166,
+      "weightedMs": 446.411,
+      "percent": 0.1315693858032633
+    },
+    {
+      "function": "run",
+      "file": "main.js",
+      "line": 5570,
+      "weightedMs": 399.982,
+      "percent": 0.11788550477555629
+    },
+    {
+      "function": "steer",
+      "file": "main.js",
+      "line": 7188,
+      "weightedMs": 392.998,
+      "percent": 0.11582713123536577
+    },
+    {
+      "function": "writevGeneric",
+      "file": "stream_base_commons",
+      "line": 121,
+      "weightedMs": 362.009,
+      "percent": 0.10669383546833197
+    },
+    {
+      "function": "send",
+      "file": "sender.js",
+      "line": 351,
+      "weightedMs": 318.123,
+      "percent": 0.09375944526432263
+    },
+    {
+      "function": "",
+      "file": "main.js",
+      "line": 6260,
+      "weightedMs": 288.38,
+      "percent": 0.08499337937000896
+    },
+    {
+      "function": "emit",
+      "file": "node:events",
+      "line": 466,
+      "weightedMs": 285.881,
+      "percent": 0.08425685653539612
+    },
+    {
+      "function": "orderSelectedFields",
+      "file": "utils.js",
+      "line": 54,
+      "weightedMs": 275.863,
+      "percent": 0.08130428120240232
+    },
+    {
+      "function": "",
+      "file": "",
+      "line": 0,
+      "weightedMs": 275.567,
+      "percent": 0.08121704200310444
+    },
+    {
+      "function": "handleFrame",
+      "file": "main.js",
+      "line": 7728,
+      "weightedMs": 260.658,
+      "percent": 0.07682295679252304
+    },
+    {
+      "function": "",
+      "file": "sql.js",
+      "line": 83,
+      "weightedMs": 247.57,
+      "percent": 0.0729655694938384
+    },
+    {
+      "function": "submit",
+      "file": "query.js",
+      "line": 152,
+      "weightedMs": 247.061,
+      "percent": 0.07281555343828901
+    },
+    {
+      "function": "query",
+      "file": "client.js",
+      "line": 668,
+      "weightedMs": 243.068,
+      "percent": 0.0716387084288416
+    },
+    {
+      "function": "stepEnemies",
+      "file": "main.js",
+      "line": 7251,
+      "weightedMs": 238.217,
+      "percent": 0.07020898763224019
+    }
+  ]
+}

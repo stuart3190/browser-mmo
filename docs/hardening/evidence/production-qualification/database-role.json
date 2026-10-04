@@ -1,0 +1,7 @@
+{
+  "user": "mmo_qual_runtime",
+  "superuser": false,
+  "createDb": false,
+  "createRole": false,
+  "ddlDenied": true
+}

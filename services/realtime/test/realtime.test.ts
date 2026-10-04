@@ -363,3 +363,19 @@ it('bounds direct error replies to slow unauthenticated clients', async () => {
     c.ws.terminate();
   }
 });
+
+it('exports socket pressure separately from pending durable output', async () => {
+  const c = new TestClient();
+  await c.opened;
+  const buffered = vi.spyOn(WebSocket.prototype, 'bufferedAmount', 'get').mockReturnValue(1024);
+  try {
+    const response = await fetch(url.replace('ws:', 'http:').replace('/ws', '/metrics'));
+    expect(response.status).toBe(200);
+    const text = await response.text();
+    expect(text).toMatch(/^world_socket_buffer_bytes 1024$/m);
+    expect(text).toMatch(/^world_outbound_queue_bytes \d+$/m);
+  } finally {
+    buffered.mockRestore();
+    c.ws.terminate();
+  }
+});
