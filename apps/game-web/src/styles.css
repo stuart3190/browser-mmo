@@ -1031,3 +1031,179 @@ kbd {
     '. interact target'
     'abilities abilities attack';
 }
+
+/* Greenvale vertical slice: forest, parchment and aged brass. */
+:root {
+  --bg: rgba(19, 32, 32, 0.94);
+  --border: #637366;
+  --accent: #dbc08a;
+  --text: #f1eddf;
+  --muted: #b2bcb1;
+}
+.panel,
+.window,
+.details {
+  box-shadow: 0 6px 24px #071b2340;
+}
+.frame-title,
+.window h2,
+.first-steps h3 {
+  font-family: Georgia, serif;
+}
+.player-frame {
+  border-top: 2px solid #d0b783;
+}
+.bar {
+  overflow: hidden;
+}
+.bar-fill {
+  transition: width 160ms ease-out;
+}
+.bar-hp .bar-fill {
+  background: linear-gradient(90deg, #7e393f, #bb6057);
+}
+.bar-xp .bar-fill {
+  background: linear-gradient(90deg, #356c79, #72b7b6);
+}
+.eyebrow {
+  color: #dec48e;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+}
+.first-steps {
+  position: absolute;
+  right: 16px;
+  top: 202px;
+  width: 220px;
+  border-left: 2px solid #d0b783;
+}
+.first-steps h3 {
+  margin: 8px 0;
+  font-size: 20px;
+}
+.first-steps p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #c7d0c4;
+  margin: 0 0 8px;
+}
+.journal-toggle {
+  position: absolute;
+  bottom: 20px;
+  left: 16px;
+  pointer-events: auto;
+  font-size: 12px;
+  background: #1b302ccc;
+}
+.journal-log .log {
+  bottom: 64px;
+  max-height: 160px;
+}
+[hidden] {
+  display: none !important;
+}
+.login {
+  width: min(380px, calc(100vw - 64px));
+  padding: 28px;
+  background: linear-gradient(145deg, #1e3735f5, #17252cf5);
+  border: 1px solid #aa9568;
+  box-shadow: 0 30px 100px #000a;
+}
+.game-title {
+  font:
+    48px Georgia,
+    serif;
+  letter-spacing: 0.04em;
+  color: #e5cd95;
+  margin: 12px 0;
+}
+.login-intro {
+  color: #bbcabe;
+  line-height: 1.7;
+  font-size: 14px;
+}
+.login input,
+.login select {
+  background: #102522;
+  border-color: #52665c;
+}
+.login button {
+  background: #526b54;
+  border-color: #9b9c71;
+}
+body:has(.login) {
+  background: radial-gradient(ellipse at 50% 75%, #67815e 0%, #273f40 45%, #12222d 85%);
+}
+@media (max-width: 700px) {
+  .first-steps {
+    top: 180px;
+    right: 8px;
+    width: 170px;
+    padding: 8px;
+  }
+  .first-steps h3 {
+    font-size: 16px;
+  }
+  .first-steps p {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .journal-toggle {
+    display: none;
+  }
+}
+@media (max-height: 540px) {
+  .first-steps {
+    display: none;
+  }
+}
+.controls-help {
+  position: absolute;
+  left: 16px;
+  bottom: 64px;
+  max-width: 310px;
+  font-size: 12px;
+  line-height: 1.6;
+  pointer-events: auto;
+}
+.controls-help summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+.journal-log.expanded ~ .controls-help {
+  bottom: 250px;
+}
+.float-text.xp {
+  color: #d8e59a;
+  font-size: 19px;
+}
+@media (max-width: 700px) {
+  .controls-help {
+    left: 8px;
+    bottom: auto;
+    top: 126px;
+    max-width: 175px;
+    font-size: 10px;
+  }
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .quest-tracker ~ .controls-help {
+    top: 230px;
+  }
+}
+.guide-close {
+  float: right;
+  min-width: 32px;
+  min-height: 32px;
+  margin: -5px -5px 0 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+@media (pointer: coarse) {
+  .guide-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

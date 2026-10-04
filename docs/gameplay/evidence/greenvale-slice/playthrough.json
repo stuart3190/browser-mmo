@@ -1,0 +1,92 @@
+{
+  "desktop": [
+    {
+      "name": "Fresh Warrior has opening objective and health/XP HUD",
+      "ok": true
+    },
+    {
+      "name": "Real sword pickup equipped through inventory UI",
+      "ok": true
+    },
+    {
+      "name": "Maren quest accepted",
+      "ok": true
+    },
+    {
+      "name": "Two real clients see replicated movement",
+      "ok": true,
+      "detail": {
+        "bp": {
+          "x": 1.6499629631195378,
+          "z": 1.9533629631553018
+        },
+        "seen": {
+          "x": 1.65,
+          "z": 0.98
+        }
+      }
+    },
+    {
+      "name": "Both browsers receive the same creature damage and death",
+      "ok": true,
+      "detail": [
+        [
+          [32, 48],
+          [20, 28],
+          [19, 9],
+          [19, 0]
+        ],
+        [
+          [32, 48],
+          [20, 28],
+          [19, 9],
+          [19, 0]
+        ]
+      ]
+    },
+    {
+      "name": "Kill awards persistent real items and XP to the first tagger",
+      "ok": true,
+      "detail": {
+        "level": 1,
+        "xp": 50,
+        "xpToNext": 400
+      }
+    },
+    {
+      "name": "Reload/login restores earned XP and the same unique item IDs",
+      "ok": true
+    },
+    {
+      "name": "Mouse drag changes camera yaw",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "touch": [
+    {
+      "name": "Real touch joystick moves the player",
+      "ok": true
+    },
+    {
+      "name": "Phone primary controls stay inside viewport",
+      "ok": true
+    },
+    {
+      "name": "Actual enemy damage kills the player and shows respawn UI",
+      "ok": true
+    },
+    {
+      "name": "Touch respawn returns to village with full authoritative health",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true
+    }
+  ]
+}

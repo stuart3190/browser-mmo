@@ -209,6 +209,12 @@ export async function startGame(args: {
     if (m.d.reason === 'target_dead') combatLine('Target is dead');
   });
   net.on('combat.damage', (m) => {
+    if (m.d.sourceId === state.myEntityId) {
+      const at = entities?.meshPosition(m.d.targetId);
+      if (at) player?.face(at);
+      player?.actor.attack();
+    } else entities?.attack(m.d.sourceId);
+    if (m.d.outcome !== 'miss') entities?.flash(m.d.targetId);
     if (m.d.targetId === state.myEntityId)
       state.update((s) => {
         if (s.vitals)
@@ -298,7 +304,11 @@ export async function startGame(args: {
       s.progress = { level: m.d.level, xp: m.d.xp, xpToNext: m.d.xpToNext };
       s.character = { ...s.character, level: m.d.level };
     });
-    if (m.d.xpGained > 0) state.addLog(`You gain ${m.d.xpGained} experience`);
+    if (m.d.xpGained > 0) {
+      state.addLog(`You gain ${m.d.xpGained} experience`);
+      const at = player && projectToScreen(scene, player.position.add(new Vector3(0, 1.5, 0)));
+      if (at) floating.spawn(at, `+${m.d.xpGained} XP`, 'xp');
+    }
     if (m.d.levelsGained > 0) state.toast(`Level up! You are now level ${m.d.level}`);
   });
   net.on('combat.loot', (m) => {
@@ -357,10 +367,20 @@ export async function startGame(args: {
   });
   net.on('presence.update', (m) => state.addLog(`${m.d.name} ${m.d.event} the zone`));
   net.on('chat.message', (m) => state.addLog(`[${m.d.channel}] ${m.d.from.name}: ${m.d.text}`));
-  net.on('inventory.snapshot', (m) => state.items.replaceAll(m.d.items));
+  const updateWeapon = () =>
+    player?.actor.setArmed(
+      state.items
+        .all()
+        .some((i) => i.instance.location.kind === 'equipped' && i.template.category === 'weapon'),
+    );
+  net.on('inventory.snapshot', (m) => {
+    state.items.replaceAll(m.d.items);
+    updateWeapon();
+  });
   net.on('inventory.updated', (m) => {
     const before = new Set(state.items.all().map((i) => i.instance.id));
     state.items.apply(m.d.items, m.d.removed);
+    updateWeapon();
     for (const i of m.d.items)
       if (!before.has(i.instance.id)) state.addLog(`Received ${i.template.name}`);
   });
@@ -396,7 +416,11 @@ export async function startGame(args: {
   });
 
   window.addEventListener('keydown', (e) => {
-    if (e.target instanceof HTMLInputElement) return;
+    if (
+      e.target instanceof HTMLElement &&
+      (e.target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName))
+    )
+      return;
     if (e.code === 'Tab') {
       e.preventDefault();
       targetNearest();

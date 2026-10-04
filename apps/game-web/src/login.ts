@@ -11,7 +11,9 @@ export function showLogin(
   const panel = document.createElement('div');
   panel.className = 'login';
   panel.innerHTML = `
-    <h2 style="margin-top:0">Greenvale</h2>
+    <div class="eyebrow">A world worth wandering</div>
+    <h2 class="game-title">Greenvale</h2>
+    <p class="login-intro">Beyond the village lights, the Northwood stirs. Take up your weapon. Find your way.</p>
     <form id="login-form">
       <label>Username <input name="username" autocomplete="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9_]+" /></label>
       <label id="password-label" hidden>Password <input name="password" type="password" autocomplete="current-password" maxlength="128" /></label>
@@ -22,7 +24,7 @@ export function showLogin(
       <form id="create-form">
         <input name="name" placeholder="New character name" required minlength="3" maxlength="20" />
         <select name="classId">${classes.map((c) => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
-        <button type="submit">Create character</button>
+        <button type="submit">Begin your adventure</button>
       </form>
     </div>
     <p id="login-error" class="error"></p>`;

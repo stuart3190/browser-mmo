@@ -7,6 +7,7 @@ import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import type { Scene } from '@babylonjs/core/scene';
 import type { WorldEntity } from '@mmo/schemas';
+import { ActorModel } from './actor-model';
 
 interface View {
   entity: WorldEntity;
@@ -21,6 +22,7 @@ interface View {
  */
 export class EntityViews {
   private readonly views = new Map<string, View>();
+  private readonly actors = new Map<string, ActorModel>();
   private ring: Mesh | undefined;
   private ringTarget: string | null = null;
   private readonly flashes = new Map<string, number>();
@@ -70,8 +72,16 @@ export class EntityViews {
   remove(entityId: string): void {
     const v = this.views.get(entityId);
     if (!v) return;
-    v.mesh.material?.dispose();
-    v.mesh.dispose();
+    const actor = this.actors.get(entityId);
+    if (actor) {
+      actor.dispose();
+      this.actors.delete(entityId);
+    } else {
+      v.mesh.material?.dispose();
+      v.mesh.dispose();
+    }
+    this.flashes.delete(entityId);
+    this.baseEmissive.delete(entityId);
     this.views.delete(entityId);
   }
 
@@ -94,8 +104,11 @@ export class EntityViews {
       if (t) this.ring.position.set(t.mesh.position.x, 0.05, t.mesh.position.z);
     }
     for (const v of this.views.values()) {
+      const distance = Vector3.Distance(v.mesh.position, v.target);
+      this.actors.get(v.entity.id)?.update(dtSeconds, distance * 12);
       Vector3.LerpToRef(v.mesh.position, v.target, k, v.mesh.position);
-      v.mesh.rotation.y += (v.targetRot - v.mesh.rotation.y) * k;
+      const angle = v.targetRot - v.mesh.rotation.y;
+      v.mesh.rotation.y += Math.atan2(Math.sin(angle), Math.cos(angle)) * k;
       if (v.entity.kind === 'pickup') v.mesh.rotation.y += dtSeconds * 1.5;
     }
   }
@@ -118,7 +131,12 @@ export class EntityViews {
   }
 
   entityIdOfMesh(mesh: AbstractMesh): string | null {
-    return this.views.has(mesh.name) ? mesh.name : null;
+    let node: AbstractMesh | null = mesh;
+    while (node) {
+      if (this.views.has(node.name)) return node.name;
+      node = node.parent as AbstractMesh | null;
+    }
+    return null;
   }
 
   /** Corpses lie on their side and turn grey. */
@@ -127,6 +145,9 @@ export class EntityViews {
     if (!v) return;
     v.entity = { ...v.entity, dead };
     v.mesh.rotation.z = dead ? Math.PI / 2 : 0;
+    this.actors.get(entityId)?.setDead(dead);
+    if (this.actors.has(entityId))
+      v.target.y = dead ? 0.25 : v.entity.kind === 'enemy' ? 0.65 : 1.05;
     const mat = v.mesh.material as StandardMaterial | null;
     if (mat && v.entity.kind === 'enemy')
       mat.diffuseColor = dead ? new Color3(0.25, 0.25, 0.25) : new Color3(0.55, 0.55, 0.6);
@@ -182,27 +203,45 @@ export class EntityViews {
     return best?.e;
   }
 
+  attack(entityId: string): void {
+    this.actors.get(entityId)?.attack();
+  }
+
   private createMesh(e: WorldEntity): Mesh {
+    if (e.kind === 'player' || e.kind === 'npc' || e.kind === 'enemy') {
+      const actor = new ActorModel(
+        this.scene,
+        e.id,
+        e.kind === 'enemy' ? 'wolf' : 'hero',
+        e.kind === 'npc' ? '#94744c' : '#526b98',
+      );
+      this.actors.set(e.id, actor);
+      return actor.mesh;
+    }
     const mat = new StandardMaterial(`mat_${e.id}`, this.scene);
     let mesh: Mesh;
-    if (e.kind === 'player') {
-      mesh = MeshBuilder.CreateCapsule(e.id, { height: 1.8, radius: 0.4 }, this.scene);
-      mesh.position.y = 0.9;
-      mat.diffuseColor = new Color3(0.3, 0.5, 0.9);
-    } else if (e.kind === 'npc') {
-      mesh = MeshBuilder.CreateCylinder(e.id, { height: 1.9, diameter: 0.8 }, this.scene);
-      mesh.position.y = 0.95;
-      mat.diffuseColor = new Color3(0.9, 0.8, 0.2);
-    } else if (e.kind === 'pickup') {
-      mesh = MeshBuilder.CreateBox(e.id, { width: 0.6, height: 0.6, depth: 0.6 }, this.scene);
+    if (e.kind === 'pickup') {
+      mesh = MeshBuilder.CreateIcoSphere(e.id, { radius: 0.35, subdivisions: 1 }, this.scene);
+      if (e.name.includes('Sword')) {
+        const blade = MeshBuilder.CreateBox(
+          `${e.id}_blade`,
+          { width: 0.12, height: 1.3, depth: 0.08 },
+          this.scene,
+        );
+        blade.parent = mesh;
+        blade.position.y = 0.65;
+        const guard = MeshBuilder.CreateBox(
+          `${e.id}_guard`,
+          { width: 0.55, height: 0.1, depth: 0.12 },
+          this.scene,
+        );
+        guard.parent = mesh;
+        guard.position.y = 0.2;
+        blade.material = guard.material = mat;
+      }
       mesh.position.y = 0.6;
       mat.diffuseColor = new Color3(0.95, 0.5, 0.1);
       mat.emissiveColor = new Color3(0.4, 0.2, 0.0);
-    } else if (e.kind === 'enemy') {
-      // Placeholder wolf: a low, long box.
-      mesh = MeshBuilder.CreateBox(e.id, { width: 0.7, height: 0.8, depth: 1.5 }, this.scene);
-      mesh.position.y = 0.4;
-      mat.diffuseColor = new Color3(0.55, 0.55, 0.6);
     } else {
       mesh = MeshBuilder.CreateSphere(e.id, { diameter: 1 }, this.scene);
       mesh.position.y = 0.5;

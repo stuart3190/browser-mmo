@@ -616,7 +616,7 @@ external actions are in `docs/hardening/production-qualification-2026-10-04.md`.
       alternative connector/browser paths unavailable; owner device authorization required.
 - [ ] Stable capacity with headroom: not certified. No new code or architecture changes justified.
 
-## Current Work
+## Hardening merge verification — 2026-10-04
 
 **Hardening locally verified and ready for fast-forward merge; external qualification is not a development/merge gate.** The owner's
 latest instruction supersedes earlier DO NOT MERGE recommendations based solely on hosted CI
@@ -644,6 +644,42 @@ retain their measurements; they do not override this updated policy or claim ext
     Replace the sleep with the final admission message (`character.progress`) and guaranteed cleanup.
     No runtime admission guard is relaxed. The final full run after this correction passed.
 
+## Current Work
+
+**Greenvale playable slice completed.** Continues main `2bec69c004d772a776f13a80f163aeba2975957c`;
+implementation/proof commit is the commit containing this entry (resolve with
+`git log -1 -- apps/game-web/src/game/actor-model.ts`). Verified 2026-10-04 by Codex.
+
+- [x] Procedural articulated adventurer/NPC and wolf models, movement/idle states, server-driven
+      attack animation, corpse pose, contact shadows, and a visible locally equipped weapon.
+  - Proof: browser combat/death/respawn; NullEngine child-picking, rotation-seam and rig disposal regression.
+- [x] Coherent starter village and wilderness routes: pitched roofs/timber details, textured ground,
+      signed north/east/south-west roads, village square and waystone route; routes also drawn on minimap.
+  - Proof: screenshots and every road centreline checked against the existing authoritative collision world.
+- [x] Opening equipment/quest guidance, dismissible guide, in-game Controls, health/target/XP HUD,
+      XP feedback, inventory/gear/vault/quest access; verbose event journal collapsed by default.
+  - Proof: fresh Warrior obtained a real world sword, equipped through the Bag, accepted Maren's quest;
+    390×844 touch input/controls and screenshot inspection. No renderer/debug labels in the normal HUD.
+- [x] Existing persistent gameplay exercised end-to-end without admin grants or teleports:
+      normal movement to Northwood, shared enemy damage/death, real unique loot and XP, reload/login persistence.
+  - Proof: two browser clients received identical four-hit health sequences and the same death;
+    credited player earned 50 XP plus real items; the same item IDs and XP survived re-login.
+    Separate touch run took actual wolf damage, died and respawned via UI at the village with full health.
+  - Existing server authority, collision/bounds, enemy AI/respawn, cooldowns, first-tagger rewards,
+    levels and quests are reused, not rebuilt. No party/shared-credit system is claimed.
+- [x] Focused verification: 2 client rendering/route tests, 46 game-data tests, 40 world tests;
+      client typecheck, repository lint, four application/service builds and production debug-artifact check.
+  - Browser proof: 9 desktop/two-client checks + 5 touch/death checks, all pass; no browser exceptions.
+    Read-only development observations locate entities; actual keyboard/UI/touch input drives gameplay.
+    No new full infrastructure qualification, capacity benchmark or hosted-CI polling.
+  - Full quest turn-in/levelling persistence retains its existing domain/realtime proof from the prior
+    verified main; this browser run verifies the fresh opening hunt and persistence, not the full five-kill quest.
+
+See [slice design and controls](gameplay/vertical-slice.md) and
+[playthrough evidence](gameplay/evidence/greenvale-slice/playthrough.json).
+Preview: `http://127.0.0.1:5178/` on this VPS only, isolated development DB `mmo_slice`, API 4450,
+realtime 4451. Local dev auth remains development-only. This is not a public hosted release.
+
 ## Known Issues
 
 ### External follow-ups (not development or merge gates)
@@ -666,7 +702,7 @@ retain their measurements; they do not override this updated policy or claim ext
 9. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
 10. **`item_instances.listing_id` has no foreign key** (circular with listings); escrow consistency is enforced in domain code and checked on cancel/buy.
 11. **Stack-merge rows accumulate** (`destroyed/stack_merged`); archiving needed eventually.
-12. **Mouse camera drag and zoom** still not covered by an automated check (touch drag is).
+12. **Camera tests:** desktop drag is now asserted in the slice browser run; wheel input is exercised but zoom distance is not numerically asserted. Physical-device pinch usability remains external.
 13. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
 14. **A full mailbox delays the whole kill reward** (XP included) until there is room; the event retries with backoff (capped at 5 min). No UI tells the player their mailbox is full.
 15. **Navigation limits.** 2D collision only (no terrain height/levels), static obstacles only, enemies do not collide with each other or with players; NavGrid is rebuilt per zone load (fine at 256 m, not for very large zones).
@@ -675,7 +711,7 @@ retain their measurements; they do not override this updated policy or claim ext
 18. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
-21. **Minimap labels can clip** at the circle edge, and landmark names overlap when close together (cosmetic).
+21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
 22. **Quest scope is deliberately small.** One quest; no repeatable/daily quests, abandoning, talk/explore objectives, quest items or party credit (only the tagging character's kills count). Selling/vaulting pelts lowers collect progress (intended, documented).
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
@@ -687,8 +723,9 @@ retain their measurements; they do not override this updated policy or claim ext
 
 ## Next Recommended Task
 
-Resume game development from the existing implementation under MASTER_PLAN with a separately
-scoped gameplay milestone. Do not rebuild completed systems. Hosting capacity, physical-device
-acceptance, hosted Actions visibility and off-host operations remain documented external follow-ups,
-not blockers to development or this locally verified code merge. No gameplay is added in this run.
-Do not describe a merge as approval for an unrestricted public release or a performance certification.
+**Party up for a shared hunt.** Add a nearby-player invitation, small party health display, explicit
+server-side group kill/quest eligibility and fair loot ownership for the existing wolves, then one
+short follow-on objective at the Old Waystone. The current first-tagger-only rule is the largest gap
+between fighting alongside someone and adventuring together. Reuse the existing starter zone,
+combat, inventory and quest systems; do not build guilds, crafting trees or another infrastructure layer.
+External hosting/CI/device follow-ups do not block this gameplay milestone.

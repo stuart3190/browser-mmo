@@ -643,3 +643,30 @@ Issuance and rotation have a defined order: issuance first is revoked by rotatio
 old verification fail. Trusted development/test session creation remains available internally. New
 credential-changing code must preserve account-first locking. No schema, gameplay or public auth flow
 is added. Local verification is not hosted CI success, device acceptance or production capacity proof.
+
+## 2026-10-04 — Greenvale playable presentation over the existing simulation
+
+**Date**: 2026-10-04
+
+**Decision**
+Build the first playable slice by completing presentation and onboarding over the existing authoritative
+movement/combat/loot/quest implementation. Use small procedural articulated rigs and shared flat
+materials instead of introducing an external asset dependency. Derive walk/idle motion from movement;
+play strikes from server damage events. Local weapon presentation follows real equipped inventory.
+Visible roads and minimap routes share one client presentation table, tested against authoritative
+colliders. The south-west trail goes around the existing house and ends before the den rock.
+
+**Reason**
+The repository already had working persistent game systems. The gaps were player readability,
+placeholder figures/scenery and an unguided opening. Rebuilding the server would duplicate completed
+work. A clear village → weapon → Maren → wolf hunt loop makes the existing systems accessible.
+
+**Alternatives considered**
+Replace the world/combat architecture; wait for generated production art; add a large skill tree;
+make cosmetic loot or client-owned rewards. None addresses this slice's immediate needs.
+
+**Consequences**
+No server schema, protocol or economy changes. Existing characters retain their state. Cosmetic
+animations never determine damage. Geometry is deliberately simple; remote weapon appearance is not
+yet replicated. First-damager ownership remains explicit until a scoped party/shared-hunt milestone.
+Physical phone performance and public hosting are separate follow-ups, not development gates.

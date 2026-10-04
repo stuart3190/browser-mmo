@@ -14,7 +14,7 @@ export class FloatingText {
   spawn(
     at: { x: number; y: number },
     text: string,
-    kind: 'dealt' | 'taken' | 'crit' | 'miss',
+    kind: 'dealt' | 'taken' | 'crit' | 'miss' | 'xp',
   ): void {
     if (this.layer.childElementCount > 40) this.layer.firstElementChild?.remove();
     const el = document.createElement('div');

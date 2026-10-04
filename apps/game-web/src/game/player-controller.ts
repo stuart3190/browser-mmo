@@ -1,14 +1,12 @@
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera';
-import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
-import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import type { Scene } from '@babylonjs/core/scene';
 import { PLAYER_COLLISION_RADIUS } from '@mmo/game-data';
 import type { CollisionWorld } from '@mmo/game-data';
 import type { Vec3 } from '@mmo/schemas';
 import type { AnalogInput } from './analog-input';
+import { ActorModel } from './actor-model';
 
 /**
  * Local player: WASD / on-screen joystick movement relative to the camera, third-person orbit
@@ -19,6 +17,7 @@ import type { AnalogInput } from './analog-input';
 export class PlayerController {
   readonly mesh: Mesh;
   readonly camera: ArcRotateCamera;
+  readonly actor: ActorModel;
   private readonly keys = new Set<string>();
   private lastSent = { x: Number.NaN, z: Number.NaN, r: Number.NaN };
   private sinceSend = 0;
@@ -34,22 +33,24 @@ export class PlayerController {
     private readonly collision: CollisionWorld,
     private readonly analog: AnalogInput,
   ) {
-    this.mesh = MeshBuilder.CreateCapsule('local_player', { height: 1.8, radius: 0.4 }, scene);
-    const mat = new StandardMaterial('local_player_mat', scene);
-    mat.diffuseColor = new Color3(0.2, 0.8, 0.4);
-    this.mesh.material = mat;
-    this.mesh.position.set(start.x, 0.9, start.z);
+    this.actor = new ActorModel(scene, 'local_player', 'hero', '#397a70');
+    this.mesh = this.actor.mesh;
+    this.mesh.position.set(start.x, 1.05, start.z);
 
     this.camera = new ArcRotateCamera(
       'camera',
       -Math.PI / 2,
       Math.PI / 3,
-      14,
+      21,
       this.mesh.position.clone(),
       scene,
     );
     this.camera.lowerRadiusLimit = 4;
-    this.camera.upperRadiusLimit = 40;
+    this.camera.upperRadiusLimit = 28;
+    this.camera.lowerBetaLimit = 0.3;
+    this.camera.panningSensibility = 0;
+    this.camera.wheelPrecision = 30;
+    this.camera.inertia = 0.65;
     this.camera.upperBetaLimit = Math.PI / 2.1;
     this.camera.attachControl(true);
     this.camera.keysUp = [];
@@ -57,7 +58,15 @@ export class PlayerController {
     this.camera.keysLeft = [];
     this.camera.keysRight = [];
 
-    window.addEventListener('keydown', (e) => this.keys.add(e.code));
+    window.addEventListener('keydown', (e) => {
+      const target = e.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(target.tagName))
+      )
+        return;
+      this.keys.add(e.code);
+    });
     window.addEventListener('keyup', (e) => this.keys.delete(e.code));
     window.addEventListener('blur', () => this.keys.clear());
     canvas.focus();
@@ -69,23 +78,41 @@ export class PlayerController {
 
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
+    this.actor.setDead(!enabled);
+    this.mesh.position.y = enabled ? 1.05 : 0.3;
     if (!enabled) {
       this.keys.clear();
       this.analog.clear();
     }
   }
 
+  face(target: Vector3): void {
+    if (this.keys.size || this.analog.x || this.analog.y) return;
+    this.mesh.rotation.y = Math.atan2(
+      target.x - this.mesh.position.x,
+      target.z - this.mesh.position.z,
+    );
+  }
+
   /** Authoritative correction from the server. */
   correct(pos: Vec3, rotationY: number): void {
-    this.mesh.position.set(pos.x, 0.9, pos.z);
+    this.mesh.position.set(pos.x, 1.05, pos.z);
     this.mesh.rotation.y = rotationY;
     this.lastSent = { x: pos.x, z: pos.z, r: rotationY };
   }
 
   update(dt: number): void {
+    const oldX = this.mesh.position.x;
+    const oldZ = this.mesh.position.z;
+    if (
+      document.activeElement instanceof HTMLElement &&
+      /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)
+    )
+      this.keys.clear();
     let fx = 0;
     let fz = 0;
     if (!this.enabled) {
+      this.actor.update(dt, 0);
       this.camera.target.copyFrom(this.mesh.position);
       return;
     }
@@ -119,6 +146,10 @@ export class PlayerController {
       this.mesh.position.z = to.z;
       this.mesh.rotation.y = Math.atan2(dir.x, dir.z);
     }
+    this.actor.update(
+      dt,
+      Math.hypot(this.mesh.position.x - oldX, this.mesh.position.z - oldZ) / Math.max(dt, 0.001),
+    );
     this.camera.target.copyFrom(this.mesh.position);
 
     // Send intent at most 10 times per second, only when something changed.

@@ -27,6 +27,7 @@ function Bar({
       <div className="bar-fill" style={{ width: `${pct(value, max)}%` }} />
       <span className="bar-text">
         {Math.round(value)} / {max}
+        {kind === 'xp' && ' XP'}
         {kind === 'hp' && ` (${Math.round(pct(value, max))}%)`}
       </span>
     </div>
@@ -42,7 +43,7 @@ export function PlayerFrame() {
   return (
     <div className="panel frame player-frame" data-testid="player-frame">
       <div className="frame-title">
-        <strong>{c.name}</strong> · {gameData.characterClass(c.classId).name}{' '}
+        <strong>{c.name}</strong> · {gameData.characterClass(c.classId).name} Level{' '}
         {prog?.level ?? c.level}
         {v?.inCombat && <span className="tag combat-tag">In combat</span>}
         {v?.dead && <span className="tag dead-tag">Dead</span>}
@@ -52,8 +53,7 @@ export function PlayerFrame() {
         <Bar value={prog.xp} max={Math.max(1, prog.xpToNext)} kind="xp" testId="player-xp" />
       )}
       <div className="muted small">
-        {state.zoneName} · {state.renderer} · WASD move · tap/click target · F attack · Tab next
-        enemy · B/C/V
+        {state.zoneName} · {v?.inCombat ? 'Hold your ground' : 'Rest outside combat to recover'}
       </div>
     </div>
   );

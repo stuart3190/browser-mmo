@@ -2,11 +2,13 @@ import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
+import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTexture';
 import type { Scene } from '@babylonjs/core/scene';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { propShapes } from '@mmo/game-data';
 import type { GameData, PropKind } from '@mmo/game-data';
 import type { WorldChunk } from '@mmo/schemas';
+import { starterRoads } from './starter-roads';
 
 /**
  * Static world rendering from chunk data. Each chunk is built/disposed independently, which is the
@@ -26,17 +28,87 @@ export class WorldView {
     const zone = this.gameData.zone(zoneId);
     this.scene.clearColor.set(...hexToRgb(zone.environment.ambientColor), 1);
     for (const chunk of this.gameData.chunksForZone(zoneId)) this.loadChunk(chunk, zone.chunkSize);
+    this.paths();
+    this.scene.fogMode = 3;
+    this.scene.fogColor = Color3.FromHexString('#b4ccbf');
+    this.scene.fogStart = 65;
+    this.scene.fogEnd = 145;
     // Safe zones get a faint ground ring so players can read where enemies will not follow.
     for (const sz of zone.safeZones) {
       const ring = MeshBuilder.CreateTorus(
         `safe_${sz.id}`,
-        { diameter: sz.radius * 2, thickness: 0.4, tessellation: 64 },
+        { diameter: sz.radius * 2, thickness: 0.12, tessellation: 64 },
         this.scene,
       );
       ring.position.set(sz.center.x, 0.05, sz.center.z);
       ring.material = this.material('#c9b46a');
       ring.isPickable = false;
     }
+  }
+
+  /** Visible roads follow the clear corridors already reserved by authoritative world data. */
+  private paths(): void {
+    const road = (ax: number, az: number, bx: number, bz: number, width: number) => {
+      const path = MeshBuilder.CreateGround(
+        'greenvale_path',
+        { width, height: Math.hypot(bx - ax, bz - az) },
+        this.scene,
+      );
+      path.position.set((ax + bx) / 2, 0.025, (az + bz) / 2);
+      path.rotation.y = Math.atan2(bx - ax, bz - az);
+      path.material = this.material('#a99972');
+      path.isPickable = false;
+      path.freezeWorldMatrix();
+    };
+    for (const segment of starterRoads) road(...segment);
+    const square = MeshBuilder.CreateDisc(
+      'village_square',
+      { radius: 10, tessellation: 32 },
+      this.scene,
+    );
+    square.rotation.x = Math.PI / 2;
+    square.position.y = 0.04;
+    square.material = this.material('#b0a486');
+    square.isPickable = false;
+    this.sign(4, 25, 'NORTHWOOD', 'Wolf dens · follow the road');
+    this.sign(27, 4, 'EASTERN ROCKS', 'Beyond the stone ridge');
+    this.sign(-12, -15, 'THE HOLLOW', 'South-west hunting trail');
+    this.sign(8, -16, 'THE OLD ARMOURY', 'Take a sword · open Bag to equip');
+    this.sign(-6, 8, 'ELDER MAREN', 'Speak with E · Wolves at the Edge');
+    this.sign(-5, -97, 'OLD WAYSTONE', 'A place to begin again');
+  }
+
+  private sign(x: number, z: number, title: string, subtitle: string): void {
+    const board = MeshBuilder.CreatePlane(`sign_${title}`, { width: 5, height: 1.25 }, this.scene);
+    board.position.set(x, 2.5, z);
+    board.billboardMode = 7;
+    board.isPickable = false;
+    const texture = new DynamicTexture(
+      `sign_${title}`,
+      { width: 512, height: 128 },
+      this.scene,
+      false,
+    );
+    const c = texture.getContext() as CanvasRenderingContext2D;
+    c.fillStyle = '#263d36';
+    c.fillRect(0, 0, 512, 128);
+    c.strokeStyle = '#c6ac76';
+    c.lineWidth = 6;
+    c.strokeRect(4, 4, 504, 120);
+    c.textAlign = 'center';
+    c.fillStyle = '#f1dfb0';
+    c.font = 'bold 30px Georgia';
+    c.fillText(title, 256, 49);
+    c.fillStyle = '#d2d9cb';
+    c.font = '22px sans-serif';
+    c.fillText(subtitle, 256, 91);
+    texture.update();
+    const mat = new StandardMaterial(`sign_${title}`, this.scene);
+    mat.diffuseTexture = texture;
+    mat.emissiveColor = new Color3(0.45, 0.45, 0.45);
+    mat.specularColor = Color3.Black();
+    mat.backFaceCulling = false;
+    board.material = mat;
   }
 
   /** Shared flat materials (one per colour, not one per prop). */
@@ -46,6 +118,36 @@ export class WorldView {
       m = new StandardMaterial(`mat_${hex}`, this.scene);
       m.diffuseColor = Color3.FromHexString(hex);
       m.specularColor = Color3.Black();
+      if (hex === '#64865b') {
+        const texture = new DynamicTexture(
+          `surface_${hex}`,
+          { width: 256, height: 256 },
+          this.scene,
+          true,
+        );
+        const ctx = texture.getContext() as CanvasRenderingContext2D;
+        ctx.fillStyle = '#dddddd';
+        ctx.fillRect(0, 0, 256, 256);
+        let seed = 42;
+        const random = () => {
+          seed = (seed * 1664525 + 1013904223) >>> 0;
+          return seed / 4294967296;
+        };
+        for (let i = 0; i < 600; i++) {
+          ctx.fillStyle = i % 2 ? '#c7c7c7' : '#eeeeee';
+          const x = random() * 256,
+            y = random() * 256;
+          if (hex === '#64865b') {
+            ctx.fillRect(x, y, 1, 3 + random() * 6);
+          } else {
+            ctx.fillRect(x, y, 4 + random() * 9, 3 + random() * 6);
+          }
+        }
+        texture.update();
+        texture.uScale = 8;
+        texture.vScale = 8;
+        m.diffuseTexture = texture;
+      }
       this.materials.set(hex, m);
     }
     return m;
@@ -61,11 +163,9 @@ export class WorldView {
       this.scene,
     );
     ground.position.set(chunk.coord.cx * size + size / 2, 0, chunk.coord.cz * size + size / 2);
-    const mat = new StandardMaterial(`ground_mat_${key}`, this.scene);
-    mat.diffuseColor = Color3.FromHexString(chunk.groundColor);
-    mat.specularColor = Color3.Black();
-    ground.material = mat;
-    disposables.push(ground, mat);
+    ground.material = this.material('#64865b');
+    ground.isPickable = false;
+    disposables.push(ground);
 
     // Props: mesh dimensions come from the same shape table as the gameplay colliders.
     for (const prop of chunk.props) {
@@ -108,6 +208,41 @@ export class WorldView {
       mesh.rotation.y = prop.rotationY;
       mesh.material = this.material(PROP_COLORS[prop.kind]);
       mesh.isPickable = false;
+      // Dressing stays inside the existing collision footprint; no invisible new obstacles.
+      const detail = (
+        name: string,
+        w: number,
+        h: number,
+        d: number,
+        x: number,
+        yy: number,
+        z: number,
+        color: string,
+      ) => {
+        const child = MeshBuilder.CreateBox(
+          `${prop.id}_${name}`,
+          { width: w, height: h, depth: d },
+          this.scene,
+        );
+        child.parent = mesh;
+        child.position.set(x, yy, z);
+        child.material = this.material(color);
+        child.isPickable = false;
+        return child;
+      };
+      if (prop.kind === 'building') {
+        for (const sign of [-1, 1]) {
+          const roof = detail('roof', 4.9, 0.25, 6.5, sign * 1.9, 3.25, 0, '#714a45');
+          roof.rotation.z = -sign * 0.5;
+          detail('window', 1.1, 1.4, 0.08, sign * 2.5, 0.1, -3.03, '#e2bb70');
+          detail('beam', 0.2, 5, 0.2, sign * 3.85, 0, -3, '#443b31');
+        }
+        detail('door', 1.2, 2.6, 0.08, 0, -1.2, -3.03, '#403e32');
+      } else if (prop.kind === 'tree') {
+        detail('trunk', 0.75, 2.5, 0.75, 0, -1.75, 0, '#655441');
+      } else if (prop.kind === 'fence') {
+        for (const x of [-4.7, 0, 4.7]) detail('post', 0.3, 1.6, 0.3, x, 0.1, 0, '#68513a');
+      }
       mesh.freezeWorldMatrix();
       disposables.push(mesh);
     }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGame } from './context';
+import { starterRoads } from '../game/starter-roads';
 
 /** Metres from the player to the minimap edge. */
 const RANGE = 60;
@@ -62,6 +63,15 @@ export function Minimap() {
         ctx.arc(sx(sz.center.x), sy(sz.center.z), sz.radius * k, 0, Math.PI * 2);
         ctx.stroke();
       }
+      ctx.strokeStyle = '#a99972';
+      for (const [ax, az, bx, bz, width] of starterRoads) {
+        ctx.lineWidth = Math.max(1, width * k);
+        ctx.beginPath();
+        ctx.moveTo(sx(ax), sy(az));
+        ctx.lineTo(sx(bx), sy(bz));
+        ctx.stroke();
+      }
+      ctx.lineWidth = 1;
       ctx.font = '9px system-ui, sans-serif';
       ctx.textAlign = 'center';
       for (const l of zone.landmarks) {
@@ -74,8 +84,7 @@ export function Minimap() {
         ctx.lineTo(x, y + 4);
         ctx.lineTo(x - 4, y);
         ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.fillText(l.name, x, y - 6);
+        // Nearest landmark is named below the map; avoid clipped/overlapping in-map labels.
       }
       for (const m of controls.markers()) {
         ctx.fillStyle = m.dead ? '#777' : (COLORS[m.kind] ?? '#fff');

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { classAbilities } from '@mmo/game-data';
 import { createRoot } from 'react-dom/client';
 import type { WindowId } from '../state/game-state';
@@ -11,6 +11,7 @@ import { hoverTooltip } from './hover';
 import { InventoryWindow } from './InventoryWindow';
 import { ItemDetails } from './ItemDetails';
 import { ItemTooltip } from './ItemTooltip';
+import { FirstSteps } from './FirstSteps';
 import { AbilityBar } from './AbilityBar';
 import { Minimap } from './Minimap';
 import { DialoguePanel, QuestLogWindow, QuestTracker } from './QuestUI';
@@ -77,10 +78,18 @@ function GameUI() {
       <TargetFrame />
       <Minimap />
       <QuestTracker />
+      <FirstSteps />
       <ConnectionBanner />
       <DeathOverlay />
       {state.prompt && !state.dialogue && <div className="panel prompt">{state.prompt}</div>}
       <LogPanel />
+      <details className="controls-help panel">
+        <summary>Controls</summary>
+        <p>WASD to move · drag the view to orbit · scroll to zoom.</p>
+        <p>Click a creature or press Tab to target. F toggles attack; 1–3 use abilities.</p>
+        <p>E to talk or pick up · B for Bag · C for gear · J for quests · Escape to close.</p>
+        <p>On touch: left stick to move, drag the world to look, tap a target and use Attack.</p>
+      </details>
       <Toasts />
       <div className="windows">
         <CharacterWindow />
@@ -124,17 +133,27 @@ function ConnectionBanner() {
 function LogPanel() {
   const { state } = useGame();
   const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
   const last = state.log.at(-1)?.id;
   useEffect(() => {
     if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
   }, [last]);
   return (
-    <div className="panel log" data-testid="log" ref={ref}>
-      {state.log.map((l) => (
-        <div key={l.id} className={l.kind === 'error' ? 'error' : ''}>
-          {new Date(l.at).toLocaleTimeString()} {l.text}
-        </div>
-      ))}
+    <div className={`journal-log${visible ? ' expanded' : ''}`}>
+      <button
+        className="journal-toggle"
+        onClick={() => setVisible(!visible)}
+        aria-expanded={visible}
+      >
+        Journal
+      </button>
+      <div className="panel log" data-testid="log" ref={ref} hidden={!visible}>
+        {state.log.map((l) => (
+          <div key={l.id} className={l.kind === 'error' ? 'error' : ''}>
+            {l.text}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -185,6 +204,7 @@ function ActionBar() {
       {btn('character', 'Character', 'C')}
       {btn('inventory', 'Bag', 'B')}
       {btn('bank', 'Bank', 'V')}
+
       {btn('quests', 'Quests', 'J')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button
