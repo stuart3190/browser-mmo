@@ -3,6 +3,7 @@ import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { Scene } from '@babylonjs/core/scene';
 import { getGameData } from '@mmo/game-data';
+import { formatCurrency } from '@mmo/ui';
 import { RealtimeClient } from '@mmo/networking';
 import type { PlayerCharacter } from '@mmo/schemas';
 import type { ApiClient } from '../api';
@@ -10,6 +11,7 @@ import { config } from '../config';
 import { GameState } from '../state/game-state';
 import { ItemActions } from '../state/item-actions';
 import { CombatActions } from '../state/combat-actions';
+import { QuestActions } from '../state/quest-actions';
 import type { EntityInfo } from '../state/game-state';
 // Side-effect import: enables scene picking (tree-shaken out of deep imports otherwise).
 import '@babylonjs/core/Culling/ray';
@@ -50,6 +52,7 @@ export async function startGame(args: {
   const actions = new ItemActions(args.api, state, gameData);
   const net = new RealtimeClient(config.realtimeUrl);
   const combat = new CombatActions(net, state);
+  const questActions = new QuestActions(net, state);
   const analog = new AnalogInput();
   const floating = new FloatingText();
   let zoneId: string | null = null;
@@ -61,12 +64,9 @@ export async function startGame(args: {
       net.send('interact.pickup', { entityId: pickup.id });
       return;
     }
+    // NPCs: the server validates entity + range and answers with npc.dialogue
     const npc = entities.nearest('npc', player.position, INTERACT_RANGE + 1);
-    const def = npc?.refId ? gameData.npcs.get(npc.refId) : undefined;
-    if (def)
-      state.addLog(
-        `${def.name}: “${def.dialogue[Math.floor(Math.random() * def.dialogue.length)]}”`,
-      );
+    if (npc) questActions.talk(npc.id);
   };
   /** Tab / touch "Next target" button: cycle to the nearest other living enemy. */
   const targetNearest = () => {
@@ -80,6 +80,7 @@ export async function startGame(args: {
     state,
     actions,
     combat,
+    quests: questActions,
     gameData,
     controls: {
       analog,
@@ -151,6 +152,7 @@ export async function startGame(args: {
       s.serverOffsetMs = m.d.serverTime - Date.now();
       s.world.clear();
       s.target = { id: null, attacking: false };
+      s.dialogue = null;
     });
     if (!entities) {
       new WorldView(scene, gameData).loadZone(m.d.zoneId);
@@ -277,6 +279,34 @@ export async function startGame(args: {
       );
     state.addLog(`Looted ${parts.join(', ') || 'nothing'}`);
   });
+  // ---- NPCs and quests (server state only) ----
+  net.on('npc.dialogue', (m) => state.update((s) => (s.dialogue = m.d)));
+  net.on('quest.log', (m) => {
+    state.update((s) => (s.quests = m.d.quests));
+    for (const e of m.d.events) {
+      const q = m.d.quests.find((x) => x.questId === e.questId);
+      if (!q) continue;
+      const o = e.objectiveId ? q.objectives.find((x) => x.id === e.objectiveId) : undefined;
+      if (e.kind === 'accepted') state.toast(`Quest accepted: ${q.name}`);
+      else if (e.kind === 'progress' && o) state.addLog(`${o.label}: ${o.current} / ${o.required}`);
+      else if (e.kind === 'objective_complete' && o)
+        state.toast(`${o.label}: ${o.current} / ${o.required} — complete`);
+      else if (e.kind === 'ready') {
+        const npc = q.turnInNpcId ? gameData.npcs.get(q.turnInNpcId)?.name : undefined;
+        state.toast(`${q.name}: return to ${npc ?? 'the quest giver'}`);
+      }
+    }
+  });
+  net.on('quest.completed', (m) => {
+    const parts = [`+${m.d.xpGained} XP`];
+    const gold = gameData.currencies.get('gold');
+    if (m.d.gold > 0 && gold) parts.push(formatCurrency(gold, m.d.gold));
+    for (const i of m.d.items) parts.push(i.template.name);
+    state.toast(`Quest complete: ${m.d.name} — ${parts.join(', ')}`);
+    state.addLog(`Quest complete: ${m.d.name} (${parts.join(', ')})`);
+    if (m.d.mailedItems.length)
+      state.toast('Your bags are full — the reward was sent to Recovered loot', 'info');
+  });
   net.on('world.moves', (m) =>
     m.d.moves.forEach(([id, x, y, z, r]) => entities?.move(id, x, y, z, r)),
   );
@@ -319,7 +349,8 @@ export async function startGame(args: {
     const rect = args.canvas.getBoundingClientRect();
     const pick = scene.pick(e.clientX - rect.left, e.clientY - rect.top);
     const picked = pick?.pickedMesh ? entities.entityIdOfMesh(pick.pickedMesh) : null;
-    if (picked) combat.target(picked);
+    if (picked && state.world.get(picked)?.kind === 'npc') questActions.talk(picked);
+    else if (picked) combat.target(picked);
     else if (state.target.id && !state.target.attacking) combat.target(null);
   });
 
@@ -413,6 +444,17 @@ function exposeDebug(
       if (!m || !p) return false;
       p.camera.alpha = Math.atan2(p.position.z - m.z, p.position.x - m.x);
       return true;
+    },
+    /** Entity id of the first replicated NPC (Elder Maren in Greenvale). */
+    get npcId() {
+      return [...state.world.values()].find((e) => e.kind === 'npc')?.id ?? null;
+    },
+    /** Quest log and open dialogue exactly as the server sent them. */
+    get quests() {
+      return state.quests;
+    },
+    get dialogue() {
+      return state.dialogue;
     },
     /** World position of a replicated entity. */
     entityPos(id: string) {

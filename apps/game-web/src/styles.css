@@ -822,3 +822,120 @@ kbd {
     margin-top: -42px;
   }
 }
+
+/* Quests: tracker, dialogue, log */
+.quest-tracker {
+  position: absolute;
+  top: 184px;
+  right: 12px;
+  width: 220px;
+  font-size: 12px;
+  padding: 6px 10px;
+  pointer-events: none;
+  background: rgba(10, 12, 18, 0.72);
+}
+.tracked + .tracked {
+  margin-top: 6px;
+}
+.tracked-title {
+  font-weight: 600;
+  color: #f2d16b;
+}
+.quest-objectives {
+  list-style: none;
+  margin: 2px 0;
+  padding: 0;
+}
+.quest-objectives li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.quest-objectives li.done {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.quest-tracker .ready,
+.quest-entry .ready {
+  color: #8fe08a;
+}
+.dialogue {
+  position: absolute;
+  left: 50%;
+  bottom: 76px;
+  transform: translateX(-50%);
+  width: min(460px, calc(100vw - 24px));
+  max-height: 60vh;
+  overflow: auto;
+  z-index: 3;
+  box-sizing: border-box;
+}
+.dialogue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.dialogue-quest h3,
+.quest-entry h3 {
+  margin: 6px 0 2px;
+  font-size: 14px;
+  color: #f2d16b;
+}
+.dialogue-line {
+  font-style: italic;
+  margin: 4px 0;
+}
+.dialogue-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.dialogue-actions button {
+  min-height: 40px;
+}
+.quest-rewards {
+  color: #c9b46a;
+  margin: 4px 0 0;
+}
+.quest-entry {
+  border-top: 1px solid var(--border);
+  padding: 6px 0;
+}
+.window-quests {
+  width: 320px;
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .quest-tracker {
+    top: 104px;
+    left: 6px;
+    right: auto;
+    width: calc(50% - 12px);
+    font-size: 11px;
+  }
+  .dialogue {
+    left: 0;
+    right: 0;
+    bottom: 64px;
+    transform: none;
+    width: auto;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .dialogue-actions button {
+    min-height: 44px;
+    flex: 1;
+  }
+}
+.dialogue {
+  background: rgba(14, 16, 22, 0.97);
+}
+/* Touch: the Talk/Take button replaces the keyboard prompt; toasts sit below the tracker. */
+.ui-root.touch .prompt {
+  display: none;
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .toasts {
+    top: 176px;
+  }
+}

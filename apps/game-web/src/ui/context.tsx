@@ -3,6 +3,7 @@ import type { GameData } from '@mmo/game-data';
 import type { GameState } from '../state/game-state';
 import type { CombatActions } from '../state/combat-actions';
 import type { ItemActions } from '../state/item-actions';
+import type { QuestActions } from '../state/quest-actions';
 import type { AnalogInput } from '../game/analog-input';
 
 export interface Controls {
@@ -22,6 +23,7 @@ export interface UiDeps {
   state: GameState;
   actions: ItemActions;
   combat: CombatActions;
+  quests: QuestActions;
   gameData: GameData;
   controls: Controls;
 }

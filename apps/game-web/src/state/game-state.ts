@@ -1,8 +1,10 @@
-import type { ConnectionStatus } from '@mmo/networking';
-import type { CharacterStats, CurrencyBalance, PlayerCharacter } from '@mmo/schemas';
+import type { ConnectionStatus, ServerPayload } from '@mmo/networking';
+import type { CharacterStats, CurrencyBalance, PlayerCharacter, QuestView } from '@mmo/schemas';
 import { ItemStore } from '@mmo/ui';
 
-export type WindowId = 'inventory' | 'character' | 'bank';
+export type WindowId = 'inventory' | 'character' | 'bank' | 'quests';
+
+export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 
 export interface LogLine {
   id: number;
@@ -67,6 +69,11 @@ export class GameState {
   /** Last combat feedback line (shown in the target frame; the log is hidden on phones). */
   combatLine: { text: string; kind: 'info' | 'error' } | null = null;
   readonly world = new Map<string, EntityInfo>();
+  // --- quests (all server-provided) ---
+  /** The authoritative quest log (replaced on every quest.log). */
+  quests: QuestView[] = [];
+  /** Open NPC dialogue (the server's answer to npc.interact / quest actions). */
+  dialogue: NpcDialogueView | null = null;
   /** serverTime - Date.now() at last auth.ok, for displaying server timestamps. */
   serverOffsetMs = 0;
   revision = 0;
