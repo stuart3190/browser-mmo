@@ -688,7 +688,7 @@ See [slice design and controls](gameplay/vertical-slice.md) and
 Preview: `http://127.0.0.1:5178/` on this VPS only, isolated development DB `mmo_slice`, API 4450,
 realtime 4451. Local dev auth remains development-only. This is not a public hosted release.
 
-## Current Work
+## Party and Waystone milestone — 2026-10-04
 
 **Party/shared-hunt and short Old Waystone quest complete; local verification green.**
 Verified 2026-10-04 by Codex. Party implementation commit: `2f3aaeab5169d628c750bcf00a1b101e46364a84`.
@@ -736,6 +736,43 @@ Waystone and final verification: the commit containing `packages/game-data/src/w
 Rules and deployment compatibility: [parties](gameplay/parties.md). No guilds, PvP, raids, voice,
 trading, party chat, hardware qualification or infrastructure redesign.
 
+## Current Work
+
+**Hollow trail and Brackenmaw continuation complete.** Verified 2026-10-05 by Codex.
+Implementation commit: `a02bde1296a0f73b64710824048b1a91a9fcfd16`; content-deployment command
+and final evidence are in the following verification commit. Continued verified main
+`3873659eadc9c028f58c49da4ac9a530a9eb50ef` without changing AGENTS.md or MASTER_PLAN.md.
+
+- [x] Rill offers Teeth Beneath the Roots after the Old Waystone quest; marked westward trail,
+      scarred roots, named level-three packleader, return to Rill and useful bound trinket.
+  - Proof: actual two-client travel/acceptance, same enemy targeted and killed, both quests ready;
+    both characters completed touch turn-in for 350 XP/125 copper/one token and equipped it.
+- [x] Stationary authoritative bite wind-up, ground warning and target HUD cue; range/LOS rechecked;
+      existing chase/leash/death/respawn and party outbox used unchanged.
+  - Proof: four focused world tests cover timing, dodge, recovery, cancellation and unique respawn;
+    both browsers received the cue. Live kill ledger: 88 XP each, one cap and 67 copper to one member.
+- [x] Additive content recovery and migration preserve saved state; reward catalog deploy step available.
+  - Proof: prior content hash reconstructed exactly, path collision tests pass, populated migration applied;
+    exact SQL against a temporary populated copy preserves all fields except contentHash.
+    `NODE_ENV=production pnpm db:sync-content` synced 16 templates using the existing idempotent
+    upsert, without demo accounts/grants. Initial missing-template turn-in rolled back safely;
+    after sync both actual retries completed once and reward items survived reconnect.
+- [x] Full local verification and functional browser proof.
+  - `NODE_ENV=production TEST_DATABASE_URL=.../mmo_party_test pnpm verify` passed format, lint,
+    workspace/scripts typechecks, **133 unit + 126 PostgreSQL integration tests**, four builds,
+    and production debug-artifact guard. Integration includes process crashes, ownership and economy races.
+  - The subsequent deployment CLI wrapper and browser continuation harness received targeted formatting,
+    lint/typechecking/syntax checks and actual populated production-mode sync + touch/reconnect/equip proof;
+    gameplay code was unchanged after the full suite. No second expensive qualification cycle.
+  - Browser hunt resumed after an automation target-ack race and a transient login timeout. The actual
+    new quest objectives/rewards were never injected. Old prerequisite quests were fixture-prepared.
+    Five hunt checks plus nine return/equipment checks, screenshots and limits:
+    [Hollow evidence](gameplay/evidence/hollow/results.json), [playable route](gameplay/hollow.md).
+
+Preview remains `http://127.0.0.1:5178/` on this VPS only. Software-rendered functional evidence is
+not physical Android performance or public hosting qualification. No unrelated gameplay/infrastructure
+systems added; external follow-ups remain separate from development and merge gates.
+
 ## Known Issues
 
 ### External follow-ups (not development or merge gates)
@@ -752,7 +789,7 @@ trading, party chat, hardware qualification or infrastructure redesign.
 3. **Reconnect = full snapshot.** No session resume/replay buffer; an expired session cannot reconnect (client shows "Disconnected"; reload to log in). The game client keeps the token in memory only.
 4. **Bank opens anywhere.** No banker NPC/proximity rule yet (server would need the player's position from the realtime service).
 5. **No drag-and-drop, sorting, search, split-stack or loadout UI.** Actions are via the details sheet. Icons are text placeholders.
-6. **Client bundle remains substantial.** Current measured main chunk 437.65 kB raw / 133.68 kB gzip; Babylon 1,948.66 kB raw / 460.45 kB gzip. See the sustained browser evidence; no hardware-phone performance pass is claimed.
+6. **Client bundle remains substantial.** Current measured main chunk 456.56 kB raw / 140.32 kB gzip; Babylon 1,952.23 kB raw / 461.57 kB gzip. See the sustained browser evidence; no hardware-phone performance pass is claimed.
 7. **One-handed weapons always equip to the main hand.** Off-hand one-handers are possible via the API but not from the UI; dual-wield rules are undesigned.
 8. **Expired listings with a full bag** stay in escrow until the seller has space (the mailbox exists now but the marketplace does not use it yet). The expiry sweep runs in every API process (safe, wasteful with replicas).
 9. **Lock-order inversion between grant and move** (grant locks container then stack items; move locks item then containers) can deadlock under contention; PostgreSQL detects it and `inTransaction` retries, but it is not eliminated.
@@ -763,12 +800,12 @@ trading, party chat, hardware qualification or infrastructure redesign.
 14. **A full mailbox delays the whole kill reward** (XP included) until there is room; the event retries with backoff (capped at 5 min). No UI tells the player their mailbox is full.
 15. **Navigation limits.** 2D collision only (no terrain height/levels), static obstacles only, enemies do not collide with each other or with players; NavGrid is rebuilt per zone load (fine at 256 m, not for very large zones).
 16. **`kill_events` grows forever.** Needs a retention/archive job for rewarded rows older than the longest respawn window.
-17. **Durable feedback includes database latency.** Death/reward feedback waits for checkpoint/kill writes; failed ownership/checkpoint writes fence the gateway and require recovery. Kill credit still goes to the first damager only (no parties).
+17. **Durable feedback includes database latency.** Death/reward feedback waits for checkpoint/kill writes; failed ownership/checkpoint writes fence the gateway and require recovery. First-hit tags now freeze eligible party credit under the documented shared-hunt rules.
 18. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
-22. **Quest scope is deliberately small.** Two quests, including one idempotent NPC-talk follow-on; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
+22. **Quest scope is deliberately small.** Three quests, including an idempotent NPC-talk follow-on and the Hollow packleader hunt; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
@@ -779,8 +816,8 @@ trading, party chat, hardware qualification or infrastructure redesign.
 
 ## Next Recommended Task
 
-**Give the party a reason to investigate the Hollow.** Build one short follow-on trail and a named
-pack-leader encounter with a readable attack cue, using existing party eligibility, combat, quests
-and single-roll rewards. Tie it to Rill's warning; keep it small enough to play together in one session.
-Do not expand into guilds, raids, PvP, trading or another infrastructure qualification cycle.
-External hosting/CI/physical-device follow-ups remain separate from development.
+**Pay off the wounded-roots story with one short Root-Wound investigation and a contrasting enemy.**
+First playtest the complete three-quest starter route with fresh solo/party characters to tune travel
+and combat pacing. Then extend the Hollow locally with a second readable enemy behaviour and a small
+quest payoff, reusing current world/party/reward systems. No guilds, raids, PvP, crafting or giant quest
+engine. Hosting/CI/physical-device follow-ups remain separate from gameplay development.

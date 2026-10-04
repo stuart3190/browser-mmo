@@ -764,3 +764,10 @@ checkpoint and terrain; recovery adds an ungrouped spawn only if neither its ene
 pending respawn exists. Deploy client/server content together after stopping owners and migrating.
 The new quest requires each member to accept and turn in individually; existing shared eligibility
 and one-roll loot rules apply. Physical-device and hosting follow-ups remain external.
+
+**Verified deployment follow-up (2026-10-05)**
+The populated preview exposed a missing item-catalog synchronization step: the new token's foreign
+key prevented turn-in, and the transaction rolled back without partial rewards. Expose the existing
+`syncItemTemplates` function as `pnpm db:sync-content`, safe in production and separate from demo seeding.
+Run after migrations before restarting hosts. Actual retry/reconnect/equipment proof passed for both
+characters. This adds a deployment entry point, not a new content or economy architecture.

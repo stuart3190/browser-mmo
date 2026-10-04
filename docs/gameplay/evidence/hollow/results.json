@@ -1,0 +1,112 @@
+{
+  "hunt": [
+    {
+      "name": "Both party members accept the Hollow follow-on at Rill",
+      "ok": true
+    },
+    {
+      "name": "Both clients target the same named packleader",
+      "ok": true,
+      "detail": "Brackenmaw, Hollow Packleader\n\u00b7 level 3\n\u00d7\n260 / 260 (100%)\nAttack"
+    },
+    {
+      "name": "Authoritative wind-up replicated to both clients",
+      "ok": true
+    },
+    {
+      "name": "One shared death advances both quests and rolls only one item",
+      "ok": true,
+      "detail": [
+        {
+          "gold": 67,
+          "items": 1,
+          "mailed": 0
+        },
+        {
+          "gold": 0,
+          "items": 0,
+          "mailed": 0
+        }
+      ]
+    },
+    {
+      "name": "Kill objective persists on reconnect",
+      "ok": true
+    }
+  ],
+  "turnInAndEquipment": [
+    {
+      "name": "Touch turn-in pays 350 XP, 125 copper and one ward-token",
+      "ok": true,
+      "detail": {
+        "xp": 350,
+        "gold": 125
+      }
+    },
+    {
+      "name": "No second turn-in button remains",
+      "ok": true
+    },
+    {
+      "name": "Completed quest and same single item survive reconnect",
+      "ok": true
+    },
+    {
+      "name": "Level-two character equips its real ward-token by touch",
+      "ok": true
+    },
+    {
+      "name": "Touch turn-in pays 350 XP, 125 copper and one ward-token",
+      "ok": true,
+      "detail": {
+        "xp": 350,
+        "gold": 125
+      }
+    },
+    {
+      "name": "No second turn-in button remains",
+      "ok": true
+    },
+    {
+      "name": "Completed quest and same single item survive reconnect",
+      "ok": true
+    },
+    {
+      "name": "Level-two character equips its real ward-token by touch",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "migration": {
+    "hashes": [
+      "1aeb2392850b5f0455d5eda2ffcaf57ada86fe44e8024fbd71110be41ff94011",
+      "f8f438e06fed39f2d91ced946322aa87bba54bab3631e49cde5ef11fbeffb113"
+    ],
+    "otherFieldsPreserved": true,
+    "test": "Exact migration SQL on temporary copy of populated preview checkpoint; transaction rolled back"
+  },
+  "databaseKillRewards": [
+    {
+      "recipient": 1,
+      "xp": 88,
+      "gold": 67,
+      "itemCount": 1
+    },
+    {
+      "recipient": 2,
+      "xp": 88,
+      "gold": 0,
+      "itemCount": 0
+    }
+  ],
+  "limitations": [
+    "Prerequisites prepared separately in isolated development database. No Hollow objective/reward injected.",
+    "Walkthrough resumed after target-ack automation race and transient login-page timeout.",
+    "First turn-in failed safely because item catalog sync was omitted; both actual turn-ins and equipment passed after existing content sync ran.",
+    "Software rendering and phone viewport only; no physical-device performance claim."
+  ]
+}

@@ -46,12 +46,15 @@ all existing terrain/props/collision remain unchanged. Every added path centre i
 ## Deployment and verification
 
 Migration `0009_hollow_content.sql` accepts only the exact preceding Greenvale content hash.
-Stop zone owners, migrate, deploy client and servers together, then restart. Never drop checkpoints.
+Stop zone owners, run `pnpm db:migrate`, then `pnpm db:sync-content` with the deployment DATABASE_URL,
+deploy matching client and servers, then restart. Content sync uses the existing idempotent template
+mirror upsert only; it creates no demo accounts or grants. New item rewards require this step.
+Never run the development seed against production and never drop checkpoints.
 Recovery adds a missing ungrouped enemy only when no live/corpse state or pending respawn exists.
 Unknown content hashes still fail closed. This is additive content, not general save conversion.
 
 Targeted simulation coverage: wind-up timing, recovery, dodge, target loss, death cancellation,
 additive recovery and respawn uniqueness. PostgreSQL coverage: prerequisite, shared kill objective,
 single loot roll, concurrent replay and per-character turn-in deduplication.
-Browser evidence and final verification are recorded in PROGRESS once complete. Real-device Android
+Browser evidence and final verification are recorded in PROGRESS and [results](evidence/hollow/results.json). Real-device Android
 performance remains an external follow-up; software-rendered browser automation is functional evidence.
