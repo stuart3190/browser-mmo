@@ -47,6 +47,7 @@ beforeAll(async () => {
 });
 afterAll(async () => {
   await server.stop();
+  await handle.db.delete(schema.zoneCheckpoints);
   await handle.close();
 });
 

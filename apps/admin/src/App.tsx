@@ -28,7 +28,8 @@ export function App() {
     e.preventDefault();
     setError('');
     try {
-      await api.login(new FormData(e.currentTarget).get('username') as string);
+      const data = new FormData(e.currentTarget);
+      await api.login(data.get('username') as string, data.get('password') as string);
       setMe(await api.me());
     } catch (err) {
       setError((err as Error).message);
@@ -40,8 +41,13 @@ export function App() {
       <main>
         <h1>MMO Admin</h1>
         <form onSubmit={onLogin}>
-          <input name="username" placeholder="username (dev login)" required />{' '}
-          <button>Login</button>
+          <input
+            name="password"
+            type="password"
+            placeholder="password"
+            autoComplete="current-password"
+          />
+          <input name="username" placeholder="username" required /> <button>Login</button>
         </form>
         <p className="error">{error}</p>
       </main>

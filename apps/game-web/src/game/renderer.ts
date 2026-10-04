@@ -16,8 +16,13 @@ export async function createEngine(
     const { WebGPUEngine } = await import('@babylonjs/core/Engines/webgpuEngine');
     if (await WebGPUEngine.IsSupportedAsync) {
       const engine = new WebGPUEngine(canvas, { antialias: true });
-      await engine.initAsync();
-      return { engine, kind: 'webgpu' };
+      try {
+        await engine.initAsync();
+        return { engine, kind: 'webgpu' };
+      } catch (error) {
+        engine.dispose();
+        console.warn('WebGPU initialization failed; falling back to WebGL2', error);
+      }
     }
     console.warn('WebGPU not supported; falling back to WebGL2');
   }

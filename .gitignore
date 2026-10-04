@@ -173,3 +173,7 @@ assets/generated/_renders/
 assets/generated/_exports/
 *.tmp.glb
 *.tmp.png
+
+# Database archives are sensitive and must never be committed.
+*.dump
+*.dump.json

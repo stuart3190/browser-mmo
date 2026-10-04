@@ -202,6 +202,11 @@ export async function startGame(args: {
     if (m.d.reason === 'target_dead') combatLine('Target is dead');
   });
   net.on('combat.damage', (m) => {
+    if (m.d.targetId === state.myEntityId)
+      state.update((s) => {
+        if (s.vitals)
+          s.vitals = { ...s.vitals, health: m.d.targetHealth, maxHealth: m.d.targetMaxHealth };
+      });
     patchEntity(m.d.targetId, { health: m.d.targetHealth, maxHealth: m.d.targetMaxHealth });
     if (m.d.sourceId === state.myEntityId || m.d.targetId === state.myEntityId) {
       const onMe = m.d.targetId === state.myEntityId;

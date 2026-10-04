@@ -2,7 +2,7 @@ import { getGameData } from '@mmo/game-data';
 import type { PlayerCharacter } from '@mmo/schemas';
 import type { ApiClient } from './api';
 
-/** Minimal dev login + character select/create screen. Deliberately plain. */
+/** Provider-aware login and character select/create screen. */
 export function showLogin(
   root: HTMLElement,
   api: ApiClient,
@@ -11,10 +11,11 @@ export function showLogin(
   const panel = document.createElement('div');
   panel.className = 'login';
   panel.innerHTML = `
-    <h2 style="margin-top:0">Greenvale (dev)</h2>
+    <h2 style="margin-top:0">Greenvale</h2>
     <form id="login-form">
       <label>Username <input name="username" autocomplete="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9_]+" /></label>
-      <button type="submit">Dev login</button>
+      <label id="password-label" hidden>Password <input name="password" type="password" autocomplete="current-password" maxlength="128" /></label>
+      <button type="submit" disabled>Log in</button>
     </form>
     <div id="chars" hidden>
       <div id="char-list"></div>
@@ -27,6 +28,23 @@ export function showLogin(
     <p id="login-error" class="error"></p>`;
   root.appendChild(panel);
   const err = panel.querySelector<HTMLElement>('#login-error')!;
+  let provider = '';
+  void api
+    .providers()
+    .then(({ providers }) => {
+      provider = providers.includes('password')
+        ? 'password'
+        : providers.includes('dev')
+          ? 'dev'
+          : '';
+      panel.querySelector<HTMLElement>('#password-label')!.hidden = provider !== 'password';
+      panel.querySelector<HTMLInputElement>('[name=password]')!.required = provider === 'password';
+      panel.querySelector<HTMLButtonElement>('button[type=submit]')!.disabled = !provider;
+      if (!provider) err.textContent = 'Login is unavailable';
+    })
+    .catch(() => {
+      err.textContent = 'Cannot reach login service';
+    });
   const list = panel.querySelector<HTMLElement>('#char-list')!;
 
   return new Promise((resolve) => {
@@ -49,7 +67,13 @@ export function showLogin(
       err.textContent = '';
       try {
         const username = new FormData(e.target as HTMLFormElement).get('username') as string;
-        token = (await api.devLogin(username)).token;
+        token = (
+          await api.login(
+            username,
+            new FormData(e.target as HTMLFormElement).get('password') as string,
+            provider,
+          )
+        ).token;
         renderChars((await api.listCharacters()).characters);
         panel.querySelector<HTMLElement>('#login-form')!.hidden = true;
         panel.querySelector<HTMLElement>('#chars')!.hidden = false;

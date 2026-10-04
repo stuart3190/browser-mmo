@@ -65,6 +65,7 @@ async function boot() {
 }
 afterEach(async () => {
   for (const s of running.splice(0)) await s.stop();
+  await handle.db.delete(schema.zoneCheckpoints);
 });
 afterAll(() => handle.close());
 

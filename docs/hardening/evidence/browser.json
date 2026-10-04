@@ -1,0 +1,90 @@
+{
+  "at": "2026-10-04T13:41:07.529Z",
+  "browser": "153.0.8010.52",
+  "results": [
+    {
+      "profile": {
+        "name": "desktop",
+        "width": 1400,
+        "height": 900,
+        "touch": false
+      },
+      "renderer": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "debugHookExposed": false,
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+      },
+      "loginReadyMs": 1576,
+      "startupMsIncluding10sWarmup": 13048,
+      "seconds": 120,
+      "frameSamples": 511,
+      "frameP50Ms": 183.3000000000029,
+      "frameP95Ms": 816.6999999999971,
+      "frameP99Ms": 1366.5999999999985,
+      "framesOver50ms": 407,
+      "heapStart": 26858932,
+      "heapEnd": 18792560,
+      "heapMax": 29334308,
+      "taskSeconds": 9.454876,
+      "startupAndAssetBytes": 599512,
+      "realtimeBytes": 260777,
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "phone-portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "renderer": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "debugHookExposed": false,
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+      },
+      "loginReadyMs": 1716,
+      "startupMsIncluding10sWarmup": 12677,
+      "seconds": 120,
+      "frameSamples": 695,
+      "frameP50Ms": 133.3000000000029,
+      "frameP95Ms": 533.4000000000015,
+      "frameP99Ms": 800,
+      "framesOver50ms": 548,
+      "heapStart": 18681916,
+      "heapEnd": 18205072,
+      "heapMax": 21175580,
+      "taskSeconds": 9.328562000000002,
+      "startupAndAssetBytes": 599355,
+      "realtimeBytes": 241205,
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "phone-landscape",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "renderer": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "debugHookExposed": false,
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+      },
+      "loginReadyMs": 1882,
+      "startupMsIncluding10sWarmup": 13601,
+      "seconds": 120,
+      "frameSamples": 527,
+      "frameP50Ms": 166.70000000001164,
+      "frameP95Ms": 849.9000000000087,
+      "frameP99Ms": 1383.2999999999993,
+      "framesOver50ms": 421,
+      "heapStart": 22528144,
+      "heapEnd": 18420760,
+      "heapMax": 25753700,
+      "taskSeconds": 9.166715,
+      "startupAndAssetBytes": 599355,
+      "realtimeBytes": 264653,
+      "errors": []
+    }
+  ]
+}

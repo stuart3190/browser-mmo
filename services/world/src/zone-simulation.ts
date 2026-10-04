@@ -139,7 +139,8 @@ interface PlayerState extends PlayerInfo {
 /**
  * 'dying': health reached 0 but the death is not yet durable. The host persists the kill event
  * (write-ahead) and then calls confirmKill(); only then is the death announced and the respawn
- * scheduled. A crash in between leaves no trace: the death never happened.
+ * scheduled. The host checkpoint also retains pending kills so recovery can finish a death
+ * even if the separate kill-event write had not started.
  */
 type EnemyMode = 'idle' | 'engaged' | 'returning' | 'dying' | 'dead';
 
@@ -259,6 +260,80 @@ export class ZoneSimulation {
     for (const r of restored)
       if (r.groupId && r.respawnAtMs > now) this.groups.get(r.groupId)?.pending.push(r.respawnAtMs);
     this.stepGroups(now);
+  }
+
+  /** Versioned recovery image. Static geometry/nav are rebuilt from game data. */
+  checkpoint(): string {
+    return JSON.stringify(
+      {
+        version: 1,
+        tickCount: this.tickCount,
+        nextEntity: this.nextEntity,
+        entities: this.entities,
+        players: this.players,
+        pickups: this.pickups,
+        respawnQueue: this.respawnQueue,
+        npcSpawns: this.npcSpawns,
+        enemies: this.enemies,
+        kills: this.kills,
+        groups: this.groups,
+      },
+      (_key, value: unknown) => {
+        if (value instanceof Map) return { $map: [...value] };
+        if (value instanceof Set) return { $set: [...value] };
+        if (value === Infinity) return { $infinity: true };
+        return value;
+      },
+    );
+  }
+
+  restoreCheckpoint(raw: string): string[] {
+    const state = JSON.parse(raw, (_key, value: unknown) => {
+      if (value && typeof value === 'object') {
+        if ('$map' in value) return new Map(value.$map as [unknown, unknown][]);
+        if ('$set' in value) return new Set(value.$set as unknown[]);
+        if ('$infinity' in value) return Infinity;
+      }
+      return value;
+    }) as {
+      version: number;
+      tickCount: number;
+      nextEntity: number;
+      entities: Map<string, WorldEntity>;
+      players: Map<string, PlayerState>;
+      pickups: Map<string, PickupState>;
+      respawnQueue: { atMs: number; spawn: SpawnPoint }[];
+      npcSpawns: Map<string, SpawnPoint>;
+      enemies: Map<string, EnemyState>;
+      kills: KillEvent[];
+      groups: Map<string, GroupState>;
+    };
+    if (state.version !== 1 || !(state.players instanceof Map))
+      throw new Error('Unsupported zone checkpoint; explicit migration required');
+    this.tickCount = state.tickCount;
+    this.nextEntity = state.nextEntity;
+    const restore = <T>(to: Map<string, T>, from: Map<string, T>) => {
+      to.clear();
+      for (const [id, value] of from) to.set(id, value);
+    };
+    restore(this.entities, state.entities);
+    restore(this.players, state.players);
+    restore(this.pickups, state.pickups);
+    restore(this.npcSpawns, state.npcSpawns);
+    restore(this.enemies, state.enemies);
+    restore(this.groups, state.groups);
+    this.respawnQueue.splice(0, this.respawnQueue.length, ...state.respawnQueue);
+    this.kills.splice(0, this.kills.length, ...state.kills);
+    for (const pickup of this.pickups.values()) pickup.reservedBy = null;
+    for (const p of this.players.values()) {
+      p.known.clear();
+      p.lastMoveAtMs = Date.now();
+      p.movementCredit = 0;
+    }
+    this.outbox.clear();
+    this.movedThisTick.clear();
+    this.lastStepMs = null;
+    return [...this.players.keys()];
   }
 
   /** Navigation grid for this zone (built on first use; static geometry). */
@@ -1498,6 +1573,7 @@ export class ZoneSimulation {
       target.lastCombatAtMs = nowMs;
       const { health, killed } = applyDamage(Math.round(target.health), result.damage);
       target.health = health;
+      if (!killed) this.sendVitals(target, nowMs);
       const te = this.entities.get(target.entityId)!;
       te.health = health;
       this.toKnowers(target.entityId, {

@@ -16,6 +16,8 @@ const ctx = createDomainContext({ db: handle.db, gameData: getGameData() });
 
 const server = createRealtimeServer({
   ctx,
+  trustProxyLoopback: env.TRUST_PROXY_LOOPBACK,
+  maxConnections: env.REALTIME_MAX_CONNECTIONS,
   // TTL is irrelevant here: the realtime service only resolves sessions created by the API.
   sessions: new SessionService(1),
   changeFeedUrl: env.DATABASE_URL,

@@ -463,3 +463,90 @@ guarantees remain process-local. Reconciliation is eventually consistent. Failed
 are not crash-durable; no per-action persistence guarantee is claimed. IP limits require an explicit
 trusted ingress review before proxy deployment. Existing grant/move lock-order inversions remain
 protected by transaction retries, not eliminated. See PROGRESS for tests and implementation SHA.
+
+---
+
+## 2026-10-04 — Exclusive zone ownership and durable publication
+
+**Date**
+2026-10-04
+
+**Decision**
+Supersede the previous hardening entry's process-local ownership and periodic-only state durability.
+Keep one simulation host per zone and enforce it with PostgreSQL session advisory locks. The pinned
+ownership connection also writes versioned recovery images and character health/position/cooldowns
+in a single atomic statement with synchronous WAL commit. Never transparently reconnect it. Lost
+ownership or failed/ambiguous writes fence ticks, gameplay and publication; replacement requires
+fresh ownership and recovery. Normal shutdown confirms lock release. Startup errors release locks.
+
+Capture world/player combat state, stable spawn/pickup identities, respawn queues and pending kills.
+Publish authoritative batches only after their checkpoint commits. The simulation continues while
+storage publication coalesces; output queues are bounded. Rewards cannot run before the associated
+kill enters a durable checkpoint, and the existing unique kill/reward transactions remain final
+idempotency barriers. Departure removal and final character state share a checkpoint. Recovering
+players retain saved state and disconnect linger; offline combat is not simulated retroactively.
+Recovery format version and game-data hash must match, otherwise startup refuses service.
+
+Serialize migration runners with a deployment lock and check applied migration hashes. Zone startup
+holds the shared side of that lock while acquiring ownership; a pending migration refuses live zone
+owners. Incompatible recovery/content changes require an explicit migration and compatible rollback.
+
+**Reason**
+Duplicate hosts could diverge; periodic-only saves lost published health, position and cooldowns.
+Keeping locks and commits on the same non-reconnecting connection prevents an old host from writing
+through a fresh pool connection after losing authority. Whole recovery images are a small, reviewable
+correctness design for the current small world, without introducing a distributed log or broker.
+
+**Alternatives considered**
+Timed leases without fencing; Redis coordination; separate ownership and pooled checkpoint writes;
+a complete event-sourced simulation; periodic saves with an accepted rollback window. The first and
+third permit stale-owner writes, distributed components add failure modes, and periodic saves do not
+satisfy published-state durability. Per-entity dirty-state persistence remains a future optimization
+if representative measurements justify it.
+
+**Consequences**
+Storage latency is now visible in authoritative feedback and database loss disconnects players.
+Unpublished predicted inputs may roll back; published state must survive a process crash. Checkpoints
+increase WAL/write work and couple recovery to content/version migrations. This is not a scalable
+multi-region design or a guarantee against asynchronous PostgreSQL replica data loss. Network
+partitions can delay failover until PostgreSQL releases the old session. Do not steal locks or use
+transaction-pooled ownership connections. Current measured results do not establish 20 Hz production
+capacity; the default five-connection admission cap is a conservative pilot guardrail, not a promise.
+See `docs/hardening/2026-10-04.md` for measured evidence and limits.
+
+## 2026-10-04 — Provisioned pre-alpha authentication and operational release gates
+
+**Date**
+2026-10-04
+
+**Decision**
+Use the existing auth-provider and opaque-session architecture with operator-provisioned password
+accounts for invited pre-alpha users. Store salted scrypt hashes (N=131072, r=8, p=1), bound hashing
+to two jobs, apply IP/name/work limits and revoke sessions on password rotation. Production refuses
+dev auth, missing password auth, non-HTTPS/empty origins and non-loopback service binding. TLS ingress
+is mandatory. Trusted forwarding is opt-in, loopback-only, and requires ingress to overwrite headers.
+Keep dev auth for development/test only. No public signup, automated reset or social-auth integration.
+
+Provide a consistent-snapshot pg_dump/pg_restore tool with checksum/count manifest, private files,
+empty-target protection, economy integrity checks and session revocation after restoration. Keep
+production scheduling, encryption, off-host retention and deployment-specific recovery objectives as
+explicit operator gates. Maintain one validated CI workflow source and attempt installation through
+GitHub; credential rejection must be recorded, with an exact owner copy/commit action, never described
+as a hosted CI pass. Browser/capacity scripts record actual observations, including failures to meet
+targets, without treating emulated phones as real hardware.
+
+**Reason**
+Username-only login cannot reach external players. The current auth abstraction already supports a
+small secure invitation flow; a replacement platform is unnecessary. Recovery and deployment need
+repeatable evidence rather than documentation-only confidence.
+
+**Alternatives considered**
+External OIDC service now; shipping dev auth behind an obscure URL; public self-registration/reset;
+manual untested SQL dumps; adding Redis/NATS/Kafka to solve performance without measurements. None
+is required for this invited single-region pre-alpha. OIDC/MFA can follow if account operations grow.
+
+**Consequences**
+Operators verify identity out of band and provision/rotate credentials; public account lifecycle is
+intentionally absent. Production needs actual TLS, private metrics, provisioned accounts, hosted CI
+and off-host backups. Local restore and software-rendered browser measurements cannot certify those
+external operations or real mobile devices. No gameplay or monetization changes are included.

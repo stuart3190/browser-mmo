@@ -1,0 +1,33 @@
+# TLS certificates must be provisioned by the operator. Services bind loopback only.
+# One API and one realtime host for the assigned zone; do not expose ports 4000/4001 publicly.
+server {
+    listen 443 ssl;
+    server_name game.example;
+    ssl_certificate /etc/letsencrypt/live/game.example/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/game.example/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy same-origin always;
+    root /srv/browser-mmo/apps/game-web/dist;
+    location / { try_files $uri $uri/ /index.html; }
+    location /v1/ {
+        proxy_pass http://127.0.0.1:4000;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+        client_max_body_size 64k;
+    }
+    location = /ws {
+        proxy_pass http://127.0.0.1:4001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+        proxy_read_timeout 75s;
+    }
+    location /metrics { deny all; }
+    location /health/ { deny all; }
+}
+server { listen 80; server_name game.example; return 301 https://$host$request_uri; }

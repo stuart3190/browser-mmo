@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-04",
+  "results": [
+    {
+      "result": "backup_verified",
+      "counts": {
+        "drizzle.__drizzle_migrations": 7,
+        "public.accounts": 1,
+        "public.audit_log": 1,
+        "public.auth_identities": 1,
+        "public.character_quests": 0,
+        "public.characters": 1,
+        "public.containers": 5,
+        "public.currency_balances": 1,
+        "public.currency_ledger": 2,
+        "public.item_history": 2,
+        "public.item_instances": 1,
+        "public.item_templates": 15,
+        "public.kill_events": 0,
+        "public.kill_rewards": 0,
+        "public.marketplace_listings": 1,
+        "public.marketplace_transactions": 0,
+        "public.sessions": 1,
+        "public.zone_checkpoints": 0
+      }
+    },
+    {
+      "result": "restore_verified",
+      "counts": {
+        "drizzle.__drizzle_migrations": 7,
+        "public.accounts": 1,
+        "public.audit_log": 1,
+        "public.auth_identities": 1,
+        "public.character_quests": 0,
+        "public.characters": 1,
+        "public.containers": 5,
+        "public.currency_balances": 1,
+        "public.currency_ledger": 2,
+        "public.item_history": 2,
+        "public.item_instances": 1,
+        "public.item_templates": 15,
+        "public.kill_events": 0,
+        "public.kill_rewards": 0,
+        "public.marketplace_listings": 1,
+        "public.marketplace_transactions": 0,
+        "public.sessions": 1,
+        "public.zone_checkpoints": 0
+      },
+      "checks": ["constraints", "ledger", "escrow", "balances", "session_revocation"]
+    }
+  ],
+  "occupiedTargetRefused": true,
+  "activeRestoredSessions": 0,
+  "disposableDatabasesDropped": true
+}

@@ -37,8 +37,11 @@ export class AdminApi {
     return json;
   }
 
-  async login(username: string) {
-    const s = await this.req<SessionResponse>('POST', '/v1/auth/dev-login', {
+  async login(username: string, password: string) {
+    const { providers } = await this.req<{ providers: string[] }>('GET', '/v1/auth/providers');
+    const provider = providers.includes('password') ? 'password-login' : 'dev-login';
+    const s = await this.req<SessionResponse>('POST', `/v1/auth/${provider}`, {
+      password,
       username,
       client: 'admin',
     });

@@ -43,6 +43,13 @@
       "when": 1791106791931,
       "tag": "0005_ability_cooldowns",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791118471896,
+      "tag": "0006_sudden_killraven",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,12 @@
 import { loadApiEnv, splitList } from '@mmo/config';
 import { createDb } from '@mmo/db';
-import { DevAuthProvider, SessionService, createDomainContext, expireListings } from '@mmo/domain';
+import {
+  DevAuthProvider,
+  PasswordAuthProvider,
+  SessionService,
+  createDomainContext,
+  expireListings,
+} from '@mmo/domain';
 import type { AuthProvider } from '@mmo/domain';
 import { getGameData } from '@mmo/game-data';
 import { Metrics, createLogger } from '@mmo/server-kit';
@@ -16,6 +22,7 @@ const handle = createDb({
 const ctx = createDomainContext({ db: handle.db, gameData: getGameData() });
 
 const authProviders = new Map<string, AuthProvider>();
+if (env.AUTH_PASSWORD_LOGIN_ENABLED) authProviders.set('password', new PasswordAuthProvider());
 if (env.AUTH_DEV_LOGIN_ENABLED) {
   authProviders.set(
     'dev',
@@ -33,15 +40,23 @@ const app = await buildApp({
   metrics: new Metrics(),
   sessions: new SessionService(env.SESSION_TTL_HOURS),
   authProviders,
+  trustProxyLoopback: env.TRUST_PROXY_LOOPBACK,
 });
 
 // Background job: marketplace expiry sweep. Single-instance for now; with several API replicas
 // this must move to a leader-elected worker (see docs/economy/marketplace.md).
+let sweeping = false;
 const sweep = setInterval(() => {
-  expireListings(ctx).then(
-    (n) => n > 0 && logger.info({ expired: n }, 'expired marketplace listings'),
-    (err: unknown) => logger.error({ err }, 'listing expiry sweep failed'),
-  );
+  if (sweeping) return;
+  sweeping = true;
+  expireListings(ctx)
+    .then(
+      (n) => n > 0 && logger.info({ expired: n }, 'expired marketplace listings'),
+      (err: unknown) => logger.error({ err }, 'listing expiry sweep failed'),
+    )
+    .finally(() => {
+      sweeping = false;
+    });
 }, 60_000);
 
 await app.listen({ host: env.API_HOST, port: env.API_PORT });

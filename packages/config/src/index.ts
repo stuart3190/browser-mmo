@@ -23,6 +23,7 @@ export const CommonEnvSchema = z.object({
   NODE_ENV: NodeEnvSchema,
   LOG_LEVEL: LogLevelSchema,
   DATABASE_URL: z.url(),
+  TRUST_PROXY_LOOPBACK: boolFromString.default(false),
   /** Pool size per process. */
   DATABASE_POOL_MAX: z.coerce.number().int().positive().default(10),
 });
@@ -39,6 +40,7 @@ export const ApiEnvSchema = CommonEnvSchema.extend({
     .default(24 * 7),
   /** Dev auth lets anyone log in by username. MUST be false in production (enforced). */
   AUTH_DEV_LOGIN_ENABLED: boolFromString.default(false),
+  AUTH_PASSWORD_LOGIN_ENABLED: boolFromString.default(false),
   /** Usernames that dev-login promotes to admin (dev only). Comma separated. */
   AUTH_DEV_ADMIN_USERNAMES: z.string().default(''),
 });
@@ -49,6 +51,7 @@ export const RealtimeEnvSchema = CommonEnvSchema.extend({
   REALTIME_PORT: z.coerce.number().int().positive().default(4001),
   REALTIME_ALLOWED_ORIGINS: z.string().default('http://localhost:5173'),
   REALTIME_TICK_HZ: z.coerce.number().int().min(1).max(60).default(20),
+  REALTIME_MAX_CONNECTIONS: z.coerce.number().int().min(1).max(256).default(5),
   /** Zones hosted by this realtime process (comma separated). */
   REALTIME_ZONES: z.string().default('zone.greenvale.meadows'),
 });
@@ -110,12 +113,32 @@ export function loadApiEnv(): ApiEnv {
   if (env.NODE_ENV === 'production' && env.AUTH_DEV_LOGIN_ENABLED) {
     throw new Error('AUTH_DEV_LOGIN_ENABLED must not be true in production');
   }
+  if (
+    env.NODE_ENV === 'production' &&
+    (!env.AUTH_PASSWORD_LOGIN_ENABLED ||
+      !['127.0.0.1', '::1'].includes(env.API_HOST) ||
+      !splitList(env.CORS_ORIGINS).length ||
+      splitList(env.CORS_ORIGINS).some((o) => !o.startsWith('https://')))
+  )
+    throw new Error(
+      'Production needs password auth, HTTPS origins and loopback binding behind TLS ingress',
+    );
   return env;
 }
 
 export function loadRealtimeEnv(): RealtimeEnv {
   loadDotEnv();
-  return parseEnv(RealtimeEnvSchema);
+  const env = parseEnv(RealtimeEnvSchema);
+  if (
+    env.NODE_ENV === 'production' &&
+    (!['127.0.0.1', '::1'].includes(env.REALTIME_HOST) ||
+      !splitList(env.REALTIME_ALLOWED_ORIGINS).length ||
+      splitList(env.REALTIME_ALLOWED_ORIGINS).some((o) => !o.startsWith('https://')))
+  )
+    throw new Error(
+      'Production realtime needs loopback binding behind TLS ingress and HTTPS origins',
+    );
+  return env;
 }
 
 export function splitList(value: string): string[] {

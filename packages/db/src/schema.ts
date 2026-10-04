@@ -592,3 +592,11 @@ export const auditLog = pgTable(
     index('audit_log_actor_idx').on(t.actorAccountId),
   ],
 );
+
+/** One bounded recovery image per zone; written only by its advisory-lock owner. */
+export const zoneCheckpoints = pgTable('zone_checkpoints', {
+  zoneId: text('zone_id').primaryKey(),
+  version: integer('version').notNull(),
+  payload: text('payload').notNull(),
+  updatedAt: updatedAt(),
+});

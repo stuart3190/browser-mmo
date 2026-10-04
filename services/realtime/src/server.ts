@@ -1,3 +1,5 @@
+import { isIP } from 'node:net';
+import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import type { IncomingMessage, Server, ServerResponse } from 'node:http';
 import { WebSocketServer } from 'ws';
@@ -16,11 +18,10 @@ import {
   processKillEvent,
   recordKill,
   requireOwnedCharacter,
-  saveCharacterState,
   turnInQuest,
 } from '@mmo/domain';
 import type { CombatProfile, KillReward } from '@mmo/domain';
-import { ChangeFeedListener } from '@mmo/db';
+import { ChangeFeedListener, ZoneOwnership } from '@mmo/db';
 import type { ClientMessage } from '@mmo/networking';
 import {
   SequenceGuard,
@@ -47,11 +48,12 @@ export interface RealtimeDeps {
   zoneIds: string[];
   tickHz: number;
   allowedOrigins: string[];
-  /** How often dirty positions are flushed to the database. */
+  /** Retry interval for retained departures; live state commits before publication. */
   positionSaveIntervalMs?: number;
   sessionCheckIntervalMs?: number;
   maxBufferedBytes?: number;
   maxConnections?: number;
+  trustProxyLoopback?: boolean;
   authTimeoutMs?: number;
   /**
    * PostgreSQL URL for the LISTEN/NOTIFY change feed (ADR 0014). When set, item and wallet
@@ -154,11 +156,29 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     { zoneId: string; state: NonNullable<ReturnType<ZoneSimulation['removePlayer']>> }
   >();
   const departureWrites = new Map<string, Promise<void>>();
-  let saving: Promise<void> | undefined;
   let activeWork = 0;
   let checkingSessions = false;
   const sessionCheckMs = deps.sessionCheckIntervalMs ?? 1_000;
   const recordQueue: PendingRecord[] = [];
+  const pendingRecords = new Map<string, KillEvent>();
+  const durableKills = new Set<string>();
+  const contentHash = createHash('sha256').update(JSON.stringify(ctx.gameData.raw)).digest('hex');
+  const pendingSend = new Map<Connection, { frames: string[]; bytes: number }>();
+  let checkpoint: Promise<void> | undefined;
+  const ownership = new ZoneOwnership(ctx.db, fence);
+  function fence(err: unknown) {
+    if (crashed) return;
+    logger.error({ err }, 'zone ownership lost; host fenced, restart required');
+    crashed = true;
+    shuttingDown = true;
+    clearInterval(tickTimer);
+    clearInterval(saveTimer);
+    clearInterval(sessionTimer);
+    clearInterval(heartbeatTimer);
+    pendingSend.clear();
+    for (const conn of connections) conn.ws.terminate();
+    void ownership.close();
+  }
   let recordsInFlight = 0;
   /** Kill events currently being rewarded by this process (DB SKIP LOCKED covers other processes). */
   const rewarding = new Set<string>();
@@ -192,6 +212,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     void (async () => {
       if (req.url === '/health/live') return json(res, 200, { status: 'ok' });
       if (req.url === '/health/ready') {
+        if (!ownership.active) return json(res, 503, { status: 'ownership_lost' });
         try {
           if (!readiness || Date.now() - readinessAt >= 1_000) {
             readinessAt = Date.now();
@@ -209,6 +230,13 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         }
       }
       if (req.url === '/metrics') {
+        deps.metrics
+          .gauge('process_rss_bytes', 'Resident process memory')
+          .set(process.memoryUsage().rss);
+        const cpu = process.cpuUsage();
+        deps.metrics
+          .gauge('process_cpu_seconds', 'Accumulated user and system CPU')
+          .set((cpu.user + cpu.system) / 1e6);
         res.writeHead(200, { 'content-type': 'text/plain; version=0.0.4' });
         return res.end(deps.metrics.render());
       }
@@ -225,9 +253,18 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   http.on('upgrade', (req: IncomingMessage, socket, head) => {
     const origin = req.headers.origin;
+    const peer = req.socket.remoteAddress ?? 'unknown';
+    const forwarded = req.headers['x-real-ip'];
+    const ip =
+      deps.trustProxyLoopback &&
+      ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(peer) &&
+      typeof forwarded === 'string' &&
+      isIP(forwarded)
+        ? forwarded
+        : peer;
     // Browsers always send Origin; reject cross-site pages (CSWSH). Non-browser clients (mobile, tools) may omit it.
     if (
-      !upgrades.take(req.socket.remoteAddress ?? 'unknown') ||
+      !upgrades.take(ip) ||
       connections.size >= (deps.maxConnections ?? 256) ||
       req.url !== '/ws' ||
       (origin !== undefined && !deps.allowedOrigins.includes(origin))
@@ -240,13 +277,19 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   });
 
   function send(conn: Connection, msg: OutMessage, ack?: number) {
-    if (conn.ws.readyState !== conn.ws.OPEN) return;
+    if (crashed || conn.ws.readyState !== conn.ws.OPEN) return;
     const frame = encodeServerMessage(msg.t, msg.d as never, ack ?? (msg as { ack?: number }).ack);
-    if (conn.ws.bufferedAmount + Buffer.byteLength(frame) > (deps.maxBufferedBytes ?? 256 * 1024)) {
+    const pending = pendingSend.get(conn) ?? { frames: [], bytes: 0 };
+    if (
+      conn.ws.bufferedAmount + pending.bytes + Buffer.byteLength(frame) >
+      (deps.maxBufferedBytes ?? 256 * 1024)
+    ) {
       conn.ws.terminate();
       return;
     }
-    conn.ws.send(frame);
+    pending.frames.push(frame);
+    pending.bytes += Buffer.byteLength(frame);
+    pendingSend.set(conn, pending);
   }
 
   function sendError(
@@ -256,7 +299,15 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     ack?: number,
     fatal = false,
   ) {
-    send(conn, { t: 'error', d: { code, message, fatal } }, ack);
+    const frame = encodeServerMessage('error', { code, message, fatal }, ack);
+    if (
+      conn.ws.bufferedAmount + (pendingSend.get(conn)?.bytes ?? 0) + Buffer.byteLength(frame) >
+      (deps.maxBufferedBytes ?? 256 * 1024)
+    ) {
+      conn.ws.terminate();
+      return;
+    }
+    if (conn.ws.readyState === conn.ws.OPEN) conn.ws.send(frame);
     if (fatal) conn.ws.close(4000, code);
   }
 
@@ -307,7 +358,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   async function handleFrame(conn: Connection, raw: string) {
     const now = Date.now();
-    if (conn.ws.readyState !== conn.ws.OPEN) return;
+    if (crashed || !ownership.active || conn.ws.readyState !== conn.ws.OPEN) return;
     if (!conn.bucket.take(now)) {
       wsMessages.inc({ type: 'any', result: 'rate_limited' });
       if (++conn.rateViolations > 100)
@@ -671,6 +722,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   }
 
   async function onClose(conn: Connection) {
+    pendingSend.delete(conn);
     if (!connections.delete(conn)) return;
     clearTimeout(conn.authTimer);
     wsConnections.set(connections.size);
@@ -698,9 +750,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         zoneId: entry.zone.zone.id,
       },
     });
+    if (last) departures.set(entry.characterId, { zoneId: entry.zone.zone.id, state: last });
     flush();
     if (last) {
-      departures.set(entry.characterId, { zoneId: entry.zone.zone.id, state: last });
       await persistDeparture(entry.characterId).catch((err: unknown) =>
         logger.error(
           { err, characterId: entry.characterId },
@@ -718,9 +770,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     if (running) return running;
     const pending = departures.get(characterId);
     if (!pending) return Promise.resolve();
+    if (!ownership.active || crashed) return Promise.reject(new Error('Zone ownership lost'));
     const write = (async () => {
-      await saving;
-      await saveCharacterState(ctx.db, characterId, pending.zoneId, pending.state);
+      await checkpoint;
+      flush();
+      await checkpoint;
+      if (!ownership.active) throw new Error('Departure commit failed');
       departures.delete(characterId);
     })().finally(() => departureWrites.delete(characterId));
     departureWrites.set(characterId, write);
@@ -785,17 +840,20 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   /**
    * Durable kill pipeline (ADR 0017):
-   *   zone death ('dying') -> recordKill (write-ahead) -> zone.confirmKill -> processKillEvent.
-   * A crash before the record leaves no trace (the wolf simply never died); a crash after it leaves
-   * a pending kill event that startup recovery / the periodic sweep rewards exactly once.
+   *   zone death ('dying') -> owned checkpoint -> recordKill -> zone.confirmKill -> processKillEvent.
+   * A checkpointed pending kill survives even if its separate record write never began.
+   * Existing kill-event/reward transactions remain the final exactly-once boundary.
    */
   function pumpKills(now: number) {
     for (const zone of zones.values())
-      for (const kill of zone.drainKills())
+      for (const kill of zone.drainKills()) {
+        pendingRecords.set(kill.killId, kill);
         recordQueue.push({ kill, zone, attempts: 0, nextAttemptAt: now });
+      }
     for (let i = recordQueue.length - 1; i >= 0; i--) {
       const r = recordQueue[i]!;
-      if (r.nextAttemptAt > now || recordsInFlight >= 4) continue;
+      if (!durableKills.has(r.kill.killId) || r.nextAttemptAt > now || recordsInFlight >= 4)
+        continue;
       recordQueue.splice(i, 1);
       recordsInFlight++;
       void recordAndConfirm(r).finally(() => recordsInFlight--);
@@ -836,6 +894,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     }
     if (crashed) return;
     r.zone.confirmKill(kill.killId, Date.now());
+    pendingRecords.delete(kill.killId);
+    durableKills.delete(kill.killId);
     flush();
     await rewardKill(kill.killId, false);
   }
@@ -946,10 +1006,88 @@ export function createRealtimeServer(deps: RealtimeDeps) {
 
   /** Delivers every queued simulation message to its recipient. */
   function flush() {
+    // Simulation remains at 20 Hz while durable publication coalesces behind disk latency.
+    // Drain into bounded per-socket queues even when a checkpoint is in flight.
+    for (const zone of zones.values())
+      for (const [id, messages] of zone.drainOutbox()) {
+        const conn = byCharacter.get(id);
+        if (conn) for (const m of messages) send(conn, m);
+      }
+    if (checkpoint || !ownership.active || crashed) return;
+    checkpoint = persistAndPublish()
+      .catch((err: unknown) => {
+        fence(err);
+        logger.error({ err }, 'checkpoint failed; fenced');
+      })
+      .finally(() => {
+        checkpoint = undefined;
+      });
+  }
+
+  async function persistAndPublish() {
+    if (!ownership.active || crashed) return;
     for (const zone of zones.values()) {
-      for (const [characterId, msgs] of zone.drainOutbox()) {
-        const conn = byCharacter.get(characterId);
-        if (conn) for (const m of msgs) send(conn, m);
+      for (const [id, messages] of zone.drainOutbox()) {
+        const conn = byCharacter.get(id);
+        if (conn) for (const m of messages) send(conn, m);
+      }
+    }
+    const batch = new Map(pendingSend);
+    pendingSend.clear();
+    const capturedKills = [...pendingRecords.keys()];
+    const writes = [...zones.values()].map((zone) => {
+      const entries = [...inWorld.values()].filter((e) => e.zone === zone);
+      const states: {
+        id: string;
+        state: NonNullable<ReturnType<ZoneSimulation['removePlayer']>>;
+      }[] = entries.flatMap((e) => {
+        const state = zone.persistentState(e.characterId);
+        return state ? [{ id: e.characterId, state }] : [];
+      });
+      for (const [id, departed] of departures)
+        if (departed.zoneId === zone.zone.id) states.push({ id, state: departed.state });
+      return {
+        zoneId: zone.zone.id,
+        payload: JSON.stringify({
+          contentHash,
+          simulation: zone.checkpoint(),
+          players: entries.map((e) => ({
+            accountId: e.accountId,
+            characterId: e.characterId,
+            name: e.name,
+            lingerUntil: e.lingerUntil,
+          })),
+          pending: [...pendingRecords.values()].filter((k) => k.zoneId === zone.zone.id),
+        }),
+        characters: states.map(({ id, state }) => ({
+          id,
+          x: state.position.x,
+          y: state.position.y,
+          z: state.position.z,
+          rotation: state.rotationY,
+          health: state.health,
+          cooldowns: state.abilityCooldowns,
+        })),
+      };
+    });
+    const started = performance.now();
+    await ownership.commit(writes);
+    for (const id of capturedKills) durableKills.add(id);
+    deps.metrics
+      .gauge('world_checkpoint_ms', 'Last durable checkpoint latency')
+      .set(performance.now() - started);
+    if (crashed || !ownership.active) return;
+    for (const [conn, messages] of batch) {
+      if (conn.ws.readyState !== conn.ws.OPEN) continue;
+      for (const frame of messages.frames) {
+        if (
+          conn.ws.bufferedAmount + Buffer.byteLength(frame) >
+          (deps.maxBufferedBytes ?? 256 * 1024)
+        ) {
+          conn.ws.terminate();
+          break;
+        }
+        conn.ws.send(frame);
       }
     }
   }
@@ -1017,13 +1155,6 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   let sessionTimer: NodeJS.Timeout | undefined;
   let lastReconcileAt = 0;
 
-  async function savePositions() {
-    for (const entry of inWorld.values()) {
-      const p = entry.zone.persistentState(entry.characterId);
-      if (p) await saveCharacterState(ctx.db, entry.characterId, entry.zone.zone.id, p);
-    }
-  }
-
   return {
     http,
     zones,
@@ -1044,67 +1175,106 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     async start(host: string, port: number): Promise<void> {
       // Rebuild zones with the respawn slots of recorded deaths, so a restart neither resurrects a
       // dead enemy early nor overfills a spawn group; then finish any kill orphaned by a crash.
-      const now = Date.now();
-      for (const id of deps.zoneIds) {
-        const restoredRespawns = await activeRespawns(ctx.db, id, new Date(now));
-        zones.set(
-          id,
-          new ZoneSimulation(ctx.gameData, id, {
-            ...(deps.rng ? { rng: deps.rng } : {}),
-            nowMs: now,
-            restoredRespawns,
-          }),
-        );
-      }
-      await this.sweepKills();
-      nextSweepAt = Date.now() + (deps.killRecoveryIntervalMs ?? 5_000);
-      await changeFeed?.start();
-      sessionTimer = setInterval(() => {
-        void checkSessions();
-        if (reconcileNeeded || Date.now() - lastReconcileAt >= 30_000) {
-          lastReconcileAt = Date.now();
-          void reconcile();
+      const recovered = await ownership.acquire(deps.zoneIds);
+      try {
+        const now = Date.now();
+        for (const id of deps.zoneIds) {
+          const restoredRespawns = await activeRespawns(ctx.db, id, new Date(now));
+          zones.set(
+            id,
+            new ZoneSimulation(ctx.gameData, id, {
+              ...(deps.rng ? { rng: deps.rng } : {}),
+              nowMs: now,
+              restoredRespawns,
+            }),
+          );
         }
-      }, sessionCheckMs);
-      heartbeatTimer = setInterval(() => {
-        for (const conn of connections) {
-          if (!conn.alive) {
-            conn.log.info('heartbeat missed; terminating');
-            conn.ws.terminate();
-            continue;
+        for (const [id, payload] of recovered) {
+          const saved = JSON.parse(payload) as {
+            contentHash: string;
+            simulation: string;
+            players: Omit<InWorld, 'zone'>[];
+            pending: KillEvent[];
+          };
+          if (saved.contentHash !== contentHash) {
+            await ownership.close();
+            throw new Error('Game-data changed: checkpoint migration required');
           }
-          conn.alive = false;
-          conn.ws.ping();
+          const zone = zones.get(id)!;
+          zone.restoreCheckpoint(saved.simulation);
+          for (const entry of saved.players)
+            inWorld.set(entry.characterId, {
+              ...entry,
+              zone,
+              lingerUntil: entry.lingerUntil ?? now + lingerMs,
+            });
+          for (const kill of saved.pending) {
+            durableKills.add(kill.killId);
+            pendingRecords.set(kill.killId, kill);
+            recordQueue.push({ kill, zone, attempts: 0, nextAttemptAt: now });
+          }
         }
-      }, deps.heartbeatMs ?? 30_000);
-      tickTimer = setInterval(
-        () => {
-          const t0 = performance.now();
-          const now = Date.now();
-          for (const conn of byCharacter.values()) {
-            if (
-              now >= conn.sessionUntil ||
-              now - conn.sessionCheckedAt > Math.max(5_000, sessionCheckMs * 3)
-            )
+        await this.sweepKills();
+        nextSweepAt = Date.now() + (deps.killRecoveryIntervalMs ?? 5_000);
+        await changeFeed?.start();
+        sessionTimer = setInterval(() => {
+          void checkSessions();
+          if (reconcileNeeded || Date.now() - lastReconcileAt >= 30_000) {
+            lastReconcileAt = Date.now();
+            void reconcile();
+          }
+        }, sessionCheckMs);
+        heartbeatTimer = setInterval(() => {
+          for (const conn of connections) {
+            if (!conn.alive) {
+              conn.log.info('heartbeat missed; terminating');
               conn.ws.terminate();
+              continue;
+            }
+            conn.alive = false;
+            conn.ws.ping();
           }
-          for (const zone of zones.values()) zone.step(now);
-          pumpKills(now);
-          expireLingering(now);
-          flush();
-          tickDuration.set(Math.round((performance.now() - t0) * 100) / 100);
-        },
-        Math.round(1000 / deps.tickHz),
-      );
-      saveTimer = setInterval(() => {
-        saving ??= savePositions()
-          .catch((err: unknown) => logger.error({ err }, 'position save failed'))
-          .finally(() => {
-            saving = undefined;
+        }, deps.heartbeatMs ?? 30_000);
+        tickTimer = setInterval(
+          () => {
+            if (crashed || !ownership.active) return;
+            const t0 = performance.now();
+            const now = Date.now();
+            for (const conn of byCharacter.values()) {
+              if (
+                now >= conn.sessionUntil ||
+                now - conn.sessionCheckedAt > Math.max(5_000, sessionCheckMs * 3)
+              )
+                conn.ws.terminate();
+            }
+            deps.metrics.counter('world_ticks_total', 'Completed simulation ticks').inc();
+            for (const zone of zones.values()) zone.step(now);
+            pumpKills(now);
+            expireLingering(now);
+            flush();
+            tickDuration.set(Math.round((performance.now() - t0) * 100) / 100);
+          },
+          Math.round(1000 / deps.tickHz),
+        );
+        saveTimer = setInterval(() => {
+          for (const id of departures.keys()) void persistDeparture(id).catch(() => undefined);
+        }, deps.positionSaveIntervalMs ?? 15_000);
+        await new Promise<void>((resolve, reject) => {
+          http.once('error', reject);
+          http.listen(port, host, () => {
+            http.off('error', reject);
+            resolve();
           });
-        for (const id of departures.keys()) void persistDeparture(id).catch(() => undefined);
-      }, deps.positionSaveIntervalMs ?? 15_000);
-      return new Promise((resolve) => http.listen(port, host, () => resolve()));
+        });
+      } catch (err) {
+        clearInterval(tickTimer);
+        clearInterval(saveTimer);
+        clearInterval(sessionTimer);
+        clearInterval(heartbeatTimer);
+        await changeFeed?.stop();
+        await ownership.close();
+        throw err;
+      }
     },
     /**
      * Test-only: dies like a killed process. Timers stop, sockets are dropped, and nothing is
@@ -1118,6 +1288,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       clearInterval(sessionTimer);
       clearInterval(heartbeatTimer);
       await changeFeed?.stop();
+      await ownership.close();
       for (const conn of [...connections]) conn.ws.terminate();
       wss.close();
       await new Promise<void>((resolve) => http.close(() => resolve()));
@@ -1145,6 +1316,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         await new Promise((r) => setTimeout(r, 20));
         if (recordQueue.length > 0) pumpKills(Date.now());
       }
+      await checkpoint;
+      if (ownership.active) await persistAndPublish();
+      await ownership.close();
       wss.close();
       await new Promise<void>((resolve) => http.close(() => resolve()));
     },

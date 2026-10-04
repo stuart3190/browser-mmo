@@ -19,8 +19,9 @@ export interface AppDeps {
   logger: Logger;
   metrics: Metrics;
   sessions: SessionService;
-  /** Enabled auth providers keyed by id (only 'dev' today). */
+  /** Enabled auth providers keyed by id (password in production, optional dev locally). */
   authProviders: ReadonlyMap<string, AuthProvider>;
+  trustProxyLoopback?: boolean;
   limits?: { burst?: number; perSecond?: number; concurrent?: number };
 }
 
@@ -29,6 +30,14 @@ const REQUEST_ID_RE = /^[A-Za-z0-9-]{8,64}$/;
 export type App = Awaited<ReturnType<typeof buildApp>>;
 
 export async function buildApp(deps: AppDeps) {
+  if (
+    deps.env.NODE_ENV === 'production' &&
+    (deps.authProviders.has('dev') ||
+      !deps.authProviders.has('password') ||
+      !splitList(deps.env.CORS_ORIGINS).length ||
+      splitList(deps.env.CORS_ORIGINS).some((origin) => !origin.startsWith('https://')))
+  )
+    throw new Error('Production requires password auth, HTTPS origins and no dev provider');
   const app = Fastify({
     loggerInstance: deps.logger,
     // Request IDs: honour a well-formed inbound X-Request-Id (from a proxy/client), else mint one.
@@ -38,7 +47,7 @@ export async function buildApp(deps: AppDeps) {
     },
     requestIdHeader: false,
     bodyLimit: 64 * 1024,
-    trustProxy: false,
+    trustProxy: deps.trustProxyLoopback ? ['127.0.0.1', '::1'] : false,
   });
 
   const httpRequests = deps.metrics.counter(
@@ -55,6 +64,7 @@ export async function buildApp(deps: AppDeps) {
   const byIp = new RateLimit(deps.limits?.burst ?? 120, deps.limits?.perSecond ?? 30);
   const byAccount = new RateLimit(60, 15);
   const login = new RateLimit(10, 0.5);
+  const loginNames = new RateLimit(5, 0.1);
   let inFlight = 0;
   // Bound actual work, not socket lifetimes: aborted uploads cannot leak admission slots.
   app.addHook('onRoute', (route) => {
@@ -62,6 +72,13 @@ export async function buildApp(deps: AppDeps) {
     route.handler = async function (req, reply) {
       if (inFlight >= (deps.limits?.concurrent ?? 16))
         throw new DomainError(ErrorCode.RATE_LIMITED, 'Request work limit reached');
+      if (req.url.startsWith('/v1/auth/') && req.method === 'POST') {
+        const body = req.body as { username?: unknown } | undefined;
+        const key =
+          typeof body?.username === 'string' ? body.username.toLowerCase().slice(0, 64) : req.ip;
+        if (!loginNames.take(key))
+          throw new DomainError(ErrorCode.RATE_LIMITED, 'Login attempt limit reached');
+      }
       inFlight++;
       try {
         return await handler.call(this, req, reply);

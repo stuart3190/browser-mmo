@@ -74,6 +74,7 @@ async function crash(s: Server) {
 
 afterEach(async () => {
   for (const s of running.splice(0)) await s.stop();
+  await handle.db.delete(schema.zoneCheckpoints);
 });
 afterAll(() => handle.close());
 
@@ -224,7 +225,7 @@ describe('durable kill rewards across crashes', { timeout: 60_000 }, () => {
     c.ws.close();
   });
 
-  it('crash BEFORE the kill is recorded: the death never happened (no reward, wolf alive after restart)', async () => {
+  it('crash after checkpoint but BEFORE the kill record: recovery finishes the pending death once)', async () => {
     let reached: KillEvent | undefined;
     const b1 = await boot({
       beforeRecord: (k) => {
@@ -240,11 +241,9 @@ describe('durable kill rewards across crashes', { timeout: 60_000 }, () => {
 
     const b2 = await boot();
     await b2.server.rewardsIdle();
-    expect(await killEventsOf(p.characterId)).toHaveLength(0);
-    expect(await rewardsOf(p.characterId)).toHaveLength(0);
-    expect(await xpOf(p.characterId)).toBe(0);
-    // no durable death => no pending respawn slot: the wolf is simply there again
-    expect(b2.zone().enemyIds()).toHaveLength(1);
+    expect(await killEventsOf(p.characterId)).toHaveLength(1);
+    expect(await rewardsOf(p.characterId)).toHaveLength(1);
+    expect(await xpOf(p.characterId)).toBe(XP);
   });
 
   it('crash AFTER recording but before reward: startup recovery rewards exactly once and keeps the respawn timer', async () => {
@@ -271,8 +270,21 @@ describe('durable kill rewards across crashes', { timeout: 60_000 }, () => {
     expect(await xpOf(p.characterId)).toBe(XP);
     expect(await lootCount(reached!.killId)).toBe(2);
     // the recorded death is not resurrected early: the slot waits for its persisted respawn time
-    if (Date.now() < reached!.respawnAtMs - 500) expect(b2.zone().enemyIds()).toHaveLength(0);
-    await until(() => b2.zone().enemyIds().length === 1, reached!.respawnAtMs - Date.now() + 3_000);
+    if (Date.now() < reached!.respawnAtMs - 500)
+      expect(
+        b2
+          .zone()
+          .enemyIds()
+          .every((id) => b2.zone().getEnemy(id)!.mode === 'dead'),
+      ).toBe(true);
+    await until(
+      () =>
+        b2
+          .zone()
+          .enemyIds()
+          .some((id) => b2.zone().getEnemy(id)!.mode === 'idle'),
+      reached!.respawnAtMs - Date.now() + 3_000,
+    );
     expect(Date.now()).toBeGreaterThanOrEqual(reached!.respawnAtMs);
 
     // another restart (or a second node) changes nothing
@@ -308,7 +320,7 @@ describe('durable kill rewards across crashes', { timeout: 60_000 }, () => {
     expect(await lootCount(rewardedKill!)).toBe(2);
   });
 
-  it('two nodes recovering the same orphaned kills concurrently award each exactly once', async () => {
+  it('a duplicate recovery host is refused; the owner rewards each kill exactly once', async () => {
     const reached: KillEvent[] = [];
     const b1 = await boot({
       afterRecord: (k) => {
@@ -321,9 +333,10 @@ describe('durable kill rewards across crashes', { timeout: 60_000 }, () => {
     await until(() => reached.length === 1);
     await crash(b1.server);
 
-    const [b2, b3] = await Promise.all([boot(), boot()]);
-    await Promise.all([b2.server.sweepKills(), b3.server.sweepKills()]);
-    await Promise.all([b2.server.rewardsIdle(), b3.server.rewardsIdle()]);
+    const b2 = await boot();
+    await expect(boot()).rejects.toThrow('already owned');
+    await b2.server.sweepKills();
+    await b2.server.rewardsIdle();
     expect(await rewardsOf(p.characterId)).toHaveLength(1);
     expect(await xpOf(p.characterId)).toBe(XP);
     expect(await lootCount(reached[0]!.killId)).toBe(2);

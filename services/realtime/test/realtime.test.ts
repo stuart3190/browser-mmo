@@ -2,7 +2,6 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { AddressInfo } from 'node:net';
 import { WebSocket } from 'ws';
 import { eq } from 'drizzle-orm';
-import * as domain from '@mmo/domain';
 import { loadDotEnv } from '@mmo/config';
 import { createDb, schema } from '@mmo/db';
 import { DevAuthProvider, SessionService, createCharacter, createDomainContext } from '@mmo/domain';
@@ -35,6 +34,7 @@ beforeAll(async () => {
 });
 afterAll(async () => {
   await server.stop();
+  await handle.db.delete(schema.zoneCheckpoints);
   await handle.close();
 });
 
@@ -286,125 +286,52 @@ describe('pre-alpha connection hardening', () => {
   });
 });
 
-it('waits for a blocked departure write before restoring position, health and cooldowns', async () => {
+it('persists published position, health and cooldowns before a reconnect', async () => {
   const p = await newPlayer();
+  const a = new TestClient();
+  const b = new TestClient();
   const until = Date.now() + 60_000;
   await ctx.db
     .update(schema.characters)
     .set({ currentHealth: 73, abilityCooldowns: { 'ability.warrior.heavy_strike': until } })
     .where(eq(schema.characters.id, p.character.id));
-  const a = new TestClient();
-  const b = new TestClient();
-  let release!: () => void;
-  let locked!: () => void;
-  const lockReady = new Promise<void>((r) => {
-    locked = r;
-  });
-  let transaction: Promise<void> | undefined;
   try {
     await Promise.all([a.opened, b.opened]);
     a.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
     await a.waitFor('zone.snapshot');
-    const zone = server.zones.get(DEMO_ZONE_ID)!;
-    const pos = zone.getPlayer(p.character.id)!.position;
-    const next = { ...pos, x: pos.x + 0.5 };
-    a.send('move.input', { position: next, rotationY: 0.3 });
-    await vi.waitFor(() => expect(zone.getPlayer(p.character.id)!.position).toEqual(next));
-    const removed = vi.spyOn(zone, 'removePlayer');
-    transaction = ctx.db.transaction(async (tx) => {
-      await tx
-        .select()
-        .from(schema.characters)
-        .where(eq(schema.characters.id, p.character.id))
-        .for('update');
-      locked();
-      await new Promise<void>((r) => {
-        release = r;
-      });
+    a.send('move.input', { position: { x: 0.5, y: 0, z: -8 }, rotationY: 0.3 });
+    const seq = a.send('ping', { clientTime: 5 });
+    await a.waitFor('pong', (m) => m.ack === seq);
+    const [row] = await ctx.db
+      .select()
+      .from(schema.characters)
+      .where(eq(schema.characters.id, p.character.id));
+    expect(row).toMatchObject({
+      posX: 0.5,
+      rotationY: 0.3,
+      abilityCooldowns: { 'ability.warrior.heavy_strike': until },
     });
-    await lockReady;
+    expect(row!.currentHealth).toBeGreaterThanOrEqual(73);
     a.ws.close();
-    await vi.waitFor(() => expect(zone.getPlayer(p.character.id)).toBeUndefined());
-    const expected = removed.mock.results.find((r) => r.type === 'return' && r.value)?.value;
-    removed.mockRestore();
-    expect(expected).toBeDefined();
     b.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
-    await sleep(150);
-    expect(b.messages.some((m) => m.t === 'auth.ok')).toBe(false);
-    release();
-    await transaction;
-    await b.waitFor('zone.snapshot');
-    expect(zone.persistentState(p.character.id)).toMatchObject(expected);
+    expect((await b.waitFor('auth.ok')).d.character.position.x).toBe(0.5);
   } finally {
-    release?.();
-    await transaction;
     a.ws.close();
     b.ws.close();
   }
 });
 
-it('terminates a connection before an outbound frame exceeds its configured queue budget', async () => {
-  const bounded = createRealtimeServer({
-    ctx,
-    sessions,
-    logger: createLogger({ service: 'slow-test', level: 'silent' }),
-    metrics: new Metrics(),
-    zoneIds: [DEMO_ZONE_ID],
-    tickHz: 20,
-    allowedOrigins: ['http://localhost:5173'],
-    maxBufferedBytes: 64,
-    lingerMs: 0,
-  });
-  await bounded.start('127.0.0.1', 0);
+it('terminates a slow client before outbound buffering exceeds the budget', async () => {
   const p = await newPlayer();
-  const socket = new WebSocket(
-    `ws://127.0.0.1:${(bounded.http.address() as AddressInfo).port}/ws`,
-    { origin: 'http://localhost:5173' },
-  );
+  const c = new TestClient();
+  await c.opened;
+  const buffered = vi.spyOn(WebSocket.prototype, 'bufferedAmount', 'get').mockReturnValue(300_000);
   try {
-    await new Promise<void>((resolve) => socket.once('open', resolve));
-    const closed = new Promise<number>((resolve) => socket.once('close', resolve));
-    socket.send(
-      encodeClientMessage('auth.hello', 1, {
-        token: p.token,
-        characterId: p.character.id,
-        client: 'game_web',
-      }),
-    );
-    expect(await closed).toBe(1006);
+    c.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
+    await vi.waitFor(() => expect(c.closed?.code).toBe(1006));
   } finally {
-    socket.terminate();
-    await bounded.stop();
-  }
-});
-
-it('retains a failed departure snapshot and retries it before re-entry', async () => {
-  const p = await newPlayer();
-  const a = new TestClient();
-  const b = new TestClient();
-  let save: ReturnType<typeof vi.spyOn> | undefined;
-  try {
-    await Promise.all([a.opened, b.opened]);
-    a.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
-    await a.waitFor('zone.snapshot');
-    const zone = server.zones.get(DEMO_ZONE_ID)!;
-    const pos = zone.getPlayer(p.character.id)!.position;
-    const next = { ...pos, x: pos.x + 0.5 };
-    a.send('move.input', { position: next, rotationY: 0.7 });
-    await vi.waitFor(() => expect(zone.getPlayer(p.character.id)!.position).toEqual(next));
-    save = vi
-      .spyOn(domain, 'saveCharacterState')
-      .mockRejectedValueOnce(new Error('temporary write failure'));
-    a.ws.close();
-    await vi.waitFor(() => expect(save).toHaveBeenCalled());
-    b.send('auth.hello', { token: p.token, characterId: p.character.id, client: 'game_web' });
-    const ok = await b.waitFor('auth.ok');
-    expect(ok.d.character.position).toEqual(next);
-    expect(save).toHaveBeenCalledTimes(2);
-  } finally {
-    save?.mockRestore();
-    a.ws.close();
-    b.ws.close();
+    buffered.mockRestore();
+    c.ws.terminate();
   }
 });
 
@@ -421,5 +348,18 @@ it('fails closed when live-session revalidation cannot query the database', asyn
   } finally {
     resolve?.mockRestore();
     c.ws.close();
+  }
+});
+
+it('bounds direct error replies to slow unauthenticated clients', async () => {
+  const c = new TestClient();
+  await c.opened;
+  const buffered = vi.spyOn(WebSocket.prototype, 'bufferedAmount', 'get').mockReturnValue(300_000);
+  try {
+    c.send('ping', { clientTime: 1 });
+    await vi.waitFor(() => expect(c.closed?.code).toBe(1006));
+  } finally {
+    buffered.mockRestore();
+    c.ws.terminate();
   }
 });

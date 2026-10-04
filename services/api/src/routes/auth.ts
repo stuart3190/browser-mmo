@@ -9,7 +9,19 @@ import { parse, requireSession } from '../http';
 export const authRoutes =
   (deps: AppDeps): FastifyPluginAsync =>
   async (app) => {
-    /** Dev-only login. Registered only when the dev provider is enabled. */
+    /** Operator-provisioned password login; no public registration. */
+    app.post('/auth/password-login', async (req) => {
+      const provider = deps.authProviders.get('password');
+      if (!provider) throw new DomainError(ErrorCode.NOT_FOUND, 'Password login disabled');
+      const { accountId } = await provider.authenticate(deps.ctx, req.body);
+      const { client } = DevLoginRequestSchema.parse(req.body);
+      const session = await deps.sessions.create(deps.ctx, accountId, client);
+      return {
+        token: session.token,
+        expiresAt: session.expiresAt.toISOString(),
+        account: session.account,
+      };
+    });
     app.post('/auth/dev-login', async (req) => {
       const provider = deps.authProviders.get('dev');
       if (!provider) throw new DomainError(ErrorCode.NOT_FOUND, 'Dev login is disabled');

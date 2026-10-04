@@ -37,6 +37,18 @@ export class ApiClient {
     return json;
   }
 
+  providers() {
+    return this.request<{ providers: string[] }>('GET', '/v1/auth/providers');
+  }
+  async login(username: string, password: string, provider: string): Promise<SessionResponse> {
+    const s = await this.request<SessionResponse>(
+      'POST',
+      `/v1/auth/${provider === 'password' ? 'password-login' : 'dev-login'}`,
+      { username, password, client: 'game_web' },
+    );
+    this.token = s.token;
+    return s;
+  }
   async devLogin(username: string): Promise<SessionResponse> {
     const s = await this.request<SessionResponse>('POST', '/v1/auth/dev-login', {
       username,

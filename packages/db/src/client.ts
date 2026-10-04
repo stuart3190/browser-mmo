@@ -3,6 +3,13 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 import * as schema from './schema';
 
+const pools = new WeakMap<Database, pg.Pool>();
+export function poolFor(db: Database): pg.Pool {
+  const pool = pools.get(db);
+  if (!pool) throw new Error('Database must be created by createDb');
+  return pool;
+}
+
 export type Schema = typeof schema;
 export type Database = NodePgDatabase<Schema>;
 /** Transaction handle type. Domain functions that must run inside a transaction take this. */
@@ -30,5 +37,6 @@ export function createDb(opts: { url: string; max?: number; applicationName?: st
     application_name: opts.applicationName ?? 'mmo',
   });
   const db = drizzle(pool, { schema });
+  pools.set(db, pool);
   return { db, pool, close: () => pool.end() };
 }

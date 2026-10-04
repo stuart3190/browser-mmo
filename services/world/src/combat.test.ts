@@ -230,3 +230,15 @@ describe('enemy AI, player death and respawn', () => {
     expect(t.sim.getPlayer(p.id)!.health).toBeGreaterThan(50);
   });
 });
+
+it('sends matching local vitals for every consecutive nonlethal hit', () => {
+  const t = setup();
+  const p = t.join({ x: 2, y: 0, z: 8 }, { ...fists, health: 1000, maxHealth: 1000 });
+  t.advance(12_000);
+  const hits = t
+    .of(p.id, 'combat.damage')
+    .filter((m) => m.d.targetId === p.entityId && m.d.amount > 0);
+  expect(hits.length).toBeGreaterThan(2);
+  const vitals = t.of(p.id, 'player.vitals').map((m) => m.d.health);
+  for (const hit of hits) expect(vitals).toContain(hit.d.targetHealth);
+});

@@ -53,6 +53,7 @@ beforeAll(async () => {
 });
 afterAll(async () => {
   await server.stop();
+  await handle.db.delete(schema.zoneCheckpoints);
   await handle.close();
 });
 
@@ -220,6 +221,9 @@ describe('server-authoritative combat over the realtime protocol', () => {
       ).toBe(true);
       expect(c.all('combat.damage').some((m) => m.d.targetId === entityId)).toBe(true); // wolf fought back
       expect(c.all('player.vitals').some((m) => m.d.health < m.d.maxHealth)).toBe(true);
+      for (const hit of c.all('combat.damage').filter((m) => m.d.targetId === entityId)) {
+        await c.waitFor('player.vitals', (m) => m.d.health === hit.d.targetHealth);
+      }
       await c.waitFor('combat.state', (m) => !m.d.attacking && m.d.reason === 'target_dead');
 
       const progress = await c.waitFor('character.progress', (m) => m.d.xpGained > 0);

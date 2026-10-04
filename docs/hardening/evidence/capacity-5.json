@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-04T13:33:08.879Z",
+  "duration": 120,
+  "results": [
+    {
+      "effectiveTickHz": 17.6,
+      "serverCpuCores": 0.24470816666666664,
+      "serverRssBytes": 126582784,
+      "players": 5,
+      "seconds": 120.022,
+      "rttP95Ms": 238,
+      "rttP99Ms": 441,
+      "httpP95Ms": 186.91490899999917,
+      "tickP95Ms": 13.55,
+      "checkpointP95Ms": 126.51360999999451,
+      "bytes": 1787671,
+      "bytesPerPlayerSecond": 2979.451666666667,
+      "messages": 10162,
+      "corrections": 0,
+      "errors": 0,
+      "httpErrors": 0,
+      "disconnects": 0,
+      "pingSamples": 295,
+      "httpSamples": 295
+    }
+  ]
+}

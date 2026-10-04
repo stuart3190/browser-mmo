@@ -1,7 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { loadDotEnv } from '@mmo/config';
 import { createDb } from '@mmo/db';
-import { DevAuthProvider, SessionService, createDomainContext } from '@mmo/domain';
+import {
+  DevAuthProvider,
+  PasswordAuthProvider,
+  provisionPasswordAccount,
+  SessionService,
+  createDomainContext,
+} from '@mmo/domain';
 import { getGameData } from '@mmo/game-data';
 import { Metrics, createLogger } from '@mmo/server-kit';
 import { uuidv7 } from '@mmo/shared';
@@ -189,5 +195,59 @@ it('limits requests before session/database lookup, and releases failed request 
     ).toBe(200);
   } finally {
     await limited.close();
+  }
+});
+
+it('production refuses dev/no auth and supports provisioned password login without dev fallback', async () => {
+  const ctx = createDomainContext({ db: handle.db, gameData: getGameData() });
+  const deps = {
+    ctx,
+    env: { CORS_ORIGINS: 'https://game.example', NODE_ENV: 'production' as const },
+    logger: createLogger({ service: 'prod-auth-test', level: 'silent' }),
+    metrics: new Metrics(),
+    sessions: new SessionService(1),
+  };
+  await expect(buildApp({ ...deps, authProviders: new Map() })).rejects.toThrow(
+    'Production requires',
+  );
+  await expect(
+    buildApp({ ...deps, authProviders: new Map([['dev', new DevAuthProvider(new Set())]]) }),
+  ).rejects.toThrow('Production requires');
+  const username = `prod_${uniq()}`;
+  const password = 'production-path test password';
+  await provisionPasswordAccount(ctx, username, password);
+  const prod = await buildApp({
+    ...deps,
+    authProviders: new Map([['password', new PasswordAuthProvider()]]),
+  });
+  try {
+    expect(
+      (await prod.inject({ method: 'POST', url: '/v1/auth/dev-login', payload: { username } }))
+        .statusCode,
+    ).toBe(404);
+    expect((await prod.inject({ url: '/v1/auth/providers' })).json()).toEqual({
+      providers: ['password'],
+    });
+    const login = await prod.inject({
+      method: 'POST',
+      url: '/v1/auth/password-login',
+      payload: { username, password },
+    });
+    expect(login.statusCode).toBe(200);
+    expect(
+      (await prod.inject({ url: '/v1/me', headers: auth(login.json<{ token: string }>().token) }))
+        .statusCode,
+    ).toBe(200);
+    expect(
+      (
+        await prod.inject({
+          method: 'POST',
+          url: '/v1/auth/password-login',
+          payload: { username, password: 'an incorrect test password' },
+        })
+      ).statusCode,
+    ).toBe(401);
+  } finally {
+    await prod.close();
   }
 });
