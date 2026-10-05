@@ -1,0 +1,28 @@
+[
+  {
+    "name": "Desktop compass never covers target health/wind-up",
+    "ok": true,
+    "detail": {
+      "guide": {
+        "x": 355,
+        "y": 12,
+        "width": 390,
+        "height": 48
+      },
+      "target": {
+        "x": 410,
+        "y": 76,
+        "width": 280,
+        "height": 103
+      }
+    }
+  },
+  {
+    "name": "Empty search explains how to recover view",
+    "ok": true
+  },
+  {
+    "name": "Reset restores real slot grid",
+    "ok": true
+  }
+]

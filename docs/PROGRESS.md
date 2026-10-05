@@ -853,13 +853,13 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Follow Maren's “bell below the roots” clue with one short expedition.**
-The seven-quest Greenvale route now ends at the keeper outpost and returns the restored oath to
-Maren. Playtest that route with owner feedback before changing established combat/rewards.
-Continue with one focused bell-site investigation/encounter using existing quest/navigation/
-party/reward systems; do not open a dungeon, add a giant effects engine or build unrelated systems.
-Inventory sorting/filtering from the genuine unchecked checklist also shipped in this batch;
-favourites/junk/vendor flows remain unchecked. Hosting/CI/physical-device follow-ups remain separate.
+**Continue the content-engine pivot: migrate the remaining live Greenvale catalog through versioned packs.**
+Use the validated factory in [content-engine.md](content-engine.md), preserving stable IDs, exact
+runtime ordering/compiled hash, party/reward rules and deployed behavior. Improve source-pack error
+diagnostics where they help authoring. Keep existing world geometry/art and mechanics; do not resume
+one-off quest expansion or build an editor/general scripting engine before the catalog migration.
+Future item/location/event/profession/dungeon/world-state sections are extension points, not implemented
+systems. Hosting/CI/physical-device follow-ups remain separate from this content milestone.
 
 ## Mobile display follow-up — 2026-10-05
 
@@ -1056,3 +1056,43 @@ Known limits: one non-repeatable expedition, independent survey/kill order, exis
 eligibility and rotating loot unchanged; no new quest/effects engine. Sorting does not repack slots.
 The existing merged-loot toast shows total ore in the resulting stack, not the four-ore increment;
 DB rewards/quantities are correct. Physical Android/device performance remains an external follow-up.
+
+## Current Work — content-engine core, 2026-10-05
+
+- [x] Strict, typed schema-version-1 content packs: quests, NPC definitions/placements,
+      single-enemy encounters/placements and reusable named quest/loot rewards. Schema version and
+      authored revision are explicit; unknown versions/fields and malformed IDs fail validation.
+- [x] Pure runtime compiler feeds the existing GameData registry used by API/realtime/browser.
+      Explicit manifest references preserve ordering and reject missing/duplicate/conflicting IDs;
+      no override merge, new gameplay handlers, remote upload endpoint or hot reload.
+- [x] Full-catalog link validation for NPC/enemy/item/currency/zone/landmark references, placements,
+      reward quantities and prerequisite chains. Added indirect quest cycle/duplicate prerequisite/
+      unavailable placeholder dependency checks, and impossible loot quantity/currency bounds.
+- [x] Representative deployed Stillwater migration: What the Ward Held, Tess/dialogue/spawn,
+      Warden/combat/spawn, seal-ring quest reward and creature loot are JSON-authored. Exact parsed
+      catalog matches deployed baseline byte-for-byte; canonical SHA-256 remains
+      `fce8c1bf74e3e8e9fd3019432542026bb82f6a65060914ce468e9d255876ace1`.
+      No database migration/reset/checkpoint rewrite or gameplay changes needed.
+- [x] `pnpm content:validate` checks the shipped catalog and prints versions/revisions/counts/hash.
+      Architecture and explicit future extension seams documented in [content-engine.md](content-engine.md).
+- [x] **25 focused factory regression/failure tests**; final complete verification exited zero:
+      format/lint/types, **184 unit tests**, **131 PostgreSQL integration tests** (domain 65,
+      realtime 58, API 8), all four production builds and production debug-hook guard.
+      Existing Stillwater DB test verifies prerequisite/personal dialogue/party kill credit and
+      exactly-once persistent rewards through the new loader; existing crash/ownership suites pass.
+- [x] Browser preview regression: real login/acceptance/movement/target/HUD/inventory (3 recorded
+      desktop assertions); persisted reward/equipment and touch controls at 390×844 and 844×390
+      (10 assertions). Evidence: `docs/gameplay/evidence/content-engine/`. Chromium touch emulation
+      is functional browser proof, not physical-device FPS evidence.
+
+Verified 2026-10-05 · Codex · implementation commit **69b0f4bfca52d6b2e10d63af59e19c3de9368836**.
+Verification command: `NODE_ENV=production TEST_DATABASE_URL=.../mmo_party_test pnpm verify`;
+disposable integration DB only. AGENTS.md and MASTER_PLAN.md unchanged.
+
+Known limits: other Greenvale content remains legacy TS; items/classes/world geometry/procedural
+art/formulas remain existing code. This core supports current objectives, rewards and single-enemy
+mechanics, not multi-stage encounter scripts, repeatables, branching quests, content editors or
+runtime reload. Stable persisted IDs must not be renamed; real semantic content changes still need
+existing content-hash/checkpoint migration discipline. No new gameplay/content was added.
+Deployment uses the existing script after merge; final deployed SHA/public proof is reported in the
+completion message and `https://brokenodyssey.com/release.json`.

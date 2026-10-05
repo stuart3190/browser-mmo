@@ -1,0 +1,22 @@
+{
+  "verifiedDate": "2026-10-05",
+  "agent": "Codex",
+  "implementationCommit": "69b0f4bfca52d6b2e10d63af59e19c3de9368836",
+  "verification": {
+    "command": "NODE_ENV=production TEST_DATABASE_URL=<disposable mmo_party_test> pnpm verify",
+    "exitCode": 0,
+    "format": true,
+    "lint": true,
+    "typecheck": true,
+    "unitTests": 184,
+    "postgresIntegrationTests": 131,
+    "productionBuilds": 4,
+    "productionDebugHookGuard": true
+  },
+  "focusedFactoryTests": 25,
+  "compiledHash": "fce8c1bf74e3e8e9fd3019432542026bb82f6a65060914ce468e9d255876ace1",
+  "baselineByteEquality": true,
+  "desktopAssertions": 3,
+  "touchAssertions": 10,
+  "physicalAndroidTested": false
+}
