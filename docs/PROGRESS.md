@@ -292,9 +292,14 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · bank window (personal + shared vault tabs, backpack below); deposit/retrieve verified in Inventory E2E and DB. Placeholder: bank opens anywhere (no banker proximity check) · 418b1fd
 - [x] Recovered loot (mailbox)
   - Verified 2026-10-04 · Claude Opus 5.5 · system-only `mailbox` container (200 slots, created lazily for old characters); overflow loot keeps provenance; players can Take but never place items in (domain tests; World E2E Recovered tab + Take) · c350b18
-- [ ] Sorting
-- [ ] Filtering
-  - Client helper `filterItems` exists in @mmo/ui; untested, unused.
+- [x] Sorting (inventory view only; persisted bag slots are unchanged)
+  - Verified 2026-10-05 · Codex · name/rarity/item-level/slot ordering over unique server items;
+    pure no-mutation test and desktop/touch filtered-view equip, portrait/landscape UI proof.
+    Implementation commit: **6094e151bf89c57f93511ee1a9360f08815973de**.
+- [x] Filtering
+  - Verified 2026-10-05 · Codex · name search + rarity on backpack/materials/recovered, empty-result
+    explanation, Reset and true occupied/capacity counts. Existing `filterItems` reused; pure test
+    and actual touch material-pouch/search/reset checks at 390×844 and 844×390. Same commit as above.
 - [x] Locking
   - Verified 2026-10-03 · Claude Opus 5.5 · locked flag blocks marketplace listing (test) · 8454ea0
 - [ ] Favourites
@@ -848,12 +853,13 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Follow the Keepers of the Last Door clue into one small ruined keeper outpost.**
-The well/culvert survey is now playable after Stillwater. Playtest the six-quest route with owner
-feedback, particularly compass clarity, Northwood travel and Stillwater's ground marks, before
-changing established combat/rewards. Build one focused outpost quest/encounter using current
-quest/combat/party/reward systems; no guilds, raids, PvP, crafting or giant quest engine.
-Hosting/CI/physical-device follow-ups stay separate from gameplay development.
+**Follow Maren's “bell below the roots” clue with one short expedition.**
+The seven-quest Greenvale route now ends at the keeper outpost and returns the restored oath to
+Maren. Playtest that route with owner feedback before changing established combat/rewards.
+Continue with one focused bell-site investigation/encounter using existing quest/navigation/
+party/reward systems; do not open a dungeon, add a giant effects engine or build unrelated systems.
+Inventory sorting/filtering from the genuine unchecked checklist also shipped in this batch;
+favourites/junk/vendor flows remain unchecked. Hosting/CI/physical-device follow-ups remain separate.
 
 ## Mobile display follow-up — 2026-10-05
 
@@ -1001,3 +1007,52 @@ The full check initially caught a test-only Node-crypto typing error; the final 
 Web Crypto, and the complete final pass is green. Browser fixtures are previously played characters,
 not grants of the new quest/progress/rewards. SwiftShader/touch emulation is not physical Samsung
 performance proof. No gameplay work remains unfinished in this batch; continue with the outpost.
+
+## Current Work — keeper outpost and inventory checklist continuation, 2026-10-05
+
+- [x] **The Names Behind the Door** after The Water Remembers, level 3: Maren offers the keeper
+      watchpost investigation; personal oath survey (24, 110), party-eligible Aster kill (33, 118),
+      return debrief. North-road/culvert spur, ruined court, shared collision pillars, seal/oath/sign.
+      The general compass guides survey, kill and return without new quest-specific UI logic.
+- [x] Aster, Last Door Sentinel: authoritative 300-HP level-four construct with a 2.2-second,
+      frozen-heading amber sector sweep; flank/behind/range dodge, LOS, existing chase/evade/death/
+      60-second respawn. Optional durable cue fields reuse checkpoint/snapshot/health/damage paths.
+- [x] Persistent, class-neutral rare Oathkeeper’s Mantle cloak; 700 quest XP/300 copper. Existing
+      atomic quest reward/overflow/replay and party credit/XP division/one-owner loot rules preserved.
+      DB proof: one party kill at 121 XP each/one owner; one solo kill at 242 XP/one owner; all three
+      completed survey/kill counters and exactly one bound unique mantle each, genuinely equipped.
+- [x] Additive `0014` exact predecessor content-hash migration. Populated preview migrated after
+      owner shutdown: every checkpoint field except contentHash compared equal; 20 templates synced.
+      Historical hash tests preserve all earlier terrain/content; old-checkpoint simulation test
+      preserves the existing character/health/cooldown/entities and adds exactly one sentinel.
+- [x] Inventory checklist sorting/filtering implemented and verified (presentation only).
+      Actual desktop/touch equip via filtered unique ID; material pouch filtering, Reset, empty-result
+      explanation and 44-pixel controls in bounds at 390×844 and 844×390. Vault grids unchanged.
+- [x] Browser play: 17 recorded two-client assertions; complete solo touch run exited zero (5);
+      corrected post-playthrough mobile inventory run exited zero (10). Real routes/acceptance/surveys/
+      combat/turn-in/reconnect/equip; no new-quest rewards, progress, positions or stats injected.
+      The party harness stopped only when tapping Reset behind the existing item-details sheet after
+      both rewards/equips passed; corrected sequence closes the sheet, independently verified.
+- [x] Screenshot-driven correction: desktop target health/warning placed below the quest compass.
+      Functional outpost art and touch controls retained. Desktop bounds regression records proof
+      separately (3 assertions, exit zero; compass bottom 60 px, target top 76 px). Emulated
+      Chromium/SwiftShader is not physical Android performance evidence.
+- [x] Final verification: one complete `NODE_ENV=production TEST_DATABASE_URL=... pnpm verify`
+      exited zero: format/lint/types, **159 unit tests**, **131 PostgreSQL integration tests**
+      (API 8, domain 65, realtime 58), all four production builds and production debug-hook guard.
+      Final review then corrected a one-line client snapshot-facing omission; affected client format/
+      lint/typecheck/**8 tests**/production build/debug-hook guard passed again. Server/schema/content
+      were unchanged after the complete pass. Browser evidence totals **35 recorded assertions**.
+- [x] Existing actor facing now follows authoritative full entity updates, with a rendering
+      regression assertion independent of the frozen sector heading. This keeps pose/cue consistent.
+
+Verified 2026-10-05 · Codex · targeted content/sector/checkpoint/client/inventory tests, workspace
+typecheck and PostgreSQL outpost concurrent reward test passed. Rules/scripts/proof:
+[keeper outpost](gameplay/keeper-outpost.md), `gameplay/evidence/keeper-outpost/`.
+Implementation/proof commit: **6094e151bf89c57f93511ee1a9360f08815973de**.
+AGENTS.md and MASTER_PLAN.md remain unchanged.
+
+Known limits: one non-repeatable expedition, independent survey/kill order, existing first-hit party
+eligibility and rotating loot unchanged; no new quest/effects engine. Sorting does not repack slots.
+The existing merged-loot toast shows total ore in the resulting stack, not the four-ore increment;
+DB rewards/quantities are correct. Physical Android/device performance remains an external follow-up.
