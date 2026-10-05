@@ -267,3 +267,71 @@ it('keeps a character in its original zone if the durable transfer write fails',
   expect((await again.wait('auth.ok')).d.zoneId).toBe(old);
   again.ws.close();
 });
+it('shares resource depletion across party members, rejects replay and preserves the one grant after crash/reconnect', async () => {
+  const nodeId = 'node.greenvale_marches.herb_beds';
+  await handle.db.delete(schema.resourceHarvests).where(eq(schema.resourceHarvests.nodeId, nodeId));
+  const h = await boot(),
+    a = await player(march, { x: 290, z: 400 }),
+    b = await player(march, { x: 291, z: 400 }),
+    ca = await join(h.url, a),
+    cb = await join(h.url, b);
+  ca.send('party.invite', { characterId: b.id });
+  const invite = (await cb.wait('party.update', (m) => !!m.d.invitation)).d.invitation!;
+  cb.send('party.respond', { invitationId: invite.id, accept: true });
+  await ca.wait('party.update', (m) => m.d.members.length === 2);
+  const herb = h.server.zones
+    .get(march)!
+    .listEntities()
+    .find((e) => e.kind === 'resource_node' && e.position.x === 290)!;
+  const sa = ca.send('interact.pickup', { entityId: herb.id }),
+    sb = cb.send('interact.pickup', { entityId: herb.id });
+  for (
+    let i = 0;
+    i < 400 &&
+    !(
+      ca.messages.some((m) => m.ack === sa && ['inventory.updated', 'error'].includes(m.t)) &&
+      cb.messages.some((m) => m.ack === sb && ['inventory.updated', 'error'].includes(m.t))
+    );
+    i++
+  )
+    await sleep(15);
+  expect(
+    [ca, cb]
+      .flatMap((c) => c.messages)
+      .filter((m) => m.t === 'inventory.updated' && [sa, sb].includes(m.ack!)),
+  ).toHaveLength(1);
+  const quantity = async () => {
+    const items = await Promise.all(
+      [a, b].map((p) => getCharacterItems(ctx.db, ctx, p.accountId, p.id)),
+    );
+    return items
+      .flatMap((x) => x.containers.flatMap((c) => c.items))
+      .filter((i) => i.template.id === 'material.world.wild_herb')
+      .reduce((n, i) => n + i.instance.quantity, 0);
+  };
+  expect(await quantity()).toBe(2);
+  // Old sequence and old entity intents cannot claim again.
+  ca.send('interact.pickup', { entityId: herb.id }, sa);
+  cb.send('interact.pickup', { entityId: herb.id });
+  await sleep(150);
+  expect(await quantity()).toBe(2);
+  expect(
+    h.server.zones
+      .get(march)!
+      .listEntities()
+      .some((e) => e.id === herb.id),
+  ).toBe(false);
+  await h.server.simulateCrash();
+  running.splice(running.indexOf(h.server), 1);
+  const restarted = await boot(),
+    reconnected = await join(restarted.url, a);
+  expect(
+    restarted.server.zones
+      .get(march)!
+      .listEntities()
+      .some((e) => e.kind === 'resource_node' && e.position.x === 290),
+  ).toBe(false);
+  expect(await quantity()).toBe(2);
+  expect((await reconnected.wait('party.update')).d.members.length).toBe(2);
+  reconnected.ws.close();
+});

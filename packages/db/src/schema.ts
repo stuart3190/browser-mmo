@@ -602,3 +602,9 @@ export const zoneCheckpoints = pgTable('zone_checkpoints', {
   payload: text('payload').notNull(),
   updatedAt: updatedAt(),
 });
+
+/** Shared renewable resource depletion, atomically committed with the existing item grant. */
+export const resourceHarvests = pgTable('resource_harvests', {
+  nodeId: text('node_id').primaryKey(),
+  readyAt: timestamp('ready_at', { withTimezone: true }).notNull(),
+});

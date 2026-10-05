@@ -308,7 +308,7 @@ export class EntityViews {
     }
     const mat = new StandardMaterial(`mat_${e.id}`, this.scene);
     let mesh: Mesh;
-    if (e.kind === 'pickup') {
+    if (e.kind === 'pickup' || e.kind === 'resource_node') {
       mesh = MeshBuilder.CreateIcoSphere(e.id, { radius: 0.35, subdivisions: 1 }, this.scene);
       if (e.name.includes('Sword')) {
         const blade = MeshBuilder.CreateBox(
@@ -330,6 +330,11 @@ export class EntityViews {
       mesh.position.y = 0.6;
       mat.diffuseColor = new Color3(0.95, 0.5, 0.1);
       mat.emissiveColor = new Color3(0.4, 0.2, 0.0);
+      if (e.kind === 'resource_node') {
+        mesh.scaling.set(2, 0.6, 2);
+        mat.diffuseColor = new Color3(0.3, 0.75, 0.35);
+        mat.emissiveColor = new Color3(0.05, 0.15, 0.04);
+      }
     } else {
       mesh = MeshBuilder.CreateSphere(e.id, { diameter: 1 }, this.scene);
       mesh.position.y = 0.5;

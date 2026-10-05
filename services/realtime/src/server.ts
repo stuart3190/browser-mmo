@@ -5,12 +5,14 @@ import type { IncomingMessage, Server, ServerResponse } from 'node:http';
 import { WebSocketServer } from 'ws';
 import type { WebSocket } from 'ws';
 import { sql } from 'drizzle-orm';
+import { schema } from '@mmo/db';
 import type { DomainContext, SessionService } from '@mmo/domain';
 import {
   acceptQuest,
   activeRespawns,
   characterFromRow,
   claimWorldPickup,
+  harvestResource,
   dueKillEvents,
   getCombatProfile,
   getQuestLog,
@@ -726,20 +728,33 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       case 'interact.pickup': {
         const reservation = player.zone.reservePickup(player.characterId, msg.d.entityId);
         try {
-          const items = await claimWorldPickup(ctx, {
-            accountId: player.accountId,
-            characterId: player.characterId,
-            templateId: reservation.templateId,
-            quantity: reservation.quantity,
-            spawnPointId: reservation.spawnPointId,
-            spawnInstanceId: reservation.spawnInstanceId,
-            requestId: `${conn.id}:${msg.seq}`,
-          });
-          player.zone.commitPickup(reservation.entityId, Date.now());
+          const harvest = reservation.resource
+            ? await harvestResource(ctx, {
+                accountId: player.accountId,
+                characterId: player.characterId,
+                nodeId: reservation.spawnPointId,
+                requestId: `${conn.id}:${msg.seq}`,
+              })
+            : undefined;
+          const items =
+            harvest?.items ??
+            (await claimWorldPickup(ctx, {
+              accountId: player.accountId,
+              characterId: player.characterId,
+              templateId: reservation.templateId,
+              quantity: reservation.quantity,
+              spawnPointId: reservation.spawnPointId,
+              spawnInstanceId: reservation.spawnInstanceId,
+              requestId: `${conn.id}:${msg.seq}`,
+            }));
+          player.zone.commitPickup(reservation.entityId, Date.now(), harvest?.readyAtMs);
           pickups.inc({ result: 'ok' });
           send(
             conn,
-            { t: 'inventory.updated', d: { reason: 'pickup', items, removed: [] } },
+            {
+              t: 'inventory.updated',
+              d: { reason: harvest ? 'gather' : 'pickup', items, removed: [] },
+            },
             msg.seq,
           );
           conn.log.info(
@@ -748,7 +763,11 @@ export function createRealtimeServer(deps: RealtimeDeps) {
           );
         } catch (err) {
           if (err instanceof DomainError && err.code === ErrorCode.ALREADY_CLAIMED)
-            player.zone.commitPickup(reservation.entityId, Date.now());
+            player.zone.commitPickup(
+              reservation.entityId,
+              Date.now(),
+              typeof err.details?.readyAtMs === 'number' ? err.details.readyAtMs : undefined,
+            );
           else player.zone.releasePickup(reservation.entityId);
           pickups.inc({ result: err instanceof DomainError ? err.code : 'error' });
           throw err;
@@ -1453,6 +1472,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             recordQueue.push({ kill, zone, attempts: 0, nextAttemptAt: now });
           }
         }
+        const resourceStates = await ctx.db.select().from(schema.resourceHarvests);
+        for (const zone of zones.values()) zone.restoreResources(resourceStates, Date.now());
         await this.sweepKills();
         nextSweepAt = Date.now() + (deps.killRecoveryIntervalMs ?? 5_000);
         await changeFeed?.start();

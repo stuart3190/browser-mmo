@@ -40,7 +40,7 @@ it('creates five substantial partitioned landmasses, 24 regions and unchanged de
 it('ships diverse reusable catalogs and sparse representative populations without new quests', () => {
   expect(world.monsterFamilies).toHaveLength(10);
   expect(world.monsterFamilies.flatMap((f) => f.variants)).toHaveLength(72);
-  expect(world.populations).toHaveLength(240);
+  expect(world.populations).toHaveLength(243);
   expect(world.resources).toHaveLength(10);
   expect(gd.quests.size).toBe(getStarterGameData().quests.size);
   expect(gd.raw.chunks.length).toBeLessThan(700);
@@ -50,13 +50,13 @@ it('ships diverse reusable catalogs and sparse representative populations withou
         .chunksForZone(r.zoneId)
         .flatMap((c) => c.spawnPoints)
         .filter((s) => s.kind === 'enemy'),
-    ).toHaveLength(3);
+    ).toHaveLength(r.zoneId === 'zone.aurelian.greenvale_marches' ? 13 : 3);
     expect(
       gd
         .chunksForZone(r.zoneId)
         .flatMap((c) => c.spawnPoints)
         .filter((s) => s.kind === 'npc'),
-    ).toHaveLength(10);
+    ).toHaveLength(r.zoneId === 'zone.aurelian.greenvale_marches' ? 13 : 10);
   }
 });
 it('loads unmaterialized chunks on demand and rejects coordinates outside bounds', () => {
@@ -135,4 +135,29 @@ it('revalidates catalog links when the runtime registry is loaded directly', () 
   const raw = structuredClone(gd.raw);
   raw.worldCatalog!.regions[0]!.resourceIds = ['missing'];
   expect(() => GameData.load(raw)).toThrow();
+});
+it('links playable herb nodes to catalog resources and rejects invalid harvesting/dressing', () => {
+  expect(world.resourceNodes).toHaveLength(2);
+  const spawns = gd.chunksForZone('zone.aurelian.greenvale_marches').flatMap((c) => c.spawnPoints);
+  expect(spawns.filter((s) => s.kind === 'resource_node').map((s) => s.refId)).toEqual([
+    'material.world.wild_herb',
+    'material.world.wild_herb',
+  ]);
+  for (const fault of ['missing', 'unimplemented', 'location', 'duplicate', 'outside'] as const) {
+    const p = fixture();
+    if (p.schemaVersion !== 2) throw Error('wrong fixture');
+    if (fault === 'missing') p.world.resourceNodes[0]!.resourceId = 'resource.missing';
+    if (fault === 'unimplemented')
+      p.world.resources.find((r) => r.id === 'resource.wild_herb')!.gatheringImplemented = false;
+    if (fault === 'location')
+      p.world.resourceNodes[0]!.locationId = 'location.greenvale_marches.town';
+    if (fault === 'duplicate') p.world.resourceNodes.push(p.world.resourceNodes[0]!);
+    if (fault === 'outside') p.world.dressing[0]!.offset.x = 99999;
+    expect(() =>
+      compileContentCatalog(
+        contentManifest,
+        contentPacks.map((pack) => (pack.schemaVersion === 2 ? p : pack)),
+      ),
+    ).toThrow();
+  }
 });

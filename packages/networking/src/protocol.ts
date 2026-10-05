@@ -235,7 +235,7 @@ export const InventorySnapshotMsg = serverMsg(
 export const InventoryUpdatedMsg = serverMsg(
   'inventory.updated',
   z.object({
-    reason: z.enum(['pickup', 'move', 'loot', 'trade', 'marketplace', 'admin', 'sync']),
+    reason: z.enum(['pickup', 'gather', 'move', 'loot', 'trade', 'marketplace', 'admin', 'sync']),
     items: z.array(ItemSchema),
     removed: z
       .array(z.object({ id: UuidSchema, version: z.number().int().nonnegative() }))

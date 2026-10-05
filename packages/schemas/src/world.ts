@@ -213,7 +213,15 @@ export type EnemyDefinition = z.infer<typeof EnemyDefinitionSchema>;
 // Runtime entities (what the realtime protocol replicates)
 // ---------------------------------------------------------------------------
 
-export const EntityKindSchema = z.enum(['player', 'npc', 'enemy', 'pickup', 'loot_drop', 'object']);
+export const EntityKindSchema = z.enum([
+  'player',
+  'npc',
+  'enemy',
+  'pickup',
+  'resource_node',
+  'loot_drop',
+  'object',
+]);
 export type EntityKind = z.infer<typeof EntityKindSchema>;
 
 /**

@@ -10,6 +10,7 @@ const COLORS: Record<string, string> = {
   enemy: '#e0544a',
   npc: '#f2d16b',
   pickup: '#5fd3e8',
+  resource_node: '#79c96b',
   player: '#5fe07a',
 };
 

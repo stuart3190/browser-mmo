@@ -197,6 +197,7 @@ export interface PickupReservation {
   quantity: number;
   spawnPointId: string;
   spawnInstanceId: string;
+  resource: boolean;
 }
 
 export interface ZoneSimulationOptions {
@@ -353,6 +354,10 @@ export class ZoneSimulation {
     restore(this.players, state.players);
     restore(this.pickups, state.pickups);
     restore(this.npcSpawns, state.npcSpawns);
+    for (const [id, spawn] of this.npcSpawns) {
+      const entity = this.entities.get(id);
+      if (entity) entity.name = this.gameData.npcs.get(spawn.refId)!.name;
+    }
     // Additive static NPC content migration. Existing entity IDs and every live combat state stay intact.
     for (const chunk of this.gameData.chunksForZone(this.zone.id))
       for (const spawn of chunk.spawnPoints)
@@ -755,6 +760,25 @@ export class ZoneSimulation {
     return { entityId, npcId: spawn.refId };
   }
 
+  /** Durable node depletion takes precedence over a possibly pre-grant recovery image. Rebuild
+   * only resource entities at boot; preserve all other live/checkpoint state. */
+  restoreResources(states: { nodeId: string; readyAt: Date }[], nowMs: number): void {
+    for (const p of [...this.pickups.values()])
+      if (p.spawn.kind === 'resource_node') {
+        this.pickups.delete(p.entityId);
+        this.despawnEntity(p.entityId, 'picked_up');
+      }
+    for (let i = this.respawnQueue.length - 1; i >= 0; i--)
+      if (this.respawnQueue[i]!.spawn.kind === 'resource_node') this.respawnQueue.splice(i, 1);
+    for (const chunk of this.gameData.chunksForZone(this.zone.id))
+      for (const spawn of chunk.spawnPoints)
+        if (spawn.kind === 'resource_node') {
+          const ready = states.find((s) => s.nodeId === spawn.id)?.readyAt.getTime() ?? 0;
+          if (ready > nowMs) this.respawnQueue.push({ atMs: ready, spawn });
+          else this.spawnFromPoint(spawn, nowMs);
+        }
+  }
+
   reservePickup(characterId: string, entityId: string): PickupReservation {
     const p = this.players.get(characterId);
     if (!p) throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Not in zone');
@@ -771,6 +795,8 @@ export class ZoneSimulation {
     ) {
       throw new DomainError(ErrorCode.OUT_OF_RANGE, 'Too far away');
     }
+    if (pickup.spawn.kind === 'resource_node' && (p.attacking || this.isThreatened(characterId)))
+      throw new DomainError(ErrorCode.CONFLICT, 'Finish combat before gathering');
     pickup.reservedBy = characterId;
     return {
       entityId,
@@ -778,17 +804,21 @@ export class ZoneSimulation {
       quantity: pickup.spawn.quantity,
       spawnPointId: pickup.spawn.id,
       spawnInstanceId: pickup.spawnInstanceId,
+      resource: pickup.spawn.kind === 'resource_node',
     };
   }
 
   /** The DB accepted the claim (or reports it was already claimed): remove the entity and schedule respawn. */
-  commitPickup(entityId: string, nowMs: number): void {
+  commitPickup(entityId: string, nowMs: number, readyAtMs?: number): void {
     const pickup = this.pickups.get(entityId);
     if (!pickup) return;
     this.pickups.delete(entityId);
     this.despawnEntity(entityId, 'picked_up');
     if (pickup.spawn.respawnMs !== null)
-      this.respawnQueue.push({ atMs: nowMs + pickup.spawn.respawnMs, spawn: pickup.spawn });
+      this.respawnQueue.push({
+        atMs: readyAtMs ?? nowMs + pickup.spawn.respawnMs,
+        spawn: pickup.spawn,
+      });
   }
 
   /** The DB claim failed for a transient reason (e.g. bag full): make it available again. */
@@ -1140,11 +1170,11 @@ export class ZoneSimulation {
         refId: def.id,
         characterId: null,
       });
-    } else if (spawn.kind === 'pickup') {
+    } else if (spawn.kind === 'pickup' || spawn.kind === 'resource_node') {
       const template = this.gameData.template(spawn.refId);
       const entity: WorldEntity = {
         id: this.newEntityId(),
-        kind: 'pickup',
+        kind: spawn.kind,
         name: spawn.quantity > 1 ? `${template.name} ×${spawn.quantity}` : template.name,
         position: spawn.position,
         rotationY: spawn.rotationY,
@@ -1201,7 +1231,6 @@ export class ZoneSimulation {
       this.addEntity(entity);
       return entity.id;
     }
-    // 'resource_node' spawns are defined in data but not simulated yet.
     return null;
   }
 

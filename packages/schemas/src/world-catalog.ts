@@ -142,9 +142,33 @@ export const WorldCatalogSchema = z.strictObject({
       itemTemplateId: ContentIdSchema,
       biomeIds: z.array(ContentIdSchema).min(1),
       profession: z.enum(['mining', 'herbalism', 'logging', 'skinning', 'salvage']),
-      gatheringImplemented: z.literal(false),
+      gatheringImplemented: z.boolean(),
     }),
   ),
+  resourceNodes: z
+    .array(
+      z.strictObject({
+        ...named,
+        locationId: ContentIdSchema,
+        resourceId: ContentIdSchema,
+        offset: z.strictObject({ x: z.number().finite(), z: z.number().finite() }),
+        quantity: z.number().int().positive().max(20),
+        regrowMs: z.number().int().min(30000).max(86400000),
+      }),
+    )
+    .default([]),
+  dressing: z
+    .array(
+      z.strictObject({
+        id: ContentIdSchema,
+        locationId: ContentIdSchema,
+        kind: z.enum(['tree', 'rock', 'building', 'fence']),
+        offset: z.strictObject({ x: z.number().finite(), z: z.number().finite() }),
+        scale: z.number().positive().max(5),
+        rotationY: z.number().finite(),
+      }),
+    )
+    .default([]),
   lootProfiles: z.array(
     LootTableSchema.extend({
       category: z.enum(['hide', 'salvage', 'mineral', 'botanical', 'elemental']),

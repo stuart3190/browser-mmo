@@ -66,7 +66,9 @@ export async function startGame(args: {
       state.update((s) => s.open.add('world'));
       return;
     }
-    const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
+    const pickup =
+      entities.nearest('resource_node', player.position, INTERACT_RANGE) ??
+      entities.nearest('pickup', player.position, INTERACT_RANGE);
     if (pickup) {
       net.send('interact.pickup', { entityId: pickup.id });
       return;
@@ -424,6 +426,16 @@ export async function startGame(args: {
     const before = new Set(state.items.all().map((i) => i.instance.id));
     state.items.apply(m.d.items, m.d.removed);
     updateWeapon();
+    if (m.d.reason === 'gather') {
+      const names = [
+        ...new Set(
+          m.d.items
+            .filter((i) => i.instance.location.kind !== 'destroyed')
+            .map((i) => i.template.name),
+        ),
+      ];
+      state.toast(`Gathered ${names.join(', ')} — patch regrowing`);
+    }
     for (const i of m.d.items)
       if (!before.has(i.instance.id)) state.addLog(`Received ${i.template.name}`);
   });
@@ -478,13 +490,15 @@ export async function startGame(args: {
     worldView.update(player.position);
     entities.update(dt);
     effects.update(dt);
-    const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
+    const pickup =
+      entities.nearest('resource_node', player.position, INTERACT_RANGE) ??
+      entities.nearest('pickup', player.position, INTERACT_RANGE);
     const npc = pickup ? undefined : entities.nearest('npc', player.position, INTERACT_RANGE + 1);
     const passage = zoneId && travelAt(gameData.raw.worldCatalog, zoneId, player.position).length;
     const prompt = passage
       ? 'Press E to choose a passage'
       : pickup
-        ? `Press E to pick up ${pickup.name}`
+        ? `Press E to ${pickup.kind === 'resource_node' ? 'gather' : 'pick up'} ${pickup.name}`
         : npc
           ? `Press E to talk to ${npc.name}`
           : null;
@@ -539,6 +553,7 @@ function exposeDebug(
         id: i.instance.id,
         templateId: i.template.id,
         version: i.instance.version,
+        quantity: i.instance.quantity,
         location: i.instance.location,
       }));
     },

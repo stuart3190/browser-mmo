@@ -97,6 +97,7 @@ export function appendWorldCatalog(raw: RawGameData, world: WorldCatalog): RawGa
     }
     return chunk;
   };
+  const usedSpawnIds = new Set(out.chunks.flatMap((c) => c.spawnPoints.map((s) => s.id)));
   for (const location of world.locations) {
     if (location.zoneId === world.enclave.zoneId) continue;
     const chunk = chunkAt(location.zoneId, location.position);
@@ -128,8 +129,13 @@ export function appendWorldCatalog(raw: RawGameData, world: WorldCatalog): RawGa
     if (location.kind === 'habitat')
       for (const [i, id] of location.variantIds.entries()) {
         const pos = { ...location.position, x: location.position.x + i * 8 };
+        // Preserve established first-placement IDs while allowing the same catalog variant
+        // at any number of distinct habitats. No regional ID/name conventions required.
+        const originalId = `spawn.${id}`;
+        const spawnId = usedSpawnIds.has(originalId) ? `spawn.${location.id}.${i}` : originalId;
+        usedSpawnIds.add(spawnId);
         chunkAt(location.zoneId, pos).spawnPoints.push({
-          id: `spawn.${id}`,
+          id: spawnId,
           kind: 'enemy',
           refId: id,
           position: pos,
@@ -142,7 +148,10 @@ export function appendWorldCatalog(raw: RawGameData, world: WorldCatalog): RawGa
         });
         const treePos = { x: pos.x + 20, y: 0, z: pos.z + 20 };
         chunkAt(location.zoneId, treePos).props.push({
-          id: `grove_${id}`.slice(0, 64),
+          id:
+            spawnId === originalId
+              ? `grove_${id}`.slice(0, 64)
+              : `grove_${location.id}_${i}`.slice(0, 64),
           kind: 'tree',
           position: treePos,
           rotationY: 0,
@@ -188,6 +197,39 @@ export function appendWorldCatalog(raw: RawGameData, world: WorldCatalog): RawGa
       wanderRadius: 0,
     });
   }
+  for (const node of world.resourceNodes) {
+    const loc = world.locations.find((l) => l.id === node.locationId)!;
+    const resource = world.resources.find((r) => r.id === node.resourceId)!;
+    if (!loc || !resource) throw new Error(`${node.id}: missing resource/location`);
+    const pos = { x: loc.position.x + node.offset.x, y: 0, z: loc.position.z + node.offset.z };
+    chunkAt(loc.zoneId, pos).spawnPoints.push({
+      id: node.id,
+      kind: 'resource_node',
+      refId: resource.itemTemplateId,
+      position: pos,
+      rotationY: 0,
+      quantity: node.quantity,
+      respawnMs: node.regrowMs,
+      interactRadius: 3,
+      groupId: null,
+      wanderRadius: 0,
+    });
+  }
+  for (const prop of world.dressing) {
+    const loc = world.locations.find((l) => l.id === prop.locationId);
+    if (!loc) throw new Error(`${prop.id}: missing location`);
+    const position = { x: loc.position.x + prop.offset.x, y: 0, z: loc.position.z + prop.offset.z };
+    if (!isInsideZone(out.zones.find((z) => z.id === loc.zoneId)! as WorldZone, position))
+      throw new Error(`${prop.id}: dressing outside zone`);
+    chunkAt(loc.zoneId, position).props.push({
+      id: prop.id.slice(0, 64),
+      kind: prop.kind,
+      position,
+      scale: prop.scale,
+      rotationY: prop.rotationY,
+      modelId: null,
+    });
+  }
   out.chunks.push(...chunks.values());
   validateWorldCatalog(out, world);
   return out;
@@ -207,6 +249,8 @@ export function validateWorldCatalog(raw: RawGameData, w: WorldCatalog): void {
     w.populations,
     w.materials,
     w.resources,
+    w.resourceNodes,
+    w.dressing,
     w.lootProfiles,
     w.dungeonArchetypes,
     ...w.monsterFamilies.map((f) => f.variants),
@@ -378,6 +422,14 @@ export function validateWorldCatalog(raw: RawGameData, w: WorldCatalog): void {
   for (const r of w.resources) {
     requireRef(raw.itemTemplates, r.itemTemplateId, r.id);
     for (const id of r.biomeIds) requireRef(w.biomes, id, r.id);
+  }
+  for (const node of w.resourceNodes) {
+    const loc = requireRef(w.locations, node.locationId, node.id);
+    const resource = requireRef(w.resources, node.resourceId, node.id);
+    if (!resource.gatheringImplemented || !loc.resourceIds.includes(resource.id))
+      throw new Error(`${node.id}: resource not harvestable at location`);
+    if (node.quantity > requireRef(raw.itemTemplates, resource.itemTemplateId, node.id).maxStack)
+      throw new Error(`${node.id}: yield exceeds stack`);
   }
   for (const a of w.npcArchetypes)
     for (const id of a.stockTemplateIds) requireRef(raw.itemTemplates, id, a.id);

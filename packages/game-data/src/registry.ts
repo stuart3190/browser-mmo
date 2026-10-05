@@ -230,7 +230,7 @@ export class GameData {
         const cz = Math.floor(sp.position.z / zone.chunkSize);
         if (cx !== c.coord.cx || cz !== c.coord.cz)
           errors.push(`spawn ${sp.id} lies outside its chunk`);
-        if (sp.kind === 'pickup') {
+        if (sp.kind === 'pickup' || sp.kind === 'resource_node') {
           const t = this.itemTemplates.get(sp.refId);
           if (t && sp.quantity > t.maxStack)
             errors.push(`spawn ${sp.id} quantity exceeds maxStack`);

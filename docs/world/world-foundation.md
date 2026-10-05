@@ -152,10 +152,10 @@ not dense finished continent content. Biome and transition intent are authored; 
 rivers, forests, shorelines and wilderness density still need regional dressing. No quests were added
 or bulk-migrated. Higher-level stat/loot balance remains provisional; this is not 54 levels of progression.
 
-Next: make Greenvale Marches one convincingly populated travel region using these existing catalogs.
-Densify bounded habitats and roads, add regional resource interaction with the existing item economy,
-and playtest solo/party travel before expanding quest output. Keep future quests tied to these stable
-places/inhabitants/families instead of bespoke inventions.
+Greenvale Marches now has a focused Roadhouse–Hollow population pass and one persistent Wild Herb
+gathering loop; see [Marches gathering](marches-gathering.md). The remaining continent space is
+still greybox. Next, connect those catalog-backed places/inhabitants/habitats to a focused expedition
+and a useful herb sink, keeping future quests tied to existing catalogs rather than bespoke inventions.
 
 ## Verification
 

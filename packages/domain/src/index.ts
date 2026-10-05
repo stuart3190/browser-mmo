@@ -15,3 +15,5 @@ export * from './combat';
 export * from './quests';
 
 export * from './password-auth';
+
+export * from './gathering';

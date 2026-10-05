@@ -973,3 +973,25 @@ remain unchanged. Mutation/favourites/junk systems are deliberately outside this
   leave cleanly when travelling. Same-host multi-continent players work now; cross-host transfer
   and cross-zone persistent parties are explicit later systems. Boat/road travel is instantaneous
   node interaction, not a ship simulation. Existing checkpoint hash migration is additive and exact.
+
+## 2026-10-05 — Catalog-backed shared gathering with atomic durable depletion
+
+- **Date:** 2026-10-05
+- **Decision:** Extend the existing world pack with optional location-relative dressing and resource
+  nodes. Enable Wild Herb only. Reuse authoritative pickup reservations, protocol rate/replay limits,
+  entity replication, item grants, material pouch and provenance. Persist one regrowth deadline per
+  node in the same locked database transaction as its item grant; reconstruct resource entities from
+  that table after restoring the zone checkpoint.
+- **Reason:** World inhabitants/resources should exist independently of quests. A process-local
+  timer or independent grant/depletion writes would allow duplicate gathering after a race or crash
+  between the grant and recovery-image publication.
+- **Alternatives considered:** Bespoke Marches handlers; quest-only collectible grants; one separate
+  node per party member; generic profession/crafting engine; checkpoint-only depletion; append-only
+  harvest event table for every interaction.
+- **Consequences:** A shared patch has one winner and no party XP/material multiplication. Pouch
+  failure rolls back depletion. PostgreSQL time controls regrowth, including offline time. Resources
+  remain bounded by authored node count; existing item history retains each acquisition, including
+  stack merges. Gathering requires an alive, nearby, non-attacking/unthreatened authoritative player.
+  New resource entity/inventory reason fields are additive; ship client/server together. Shops,
+  profession progression, tools, recipes and other harvesting types remain future systems. The
+  five-continent map, bands, original Greenvale quests and existing economy architecture remain intact.

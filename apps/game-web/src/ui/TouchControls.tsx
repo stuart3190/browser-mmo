@@ -58,7 +58,9 @@ export function TouchControls() {
               ? 'Travel'
               : interactLabel.split(' ')[0] === 'talk'
                 ? 'Talk'
-                : 'Take'}
+                : interactLabel.startsWith('gather')
+                  ? 'Gather'
+                  : 'Take'}
           </button>
         )}
         {!dead && (
