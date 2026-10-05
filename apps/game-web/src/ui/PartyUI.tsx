@@ -6,7 +6,10 @@ export function PartySummary() {
   const p = state.party;
   if (!p.partyId && !p.invitation) return null;
   return (
-    <aside className="party-summary panel" aria-label="Party members">
+    <aside
+      className={`party-summary panel${p.invitation ? ' has-invitation' : ''}`}
+      aria-label="Party members"
+    >
       {p.invitation ? (
         <>
           <span>{p.invitation.fromName} invites you to a party</span>

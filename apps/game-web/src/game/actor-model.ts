@@ -18,7 +18,7 @@ export class ActorModel {
   constructor(
     scene: Scene,
     id: string,
-    readonly kind: 'hero' | 'wolf',
+    readonly kind: 'hero' | 'wolf' | 'lantern',
     coat = '#426877',
   ) {
     const material = (hex: string) => {
@@ -42,13 +42,16 @@ export class ActorModel {
     const main = material(kind === 'wolf' ? '#78838b' : coat);
     const dark = material(kind === 'wolf' ? '#394951' : '#333b41');
     const light = material(kind === 'wolf' ? '#c5c9bd' : '#d2b58a');
-    this.mesh = MeshBuilder.CreateBox(
-      id,
-      kind === 'wolf'
-        ? { width: 0.65, height: 0.55, depth: 1.25 }
-        : { width: 0.65, height: 0.7, depth: 0.38 },
-      scene,
-    );
+    this.mesh =
+      kind === 'lantern'
+        ? MeshBuilder.CreateIcoSphere(id, { radius: 0.65, subdivisions: 0 }, scene)
+        : MeshBuilder.CreateBox(
+            id,
+            kind === 'wolf'
+              ? { width: 0.65, height: 0.55, depth: 1.25 }
+              : { width: 0.65, height: 0.7, depth: 0.38 },
+            scene,
+          );
     this.mesh.material = main;
     this.mesh.position.y = kind === 'wolf' ? 0.65 : 1.05;
     const part = (
@@ -67,7 +70,16 @@ export class ActorModel {
       m.material = mat;
       return m;
     };
-    if (kind === 'wolf') {
+    if (kind === 'lantern') {
+      main.diffuseColor = Color3.FromHexString('#9373bd');
+      main.emissiveColor = Color3.FromHexString('#362047');
+      for (const x of [-0.85, 0.85]) {
+        const shard = part('ward_shard', [0.22, 1.3, 0.3], [x, 0, 0], dark);
+        shard.rotation.z = x * 0.4;
+        this.limbs.push(shard);
+      }
+      part('light', [0.32, 0.45, 0.18], [0, 0, 0.6], light);
+    } else if (kind === 'wolf') {
       part('neck', [0.55, 0.62, 0.55], [0, 0.13, 0.55]);
       part('muzzle', [0.33, 0.24, 0.5], [0, 0.06, 0.95], light);
       part('nose', [0.27, 0.15, 0.12], [0, 0.09, 1.21], dark);
@@ -119,6 +131,13 @@ export class ActorModel {
     this.phase += step * (speed > 0.1 ? 11 : 2);
     this.strike = Math.max(0, this.strike - step);
     this.mesh.scaling.y = this.dead ? 1 : 1 + Math.sin(this.phase * 0.5) * 0.015;
+    if (this.kind === 'lantern') {
+      this.mesh.rotation.z = this.dead ? Math.PI / 2 : Math.sin(this.phase) * 0.12;
+      this.limbs.forEach((limb, i) => {
+        limb.rotation.y = this.dead ? 0 : this.phase * (i ? 0.3 : -0.3);
+      });
+      return;
+    }
     this.limbs.forEach((limb, i) => {
       const walking = speed > 0.1 ? Math.sin(this.phase + (i % 2) * Math.PI) * 0.55 : 0;
       limb.rotation.x = this.dead

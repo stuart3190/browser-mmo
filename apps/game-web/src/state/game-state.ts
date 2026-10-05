@@ -25,6 +25,7 @@ export interface Toast {
  */
 /** What the HUD needs to know about a replicated combatant (target frame, log names). */
 export interface EntityInfo {
+  refId?: string | null | undefined;
   id: string;
   kind: string;
   characterId?: string | null | undefined;

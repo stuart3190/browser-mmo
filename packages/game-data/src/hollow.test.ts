@@ -3,6 +3,12 @@ import { getGameData } from './index';
 it('Hollow is additive to the exact prior content hash; existing terrain is unchanged', async () => {
   const raw = getGameData().raw;
   const old = structuredClone(raw);
+  old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.root_wound');
+  old.enemies = old.enemies.filter((e) => e.id !== 'enemy.greenvale.hollow_lantern');
+  old.lootTables = old.lootTables.filter((l) => l.id !== 'loot.greenvale.hollow_lantern');
+  old.itemTemplates = old.itemTemplates.filter((i) => i.id !== 'accessory.cloak.rootward_mantle');
+  for (const c of old.chunks)
+    c.spawnPoints = c.spawnPoints.filter((s) => s.id !== 'spawn.greenvale.hollow_lantern');
   old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.hollow_trail');
   old.enemies = old.enemies.filter((e) => e.id !== 'enemy.greenvale.brackenmaw');
   old.lootTables = old.lootTables.filter((l) => l.id !== 'loot.greenvale.brackenmaw');

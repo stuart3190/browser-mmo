@@ -132,6 +132,7 @@ export async function startGame(args: {
     dead: e.dead,
     hostile: e.hostile,
     attackCue: e.attackCue,
+    refId: e.refId,
   });
   const patchEntity = (id: string, patch: Partial<EntityInfo>) => {
     const cur = state.world.get(id);
@@ -258,6 +259,12 @@ export async function startGame(args: {
         m.d.sourceId === state.myEntityId ? player?.position : entities.meshPosition(m.d.sourceId);
       const to = entities.meshPosition(m.d.targetId);
       if (from && to) effects.projectile(from, to, ability.icon.color);
+    }
+    if (state.world.get(m.d.sourceId)?.refId === 'enemy.greenvale.hollow_lantern' && entities) {
+      const from = entities.meshPosition(m.d.sourceId);
+      const to =
+        m.d.targetId === state.myEntityId ? player?.position : entities.meshPosition(m.d.targetId);
+      if (from && to) effects.projectile(from, to, '#ba80ef');
     }
     const src = state.nameOf(m.d.sourceId);
     const dst = state.nameOf(m.d.targetId);

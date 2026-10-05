@@ -490,8 +490,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 # Deployment
 
-- [ ] Development deployment
-  - Runs locally only (`pnpm dev`, or bundled `node services/*/dist/main.js` — verified). No hosted dev environment.
+- [x] Persistent development deployment
+  - Verified 2026-10-05 · Codex · public HTTPS gameplay, password login, supervised services and repeatable deploy; see Persistent public development preview below · a11e9ab7118c68d6af470a78105a661f9934904e.
 - [x] Production startup guards and deployment/recovery runbook
   - Verified 2026-10-04 · Codex · production auth/config tests; `docs/deployment/PRE_ALPHA.md` and TLS ingress template · `cf3bc1e182b5ef3debfe6774052f9bda6f4e3d9b`
 - [x] Isolated production-mode TLS/ingress qualification
@@ -736,7 +736,7 @@ Waystone and final verification: the commit containing `packages/game-data/src/w
 Rules and deployment compatibility: [parties](gameplay/parties.md). No guilds, PvP, raids, voice,
 trading, party chat, hardware qualification or infrastructure redesign.
 
-## Current Work
+## Hollow milestone verification
 
 **Hollow trail and Brackenmaw continuation complete.** Verified 2026-10-05 by Codex.
 Implementation commit: `a02bde1296a0f73b64710824048b1a91a9fcfd16`; content-deployment command
@@ -827,7 +827,7 @@ systems added; external follow-ups remain separate from development and merge ga
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
-22. **Quest scope is deliberately small.** Three quests, including an idempotent NPC-talk follow-on and the Hollow packleader hunt; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
+22. **Quest scope is deliberately small.** Four quests, including an idempotent NPC-talk follow-on, the Hollow packleader hunt and the Root-Wound Lantern; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
@@ -838,10 +838,9 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Pay off the wounded-roots story with one short Root-Wound investigation and a contrasting enemy.**
-First playtest the complete three-quest starter route with fresh solo/party characters to tune travel
-and combat pacing. Then extend the Hollow locally with a second readable enemy behaviour and a small
-quest payoff, reusing current world/party/reward systems. No guilds, raids, PvP, crafting or giant quest
+**Playtest the complete four-quest Greenvale route, then bring the ward mystery back to Maren.**
+Tune solo/party travel, kill requirements and combat pacing from the live playable route before adding
+a small next expedition. Keep reusing existing systems; no guilds, raids, PvP, crafting or giant quest
 engine. Hosting/CI/physical-device follow-ups remain separate from gameplay development.
 
 ## Mobile display follow-up — 2026-10-05
@@ -852,3 +851,47 @@ engine. Hosting/CI/physical-device follow-ups remain separate from gameplay deve
 - Verification: Codex, 2026-10-05. Client typecheck/unit tests/production build; repository lint/format; browser regression `scripts/e2e/mobile-display.cjs` at 390×844, 844×390, reduced-height 390×650 and desktop 1280×800. Checks visible control bounds/hit targets, fullscreen denial, native fullscreen/exit/re-entry and absence of desktop prompt. Commit: this mobile-display change (resolve with `git log -- apps/game-web/src/mobile-display.ts`).
 - Known limitation: emulated Chromium is not a physical Samsung device. Android navigation bars, orientation permission and browser install UI remain controlled by the browser/OS. Test installation and bar transitions on a real phone; this does not block gameplay development.
 - Next gameplay task remains the Root-Wound investigation above; no gameplay changed here.
+
+## Current Work — Root-Wound continuation, 2026-10-05
+
+Continues verified main `02a721178587c92e8642c5097f7c55139d6f42af`. Agent: Codex.
+Implementation/proof commit: the commit containing `packages/game-data/src/root-wound.test.ts`
+(resolve with `git log -1 -- packages/game-data/src/root-wound.test.ts`). AGENTS/MASTER_PLAN unchanged.
+
+- [x] Rill's prerequisite-gated **The Light Beneath**, marked continuation beyond Brackenmaw,
+      distinct ranged Hollow Lantern, and persistent Rootward Mantle/450 XP/200 copper reward.
+  - Verified 2026-10-05 · content/route tests, real PostgreSQL prerequisite/incomplete/duplicate-turn-in
+    tests. Party rewards use the existing atomic outbox: 99 XP per level-two member, one kill loot stack.
+- [x] Existing authoritative wind-up/range/LOS rules support the contrasting ranged encounter.
+  - Verified 2026-10-05 · five focused simulation tests: delayed ranged damage, range evasion, cover
+    evasion, target removal, warning recovery and unique death/respawn. Client picking/disposal regression.
+- [x] Exact additive migration and populated content synchronization preserve existing progress.
+  - Verified 2026-10-05 · old/current content hashes, populated development checkpoint compared before
+    and after migration: all fields except contentHash identical; 17 catalog templates synchronized.
+- [x] Mobile landscape party-invitation hit-target conflict corrected.
+  - Verified 2026-10-05 · real two-client invitation accepted by ordinary touch before the shared hunt;
+    pending invitation now clears the joystick. No forced input or server validation bypass.
+- [x] Real desktop/touch shared quest, reward, level-up and equipment progression.
+  - Verified 2026-10-05 · 15 recorded browser assertions: normal party invitation/acceptance, actual
+    travel, both clients see the same Lantern/cue/death, one shared kill, one loot owner, quest
+    reconnect, 450 XP/200 copper/one mantle each, both reach level 3, same unique item after reload,
+    and desktop/portrait touch equip. No browser exceptions. Persisted DB rows agree with both clients.
+  - Screenshot review also caught the fullscreen shortcut covering Goodbye; it now hides while
+    panels/invitations are open. Separate portrait reload/Goodbye checks passed for both characters.
+  - Evidence: `gameplay/evidence/root-wound`; the complete hunt harness saved all passing assertions
+    but its launcher returned SIGTERM afterward. Independent completed-quest/equipped-item browser
+    checks exited zero. No new quest progress/rewards were injected for this playthrough.
+- [x] All final verification phases completed: format/lint, workspace/script types, **140 unit
+      and 127 PostgreSQL integration cases**, four production builds and no production debug hook.
+  - Verified 2026-10-05 · one full verification attempt followed by targeted corrections/continuation,
+    not a claimed zero exit from the original aggregate command. The legacy pre-Rill fixture now
+    omits the new dependent quest. Existing process-crash fixtures now equip persisted test power
+    and await the durable enemy respawn instead of racing transient power/undefined targets;
+    all three crash-boundary cases passed their final rerun. No production authority was weakened.
+  - API 8/8, domain 62/62, realtime 55 initially passing plus the corrected crash cases (57 total).
+    Final touched-test types/lint and CSS production rebuild passed. No hardware/CI detour.
+
+Playable route, rewards and proof limitations: [Root-Wound](gameplay/root-wound.md).
+Known limits: one non-repeatable quest, one ranged single-target enemy, simple procedural visuals,
+no world phasing; existing party eligibility and loot rotation remain unchanged. Physical-device
+performance and encounter balance need player feedback, not another hosting qualification cycle.

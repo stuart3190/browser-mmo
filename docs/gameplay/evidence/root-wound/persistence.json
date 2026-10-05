@@ -1,0 +1,41 @@
+{
+  "verified": "2026-10-05",
+  "database": "isolated development preview",
+  "kills": [
+    {
+      "xp": 99,
+      "gold": "78",
+      "item_count": 1,
+      "name": "guardmuujvmcy"
+    },
+    {
+      "xp": 99,
+      "gold": "0",
+      "item_count": 0,
+      "name": "sparkmuujvmcy"
+    }
+  ],
+  "quests": [
+    {
+      "name": "guardmuujvmcy",
+      "level": 3,
+      "status": "completed",
+      "progress": {
+        "silence_lantern": 1
+      },
+      "mantles": 1,
+      "equipped": true
+    },
+    {
+      "name": "sparkmuujvmcy",
+      "level": 3,
+      "status": "completed",
+      "progress": {
+        "silence_lantern": 1
+      },
+      "mantles": 1,
+      "equipped": true
+    }
+  ],
+  "populatedMigration": "Every checkpoint field except contentHash compared equal before/after migration 0010."
+}

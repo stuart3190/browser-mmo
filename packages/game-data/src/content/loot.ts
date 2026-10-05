@@ -2,6 +2,21 @@ import type { LootTable } from '@mmo/schemas';
 
 export const lootTables: LootTable[] = [
   {
+    id: 'loot.greenvale.hollow_lantern',
+    rolls: 1,
+    emptyChance: 0,
+    entries: [
+      {
+        itemTemplateId: 'material.ore.copper_ore',
+        weight: 1,
+        minQuantity: 3,
+        maxQuantity: 3,
+        rarityId: null,
+      },
+    ],
+    currency: { currencyId: 'gold', min: 65, max: 85 },
+  },
+  {
     id: 'loot.greenvale.brackenmaw',
     rolls: 1,
     emptyChance: 0,

@@ -1469,3 +1469,23 @@ body:has(.login) {
     font-size: 12px;
   }
 }
+/* Invitations must stay clear of the thumb controls, especially on short landscape screens. */
+@media (pointer: coarse) {
+  .ui-root.touch .party-summary.has-invitation {
+    left: 50%;
+    top: 110px;
+    transform: translateX(-50%);
+    width: min(260px, calc(100% - 32px));
+    box-sizing: border-box;
+    z-index: 4;
+  }
+  .party-summary.has-invitation > div {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+}
+/* Keep the optional fullscreen shortcut from covering dialogue and inventory actions. */
+body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscreen-return {
+  display: none;
+}

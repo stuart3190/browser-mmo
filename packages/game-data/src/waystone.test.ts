@@ -25,6 +25,12 @@ describe('short Waystone follow-on', () => {
   });
   it('adds only the NPC/quest to prior content; the checkpoint migration hash is exact', async () => {
     const raw = structuredClone(gd.raw);
+    raw.quests = raw.quests.filter((q) => q.id !== 'quest.greenvale.root_wound');
+    raw.enemies = raw.enemies.filter((e) => e.id !== 'enemy.greenvale.hollow_lantern');
+    raw.lootTables = raw.lootTables.filter((l) => l.id !== 'loot.greenvale.hollow_lantern');
+    raw.itemTemplates = raw.itemTemplates.filter((i) => i.id !== 'accessory.cloak.rootward_mantle');
+    for (const c of raw.chunks)
+      c.spawnPoints = c.spawnPoints.filter((s) => s.id !== 'spawn.greenvale.hollow_lantern');
     raw.quests = raw.quests.filter((q) => q.id !== Q.id && q.id !== 'quest.greenvale.hollow_trail');
     raw.enemies = raw.enemies.filter((e) => e.id !== 'enemy.greenvale.brackenmaw');
     raw.lootTables = raw.lootTables.filter((l) => l.id !== 'loot.greenvale.brackenmaw');

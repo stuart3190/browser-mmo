@@ -355,6 +355,22 @@ chunks
     wanderRadius: 2,
   });
 
+// Additive Root-Wound encounter: no existing props, colliders or spawns are changed.
+chunks
+  .find((c) => c.coord.cx === -2 && c.coord.cz === -2)!
+  .spawnPoints.push({
+    id: 'spawn.greenvale.hollow_lantern',
+    kind: 'enemy',
+    refId: 'enemy.greenvale.hollow_lantern',
+    position: { x: -93, y: 0, z: -82 },
+    rotationY: 1.5,
+    quantity: 1,
+    respawnMs: 60000,
+    interactRadius: 3,
+    groupId: null,
+    wanderRadius: 0,
+  });
+
 export const zones: WorldZone[] = [
   {
     id: ZONE_ID,
@@ -465,6 +481,29 @@ export const npcs: NpcDefinition[] = [
 
 export const enemies: EnemyDefinition[] = [
   {
+    id: 'enemy.greenvale.hollow_lantern',
+    name: 'Hollow Lantern',
+    level: 3,
+    maxHealth: 210,
+    family: 'elemental',
+    lootTableId: 'loot.greenvale.hollow_lantern',
+    xpReward: 180,
+    modelId: null,
+    isBoss: false,
+    isWorldBoss: false,
+    combat: {
+      damage: { min: 14, max: 20 },
+      attackSpeedMs: 3500,
+      windupMs: 1800,
+      attackRange: 10,
+      aggroRange: 10,
+      leashRange: 22,
+      moveSpeed: 1.8,
+      armor: 3,
+      corpseMs: 6000,
+    },
+  },
+  {
     id: 'enemy.greenvale.brackenmaw',
     name: 'Brackenmaw, Hollow Packleader',
     level: 3,
@@ -512,6 +551,39 @@ export const enemies: EnemyDefinition[] = [
 ];
 
 export const quests: QuestDefinitionInput[] = [
+  {
+    id: 'quest.greenvale.root_wound',
+    name: 'The Light Beneath',
+    description:
+      "Beyond Brackenmaw's clearing, follow the violet roots west, then north to the broken ward. Silence the Hollow Lantern and report to Rill. Its light reaches farther than a wolf's bite: break sight behind the boulder north of the ward, or leave its violet ring during the wind-up. Each party member must accept and return individually; nearby eligible members share the kill.",
+    giverNpcId: 'npc.greenvale.keeper_rill',
+    minLevel: 2,
+    prerequisites: ['quest.greenvale.hollow_trail'],
+    objectives: [
+      {
+        id: 'silence_lantern',
+        kind: 'kill',
+        enemyId: 'enemy.greenvale.hollow_lantern',
+        count: 1,
+        label: 'Silence the Hollow Lantern (beyond Brackenmaw)',
+      },
+    ],
+    rewards: {
+      xp: 450,
+      currency: [{ currencyId: 'gold', amount: 200 }],
+      items: [{ itemTemplateId: 'accessory.cloak.rootward_mantle', quantity: 1 }],
+    },
+    dialogue: {
+      offer:
+        "The wolf guarded an old ward, not a den. Follow the violet roots beyond its clearing, west then north. A Hollow Lantern has turned the ward's light against living things. Silence it. Its violet ring shows its reach; hide behind the boulder north of the ward while it gathers light, or step beyond its reach. It moves slowly — use that time to close in.",
+      inProgress:
+        'Follow the violet roots beyond Brackenmaw. The Lantern strikes at range, but cannot strike through stone. Return when its light goes out.',
+      readyToTurnIn:
+        "The roots have cooled. That was a keeper's ward — something below has been calling through it. You have cut that voice off from Greenvale. Take this mantle; it was woven for the old wardens. For tonight, the village can sleep. Tomorrow we must learn who is calling.",
+      completed:
+        'The ward is quiet, and Greenvale has breathing room. Keep your mantle close. A broken ward can be mended; the voice beneath it still needs an answer.',
+    },
+  },
   {
     id: 'quest.greenvale.hollow_trail',
     name: 'Teeth Beneath the Roots',

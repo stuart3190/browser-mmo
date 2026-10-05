@@ -12,4 +12,6 @@ export const starterRoads: readonly (readonly [number, number, number, number, n
   [-8, -90, -25, -88, 2.4],
   [-25, -88, -40, -90, 2.4],
   [-40, -90, -57, -92, 2.4],
+  [-57, -92, -76, -92, 2.4],
+  [-76, -92, -93, -82, 2.4],
 ];

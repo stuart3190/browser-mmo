@@ -807,3 +807,24 @@ preview stopped for inspection. No automatic backward database/checkpoint rollba
 - **Reason:** Browser and Android bars otherwise consume playable space; web pages cannot guarantee immersive mode or force orientation.
 - **Alternatives considered:** Automatic fullscreen (blocked without activation), repeatedly reopening a modal (disruptive), requiring installation (unnecessary barrier).
 - **Consequences:** Installable standalone manifest and icons reduce browser chrome. The service worker is online-only: no account/game data or stale release caching, no offline-play promise. Browser/system navigation remains user-controlled; physical Samsung verification is still required. Desktop has no entry prompt or fullscreen control.
+
+## 2026-10-05 — Root-Wound ranged encounter through existing combat rules
+
+**Date:** 2026-10-05
+
+**Decision:** Add a slow, ranged Hollow Lantern and one prerequisite-gated Rill kill-and-return
+quest beyond Brackenmaw. Reuse the existing attack-range, wind-up and resolution-time line-of-sight
+checks. Render a distinct floating ward-light, violet reach warning and cosmetic server-hit projectile.
+Use an existing terrain boulder for cover. Add a class-neutral bound cloak as the personal quest
+reward; retain shared party kill credit, divided XP and one rotating loot roll unchanged.
+
+**Reason:** The next short progression beat needs a different positioning decision and a payoff to
+the wounded-root story. The existing simulation already supports the required ranged timing and cover.
+
+**Alternatives considered:** Another fast melee wolf; a new spell/projectile simulation or boss
+phase engine; bespoke party rewards; regenerating terrain. These add scope or repeat the previous encounter.
+
+**Consequences:** Single-target ranged strikes still use current armour/hit rules, not a new elemental
+resistance system. Projectiles are cosmetic, not dodgeable after damage resolution. The additive
+content-hash migration preserves all prior checkpoint fields; ungrouped recovery creates the Lantern
+only when no saved enemy/pending respawn exists. No new protocol or persistence schema is required.

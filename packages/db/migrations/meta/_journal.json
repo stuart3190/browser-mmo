@@ -71,6 +71,13 @@
       "when": 1791145385608,
       "tag": "0009_hollow_content",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791145385609,
+      "tag": "0010_root_wound_content",
+      "breakpoints": true
     }
   ]
 }

@@ -6,7 +6,10 @@ it('additive Waystone recovery preserves old entities and live player state and 
   const current = getGameData();
   const raw = structuredClone(current.raw);
   raw.quests = raw.quests.filter(
-    (q) => q.id !== 'quest.greenvale.old_waystone' && q.id !== 'quest.greenvale.hollow_trail',
+    (q) =>
+      q.id !== 'quest.greenvale.old_waystone' &&
+      q.id !== 'quest.greenvale.hollow_trail' &&
+      q.id !== 'quest.greenvale.root_wound',
   );
   raw.npcs = raw.npcs.filter((n) => n.id !== 'npc.greenvale.keeper_rill');
   for (const c of raw.chunks)

@@ -47,6 +47,22 @@ const gear = (g: GearInput): ItemTemplate => {
 
 export const itemTemplates: ItemTemplate[] = [
   gear({
+    id: 'accessory.cloak.rootward_mantle',
+    name: 'Rootward Mantle',
+    description: "An old keeper's mantle, earned by silencing the light beneath the Hollow.",
+    category: 'accessory',
+    rarityId: 'uncommon',
+    itemLevel: 4,
+    requiredLevel: 2,
+    binding: 'on_pickup',
+    equipment: {
+      slotType: 'cloak',
+      equipmentTypeId: 'cloak',
+      baseStats: { armor: { min: 9, max: 9 }, stamina: { min: 3, max: 3 } },
+      maxDurability: null,
+    },
+  }),
+  gear({
     id: 'accessory.trinket.keepers_token',
     name: "Keeper's Ward-Token",
     description: "Rill's small carved ward. The roots beneath the Hollow still stir.",

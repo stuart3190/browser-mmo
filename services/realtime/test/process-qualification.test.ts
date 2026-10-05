@@ -94,7 +94,7 @@ async function player(nearWolf = false) {
     ],
   );
   const { token } = await new SessionService(1).create(ctx, accountId, 'game_web');
-  return { id: c.id, token, cd };
+  return { id: c.id, accountId, token, cd };
 }
 async function join(host: Awaited<ReturnType<typeof boot>>, p: Awaited<ReturnType<typeof player>>) {
   const ws = new WebSocket(`ws://127.0.0.1:${host.port}/ws`, { origin: 'http://localhost:5173' });
@@ -182,11 +182,33 @@ for (const phase of ['beforeRecord', 'afterRecord', 'afterReward'])
   it(`SIGKILL ${phase} recovers exactly one reward`, { timeout: 60000 }, async () => {
     const owner = await boot(phase);
     const p = await player(true);
+    // Persist this test-only high-damage loadout before admission. A transient simulation
+    // injection can be overwritten by normal inventory reconciliation before the first hit.
+    const weapon = await adminGrantItem(ctx, {
+      characterId: p.id,
+      templateId: 'weapon.sword.iron_longsword',
+      quantity: 1,
+      actor: { accountId: null, characterId: null },
+      reason: 'crash boundary fixture',
+    });
+    await handle.pool.query(
+      `update item_instances set stats = stats || '{"attack_power":1000}'::jsonb where id=$1`,
+      [weapon.instance.id],
+    );
+    await moveItem(ctx, {
+      accountId: p.accountId,
+      characterId: p.id,
+      request: {
+        itemInstanceId: weapon.instance.id,
+        expectedVersion: weapon.instance.version,
+        to: { kind: 'equipped', slotId: 'main_hand' },
+      },
+    });
     const c = await join(owner, p);
-    const s = await state(owner, p.id);
-    owner.child.send({ kind: 'weapon', id: p.id });
-    await until(() => owner.notices.find((n) => n.kind === 'weapon'));
-    c.send('target.set', { entityId: s.enemies![0] });
+    // A prior crash case leaves a durable respawn timer. Never send an undefined target
+    // while recovery is correctly keeping that spawn absent.
+    const enemyId = await until(async () => (await state(owner, p.id)).enemies?.[0]);
+    c.send('target.set', { entityId: enemyId });
     c.send('combat.attack', { start: true });
     await until(() => owner.notices.find((n) => n.kind === 'fault'));
     await kill(owner.child);

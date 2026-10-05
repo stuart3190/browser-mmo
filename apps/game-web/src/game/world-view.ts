@@ -78,6 +78,31 @@ export class WorldView {
     this.sign(-5, -97, 'OLD WAYSTONE', 'A place to begin again');
     this.sign(-23, -91, 'THE PALE TRAIL', 'Claw marks lead west');
     this.sign(-43, -94, 'BROKEN ROOTS', 'A low growl from the Hollow');
+    this.sign(-74, -95, 'THE ROOT-WOUND', 'Violet roots lead to the broken ward');
+    this.sign(-96, -86, 'BROKEN WARD', 'Stone shelters from its light');
+    // The real boulder north of the ward provides server-authoritative line-of-sight cover.
+    for (let i = 0; i < 13; i++) {
+      const root = MeshBuilder.CreateBox(
+        'wound_root',
+        { width: 0.18, height: 0.12, depth: 2.5 },
+        this.scene,
+      );
+      const t = i / 12;
+      root.position.set(-62 - t * 31, 0.1, -94 + Math.max(0, t - 0.4) * 17);
+      root.rotation.y = -0.7;
+      root.material = this.material(i % 2 ? '#a085bd' : '#554161');
+      root.isPickable = false;
+      root.freezeWorldMatrix();
+    }
+    const ward = MeshBuilder.CreateTorus(
+      'broken_ward',
+      { diameter: 5, thickness: 0.25, tessellation: 12 },
+      this.scene,
+    );
+    ward.position.set(-93, 0.08, -82);
+    ward.material = this.material('#846a9c');
+    ward.isPickable = false;
+    ward.freezeWorldMatrix();
     // Non-blocking story dressing: preserve all authoritative terrain/colliders.
     for (const [x, z] of [
       [-15, -92],

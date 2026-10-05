@@ -57,6 +57,11 @@ async function enter(page, username, create, classId = 'class.warrior') {
     await page.selectOption('[name=classId]', classId);
     await page.click('#create-form button');
   } else await page.locator('#char-list button').first().click();
+  await page.waitForFunction(
+    () => window.__mmo?.vitals || document.querySelector('[data-testid=continue-browser]'),
+  );
+  if (await page.locator('[data-testid=continue-browser]').isVisible())
+    await page.locator('[data-testid=continue-browser]').click();
   await page.waitForFunction(() => window.__mmo?.vitals && window.__mmo?.position, null, {
     timeout: 30000,
   });

@@ -54,7 +54,10 @@ export class EntityViews {
         this.scene,
       );
       const mat = new StandardMaterial(`bite_mat_${entity.id}`, this.scene);
-      mat.emissiveColor = new Color3(1, 0.65, 0.1);
+      mat.emissiveColor =
+        entity.refId === 'enemy.greenvale.hollow_lantern'
+          ? new Color3(0.75, 0.35, 1)
+          : new Color3(1, 0.65, 0.1);
       mat.disableLighting = true;
       cue.material = mat;
       cue.isPickable = false;
@@ -239,7 +242,11 @@ export class EntityViews {
       const actor = new ActorModel(
         this.scene,
         e.id,
-        e.kind === 'enemy' ? 'wolf' : 'hero',
+        e.refId === 'enemy.greenvale.hollow_lantern'
+          ? 'lantern'
+          : e.kind === 'enemy'
+            ? 'wolf'
+            : 'hero',
         e.kind === 'npc' ? '#94744c' : '#526b98',
       );
       if (e.refId === 'enemy.greenvale.brackenmaw') {
