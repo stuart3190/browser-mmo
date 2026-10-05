@@ -18,7 +18,7 @@ export class ActorModel {
   constructor(
     scene: Scene,
     id: string,
-    readonly kind: 'hero' | 'wolf' | 'lantern',
+    readonly kind: 'hero' | 'wolf' | 'lantern' | 'warden',
     coat = '#426877',
   ) {
     const material = (hex: string) => {
@@ -70,7 +70,19 @@ export class ActorModel {
       m.material = mat;
       return m;
     };
-    if (kind === 'lantern') {
+    if (kind === 'warden') {
+      main.diffuseColor = Color3.FromHexString('#758d8e');
+      dark.diffuseColor = Color3.FromHexString('#435c63');
+      light.diffuseColor = Color3.FromHexString('#56d5d6');
+      light.emissiveColor = Color3.FromHexString('#257d87');
+      this.mesh.scaling.x = 1.65;
+      part('crest', [0.7, 0.6, 0.45], [0, 0.6, 0], dark);
+      part('seal', [0.25, 0.3, 0.15], [0, 0, 0.27], light);
+      for (const x of [-0.65, 0.65]) {
+        this.limbs.push(part('stone_arm', [0.35, 0.9, 0.5], [x, -0.08, 0]));
+        this.limbs.push(part('stone_foot', [0.35, 0.65, 0.5], [x * 0.5, -0.72, 0], dark));
+      }
+    } else if (kind === 'lantern') {
       main.diffuseColor = Color3.FromHexString('#9373bd');
       main.emissiveColor = Color3.FromHexString('#362047');
       for (const x of [-0.85, 0.85]) {

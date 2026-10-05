@@ -13,6 +13,17 @@ export function FirstSteps() {
   if (dismissed || state.quests.some((q) => q.state === 'active' || q.state === 'ready_to_turn_in'))
     return null;
   const completed = quest?.state === 'completed';
+  const done = (id: string) =>
+    state.quests.some((q) => q.questId === `quest.greenvale.${id}` && q.state === 'completed');
+  const next = done('stillwater')
+    ? 'The eastern seal holds. Explore Greenvale with your party while Maren studies the old well records.'
+    : done('root_wound')
+      ? 'Bring Rill’s discovery home to Elder Maren in Greenvale. She knows what the ward was built to hold.'
+      : done('hollow_trail')
+        ? 'Return to Keeper Rill at the Old Waystone. The ward beyond Brackenmaw still shines beneath the roots.'
+        : done('old_waystone')
+          ? 'Rill needs your help at the Old Waystone. Follow his pale trail into the Hollow.'
+          : 'Return to Elder Maren. She has heard troubling news from the Old Waystone, down the southern road.';
   return (
     <aside className="first-steps panel" data-testid="first-steps">
       <button
@@ -34,10 +45,7 @@ export function FirstSteps() {
       </h3>
       <p>
         {completed
-          ? state.quests.find((q) => q.questId === 'quest.greenvale.old_waystone')?.state ===
-            'completed'
-            ? 'Rill keeps watch at the Old Waystone. Party up, explore the other dens and hunt for better gear.'
-            : 'Return to Elder Maren. She has heard troubling news from the Old Waystone, down the southern road.'
+          ? next
           : !weapon && state.character.classId === 'class.warrior'
             ? sword
               ? 'Open your Bag, select the Iron Longsword, then Equip. Find Elder Maren by the village square.'

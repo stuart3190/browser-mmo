@@ -1436,7 +1436,15 @@ export class ZoneSimulation {
     entity.attackCue =
       endsAtMs === null
         ? null
-        : { endsAtMs, range: enemy.def.combat.attackRange + this.rules.rangeTolerance };
+        : {
+            endsAtMs,
+            range:
+              enemy.def.combat.groundStrikeRadius ??
+              enemy.def.combat.attackRange + this.rules.rangeTolerance,
+            ...(enemy.def.combat.groundStrikeRadius && enemy.targetCharacterId
+              ? { groundPosition: { ...this.players.get(enemy.targetCharacterId)!.position } }
+              : {}),
+          };
     this.toKnowers(enemy.entityId, { t: 'entity.spawn', d: { entity: { ...entity } } });
   }
 
@@ -1629,9 +1637,9 @@ export class ZoneSimulation {
       if (cue) {
         this.cue(enemy, null);
         enemy.nextAttackAtMs = nowMs + c.attackSpeedMs;
-        if (!canHit) continue;
+        if (!cue.groundPosition && !canHit) continue;
       }
-      if (!canHit) {
+      if (!canHit && !cue?.groundPosition) {
         const left = this.steer(
           enemy,
           target.position,
@@ -1653,34 +1661,47 @@ export class ZoneSimulation {
         }
         enemy.nextAttackAtMs = nextSwingAt(enemy.nextAttackAtMs, nowMs, c.attackSpeedMs);
       }
-      const result = resolveAttack(
-        this.rules,
-        {
-          level: enemy.def.level,
-          stats: {},
-          weapon: { min: c.damage.min, max: c.damage.max, attackSpeedMs: c.attackSpeedMs },
-        },
-        { level: target.level, armor: target.stats.armor ?? 0 },
-        this.rng,
-      );
-      target.lastCombatAtMs = nowMs;
-      const { health, killed } = applyDamage(Math.round(target.health), result.damage);
-      target.health = health;
-      if (!killed) this.sendVitals(target, nowMs);
-      const te = this.entities.get(target.entityId)!;
-      te.health = health;
-      this.toKnowers(target.entityId, {
-        t: 'combat.damage',
-        d: {
-          sourceId: enemy.entityId,
-          targetId: target.entityId,
-          outcome: result.outcome,
-          amount: result.damage,
-          targetHealth: health,
-          targetMaxHealth: target.maxHealth,
-        },
-      });
-      if (killed) this.playerDies(target, enemy.entityId, nowMs);
+      // The mark is frozen at wind-up start. Resolve against current authoritative positions;
+      // no target-following, friendly exemption or client-reported hits. All nearby players
+      // can dodge; this is the only new mechanic, reusing the existing damage/vitals path.
+      const victims = cue?.groundPosition
+        ? [...this.players.values()].filter(
+            (p) =>
+              !p.dead &&
+              distance2D(p.position, cue.groundPosition!) <= cue.range &&
+              this.hasLineOfSight(entity.position, p.position),
+          )
+        : [target];
+      for (const victim of victims) {
+        const result = resolveAttack(
+          this.rules,
+          {
+            level: enemy.def.level,
+            stats: {},
+            weapon: { min: c.damage.min, max: c.damage.max, attackSpeedMs: c.attackSpeedMs },
+          },
+          { level: victim.level, armor: victim.stats.armor ?? 0 },
+          this.rng,
+        );
+        victim.lastCombatAtMs = nowMs;
+        const { health, killed } = applyDamage(Math.round(victim.health), result.damage);
+        victim.health = health;
+        if (!killed) this.sendVitals(victim, nowMs);
+        const te = this.entities.get(victim.entityId)!;
+        te.health = health;
+        this.toKnowers(victim.entityId, {
+          t: 'combat.damage',
+          d: {
+            sourceId: enemy.entityId,
+            targetId: victim.entityId,
+            outcome: result.outcome,
+            amount: result.damage,
+            targetHealth: health,
+            targetMaxHealth: victim.maxHealth,
+          },
+        });
+        if (killed) this.playerDies(victim, enemy.entityId, nowMs);
+      }
     }
   }
 

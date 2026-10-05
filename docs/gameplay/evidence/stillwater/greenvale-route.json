@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-05",
+  "agent": "Codex",
+  "environment": "Chromium / SwiftShader; functional emulation, not device performance",
+  "user": "route_muuzc28m",
+  "scaffolding": "None: fresh character, UI pickup/equip, ordinary travel/combat/turn-ins",
+  "actions": [
+    {
+      "quest": "quest.greenvale.wolves_at_the_edge",
+      "action": "accept",
+      "elapsedSeconds": 0
+    },
+    {
+      "quest": "quest.greenvale.wolves_at_the_edge",
+      "action": "turn-in",
+      "elapsedSeconds": 243
+    },
+    {
+      "quest": "quest.greenvale.old_waystone",
+      "action": "accept",
+      "elapsedSeconds": 245
+    },
+    {
+      "quest": "quest.greenvale.old_waystone",
+      "action": "turn-in",
+      "elapsedSeconds": 345
+    },
+    {
+      "quest": "quest.greenvale.hollow_trail",
+      "action": "accept",
+      "elapsedSeconds": 393
+    },
+    {
+      "quest": "quest.greenvale.hollow_trail",
+      "action": "turn-in",
+      "elapsedSeconds": 455
+    },
+    {
+      "quest": "quest.greenvale.root_wound",
+      "action": "accept",
+      "elapsedSeconds": 456
+    },
+    {
+      "quest": "quest.greenvale.root_wound",
+      "action": "turn-in",
+      "elapsedSeconds": 567
+    }
+  ],
+  "finalQuests": [
+    {
+      "id": "quest.greenvale.root_wound",
+      "state": "completed"
+    },
+    {
+      "id": "quest.greenvale.hollow_trail",
+      "state": "completed"
+    },
+    {
+      "id": "quest.greenvale.old_waystone",
+      "state": "completed"
+    },
+    {
+      "id": "quest.greenvale.wolves_at_the_edge",
+      "state": "completed"
+    }
+  ],
+  "finalVitals": {
+    "health": 180,
+    "maxHealth": 180,
+    "dead": false,
+    "inCombat": false,
+    "respawnAvailableAt": null
+  },
+  "errors": []
+}

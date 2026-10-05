@@ -1,5 +1,11 @@
 import type { ConnectionStatus, ServerPayload } from '@mmo/networking';
-import type { CharacterStats, CurrencyBalance, PlayerCharacter, QuestView } from '@mmo/schemas';
+import type {
+  CharacterStats,
+  CurrencyBalance,
+  PlayerCharacter,
+  QuestView,
+  WorldEntity,
+} from '@mmo/schemas';
 import { ItemStore } from '@mmo/ui';
 
 export type WindowId = 'inventory' | 'character' | 'bank' | 'quests' | 'party';
@@ -35,7 +41,7 @@ export interface EntityInfo {
   maxHealth?: number | undefined;
   dead?: boolean | undefined;
   hostile?: boolean | undefined;
-  attackCue?: { endsAtMs: number; range: number } | null | undefined;
+  attackCue?: WorldEntity['attackCue'];
 }
 
 export interface Vitals {

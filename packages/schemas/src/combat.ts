@@ -11,22 +11,26 @@ export const DamageRangeSchema = z
   .refine((r) => r.min <= r.max, 'min must be <= max');
 
 /** Per-enemy combat block. Enemies without one are not simulated as combatants. */
-export const EnemyCombatSchema = z.object({
-  /** Optional stationary wind-up; range and line of sight are rechecked before the strike. */
-  windupMs: z.number().int().min(500).max(5000).optional(),
-  damage: DamageRangeSchema,
-  attackSpeedMs: z.number().int().positive(),
-  /** Metres between centres at which the enemy can hit. */
-  attackRange: z.number().positive(),
-  /** Metres at which an idle enemy notices a player. 0 = only fights back when attacked. */
-  aggroRange: z.number().nonnegative(),
-  /** Max distance from its spawn point before it gives up and resets. */
-  leashRange: z.number().positive(),
-  moveSpeed: z.number().positive(),
-  armor: z.number().int().nonnegative(),
-  /** How long the corpse stays visible before the spawn point's respawn timer takes over. */
-  corpseMs: z.number().int().nonnegative(),
-});
+export const EnemyCombatSchema = z
+  .object({
+    /** Optional stationary wind-up; range and line of sight are rechecked before the strike. */
+    windupMs: z.number().int().min(500).max(5000).optional(),
+    /** Optional ground strike: wind-up freezes the target position, then hits players in this radius. */
+    groundStrikeRadius: z.number().positive().max(10).optional(),
+    damage: DamageRangeSchema,
+    attackSpeedMs: z.number().int().positive(),
+    /** Metres between centres at which the enemy can hit. */
+    attackRange: z.number().positive(),
+    /** Metres at which an idle enemy notices a player. 0 = only fights back when attacked. */
+    aggroRange: z.number().nonnegative(),
+    /** Max distance from its spawn point before it gives up and resets. */
+    leashRange: z.number().positive(),
+    moveSpeed: z.number().positive(),
+    armor: z.number().int().nonnegative(),
+    /** How long the corpse stays visible before the spawn point's respawn timer takes over. */
+    corpseMs: z.number().int().nonnegative(),
+  })
+  .refine((c) => !c.groundStrikeRadius || !!c.windupMs, 'Ground strikes require a wind-up');
 export type EnemyCombat = z.infer<typeof EnemyCombatSchema>;
 
 /** Global combat tunables (one object in game data). */

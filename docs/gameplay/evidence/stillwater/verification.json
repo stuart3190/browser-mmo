@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-05",
+  "agent": "Codex",
+  "branch": "codex/maren-stillwater",
+  "baseMain": "3d69bcca31ef9a2a6c860d7afcdf53c229f778b4",
+  "command": "NODE_ENV=production TEST_DATABASE_URL=postgres://postgres@127.0.0.1:55439/mmo_party_test pnpm verify",
+  "exitCode": 0,
+  "unitTests": 148,
+  "integrationTests": {
+    "api": 8,
+    "domain": 63,
+    "realtime": 57
+  },
+  "productionBuilds": 4,
+  "productionDebugHookAbsent": true,
+  "browserAssertions": {
+    "partyHuntReconnect": 7,
+    "correctedReturnReward": 9,
+    "soloTouch": 4
+  },
+  "limitations": [
+    "Initial party harness exposed a ridge-edge travel trap; corrected path and persisted-state continuation tested separately.",
+    "Browser touch checks are Chromium emulation, not physical Android performance."
+  ],
+  "checkpointMigration": "All populated checkpoint fields except contentHash remained identical."
+}

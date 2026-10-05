@@ -827,7 +827,7 @@ systems added; external follow-ups remain separate from development and merge ga
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
-22. **Quest scope is deliberately small.** Four quests, including an idempotent NPC-talk follow-on, the Hollow packleader hunt and the Root-Wound Lantern; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
+22. **Quest scope is deliberately small.** Five quests, including an idempotent NPC-talk follow-on, the Hollow packleader hunt the Root-Wound Lantern and Maren’s Stillwater talk/ground-strike expedition; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
@@ -838,10 +838,11 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Playtest the complete four-quest Greenvale route, then bring the ward mystery back to Maren.**
-Tune solo/party travel, kill requirements and combat pacing from the live playable route before adding
-a small next expedition. Keep reusing existing systems; no guilds, raids, PvP, crafting or giant quest
-engine. Hosting/CI/physical-device follow-ups remain separate from gameplay development.
+**Playtest the five-quest route with owner feedback, then investigate Maren's old well records.**
+Pay attention to Stillwater ground-mark readability on touch screens and repeated Waystone travel
+before tuning established rewards or kill requirements. Choose one focused deep-spring story
+continuation using current systems. No guilds, raids, PvP, crafting or giant quest engine;
+hosting/CI/physical-device follow-ups remain separate from gameplay development.
 
 ## Mobile display follow-up — 2026-10-05
 
@@ -852,7 +853,7 @@ engine. Hosting/CI/physical-device follow-ups remain separate from gameplay deve
 - Known limitation: emulated Chromium is not a physical Samsung device. Android navigation bars, orientation permission and browser install UI remain controlled by the browser/OS. Test installation and bar transitions on a real phone; this does not block gameplay development.
 - Next gameplay task remains the Root-Wound investigation above; no gameplay changed here.
 
-## Current Work — Root-Wound continuation, 2026-10-05
+## Completed Work — Root-Wound continuation, 2026-10-05
 
 Continues verified main `02a721178587c92e8642c5097f7c55139d6f42af`. Agent: Codex.
 Implementation/proof commit: the commit containing `packages/game-data/src/root-wound.test.ts`
@@ -895,3 +896,62 @@ Playable route, rewards and proof limitations: [Root-Wound](gameplay/root-wound.
 Known limits: one non-repeatable quest, one ranged single-target enemy, simple procedural visuals,
 no world phasing; existing party eligibility and loot rotation remain unchanged. Physical-device
 performance and encounter balance need player feedback, not another hosting qualification cycle.
+
+## Current Work — Maren / Stillwater continuation, 2026-10-05
+
+Continues verified main `3d69bcca31ef9a2a6c860d7afcdf53c229f778b4`. Agent: Codex.
+Implementation/proof commit: the commit containing `packages/game-data/src/stillwater.test.ts`
+(resolve with `git log -1 -- packages/game-data/src/stillwater.test.ts`). AGENTS/MASTER_PLAN unchanged.
+
+- [x] Playtested the entire existing four-quest Greenvale route with a fresh Warrior.
+  - Verified 2026-10-05 · actual browser movement, sword pickup/equip, six wolves, Brackenmaw,
+    Lantern and all four normal quest turn-ins; no travel/progress/XP/power injection. No deaths or
+    browser errors. Durable kill rows match the hunt; final character is level 3, 311/2320 XP.
+    Acceptance-to-final-return: 567 seconds in emulated Chromium, not a phone performance result.
+  - No numerical combat/reward/objective tuning justified from this one pass. Corrected the stale
+    opening guide to point to each next quest giver, including Maren after Root-Wound.
+- [x] Maren’s **What the Ward Held** debrief and small Stillwater expedition implemented.
+  - Verified 2026-10-05 · content/route/persistence tests. Requires Root-Wound completion and level 3;
+    personal Tess talk plus party-eligible Warden kill, returning to Maren for 600 XP/250 copper/
+    one class-neutral, on-pickup-bound Stillwater Seal ring. Existing atomic reward pipeline reused.
+- [x] Contrasting authoritative Warden ground-strike mechanic, warning and procedural rig.
+  - Verified 2026-10-05 · five focused simulation tests: frozen mark, dodging/nearby-player damage,
+    checkpoint recovery, cancellation/fresh re-aggro, additive spawns, solo death/pending respawn.
+    Client test checks mark stays fixed as enemy moves, articulated picking and cleanup.
+- [x] Exact additive migration preserves populated checkpoints and prior progression.
+  - Verified 2026-10-05 · preview DB migrated after owner shutdown; all checkpoint fields except
+    contentHash compared equal, 18 item templates synchronized. Historical content hashes still
+    exact after removing only new additions. No existing props/colliders/quest rewards changed.
+- [x] Desktop/touch party expedition, reconnect, personal rewards and equipment browser checks.
+  - Verified 2026-10-05 · seven hunt/reconnect assertions and nine final return/reward assertions:
+    same Warden/warning, personal Tess talks, shared kill credit, one loot stack, quest reconnect,
+    600 XP/250 copper/one unique ring per member, completed quest/item reload and real equip.
+    Mage turns in via actual touch in portrait. No browser exceptions.
+  - Initial complete harness exposed a ridge-edge travel trap; fixed the new path to x=42 and tested
+    both edges against the authoritative collider. The continuation used the same persisted ready
+    characters without teleports/progress/reward injection and exited zero. Objective count wrapping
+    and decorative-seal/warning colour ambiguity also corrected after screenshot review.
+- [x] Solo Warrior expedition and portrait touch reward/equipment progression.
+  - Verified 2026-10-05 · four browser assertions, exited zero: actual touch accept/target/attack/
+    abilities/talk/turn-in/equip with existing ordinary sword/token/mantle stats. Warden killed solo,
+    242 kill XP, 600 quest XP and one persistent ring. No injected new progress/rewards or deaths.
+- [x] One complete final verification pass exited zero.
+  - Verified 2026-10-05 · `NODE_ENV=production TEST_DATABASE_URL=…/mmo_party_test pnpm verify`:
+    format, lint, all workspace/script types, **148 unit tests**, **128 PostgreSQL integration tests**
+    (API 8, domain 63, realtime 57), four production builds and no production development debug hook.
+    Includes movement/replay, sessions, ownership, crash/reward recovery and equipment regressions.
+  - Browser evidence totals 20 assertions across the staged party hunt/return and complete solo
+    touch run, plus the fresh complete four-quest playthrough. DB records agree with all three
+    completed quests/equipped unique rings; two party rewards at 121 XP each, solo reward at 242 XP,
+    one loot stack per kill. Screenshots and machine-readable proof: `gameplay/evidence/stillwater`.
+
+Deployment uses `bash scripts/deploy-broken-odyssey.sh` after verified main is pushed; the public
+`https://brokenodyssey.com/release.json` supplies the deployed commit independently of this file.
+
+Playable route/rules and evidence limitations: [Stillwater](gameplay/stillwater.md).
+Known limits: one non-repeatable expedition; independent talk/kill objectives, one ground-strike
+mechanic rather than a general spell engine; decorative shallow water without swimming. Existing
+party eligibility/loot rotation unchanged. Physical Android performance remains unmeasured.
+Loot toasts currently show a merged stack’s total quantity rather than only that kill’s increment
+(e.g. existing three ore plus four dropped displays seven); persistent quantity/reward integrity is
+correct, but this existing presentation issue should be corrected during the next feedback pass.

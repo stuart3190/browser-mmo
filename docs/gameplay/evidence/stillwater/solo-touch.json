@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Maren debrief accepted by touch",
+    "ok": true
+  },
+  {
+    "name": "Normal geared Warrior can defeat the Warden solo with touch abilities",
+    "ok": true
+  },
+  {
+    "name": "Portrait touch turn-in and real seal equip succeed",
+    "ok": true
+  },
+  {
+    "name": "No browser exceptions",
+    "ok": true,
+    "detail": []
+  }
+]

@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Maren pays 600 XP, 250 copper and one seal-ring",
+    "ok": true
+  },
+  {
+    "name": "No duplicate turn-in action remains",
+    "ok": true
+  },
+  {
+    "name": "Same unique reward and completed quest persist",
+    "ok": true
+  },
+  {
+    "name": "Real seal-ring can be equipped on desktop/touch",
+    "ok": true
+  },
+  {
+    "name": "Maren pays 600 XP, 250 copper and one seal-ring",
+    "ok": true
+  },
+  {
+    "name": "No duplicate turn-in action remains",
+    "ok": true
+  },
+  {
+    "name": "Same unique reward and completed quest persist",
+    "ok": true
+  },
+  {
+    "name": "Real seal-ring can be equipped on desktop/touch",
+    "ok": true
+  },
+  {
+    "name": "No browser exceptions",
+    "ok": true,
+    "detail": []
+  }
+]

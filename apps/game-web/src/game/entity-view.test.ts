@@ -74,3 +74,43 @@ it('renders a pickable Lantern, restores its warning and removes all meshes/mate
     engine.dispose();
   }
 });
+
+it('keeps the Warden ground mark fixed while the enemy moves, then clears and disposes it', () => {
+  const engine = new NullEngine();
+  const scene = new Scene(engine);
+  try {
+    void scene.defaultMaterial;
+    const views = new EntityViews(scene, 'local');
+    const before = { meshes: scene.meshes.length, materials: scene.materials.length };
+    const e = {
+      id: 'warden',
+      kind: 'enemy' as const,
+      name: 'Siltbound Warden',
+      position: { x: 75, y: 0, z: 27 },
+      rotationY: 0,
+      refId: 'enemy.greenvale.siltbound_warden',
+      characterId: null,
+      dead: false,
+      attackCue: { endsAtMs: 2000, range: 2.5, groundPosition: { x: 72, y: 0, z: 29 } },
+    };
+    views.upsert(e);
+    views.update(0.1);
+    const mark = scene.getMeshByName('bite_warden')!;
+    expect(mark.position.x).toBe(72);
+    expect(mark.position.z).toBe(29);
+    expect(views.entityIdOfMesh(scene.getMeshByName('warden_stone_arm')!)).toBe('warden');
+    views.move(e.id, 73, 0, 26, 1);
+    views.update(0.1);
+    expect(mark.position.x).toBe(72);
+    expect(mark.position.z).toBe(29);
+    views.upsert({ ...e, attackCue: null });
+    expect(scene.getMeshByName('bite_warden')).toBeNull();
+    views.upsert(e);
+    views.reset('local');
+    expect(scene.meshes).toHaveLength(before.meshes);
+    expect(scene.materials).toHaveLength(before.materials);
+  } finally {
+    scene.dispose();
+    engine.dispose();
+  }
+});

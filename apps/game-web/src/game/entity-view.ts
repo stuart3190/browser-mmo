@@ -50,12 +50,17 @@ export class EntityViews {
     } else if (!previousCue) {
       const cue = MeshBuilder.CreateTorus(
         `bite_${entity.id}`,
-        { diameter: entity.attackCue.range * 2, thickness: 0.14, tessellation: 40 },
+        {
+          diameter: entity.attackCue.range * 2,
+          thickness: entity.attackCue.groundPosition ? 0.24 : 0.14,
+          tessellation: 40,
+        },
         this.scene,
       );
       const mat = new StandardMaterial(`bite_mat_${entity.id}`, this.scene);
-      mat.emissiveColor =
-        entity.refId === 'enemy.greenvale.hollow_lantern'
+      mat.emissiveColor = entity.attackCue.groundPosition
+        ? new Color3(0.2, 0.85, 1)
+        : entity.refId === 'enemy.greenvale.hollow_lantern'
           ? new Color3(0.75, 0.35, 1)
           : new Color3(1, 0.65, 0.1);
       mat.disableLighting = true;
@@ -131,7 +136,10 @@ export class EntityViews {
     }
     for (const [id, cue] of this.cues) {
       const v = this.views.get(id);
-      if (v) cue.position.set(v.target.x, 0.07, v.target.z);
+      if (v) {
+        const centre = v.entity.attackCue?.groundPosition;
+        cue.position.set(centre?.x ?? v.target.x, 0.07, centre?.z ?? v.target.z);
+      }
     }
     for (const v of this.views.values()) {
       const distance = Vector3.Distance(v.mesh.position, v.target);
@@ -242,11 +250,13 @@ export class EntityViews {
       const actor = new ActorModel(
         this.scene,
         e.id,
-        e.refId === 'enemy.greenvale.hollow_lantern'
-          ? 'lantern'
-          : e.kind === 'enemy'
-            ? 'wolf'
-            : 'hero',
+        e.refId === 'enemy.greenvale.siltbound_warden'
+          ? 'warden'
+          : e.refId === 'enemy.greenvale.hollow_lantern'
+            ? 'lantern'
+            : e.kind === 'enemy'
+              ? 'wolf'
+              : 'hero',
         e.kind === 'npc' ? '#94744c' : '#526b98',
       );
       if (e.refId === 'enemy.greenvale.brackenmaw') {

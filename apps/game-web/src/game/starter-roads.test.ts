@@ -11,3 +11,9 @@ it('keeps every signposted road centre traversable with the authoritative player
     ).toBe(false);
   }
 });
+
+it('keeps both sides of the new Stillwater approach clear of the ridge, not just its centre', () => {
+  const c = getGameData().collisionWorld('zone.greenvale.meadows');
+  for (const x of [42 - 1.4, 42, 42 + 1.4])
+    expect(c.sweepBlocked({ x, z: 0 }, { x, z: 38 }, PLAYER_COLLISION_RADIUS)).toBe(false);
+});

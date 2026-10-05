@@ -70,6 +70,41 @@ export class WorldView {
     square.position.y = 0.04;
     square.material = this.material('#b0a486');
     square.isPickable = false;
+    this.sign(43, 5, 'STILLWATER STEPS', 'North around the ridge · Tess’s camp');
+    this.sign(61, 41, 'TESS’S CAMP', 'Old records · a sleeping spring');
+    this.sign(79, 30, 'SILTBOUND SEAL', 'Leave the blue ground mark before the surge');
+    // Shallow decorative water and ruined steps do not add invisible collision.
+    const pool = MeshBuilder.CreateDisc(
+      'stillwater_pool',
+      { radius: 6, tessellation: 32 },
+      this.scene,
+    );
+    pool.rotation.x = Math.PI / 2;
+    pool.position.set(87, 0.035, 25);
+    pool.material = this.material('#488d95');
+    pool.isPickable = false;
+    pool.freezeWorldMatrix();
+    for (let i = 0; i < 8; i++) {
+      const step = MeshBuilder.CreateBox(
+        'stillwater_step',
+        { width: 3, height: 0.12, depth: 0.8 },
+        this.scene,
+      );
+      step.position.set(63 + i * 1.3, 0.06, 38 - i * 1.2);
+      step.rotation.y = -0.8;
+      step.material = this.material(i % 2 ? '#bac4b4' : '#829b92');
+      step.isPickable = false;
+      step.freezeWorldMatrix();
+    }
+    const seal = MeshBuilder.CreateTorus(
+      'stillwater_seal',
+      { diameter: 6, thickness: 0.2, tessellation: 16 },
+      this.scene,
+    );
+    seal.position.set(75, 0.06, 27);
+    seal.material = this.material('#9f987d');
+    seal.isPickable = false;
+    seal.freezeWorldMatrix();
     this.sign(4, 25, 'NORTHWOOD', 'Wolf dens · follow the road');
     this.sign(27, 4, 'EASTERN ROCKS', 'Beyond the stone ridge');
     this.sign(-12, -15, 'THE HOLLOW', 'South-west hunting trail');

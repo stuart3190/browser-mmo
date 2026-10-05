@@ -851,6 +851,10 @@ kbd {
   justify-content: space-between;
   gap: 8px;
 }
+.quest-objectives .count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 .quest-objectives li.done {
   color: var(--muted);
   text-decoration: line-through;

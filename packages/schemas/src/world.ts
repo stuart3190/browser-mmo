@@ -238,7 +238,15 @@ export const WorldEntitySchema = z.object({
   dead: z.boolean().optional(),
   hostile: z.boolean().optional(),
   /** Persistent attack cue; null clears it. Snapshots also carry active cues. */
-  attackCue: z.object({ endsAtMs: z.number(), range: z.number().positive() }).nullable().optional(),
+  attackCue: z
+    .object({
+      endsAtMs: z.number(),
+      range: z.number().positive(),
+      /** Frozen, server-authored centre for a ground strike; absent for existing enemy-centred attacks. */
+      groundPosition: Vec3Schema.optional(),
+    })
+    .nullable()
+    .optional(),
 });
 export type WorldEntity = z.infer<typeof WorldEntitySchema>;
 

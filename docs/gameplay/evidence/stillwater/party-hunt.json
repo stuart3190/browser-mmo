@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Both party members accepted Maren’s prerequisite-gated debrief/expedition",
+    "ok": true
+  },
+  {
+    "name": "Both clients personally read Tess’s records",
+    "ok": true
+  },
+  {
+    "name": "Both clients see the same distinct Warden",
+    "ok": true
+  },
+  {
+    "name": "Frozen ground warning is replicated to both clients",
+    "ok": true
+  },
+  {
+    "name": "Shared Warden kill advances both quests with one loot stack",
+    "ok": true,
+    "detail": [
+      {
+        "gold": 83,
+        "items": 1,
+        "mailed": 0
+      },
+      {
+        "gold": 0,
+        "items": 0,
+        "mailed": 0
+      }
+    ]
+  },
+  {
+    "name": "Authoritative ground surge damage occurred",
+    "ok": true
+  },
+  {
+    "name": "Kill objective survives reconnect",
+    "ok": true
+  }
+]

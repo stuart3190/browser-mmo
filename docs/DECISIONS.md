@@ -828,3 +828,28 @@ phase engine; bespoke party rewards; regenerating terrain. These add scope or re
 resistance system. Projectiles are cosmetic, not dodgeable after damage resolution. The additive
 content-hash migration preserves all prior checkpoint fields; ungrouped recovery creates the Lantern
 only when no saved enemy/pending respawn exists. No new protocol or persistence schema is required.
+
+## 2026-10-05 — Stillwater uses one durable ground-strike cue, not a new ability engine
+
+**Decision:** Continue Greenvale through Maren's existing dialogue/quest flow to Stillwater Steps.
+Extend the existing optional enemy wind-up with a validated `groundStrikeRadius` and optional
+`attackCue.groundPosition`. The authoritative simulation freezes the target's ground position at
+wind-up start and uses current player positions/LOS/armour at resolution. Reuse existing damage,
+health, death, party, kill outbox, inventory and quest transactions. Existing attacks are unchanged.
+
+**Reason:** A contrasting “move out and spread out” encounter creates a new playable decision for
+both melee and ranged characters without adding casts, resources, buffs or a general effect system.
+The warning must survive snapshots and checkpoint recovery and must be identical for spectators.
+
+**Alternatives considered:** Another wolf or recoloured ranged Lantern (little gameplay contrast);
+a general AoE/spell framework (too much scope); client-authoritative hazard hits (unacceptable);
+new zone/server or phased expedition (unnecessary for one small route).
+
+**Consequences:** Ground strikes require a wind-up. All living players in the marked radius and
+line of sight can be hit, including bystanders; moving outside dodges with no extra radius slack.
+Removing the target, leashing or killing the enemy cancels its committed strike. The new NPC and
+Warden are additive ungrouped spawns: an exact content-hash migration preserves the old checkpoint
+and recovery creates only missing new spawns. Original terrain, four quests and rewards stay intact.
+Talk and kill objectives remain independent under the existing quest engine; each player must talk
+and turn in personally, while eligible party kills share credit and rotate only one loot award.
+Physical-device performance and broad encounter balancing remain player-feedback follow-ups.

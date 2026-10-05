@@ -47,6 +47,27 @@ const gear = (g: GearInput): ItemTemplate => {
 
 export const itemTemplates: ItemTemplate[] = [
   gear({
+    id: 'accessory.ring.stillwater_seal',
+    name: 'Stillwater Seal',
+    description: 'Maren’s warden seal, entrusted to the traveller who quieted the eastern water.',
+    category: 'accessory',
+    rarityId: 'uncommon',
+    itemLevel: 5,
+    requiredLevel: 3,
+    binding: 'on_pickup',
+    equipment: {
+      slotType: 'ring',
+      equipmentTypeId: 'ring',
+      baseStats: {
+        armor: { min: 3, max: 3 },
+        stamina: { min: 4, max: 4 },
+        strength: { min: 3, max: 3 },
+        intellect: { min: 3, max: 3 },
+      },
+      maxDurability: null,
+    },
+  }),
+  gear({
     id: 'accessory.cloak.rootward_mantle',
     name: 'Rootward Mantle',
     description: "An old keeper's mantle, earned by silencing the light beneath the Hollow.",

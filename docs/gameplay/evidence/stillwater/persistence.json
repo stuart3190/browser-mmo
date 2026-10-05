@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-05",
+  "environment": "isolated development preview DB",
+  "progress": [
+    {
+      "username": "route_muuzc28m",
+      "level": 3,
+      "xp": "1032",
+      "status": "completed",
+      "progress": {
+        "speak_to_tess": 1,
+        "silence_warden": 1
+      }
+    },
+    {
+      "username": "guard_muu9vm2y",
+      "level": 3,
+      "xp": "866",
+      "status": "completed",
+      "progress": {
+        "speak_to_tess": 1,
+        "silence_warden": 1
+      }
+    },
+    {
+      "username": "spark_muu9vm2y",
+      "level": 3,
+      "xp": "745",
+      "status": "completed",
+      "progress": {
+        "speak_to_tess": 1,
+        "silence_warden": 1
+      }
+    }
+  ],
+  "rings": [
+    {
+      "username": "route_muuzc28m",
+      "id": "01a10b40-e230-71e9-bc8c-2a2506774871",
+      "template_id": "accessory.ring.stillwater_seal",
+      "location_kind": "equipped",
+      "equip_slot": "ring_1",
+      "stats": {
+        "armor": 3,
+        "stamina": 4,
+        "strength": 3,
+        "intellect": 3
+      },
+      "personally_bound": true
+    },
+    {
+      "username": "spark_muu9vm2y",
+      "id": "01a10b41-3a1e-7883-93c0-7106c785bef6",
+      "template_id": "accessory.ring.stillwater_seal",
+      "location_kind": "equipped",
+      "equip_slot": "ring_1",
+      "stats": {
+        "armor": 3,
+        "stamina": 4,
+        "strength": 3,
+        "intellect": 3
+      },
+      "personally_bound": true
+    },
+    {
+      "username": "guard_muu9vm2y",
+      "id": "01a10b44-60a6-7666-8d07-e81fb44c11bc",
+      "template_id": "accessory.ring.stillwater_seal",
+      "location_kind": "equipped",
+      "equip_slot": "ring_1",
+      "stats": {
+        "armor": 3,
+        "stamina": 4,
+        "strength": 3,
+        "intellect": 3
+      },
+      "personally_bound": true
+    }
+  ],
+  "kills": [
+    {
+      "kill_id": "01a10b3a-07a2-7cc6-b455-189896b9d9ec",
+      "recipients": 2,
+      "loot_stacks": 1,
+      "gold": 83,
+      "xp": [121, 121]
+    },
+    {
+      "kill_id": "01a10b43-9e7a-78db-af29-38806c26c9cd",
+      "recipients": 1,
+      "loot_stacks": 1,
+      "gold": 84,
+      "xp": [242]
+    }
+  ]
+}
