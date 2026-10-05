@@ -365,11 +365,11 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Enemy population (spawn groups)
   - Verified 2026-10-04 · Claude Opus 5.5 · Greenvale: 3 wolf dens + roamers, maxAlive limits, randomised respawn windows, min player distance, tick-driven (no timers); restart restores pending slots (world-population tests; 8 wolves in World E2E) · 6db82ba
 - [x] Bounded client chunk streaming for atlas regions
-  - Verified 2026-10-05 · Codex · WorldView regression: at most 25 chunks, distant ground removed, zone changes release meshes/materials/textures. Greenvale keeps its original 16 chunks. Commit: the world-foundation implementation commit.
+  - Verified 2026-10-05 · Codex · WorldView regression: at most 25 chunks, distant ground removed, zone changes release meshes/materials/textures. Greenvale keeps its original 16 chunks. Commit: `573a07b3f74454e7f2481a790d42ca9d4fbce3e5`.
 - [x] Greybox towns and reusable settlement inhabitants
-  - Verified 2026-10-05 · Codex · catalog tests: 24 named settlements/ports, 240 real NPC placements, stable role/service/stock references. Shops/lodging/training remain placeholders. Commit: the world-foundation implementation commit.
+  - Verified 2026-10-05 · Codex · catalog tests: 24 named settlements/ports, 240 real NPC placements, stable role/service/stock references. Shops/lodging/training remain placeholders. Commit: `573a07b3f74454e7f2481a790d42ca9d4fbce3e5`.
 - [x] Greybox regional wilderness habitats
-  - Verified 2026-10-05 · Codex · 24 regions, 72 actual creature placements from 10 families/72 variants; existing authoritative combat/rewards. Detailed terrain/density remain unfinished. Commit: the world-foundation implementation commit.
+  - Verified 2026-10-05 · Codex · 24 regions, 72 actual creature placements from 10 families/72 variants; existing authoritative combat/rewards. Detailed terrain/density remain unfinished. Commit: `573a07b3f74454e7f2481a790d42ca9d4fbce3e5`.
 - [ ] Caves
   - 24 fixed entrance POIs and cave/ruin/mine/crypt catalogs exist; dungeon entry/instances are not playable.
 - [ ] Dynamic events
@@ -1141,8 +1141,7 @@ completion message and `https://brokenodyssey.com/release.json`.
       and 844×390 atlas/travel/control bounds. **31 tour + 4 final navigation assertions**, both final
       scripts exit zero; **six read-only PostgreSQL reward/ownership assertions**. No grants/teleports.
 
-Verified 2026-10-05 · Codex · implementation commit: the commit containing
-`packages/game-data/src/content/packs/world-greybox.json` (resolve with `git log -1 --` that path).
+Verified 2026-10-05 · Codex · implementation commit: **573a07b3f74454e7f2481a790d42ca9d4fbce3e5**.
 Layout/names/bands/catalogs/travel/loading/extension rules: [world foundation](world/world-foundation.md).
 Evidence: `docs/world/evidence/`; repeatable playthrough: `scripts/e2e/world-foundation.cjs`,
 `scripts/e2e/world-guidance.cjs`. AGENTS.md / MASTER_PLAN.md unchanged.

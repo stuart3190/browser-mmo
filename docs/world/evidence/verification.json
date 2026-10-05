@@ -40,5 +40,6 @@
   "verificationNotes": [
     "First aggregate attempt stopped at a test-only JSON fixture typing error, before suites; schema-parsed fixture corrected and the complete final aggregate exited zero.",
     "Browser started with fresh characters and resumed earned state after harness timeout/selector/port-ferryman expectation corrections; no position/progression/reward/stat injection. Starter prefix records six passes and the corrected NPC-count failure; final tour and guidance scripts exited zero."
-  ]
+  ],
+  "implementationCommit": "573a07b3f74454e7f2481a790d42ca9d4fbce3e5"
 }
