@@ -405,6 +405,41 @@ for (const spawn of [
     });
 }
 
+// Shared geometry for the ruined pillars: visible footprint equals authoritative collision.
+export const keeperOutpostPillars = [
+  [24, 115, 1.3],
+  [24, 122, 1.7],
+  [38, 122, 1.2],
+  [38, 115, 1.8],
+] as const;
+chunks
+  .find((c) => c.coord.cx === 0 && c.coord.cz === 1)!
+  .colliders.push(
+    ...keeperOutpostPillars.map(([x, z]) => ({
+      shape: 'circle' as const,
+      x,
+      z,
+      radius: 0.5,
+      blocksSight: true,
+    })),
+  );
+
+// Additive keeper outpost: preserve all previously shipped terrain/spawns.
+chunks
+  .find((c) => c.coord.cx === 0 && c.coord.cz === 1)!
+  .spawnPoints.push({
+    id: 'spawn.greenvale.last_door_sentinel',
+    kind: 'enemy',
+    refId: 'enemy.greenvale.last_door_sentinel',
+    position: { x: 33, y: 0, z: 118 },
+    rotationY: Math.PI,
+    quantity: 1,
+    respawnMs: 60000,
+    interactRadius: 3,
+    groupId: null,
+    wanderRadius: 0,
+  });
+
 export const zones: WorldZone[] = [
   {
     id: ZONE_ID,
@@ -464,6 +499,11 @@ export const zones: WorldZone[] = [
       },
     ],
     landmarks: [
+      {
+        id: 'landmark.greenvale.keeper_outpost',
+        name: 'Keeper Outpost inscription',
+        position: { x: 24, y: 0, z: 110 },
+      },
       { id: 'landmark.greenvale.old_well', name: 'Old Well', position: { x: 8, y: 0, z: 12 } },
       {
         id: 'landmark.greenvale.spring_culvert',
@@ -536,6 +576,30 @@ export const npcs: NpcDefinition[] = [
 ];
 
 export const enemies: EnemyDefinition[] = [
+  {
+    id: 'enemy.greenvale.last_door_sentinel',
+    name: 'Aster, Last Door Sentinel',
+    level: 4,
+    maxHealth: 300,
+    family: 'construct',
+    lootTableId: 'loot.greenvale.last_door_sentinel',
+    xpReward: 220,
+    modelId: null,
+    isBoss: true,
+    isWorldBoss: false,
+    combat: {
+      damage: { min: 22, max: 28 },
+      attackSpeedMs: 2400,
+      windupMs: 2200,
+      cleaveArcDegrees: 100,
+      attackRange: 6,
+      aggroRange: 8,
+      leashRange: 16,
+      moveSpeed: 2.2,
+      armor: 8,
+      corpseMs: 6000,
+    },
+  },
   {
     id: 'enemy.greenvale.siltbound_warden',
     name: 'Siltbound Warden',
@@ -631,6 +695,46 @@ export const enemies: EnemyDefinition[] = [
 ];
 
 export const quests: QuestDefinitionInput[] = [
+  {
+    id: 'quest.greenvale.keeper_outpost',
+    name: 'The Names Behind the Door',
+    description:
+      'Follow the north road past the Spring Culvert, then take the eastward stone path to the ruined keeper outpost. Read its oath stone within four metres and quiet Aster, the Last Door Sentinel. His amber sweep freezes its direction: flank him, pass behind him, or leave the marked sector before it lands. Return to Maren. Each companion must accept and survey personally; eligible nearby party members share the kill.',
+    giverNpcId: 'npc.greenvale.elder_maren',
+    minLevel: 3,
+    prerequisites: ['quest.greenvale.well_records'],
+    objectives: [
+      {
+        id: 'read_oath',
+        kind: 'explore',
+        zoneId: ZONE_ID,
+        areaId: 'landmark.greenvale.keeper_outpost',
+        label: 'Read the keeper oath at the ruined outpost',
+      },
+      {
+        id: 'quiet_aster',
+        kind: 'kill',
+        enemyId: 'enemy.greenvale.last_door_sentinel',
+        count: 1,
+        label: 'Quiet Aster, Last Door Sentinel',
+      },
+    ],
+    rewards: {
+      xp: 700,
+      currency: [{ currencyId: 'gold', amount: 300 }],
+      items: [{ itemTemplateId: 'accessory.cloak.oathkeepers_mantle', quantity: 1 }],
+    },
+    dialogue: {
+      offer:
+        'The culvert marks lead east to a ruined watchpost. Its keepers swore an oath before their names vanished from our book. Read their stone without opening the seal. Aster still guards the courtyard, but his memory has turned every visitor into a trespasser. Quiet him. Watch his amber sweep: once he raises his blade, its direction is fixed. Step to his flank or behind him. Bring the oath back to me.',
+      inProgress:
+        'Beyond the culvert, follow the pale path east. Read the oath stone, quiet Aster, and return. Every companion must read the stone; you may face the sentinel together. His sweep cannot turn during its warning.',
+      readyToTurnIn:
+        '“We closed the door so the spring could dream, not so it could die.” Aster was a keeper, not a jailer. Our founders erased their names to spare their families the blame. And this last line: “When the dream calls back, seek the bell below the roots.” Take this mantle. We must learn whether that bell is a warning or an invitation before anyone touches the Last Door.',
+      completed:
+        'Aster’s watch is quiet, and the seal is unbroken. The keepers chose sleep over destruction. The bell below the roots is our next question; we will not open the door blindly.',
+    },
+  },
   {
     id: 'quest.greenvale.well_records',
     name: 'The Water Remembers',

@@ -876,3 +876,42 @@ compass bearings, not paths through obstacles. Collection guidance names possibl
 promised drops. Visits are personal, idempotent, alive/same-zone/range validated, bounded and
 committed before publication. Existing reward and party rules stay intact. No repeatables, dailies,
 escorts or abandonment are claimed. An exact additive hash migration preserves live checkpoints.
+
+## 2026-10-05 — Additive keeper outpost and frozen directional warning
+
+**Date:** 2026-10-05
+
+**Decision:** Continue the Last Door story with one existing explore/kill/return quest and an
+optional frozen sector on the existing durable enemy attack cue. Store its origin, heading and
+width when the wind-up starts; resolve against authoritative current player positions and LOS.
+Share pillar geometry between client dressing and authoritative colliders. Append an exact
+predecessor-hash checkpoint migration without replacing its live payload.
+
+**Reason:** A directional flank encounter contrasts with the Warden's ground circle while keeping
+working party eligibility, kill outbox, health, respawn and quest reward transactions intact.
+
+**Alternatives considered:** Reuse the circle unchanged; introduce a general boss/ability engine;
+let the cue track the target during wind-up; recreate terrain/checkpoints for the new outpost.
+
+**Consequences:** Existing attacks are unchanged; new optional fields preserve historical content.
+Survey and turn-in remain personal; existing eligible party kill sharing and one-owner loot remain.
+This is a single non-repeatable expedition, not a dungeon or a spell-effect framework.
+Verification evidence is recorded in PROGRESS and the keeper-outpost gameplay document.
+
+## 2026-10-05 — Inventory sorting is an authoritative-slot-preserving view
+
+**Date:** 2026-10-05
+
+**Decision:** Complete inventory sorting/filtering as presentation over server-provided items:
+name search, rarity filter and slot/name/rarity/item-level order. Use unique instance IDs for
+selection/actions and always display real container occupancy; Reset restores the slot grid.
+
+**Reason:** Players can find and compare their earned rewards now without adding a bag mutation
+endpoint, extra transactions, slot races or another item model.
+
+**Alternatives considered:** Rewrite bag slots on the server for automatic packing; leave the
+existing unused filter helper disconnected; add favourites/junk/vendor flows in the same batch.
+
+**Consequences:** Sorting does not reorganise persisted slots or free capacity. Filters apply only
+to the chosen backpack/materials/recovered tab. Existing vault grids and item action authority
+remain unchanged. Mutation/favourites/junk systems are deliberately outside this milestone.

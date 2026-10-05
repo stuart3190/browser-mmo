@@ -1,0 +1,224 @@
+[
+  {
+    "name": "Actual touch joystick moves with outpost guidance visible",
+    "ok": true
+  },
+  {
+    "name": "Solo authoritative sentinel kill and normal loot",
+    "ok": true,
+    "detail": {
+      "killId": "01a10ba4-16a6-76f4-9a60-e053f7ae5ee5",
+      "enemyName": "Aster, Last Door Sentinel",
+      "items": [
+        {
+          "instance": {
+            "id": "01a10b2e-8e5c-766b-953e-2a24bc8b2d87",
+            "templateId": "material.ore.copper_ore",
+            "rarityId": "common",
+            "quantity": 11,
+            "ownership": {
+              "ownerAccountId": "01a10b26-5246-7707-8773-c35e9b934d26",
+              "ownerCharacterId": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+              "originalOwnerAccountId": "01a10b26-5246-7707-8773-c35e9b934d26",
+              "originalOwnerCharacterId": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+              "crafterCharacterId": null
+            },
+            "location": {
+              "kind": "container",
+              "containerId": "01a10b26-534d-7b81-8e9a-680c91e78d8f",
+              "containerKind": "material_pouch",
+              "slot": 1
+            },
+            "acquisition": {
+              "method": "loot_drop",
+              "sourceRef": "kill:01a10b2e-8dc8-7572-ba03-0c61cc6f0820:01a10b26-5349-7759-8ef0-81113bcfe7b2:0"
+            },
+            "binding": {
+              "kind": "unbound"
+            },
+            "stats": {},
+            "modifiers": [],
+            "sockets": [],
+            "enchantments": [],
+            "durability": null,
+            "appearance": null,
+            "flags": {
+              "locked": false,
+              "favourite": false,
+              "junk": false
+            },
+            "external": {
+              "externalOwnershipEnabled": false,
+              "externalAssetId": null,
+              "externalNetwork": null
+            },
+            "version": 2,
+            "createdAt": "2026-10-05T08:29:22.885Z",
+            "updatedAt": "2026-10-05T10:37:45.603Z"
+          },
+          "template": {
+            "id": "material.ore.copper_ore",
+            "name": "Copper Ore",
+            "description": "Raw ore used in blacksmithing.",
+            "category": "material",
+            "rarityId": "common",
+            "itemLevel": 1,
+            "requiredLevel": 1,
+            "allowedClassIds": [],
+            "binding": "none",
+            "maxStack": 200,
+            "tradeable": true,
+            "marketplaceAllowed": true,
+            "vaultAllowed": true,
+            "accountVaultAllowed": true,
+            "vendorValue": 5,
+            "iconId": "icons/items/material.ore.copper_ore",
+            "modelId": "models/props/ore_chunk",
+            "equipment": null,
+            "consumable": null,
+            "questId": null,
+            "goesToMaterialPouch": true,
+            "tags": ["ore"]
+          }
+        }
+      ],
+      "gold": 108,
+      "mailedItems": [],
+      "recovered": false
+    }
+  },
+  {
+    "name": "Solo persistent 700 XP / 300 copper / one mantle",
+    "ok": true,
+    "detail": {
+      "questId": "quest.greenvale.keeper_outpost",
+      "name": "The Names Behind the Door",
+      "xpGained": 700,
+      "gold": 300,
+      "items": [
+        {
+          "instance": {
+            "id": "01a10ba4-bdde-7e56-8dfc-81d34af8563f",
+            "templateId": "accessory.cloak.oathkeepers_mantle",
+            "rarityId": "rare",
+            "quantity": 1,
+            "ownership": {
+              "ownerAccountId": "01a10b26-5246-7707-8773-c35e9b934d26",
+              "ownerCharacterId": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+              "originalOwnerAccountId": "01a10b26-5246-7707-8773-c35e9b934d26",
+              "originalOwnerCharacterId": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+              "crafterCharacterId": null
+            },
+            "location": {
+              "kind": "container",
+              "containerId": "01a10b26-534d-789c-8b67-ef7f74565a53",
+              "containerKind": "backpack",
+              "slot": 11
+            },
+            "acquisition": {
+              "method": "quest_reward",
+              "sourceRef": "quest:quest.greenvale.keeper_outpost:01a10b26-5349-7759-8ef0-81113bcfe7b2:0"
+            },
+            "binding": {
+              "kind": "character",
+              "characterId": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+              "boundAt": "2026-10-05T10:38:28.309Z"
+            },
+            "stats": {
+              "armor": 8,
+              "stamina": 8,
+              "strength": 4,
+              "intellect": 4
+            },
+            "modifiers": [
+              {
+                "stat": "agility",
+                "value": 1,
+                "modifierId": "mod.of_the_tiger"
+              }
+            ],
+            "sockets": [
+              {
+                "color": "red",
+                "gemItemInstanceId": null
+              }
+            ],
+            "enchantments": [],
+            "durability": null,
+            "appearance": null,
+            "flags": {
+              "locked": false,
+              "favourite": false,
+              "junk": false
+            },
+            "external": {
+              "externalOwnershipEnabled": false,
+              "externalAssetId": null,
+              "externalNetwork": null
+            },
+            "version": 0,
+            "createdAt": "2026-10-05T10:38:28.309Z",
+            "updatedAt": "2026-10-05T10:38:28.309Z"
+          },
+          "template": {
+            "id": "accessory.cloak.oathkeepers_mantle",
+            "name": "Oathkeeper’s Mantle",
+            "description": "The restored mantle of the Last Door keepers. Their oath was to preserve the dream.",
+            "category": "accessory",
+            "rarityId": "rare",
+            "itemLevel": 7,
+            "requiredLevel": 3,
+            "allowedClassIds": [],
+            "binding": "on_pickup",
+            "maxStack": 1,
+            "tradeable": false,
+            "marketplaceAllowed": false,
+            "vaultAllowed": true,
+            "accountVaultAllowed": false,
+            "vendorValue": 100,
+            "iconId": "icons/items/accessory.cloak.oathkeepers_mantle",
+            "modelId": "models/items/accessory.cloak.oathkeepers_mantle",
+            "equipment": {
+              "slotType": "cloak",
+              "equipmentTypeId": "cloak",
+              "baseStats": {
+                "stamina": {
+                  "min": 6,
+                  "max": 6
+                },
+                "armor": {
+                  "min": 6,
+                  "max": 6
+                },
+                "strength": {
+                  "min": 3,
+                  "max": 3
+                },
+                "intellect": {
+                  "min": 3,
+                  "max": 3
+                }
+              },
+              "maxDurability": null,
+              "weapon": null
+            },
+            "consumable": null,
+            "questId": null,
+            "goesToMaterialPouch": false,
+            "tags": []
+          }
+        }
+      ],
+      "mailedItems": []
+    }
+  },
+  {
+    "name": "Solo completed quest and equipped unique cloak survive reload",
+    "ok": true
+  },
+  {
+    "name": "No browser exceptions",
+    "ok": true,
+    "detail": []
+  }
+]

@@ -47,6 +47,28 @@ const gear = (g: GearInput): ItemTemplate => {
 
 export const itemTemplates: ItemTemplate[] = [
   gear({
+    id: 'accessory.cloak.oathkeepers_mantle',
+    name: 'Oathkeeper’s Mantle',
+    description:
+      'The restored mantle of the Last Door keepers. Their oath was to preserve the dream.',
+    category: 'accessory',
+    rarityId: 'rare',
+    itemLevel: 7,
+    requiredLevel: 3,
+    binding: 'on_pickup',
+    equipment: {
+      slotType: 'cloak',
+      equipmentTypeId: 'cloak',
+      maxDurability: null,
+      baseStats: {
+        stamina: { min: 6, max: 6 },
+        armor: { min: 6, max: 6 },
+        strength: { min: 3, max: 3 },
+        intellect: { min: 3, max: 3 },
+      },
+    },
+  }),
+  gear({
     id: 'accessory.necklace.springward_pendant',
     name: 'Springward Pendant',
     description:

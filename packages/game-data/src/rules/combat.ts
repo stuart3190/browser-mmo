@@ -168,3 +168,20 @@ export function rollLootTable(table: LootTable, rng: Rng): LootRoll {
     : null;
   return { items, currency: currency && currency.amount > 0 ? currency : null };
 }
+
+/** Server-authoritative planar sector, inclusive edge. Heading 0 faces +Z. */
+export function inAttackSector(
+  point: { x: number; z: number },
+  origin: { x: number; z: number },
+  heading: number,
+  arc: number,
+  range: number,
+): boolean {
+  const dx = point.x - origin.x,
+    dz = point.z - origin.z;
+  const distance = Math.hypot(dx, dz);
+  if (distance > range) return false;
+  if (distance === 0) return true;
+  const delta = Math.atan2(dx, dz) - heading;
+  return Math.abs(Math.atan2(Math.sin(delta), Math.cos(delta))) <= arc / 2 + 1e-9;
+}

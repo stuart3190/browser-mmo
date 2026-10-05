@@ -99,6 +99,13 @@
       "when": 1791145385612,
       "tag": "0013_culvert_safe_approach",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791145385613,
+      "tag": "0014_keeper_outpost_content",
+      "breakpoints": true
     }
   ]
 }

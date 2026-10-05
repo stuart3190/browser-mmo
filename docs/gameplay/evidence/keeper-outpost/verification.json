@@ -1,0 +1,39 @@
+{
+  "verifiedDate": "2026-10-05",
+  "agent": "Codex",
+  "fullRepositoryPass": {
+    "command": "NODE_ENV=production TEST_DATABASE_URL=<disposable database> pnpm verify",
+    "exitCode": 0,
+    "unitTests": 159,
+    "postgresTests": 131,
+    "postgresBreakdown": {
+      "api": 8,
+      "domain": 65,
+      "realtime": 58
+    },
+    "productionBuilds": 4,
+    "formatLintTypecheck": "passed",
+    "productionDebugGuard": "passed"
+  },
+  "clientFacingReviewFollowup": {
+    "change": "Existing actor targetRot follows authoritative full entity rotationY; frozen sector stays independent.",
+    "formatLintTypes": "passed",
+    "clientTests": 8,
+    "productionBuild": "passed",
+    "productionDebugGuard": "passed",
+    "note": "Affected client checks repeated after full pass; server/schema/content unchanged."
+  },
+  "browserAssertions": {
+    "twoClientStaged": 17,
+    "soloTouchExitZero": 5,
+    "inventoryExitZero": 10,
+    "hudExitZero": 3
+  },
+  "populatedMigration": {
+    "migration": "0014_keeper_outpost_content",
+    "allCheckpointFieldsExceptContentHashUnchanged": true,
+    "templatesSynced": 20,
+    "previousHash": "cb487f9ce444543a86798f540285a5bdbf9f3a6e81f64869152483bf33d9362c",
+    "newHash": "fce8c1bf74e3e8e9fd3019432542026bb82f6a65060914ce468e9d255876ace1"
+  }
+}

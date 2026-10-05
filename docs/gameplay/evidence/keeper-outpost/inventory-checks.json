@@ -1,0 +1,78 @@
+[
+  {
+    "name": "Completed survey/kill and equipped reward persisted",
+    "ok": true
+  },
+  {
+    "name": "Touch reset works after closing the selected-item sheet",
+    "ok": true
+  },
+  {
+    "name": "Search inventory reachable at 390×844",
+    "ok": true,
+    "detail": {
+      "x": 11,
+      "y": 510,
+      "width": 117.328125,
+      "height": 44
+    }
+  },
+  {
+    "name": "Filter rarity reachable at 390×844",
+    "ok": true,
+    "detail": {
+      "x": 136.328125,
+      "y": 510,
+      "width": 117.34375,
+      "height": 44
+    }
+  },
+  {
+    "name": "Sort inventory reachable at 390×844",
+    "ok": true,
+    "detail": {
+      "x": 261.671875,
+      "y": 510,
+      "width": 117.328125,
+      "height": 44
+    }
+  },
+  {
+    "name": "Sorting/filtering also works for the material pouch",
+    "ok": true
+  },
+  {
+    "name": "Search inventory reachable at 844×390",
+    "ok": true,
+    "detail": {
+      "x": 11,
+      "y": 149,
+      "width": 228.453125,
+      "height": 44
+    }
+  },
+  {
+    "name": "Filter rarity reachable at 844×390",
+    "ok": true,
+    "detail": {
+      "x": 247.453125,
+      "y": 149,
+      "width": 228.46875,
+      "height": 44
+    }
+  },
+  {
+    "name": "Sort inventory reachable at 844×390",
+    "ok": true,
+    "detail": {
+      "x": 483.921875,
+      "y": 149,
+      "width": 228.453125,
+      "height": 44
+    }
+  },
+  {
+    "name": "Sorting/filtering also works for the material pouch",
+    "ok": true
+  }
+]

@@ -17,6 +17,7 @@ import {
   distance2D,
   isAttackReady,
   isInRange,
+  inAttackSector,
   isInsideZone,
   nextSwingAt,
   regenAmount,
@@ -1441,6 +1442,15 @@ export class ZoneSimulation {
             range:
               enemy.def.combat.groundStrikeRadius ??
               enemy.def.combat.attackRange + this.rules.rangeTolerance,
+            ...(enemy.def.combat.cleaveArcDegrees
+              ? {
+                  groundPosition: { ...entity.position },
+                  cleave: {
+                    heading: entity.rotationY,
+                    arc: (enemy.def.combat.cleaveArcDegrees * Math.PI) / 180,
+                  },
+                }
+              : {}),
             ...(enemy.def.combat.groundStrikeRadius && enemy.targetCharacterId
               ? { groundPosition: { ...this.players.get(enemy.targetCharacterId)!.position } }
               : {}),
@@ -1668,7 +1678,15 @@ export class ZoneSimulation {
         ? [...this.players.values()].filter(
             (p) =>
               !p.dead &&
-              distance2D(p.position, cue.groundPosition!) <= cue.range &&
+              (cue.cleave
+                ? inAttackSector(
+                    p.position,
+                    cue.groundPosition!,
+                    cue.cleave.heading,
+                    cue.cleave.arc,
+                    cue.range,
+                  )
+                : distance2D(p.position, cue.groundPosition!) <= cue.range) &&
               this.hasLineOfSight(entity.position, p.position),
           )
         : [target];

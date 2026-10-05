@@ -1575,3 +1575,41 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     min-height: 44px;
   }
 }
+
+.inventory-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+.inventory-tools label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  flex: 1 1 110px;
+  min-width: 0;
+}
+.inventory-tools input,
+.inventory-tools select {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 8px;
+  font: inherit;
+}
+.inventory-tools button {
+  align-self: flex-end;
+  min-height: 44px;
+}
+
+/* Keep desktop target health/wind-up readable below the active-quest compass. */
+@media (pointer: fine) and (min-width: 721px) {
+  .target-frame {
+    top: 76px;
+  }
+}

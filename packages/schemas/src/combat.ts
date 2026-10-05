@@ -17,6 +17,8 @@ export const EnemyCombatSchema = z
     windupMs: z.number().int().min(500).max(5000).optional(),
     /** Optional ground strike: wind-up freezes the target position, then hits players in this radius. */
     groundStrikeRadius: z.number().positive().max(10).optional(),
+    /** Fixed enemy-centred sector; heading freezes when the warning starts. */
+    cleaveArcDegrees: z.number().positive().max(180).optional(),
     damage: DamageRangeSchema,
     attackSpeedMs: z.number().int().positive(),
     /** Metres between centres at which the enemy can hit. */
@@ -30,7 +32,11 @@ export const EnemyCombatSchema = z
     /** How long the corpse stays visible before the spawn point's respawn timer takes over. */
     corpseMs: z.number().int().nonnegative(),
   })
-  .refine((c) => !c.groundStrikeRadius || !!c.windupMs, 'Ground strikes require a wind-up');
+  .refine((c) => !c.groundStrikeRadius || !!c.windupMs, 'Ground strikes require a wind-up')
+  .refine(
+    (c) => !c.cleaveArcDegrees || (!!c.windupMs && !c.groundStrikeRadius),
+    'Cleave requires a wind-up and cannot combine with a ground strike',
+  );
 export type EnemyCombat = z.infer<typeof EnemyCombatSchema>;
 
 /** Global combat tunables (one object in game data). */

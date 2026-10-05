@@ -61,3 +61,5 @@ export function getGameData(): GameData {
 }
 
 export const DEMO_ZONE_ID = 'zone.greenvale.meadows';
+
+export { keeperOutpostPillars } from './content/world';

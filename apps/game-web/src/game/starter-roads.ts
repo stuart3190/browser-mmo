@@ -1,5 +1,7 @@
 /** Visual paths and minimap routes over Greenvale's existing authoritative terrain. */
 export const starterRoads: readonly (readonly [number, number, number, number, number])[] = [
+  [8, 110, 24, 110, 2.4],
+  [24, 110, 33, 118, 2.4],
   [0, 12, 8, 12, 2.4],
   [0, 110, 8, 110, 2.4],
   [42, 0, 42, 38, 2.8],

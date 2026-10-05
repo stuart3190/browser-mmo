@@ -5,6 +5,7 @@ import { DORMANT_EXTERNAL_OWNERSHIP } from '@mmo/schemas';
 import { uuidv7 } from '@mmo/shared';
 import {
   ItemStore,
+  inventoryView,
   chooseEquipSlot,
   compareItemStats,
   itemRequirements,
@@ -148,4 +149,22 @@ describe('equip targeting and comparison', () => {
     expect(itemTypeLine(gd, item('weapon.staff.oak_staff'))).toBe('Two-Hand Staff');
     expect(itemTypeLine(gd, item('accessory.ring.copper_band'))).toBe('Ring');
   });
+});
+
+it('filters and sorts by authored rarity/name/level without mutating authoritative slots or IDs', () => {
+  const a = item('weapon.sword.iron_longsword', {
+    location: { kind: 'container', containerId: CONTAINER, containerKind: 'backpack', slot: 4 },
+  });
+  const b = item('accessory.cloak.oathkeepers_mantle', {
+    location: { kind: 'container', containerId: CONTAINER, containerKind: 'backpack', slot: 1 },
+  });
+  const input = [a, b],
+    before = structuredClone(input);
+  expect(inventoryView(gd, input, { sort: 'slots' })).toEqual([b, a]);
+  expect(inventoryView(gd, input, { sort: 'name' })).toEqual([a, b]);
+  expect(inventoryView(gd, input, { sort: 'rarity' })[0]).toBe(b);
+  expect(inventoryView(gd, input, { sort: 'level' })[0]).toBe(b);
+  expect(inventoryView(gd, input, { search: '  oAtH  ', rarityIds: ['rare'] })).toEqual([b]);
+  expect(inventoryView(gd, input, { search: 'nothing' })).toEqual([]);
+  expect(input).toEqual(before);
 });

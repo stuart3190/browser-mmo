@@ -114,3 +114,48 @@ it('keeps the Warden ground mark fixed while the enemy moves, then clears and di
     engine.dispose();
   }
 });
+
+it('renders the frozen amber sector independently of enemy movement and cleans it up', () => {
+  const engine = new NullEngine();
+  const scene = new Scene(engine);
+  try {
+    void scene.defaultMaterial;
+    const views = new EntityViews(scene, 'local');
+    const baseline = scene.meshes.length;
+    const e = {
+      id: 'sentinel',
+      kind: 'enemy' as const,
+      name: 'Aster',
+      position: { x: 33, y: 0, z: 118 },
+      rotationY: Math.PI,
+      refId: 'enemy.greenvale.last_door_sentinel',
+      characterId: null,
+      dead: false,
+      attackCue: {
+        endsAtMs: 3000,
+        range: 6,
+        groundPosition: { x: 33, y: 0, z: 118 },
+        cleave: { heading: Math.PI, arc: Math.PI / 2 },
+      },
+    };
+    views.upsert(e);
+    views.upsert({ ...e, rotationY: 0 });
+    views.update(0.1);
+    expect(scene.getMeshByName('sentinel')!.rotation.y).toBeCloseTo(0);
+    views.move(e.id, 40, 0, 120, 0);
+    views.update(0.1);
+    const sector = scene.getMeshByName('bite_sentinel')!;
+    expect(sector.position.x).toBe(33);
+    expect(sector.position.z).toBe(118);
+    expect(sector.rotation.y).toBe(Math.PI);
+    expect(sector.getTotalVertices()).toBeGreaterThan(0);
+    expect(sector.isPickable).toBe(false);
+    views.upsert({ ...e, attackCue: null });
+    expect(scene.getMeshByName('bite_sentinel')).toBeNull();
+    views.remove(e.id);
+    expect(scene.meshes.length).toBe(baseline);
+  } finally {
+    scene.dispose();
+    engine.dispose();
+  }
+});

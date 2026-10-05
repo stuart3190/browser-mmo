@@ -48,21 +48,44 @@ export class EntityViews {
       previousCue?.dispose();
       this.cues.delete(entity.id);
     } else if (!previousCue) {
-      const cue = MeshBuilder.CreateTorus(
-        `bite_${entity.id}`,
-        {
-          diameter: entity.attackCue.range * 2,
-          thickness: entity.attackCue.groundPosition ? 0.24 : 0.14,
-          tessellation: 40,
-        },
-        this.scene,
-      );
+      const sector = entity.attackCue.cleave;
+      const cue = sector
+        ? MeshBuilder.CreateRibbon(
+            `bite_${entity.id}`,
+            {
+              pathArray: [
+                Array.from({ length: 25 }, () => Vector3.Zero()),
+                Array.from({ length: 25 }, (_, i) => {
+                  const a = -sector.arc / 2 + (sector.arc * i) / 24;
+                  return new Vector3(
+                    Math.sin(a) * entity.attackCue!.range,
+                    0,
+                    Math.cos(a) * entity.attackCue!.range,
+                  );
+                }),
+              ],
+              sideOrientation: 2,
+            },
+            this.scene,
+          )
+        : MeshBuilder.CreateTorus(
+            `bite_${entity.id}`,
+            {
+              diameter: entity.attackCue.range * 2,
+              thickness: entity.attackCue.groundPosition ? 0.24 : 0.14,
+              tessellation: 40,
+            },
+            this.scene,
+          );
       const mat = new StandardMaterial(`bite_mat_${entity.id}`, this.scene);
-      mat.emissiveColor = entity.attackCue.groundPosition
-        ? new Color3(0.2, 0.85, 1)
-        : entity.refId === 'enemy.greenvale.hollow_lantern'
-          ? new Color3(0.75, 0.35, 1)
-          : new Color3(1, 0.65, 0.1);
+      if (sector) mat.alpha = 0.55;
+      mat.emissiveColor = sector
+        ? new Color3(1, 0.65, 0.1)
+        : entity.attackCue.groundPosition
+          ? new Color3(0.2, 0.85, 1)
+          : entity.refId === 'enemy.greenvale.hollow_lantern'
+            ? new Color3(0.75, 0.35, 1)
+            : new Color3(1, 0.65, 0.1);
       mat.disableLighting = true;
       cue.material = mat;
       cue.isPickable = false;
@@ -73,6 +96,7 @@ export class EntityViews {
       if (existing.entity.dead !== entity.dead) this.setDead(entity.id, entity.dead ?? false);
       existing.entity = entity;
       existing.target.set(entity.position.x, existing.target.y, entity.position.z);
+      existing.targetRot = entity.rotationY;
       return;
     }
     const mesh = this.createMesh(entity);
@@ -139,6 +163,7 @@ export class EntityViews {
       if (v) {
         const centre = v.entity.attackCue?.groundPosition;
         cue.position.set(centre?.x ?? v.target.x, 0.07, centre?.z ?? v.target.z);
+        cue.rotation.y = v.entity.attackCue?.cleave?.heading ?? 0;
       }
     }
     for (const v of this.views.values()) {
@@ -250,15 +275,21 @@ export class EntityViews {
       const actor = new ActorModel(
         this.scene,
         e.id,
-        e.refId === 'enemy.greenvale.siltbound_warden'
-          ? 'warden'
-          : e.refId === 'enemy.greenvale.hollow_lantern'
-            ? 'lantern'
-            : e.kind === 'enemy'
-              ? 'wolf'
-              : 'hero',
+        e.refId === 'enemy.greenvale.last_door_sentinel'
+          ? 'hero'
+          : e.refId === 'enemy.greenvale.siltbound_warden'
+            ? 'warden'
+            : e.refId === 'enemy.greenvale.hollow_lantern'
+              ? 'lantern'
+              : e.kind === 'enemy'
+                ? 'wolf'
+                : 'hero',
         e.kind === 'npc' ? '#94744c' : '#526b98',
       );
+      if (e.refId === 'enemy.greenvale.last_door_sentinel') {
+        actor.mesh.scaling.setAll(1.35);
+        (actor.mesh.material as StandardMaterial).diffuseColor = Color3.FromHexString('#a38d56');
+      }
       if (e.refId === 'enemy.greenvale.brackenmaw') {
         actor.mesh.scaling.setAll(1.45);
         const mat = actor.mesh.material as StandardMaterial;

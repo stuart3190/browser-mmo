@@ -1,0 +1,106 @@
+{
+  "verifiedAt": "2026-10-05T10:41:50.551Z",
+  "characters": [
+    {
+      "username": "guard_muu9vm2y",
+      "level": 3,
+      "xp": "2137",
+      "quest": [
+        {
+          "quest_id": "quest.greenvale.keeper_outpost",
+          "status": "completed",
+          "progress": {
+            "read_oath": 1,
+            "quiet_aster": 1
+          },
+          "rewarded_at": "2026-10-05T10:32:55.280Z"
+        }
+      ],
+      "items": [
+        {
+          "id": "01a10b9f-a8e5-7437-91d4-96db9b3f92bb",
+          "template_id": "accessory.cloak.oathkeepers_mantle",
+          "location_kind": "equipped",
+          "equip_slot": "cloak",
+          "bound_character_id": "01a10899-d8ca-7906-bf3a-b72e9bc2f571",
+          "source_ref": "quest:quest.greenvale.keeper_outpost:01a10899-d8ca-7906-bf3a-b72e9bc2f571:0"
+        }
+      ]
+    },
+    {
+      "username": "route_muuzc28m",
+      "level": 4,
+      "xp": "104",
+      "quest": [
+        {
+          "quest_id": "quest.greenvale.keeper_outpost",
+          "status": "completed",
+          "progress": {
+            "read_oath": 1,
+            "quiet_aster": 1
+          },
+          "rewarded_at": "2026-10-05T10:38:28.353Z"
+        }
+      ],
+      "items": [
+        {
+          "id": "01a10ba4-bdde-7e56-8dfc-81d34af8563f",
+          "template_id": "accessory.cloak.oathkeepers_mantle",
+          "location_kind": "equipped",
+          "equip_slot": "cloak",
+          "bound_character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+          "source_ref": "quest:quest.greenvale.keeper_outpost:01a10b26-5349-7759-8ef0-81113bcfe7b2:0"
+        }
+      ]
+    },
+    {
+      "username": "spark_muu9vm2y",
+      "level": 3,
+      "xp": "2016",
+      "quest": [
+        {
+          "quest_id": "quest.greenvale.keeper_outpost",
+          "status": "completed",
+          "progress": {
+            "read_oath": 1,
+            "quiet_aster": 1
+          },
+          "rewarded_at": "2026-10-05T10:33:33.467Z"
+        }
+      ],
+      "items": [
+        {
+          "id": "01a10ba0-3e12-7e40-b765-573cbf447fcd",
+          "template_id": "accessory.cloak.oathkeepers_mantle",
+          "location_kind": "equipped",
+          "equip_slot": "cloak",
+          "bound_character_id": "01a10899-eab3-7fb6-b78a-8a2e13f69e98",
+          "source_ref": "quest:quest.greenvale.keeper_outpost:01a10899-eab3-7fb6-b78a-8a2e13f69e98:0"
+        }
+      ]
+    }
+  ],
+  "kills": [
+    {
+      "kill_id": "01a10b9b-d84d-7b4c-980f-8b4e075b6a2c",
+      "enemy_id": "enemy.greenvale.last_door_sentinel",
+      "character_id": "01a10899-d8ca-7906-bf3a-b72e9bc2f571",
+      "xp": 121,
+      "item_count": 1
+    },
+    {
+      "kill_id": "01a10b9b-d84d-7b4c-980f-8b4e075b6a2c",
+      "enemy_id": "enemy.greenvale.last_door_sentinel",
+      "character_id": "01a10899-eab3-7fb6-b78a-8a2e13f69e98",
+      "xp": 121,
+      "item_count": 0
+    },
+    {
+      "kill_id": "01a10ba4-16a6-76f4-9a60-e053f7ae5ee5",
+      "enemy_id": "enemy.greenvale.last_door_sentinel",
+      "character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "xp": 242,
+      "item_count": 1
+    }
+  ]
+}

@@ -2,6 +2,21 @@ import type { LootTable } from '@mmo/schemas';
 
 export const lootTables: LootTable[] = [
   {
+    id: 'loot.greenvale.last_door_sentinel',
+    rolls: 1,
+    emptyChance: 0,
+    entries: [
+      {
+        itemTemplateId: 'material.ore.copper_ore',
+        weight: 1,
+        minQuantity: 4,
+        maxQuantity: 4,
+        rarityId: null,
+      },
+    ],
+    currency: { currencyId: 'gold', min: 85, max: 110 },
+  },
+  {
     id: 'loot.greenvale.siltbound_warden',
     rolls: 1,
     emptyChance: 0,

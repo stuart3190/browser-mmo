@@ -244,6 +244,10 @@ export const WorldEntitySchema = z.object({
       range: z.number().positive(),
       /** Frozen, server-authored centre for a ground strike; absent for existing enemy-centred attacks. */
       groundPosition: Vec3Schema.optional(),
+      /** Frozen heading and angular width; groundPosition is the sector origin. */
+      cleave: z
+        .object({ heading: z.number().finite(), arc: z.number().positive().max(Math.PI) })
+        .optional(),
     })
     .nullable()
     .optional(),

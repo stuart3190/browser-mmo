@@ -3,6 +3,28 @@ import { getGameData, questAvailability } from './index';
 it('adds the exact Root-Wound content without changing existing terrain or rewards', async () => {
   const gd = getGameData();
   const old = structuredClone(gd.raw);
+
+  for (const c of old.chunks)
+    c.colliders = c.colliders.filter(
+      (p) =>
+        ![
+          [24, 115],
+          [24, 122],
+          [38, 122],
+          [38, 115],
+        ].some(([x, z]) => p.x === x && p.z === z),
+    );
+
+  old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.keeper_outpost');
+  old.enemies = old.enemies.filter((e) => e.id !== 'enemy.greenvale.last_door_sentinel');
+  old.lootTables = old.lootTables.filter((l) => l.id !== 'loot.greenvale.last_door_sentinel');
+  old.itemTemplates = old.itemTemplates.filter(
+    (i) => i.id !== 'accessory.cloak.oathkeepers_mantle',
+  );
+  for (const z of old.zones)
+    z.landmarks = z.landmarks.filter((l) => l.id !== 'landmark.greenvale.keeper_outpost');
+  for (const c of old.chunks)
+    c.spawnPoints = c.spawnPoints.filter((s) => s.id !== 'spawn.greenvale.last_door_sentinel');
   old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.well_records');
   old.itemTemplates = old.itemTemplates.filter(
     (i) => i.id !== 'accessory.necklace.springward_pendant',

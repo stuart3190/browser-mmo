@@ -11,7 +11,8 @@ it('additive Waystone recovery preserves old entities and live player state and 
       q.id !== 'quest.greenvale.hollow_trail' &&
       q.id !== 'quest.greenvale.root_wound' &&
       q.id !== 'quest.greenvale.stillwater' &&
-      q.id !== 'quest.greenvale.well_records',
+      q.id !== 'quest.greenvale.well_records' &&
+      q.id !== 'quest.greenvale.keeper_outpost',
   );
   raw.npcs = raw.npcs.filter((n) => n.id !== 'npc.greenvale.keeper_rill');
   for (const c of raw.chunks)

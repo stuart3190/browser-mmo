@@ -5,7 +5,7 @@ import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTexture';
 import type { Scene } from '@babylonjs/core/scene';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { propShapes } from '@mmo/game-data';
+import { propShapes, keeperOutpostPillars } from '@mmo/game-data';
 import type { GameData, PropKind } from '@mmo/game-data';
 import type { WorldChunk } from '@mmo/schemas';
 import { starterRoads } from './starter-roads';
@@ -70,6 +70,47 @@ export class WorldView {
     square.position.y = 0.04;
     square.material = this.material('#b0a486');
     square.isPickable = false;
+    this.sign(
+      24,
+      110,
+      'KEEPERS OF THE LAST DOOR',
+      '“We closed the door so the spring could dream.”',
+    );
+    const court = MeshBuilder.CreateGround(
+      'keeper_courtyard',
+      { width: 15, height: 13 },
+      this.scene,
+    );
+    court.position.set(31, 0.035, 117);
+    court.material = this.material('#8f9385');
+    court.isPickable = false;
+    // Shared footprints keep rendered ruins and authoritative collision in agreement.
+    for (const [x, z, h] of keeperOutpostPillars) {
+      const pillar = MeshBuilder.CreateCylinder(
+        'keeper_broken_pillar',
+        { diameter: 1, height: h, tessellation: 6 },
+        this.scene,
+      );
+      pillar.position.set(x!, h! / 2, z!);
+      pillar.material = this.material('#798476');
+      pillar.isPickable = false;
+    }
+    const oath = MeshBuilder.CreateBox(
+      'keeper_oath_stone',
+      { width: 1.6, height: 0.8, depth: 0.6 },
+      this.scene,
+    );
+    oath.position.set(24, 0.4, 110);
+    oath.material = this.material('#c4b78b');
+    oath.isPickable = false;
+    const outpostSeal = MeshBuilder.CreateTorus(
+      'keeper_closed_seal',
+      { diameter: 3, thickness: 0.16, tessellation: 24 },
+      this.scene,
+    );
+    outpostSeal.position.set(33, 0.07, 118);
+    outpostSeal.material = this.material('#dbc783');
+    outpostSeal.isPickable = false;
     this.sign(8, 12, 'OLD WELL', '“Two watchers. One door. Keep it sleeping.”');
     this.sign(8, 110, 'SPRING CULVERT', 'The same seal faces inward · do not break it');
     for (const [x, z] of [

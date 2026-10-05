@@ -60,3 +60,26 @@ export function filterItems(
 
 export * from './item-store';
 export * from './item-presentation';
+
+export type InventorySort = 'slots' | 'name' | 'rarity' | 'level';
+/** View order only. Never changes authoritative slots, versions or instance identities. */
+export function inventoryView(
+  gameData: GameData,
+  items: Item[],
+  query: { search?: string; rarityIds?: string[]; sort?: InventorySort },
+): Item[] {
+  const slot = (i: Item) =>
+    i.instance.location.kind === 'container' ? i.instance.location.slot : -1;
+  const rarity = (i: Item) => gameData.rarities.get(i.instance.rarityId)?.tier ?? 0;
+  return filterItems(items, query).sort((a, b) => {
+    const difference =
+      query.sort === 'name'
+        ? a.template.name.localeCompare(b.template.name)
+        : query.sort === 'rarity'
+          ? rarity(b) - rarity(a)
+          : query.sort === 'level'
+            ? b.template.itemLevel - a.template.itemLevel
+            : slot(a) - slot(b);
+    return difference || slot(a) - slot(b) || a.instance.id.localeCompare(b.instance.id);
+  });
+}
