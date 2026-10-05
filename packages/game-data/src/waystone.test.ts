@@ -25,6 +25,14 @@ describe('short Waystone follow-on', () => {
   });
   it('adds only the NPC/quest to prior content; the checkpoint migration hash is exact', async () => {
     const raw = structuredClone(gd.raw);
+    raw.quests = raw.quests.filter((q) => q.id !== 'quest.greenvale.well_records');
+    raw.itemTemplates = raw.itemTemplates.filter(
+      (i) => i.id !== 'accessory.necklace.springward_pendant',
+    );
+    for (const z of raw.zones)
+      z.landmarks = z.landmarks.filter(
+        (l) => !['landmark.greenvale.old_well', 'landmark.greenvale.spring_culvert'].includes(l.id),
+      );
     raw.quests = raw.quests.filter((q) => q.id !== 'quest.greenvale.stillwater');
     raw.enemies = raw.enemies.filter((e) => e.id !== 'enemy.greenvale.siltbound_warden');
     raw.lootTables = raw.lootTables.filter((l) => l.id !== 'loot.greenvale.siltbound_warden');

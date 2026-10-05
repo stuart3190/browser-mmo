@@ -5,6 +5,7 @@ import {
   applyExperience,
   applyKill,
   applyTalk,
+  applyExploration,
   questAvailability,
   questDialogue,
   questView,
@@ -433,5 +434,43 @@ export async function recordNpcTalk(
           ),
         );
     }
+  });
+}
+
+/** SERVER ONLY: no API/message accepts coordinates or completion claims from a client.
+ * Caller supplies a sample taken from its owned zone simulation. Visits are personal and
+ * idempotent; the character lock serialises this with acceptance, rewards and other progress.
+ */
+export async function recordExploration(
+  ctx: DomainContext,
+  input: {
+    characterId: string;
+    zoneId: string;
+    position: { x: number; y: number; z: number };
+    health: number;
+  },
+): Promise<boolean> {
+  const zone = ctx.gameData.zones.get(input.zoneId);
+  if (!zone) return false;
+  return inTransaction(ctx, async (tx) => {
+    await lockCharacter(tx, input.characterId);
+    let changed = false;
+    for (const row of await questRows(tx, input.characterId, true)) {
+      if (row.status !== 'active') continue;
+      const def = ctx.gameData.quests.get(row.questId);
+      const next = def && applyExploration(def, row.progress, zone, input.position, input.health);
+      if (!next) continue;
+      await tx
+        .update(schema.characterQuests)
+        .set({ progress: next, version: row.version + 1, updatedAt: ctx.now() })
+        .where(
+          and(
+            eq(schema.characterQuests.characterId, input.characterId),
+            eq(schema.characterQuests.questId, row.questId),
+          ),
+        );
+      changed = true;
+    }
+    return changed;
   });
 }

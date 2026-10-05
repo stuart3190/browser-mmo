@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Fresh follow-on personally surveys village well",
+    "ok": true
+  },
+  {
+    "name": "Corrected culvert reached alive and outside combat after waiting",
+    "ok": true,
+    "detail": {
+      "health": 188,
+      "maxHealth": 188,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  }
+]

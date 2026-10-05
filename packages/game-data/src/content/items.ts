@@ -47,6 +47,23 @@ const gear = (g: GearInput): ItemTemplate => {
 
 export const itemTemplates: ItemTemplate[] = [
   gear({
+    id: 'accessory.necklace.springward_pendant',
+    name: 'Springward Pendant',
+    description:
+      'Maren’s pendant, earned by tracing the inward-facing well seals. The Last Door is still closed.',
+    category: 'accessory',
+    rarityId: 'uncommon',
+    itemLevel: 5,
+    requiredLevel: 3,
+    binding: 'on_pickup',
+    equipment: {
+      slotType: 'necklace',
+      equipmentTypeId: 'necklace',
+      baseStats: { stamina: { min: 4, max: 4 }, armor: { min: 3, max: 3 } },
+      maxDurability: null,
+    },
+  }),
+  gear({
     id: 'accessory.ring.stillwater_seal',
     name: 'Stillwater Seal',
     description: 'Maren’s warden seal, entrusted to the traveller who quieted the eastern water.',

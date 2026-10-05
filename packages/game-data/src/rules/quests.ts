@@ -62,7 +62,7 @@ export function objectiveProgress(
   return def.objectives.map((o) => {
     const required = o.kind === 'kill' || o.kind === 'collect' ? o.count : 1;
     const raw =
-      o.kind === 'kill' || o.kind === 'talk'
+      o.kind === 'kill' || o.kind === 'talk' || o.kind === 'explore'
         ? (record?.progress[o.id] ?? 0)
         : o.kind === 'collect'
           ? itemCount(o.itemTemplateId)
@@ -190,6 +190,39 @@ export function applyTalk(
       next[o.id] = 1;
       changed = true;
     }
+  }
+  return changed ? next : null;
+}
+
+/** A personal visit, measured from the living character's authoritative zone position. */
+export const EXPLORATION_RADIUS = 4;
+export function applyExploration(
+  def: QuestDefinition,
+  progress: Readonly<Record<string, number>>,
+  zone: {
+    id: string;
+    landmarks: readonly { id: string; position: { x: number; y: number; z: number } }[];
+  },
+  position: { x: number; y: number; z: number },
+  health: number,
+): Record<string, number> | null {
+  if (health <= 0 || ![position.x, position.y, position.z].every(Number.isFinite)) return null;
+  const next = { ...progress };
+  let changed = false;
+  for (const o of def.objectives) {
+    if (o.kind !== 'explore' || o.zoneId !== zone.id || (next[o.id] ?? 0) >= 1) continue;
+    const area = zone.landmarks.find((l) => l.id === o.areaId);
+    if (
+      !area ||
+      Math.hypot(
+        position.x - area.position.x,
+        position.y - area.position.y,
+        position.z - area.position.z,
+      ) > EXPLORATION_RADIUS
+    )
+      continue;
+    next[o.id] = 1;
+    changed = true;
   }
   return changed ? next : null;
 }

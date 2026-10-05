@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Actual touch joystick moves with guidance visible",
+    "ok": true
+  },
+  {
+    "name": "Survey complete, guidance directs return to Maren",
+    "ok": true
+  },
+  {
+    "name": "Survey complete, guidance directs return to Maren",
+    "ok": true
+  },
+  {
+    "name": "390x844 portrait guidance fully visible and touch-sized",
+    "ok": true
+  },
+  {
+    "name": "Reconnect preserves survey and turn-in guidance",
+    "ok": true
+  },
+  {
+    "name": "Personal persistent pendant reward received",
+    "ok": true
+  },
+  {
+    "name": "Personal persistent pendant reward received",
+    "ok": true
+  },
+  {
+    "name": "Touch equip of persistent necklace succeeds",
+    "ok": true
+  },
+  {
+    "name": "No browser exceptions",
+    "ok": true,
+    "detail": []
+  }
+]

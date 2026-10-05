@@ -116,7 +116,13 @@ export function QuestTracker() {
     <div className="panel quest-tracker" data-testid="quest-tracker" aria-label="Quest tracker">
       {tracked.map((q) => (
         <div key={q.questId} className="tracked" data-quest={q.questId} data-state={q.state}>
-          <div className="tracked-title">{q.name}</div>
+          <button
+            className="tracked-title secondary"
+            aria-label={`Track ${q.name}`}
+            onClick={() => state.trackQuest(q.questId)}
+          >
+            {q.name}
+          </button>
           {q.state === 'ready_to_turn_in' ? (
             <div className="ready" data-testid="quest-ready">
               {returnTo(q, (id) => gameData.npcs.get(id)?.name)}
@@ -164,6 +170,15 @@ export function QuestLogWindow() {
           data-state={q.state}
         >
           <h3>{q.name}</h3>
+          {q.state !== 'completed' && (
+            <button
+              className="secondary"
+              onClick={() => state.trackQuest(q.questId)}
+              data-testid="quest-track"
+            >
+              Track quest
+            </button>
+          )}
           <p className="small">{q.description}</p>
           {q.state !== 'completed' && <Objectives quest={q} />}
           {q.state === 'ready_to_turn_in' && (

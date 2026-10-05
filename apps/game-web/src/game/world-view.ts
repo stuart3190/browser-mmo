@@ -70,6 +70,32 @@ export class WorldView {
     square.position.y = 0.04;
     square.material = this.material('#b0a486');
     square.isPickable = false;
+    this.sign(8, 12, 'OLD WELL', '“Two watchers. One door. Keep it sleeping.”');
+    this.sign(8, 110, 'SPRING CULVERT', 'The same seal faces inward · do not break it');
+    for (const [x, z] of [
+      [8, 12],
+      [8, 110],
+    ]) {
+      const ring = MeshBuilder.CreateTorus(
+        'spring_watcher',
+        { diameter: 2.5, thickness: 0.35, tessellation: 20 },
+        this.scene,
+      );
+      ring.position.set(x!, 0.18, z!);
+      ring.material = this.material('#bac4b4');
+      ring.isPickable = false;
+      ring.freezeWorldMatrix();
+      const water = MeshBuilder.CreateDisc(
+        'spring_water',
+        { radius: 1.1, tessellation: 20 },
+        this.scene,
+      );
+      water.rotation.x = Math.PI / 2;
+      water.position.set(x!, 0.04, z!);
+      water.material = this.material('#488d95');
+      water.isPickable = false;
+      water.freezeWorldMatrix();
+    }
     this.sign(43, 5, 'STILLWATER STEPS', 'North around the ridge · Tess’s camp');
     this.sign(61, 41, 'TESS’S CAMP', 'Old records · a sleeping spring');
     this.sign(79, 30, 'SILTBOUND SEAL', 'Leave the blue ground mark before the surge');

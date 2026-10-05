@@ -18,6 +18,7 @@ import {
   processKillEvent,
   recordKill,
   recordNpcTalk,
+  recordExploration,
   requireOwnedCharacter,
   turnInQuest,
 } from '@mmo/domain';
@@ -36,6 +37,7 @@ import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
 import type { KillEvent, OutMessage } from '@mmo/world';
 import type { QuestView } from '@mmo/schemas';
+import { applyExploration } from '@mmo/game-data';
 import type { Rng } from '@mmo/game-data';
 import { TokenBucket } from './rate-limit';
 import { AccountSync, loadContainerIds } from './sync';
@@ -745,6 +747,53 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     return conn.questChain;
   }
 
+  // Only unfinished exploration near an actual site causes DB work. One task per connection,
+  // at most four globally, sampled once per second. Failed writes retry while inside the area;
+  // reconnect/full quest-log reconciliation reuses persisted progress. No per-tick DB polling.
+  const exploration = new WeakMap<Connection, { nextAt: number; busy: boolean }>();
+  let explorationsInFlight = 0;
+  function pumpExploration(now: number) {
+    for (const conn of byCharacter.values()) {
+      const p = conn.player;
+      if (!p || conn.ws.readyState !== conn.ws.OPEN || now >= conn.sessionUntil || !conn.questLog)
+        continue;
+      let task = exploration.get(conn);
+      if (!task) {
+        task = { nextAt: 0, busy: false };
+        exploration.set(conn, task);
+      }
+      if (task.busy || task.nextAt > now || explorationsInFlight >= 4) continue;
+      task.nextAt = now + 1_000;
+      const sample = p.zone.persistentState(p.characterId);
+      if (
+        !sample ||
+        !conn.questLog.some((q) => {
+          if (q.state !== 'active') return false;
+          const def = ctx.gameData.quest(q.questId);
+          const progress = Object.fromEntries(q.objectives.map((o) => [o.id, o.current]));
+          return (
+            applyExploration(def, progress, p.zone.zone, sample.position, sample.health) !== null
+          );
+        })
+      )
+        continue;
+      task.busy = true;
+      explorationsInFlight++;
+      void recordExploration(ctx, { characterId: p.characterId, zoneId: p.zone.zone.id, ...sample })
+        .then(async (changed) => {
+          if (changed && !crashed && ownership.active && byCharacter.get(p.characterId) === conn)
+            await pushQuestLog(conn);
+        })
+        .catch((err: unknown) => {
+          conn.log.warn({ err }, 'exploration progress failed; retrying');
+        })
+        .finally(() => {
+          task.busy = false;
+          explorationsInFlight--;
+        });
+    }
+  }
+
   function pushQuestLogFor(characterId: string): void {
     const conn = byCharacter.get(characterId);
     if (conn) void pushQuestLog(conn);
@@ -1290,6 +1339,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             }
             deps.metrics.counter('world_ticks_total', 'Completed simulation ticks').inc();
             for (const zone of zones.values()) zone.step(now);
+            pumpExploration(now);
             pumpKills(now);
             expireLingering(now);
             flush();

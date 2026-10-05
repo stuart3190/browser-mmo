@@ -464,6 +464,12 @@ export const zones: WorldZone[] = [
       },
     ],
     landmarks: [
+      { id: 'landmark.greenvale.old_well', name: 'Old Well', position: { x: 8, y: 0, z: 12 } },
+      {
+        id: 'landmark.greenvale.spring_culvert',
+        name: 'Spring Culvert',
+        position: { x: 8, y: 0, z: 110 },
+      },
       {
         id: 'landmark.greenvale.stillwater',
         name: 'Stillwater Steps',
@@ -625,6 +631,46 @@ export const enemies: EnemyDefinition[] = [
 ];
 
 export const quests: QuestDefinitionInput[] = [
+  {
+    id: 'quest.greenvale.well_records',
+    name: 'The Water Remembers',
+    description:
+      'Read the old well inscription in Greenvale, then follow the north road beyond the wolf den to the Spring Culvert. Approach each stone within four metres to survey it. Return to Elder Maren with the matching marks. Each companion must accept and visit both sites personally. This is a survey, not a request to break either seal.',
+    giverNpcId: 'npc.greenvale.elder_maren',
+    minLevel: 3,
+    prerequisites: ['quest.greenvale.stillwater'],
+    objectives: [
+      {
+        id: 'survey_well',
+        kind: 'explore',
+        zoneId: ZONE_ID,
+        areaId: 'landmark.greenvale.old_well',
+        label: 'Survey the Old Well inscription',
+      },
+      {
+        id: 'survey_culvert',
+        kind: 'explore',
+        zoneId: ZONE_ID,
+        areaId: 'landmark.greenvale.spring_culvert',
+        label: 'Survey the Spring Culvert beyond Northwood',
+      },
+    ],
+    rewards: {
+      xp: 450,
+      currency: [{ currencyId: 'gold', amount: 150 }],
+      items: [{ itemTemplateId: 'accessory.necklace.springward_pendant', quantity: 1 }],
+    },
+    dialogue: {
+      offer:
+        'The well book names two watchers: one beneath our square, one beyond Northwood. Neither was built to keep water out. Read the stone at the old well, then follow the north road past the wolves to the culvert. Compare the marks without disturbing them. The gold compass will guide you; a visit within four metres is enough. Bring your companions, but each must see the inscriptions.',
+      inProgress:
+        'The well is just northeast of our square. The culvert lies beyond Northwood, beside the north road. Read both stones, then bring their marks back to me. Leave the seals intact.',
+      readyToTurnIn:
+        'The same mark, facing inward at both ends. Our founders were not guarding Greenvale from a flood — they were keeping something from remembering the way out. The well book calls its watchers the Keepers of the Last Door. Wear this pendant. Next we must find who closed that door, and why their names were scratched out.',
+      completed:
+        'The water remembers a door. Now we know where to look for its keepers. The seals must hold until we know what waits behind them.',
+    },
+  },
   {
     id: 'quest.greenvale.stillwater',
     name: 'What the Ward Held',

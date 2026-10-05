@@ -3,6 +3,15 @@ import { getGameData, questAvailability } from './index';
 it('adds Stillwater to the exact existing content, keeps terrain/progression, and gates it after Root-Wound', async () => {
   const gd = getGameData(),
     old = structuredClone(gd.raw);
+  old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.well_records');
+  old.itemTemplates = old.itemTemplates.filter(
+    (i) => i.id !== 'accessory.necklace.springward_pendant',
+  );
+  for (const z of old.zones)
+    z.landmarks = z.landmarks.filter(
+      (l) => !['landmark.greenvale.old_well', 'landmark.greenvale.spring_culvert'].includes(l.id),
+    );
+  const stillwater = structuredClone(old);
   old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.stillwater');
   old.enemies = old.enemies.filter((e) => e.id !== 'enemy.greenvale.siltbound_warden');
   old.lootTables = old.lootTables.filter((l) => l.id !== 'loot.greenvale.siltbound_warden');
@@ -25,7 +34,7 @@ it('adds Stillwater to the exact existing content, keeps terrain/progression, an
   expect(hash).toBe('8d18c22459d9ad219d56832b052805115cf907fd8bbceacdb22e4bb88af2674b');
   const currentHash = [
     ...new Uint8Array(
-      await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(gd.raw))),
+      await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(stillwater))),
     ),
   ]
     .map((b) => b.toString(16).padStart(2, '0'))

@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Corrected culvert reached alive and outside combat after waiting",
+    "ok": true,
+    "detail": {
+      "health": 188,
+      "maxHealth": 188,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  },
+  {
+    "name": "Touch guidance opens log and allows active quest selection",
+    "ok": true
+  },
+  {
+    "name": "Portrait guide and touch controls are visible",
+    "ok": true
+  },
+  {
+    "name": "Portrait touch controls and guide are unobscured",
+    "ok": true,
+    "detail": [
+      {
+        "id": "quest-guide",
+        "visible": true,
+        "inBounds": true,
+        "reachable": true
+      },
+      {
+        "id": "joystick",
+        "visible": true,
+        "inBounds": true,
+        "reachable": true
+      },
+      {
+        "id": "touch-target",
+        "visible": true,
+        "inBounds": true,
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "name": "Reconnect retains survey completion and guidance",
+    "ok": true
+  },
+  {
+    "name": "Solo touch turn-in and persistent useful necklace equip succeed",
+    "ok": true
+  },
+  {
+    "name": "No browser exceptions",
+    "ok": true,
+    "detail": []
+  }
+]

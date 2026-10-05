@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGame } from './context';
+import { questBearing, questDestination } from '../state/quest-navigation';
 import { starterRoads } from '../game/starter-roads';
 
 /** Metres from the player to the minimap edge. */
@@ -17,9 +18,16 @@ const COLORS: Record<string, string> = {
  * ~10 Hz, independent of React renders.
  */
 export function Minimap() {
-  const { controls, gameData } = useGame();
+  const { controls, gameData, state } = useGame();
   const canvas = useRef<HTMLCanvasElement>(null);
   const [near, setNear] = useState<string | null>(null);
+
+  const [guide, setGuide] = useState<{
+    name: string;
+    label: string;
+    detail: string;
+    radians: number | null;
+  } | null>(null);
 
   useEffect(() => {
     const draw = () => {
@@ -92,6 +100,47 @@ export function Minimap() {
         ctx.arc(sx(m.x), sy(m.z), m.kind === 'enemy' ? 3 : 2.5, 0, Math.PI * 2);
         ctx.fill();
       }
+      const destination = questDestination(
+        gameData,
+        state.quests,
+        state.trackedQuestId,
+        zoneId,
+        me,
+        controls.markers().map((m) => ({ ...m, refId: state.world.get(m.id)?.refId })),
+      );
+      const bearing =
+        destination?.position && destination.zoneId === zoneId
+          ? questBearing(me, destination.position)
+          : null;
+      const next = destination
+        ? {
+            name: destination.questName,
+            label: destination.label,
+            detail: bearing
+              ? `${bearing.compass} · ${bearing.distance} m`
+              : destination.zoneId
+                ? gameData.zone(destination.zoneId).name
+                : 'See quest log',
+            radians: bearing?.radians ?? null,
+          }
+        : null;
+      setGuide((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
+      if (bearing) {
+        const radius = Math.min(half - 9, bearing.distance * k);
+        const x = half + Math.sin(bearing.radians) * radius,
+          y = half - Math.cos(bearing.radians) * radius;
+        ctx.fillStyle = '#ffe39a';
+        ctx.strokeStyle = '#342815';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y - 6);
+        ctx.lineTo(x + 5, y);
+        ctx.lineTo(x, y + 6);
+        ctx.lineTo(x - 5, y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
       // me: heading arrow (rotationY 0 = +z = up)
       const hx = Math.sin(me.rotationY);
       const hy = -Math.cos(me.rotationY);
@@ -118,14 +167,40 @@ export function Minimap() {
     };
     const t = setInterval(draw, 100);
     return () => clearInterval(t);
-  }, [controls, gameData]);
+  }, [controls, gameData, state]);
 
   return (
-    <div className="minimap" data-testid="minimap">
-      <canvas ref={canvas} aria-label="Minimap" />
-      <div className="minimap-label" data-testid="minimap-area">
-        {near}
+    <>
+      {guide && (
+        <button
+          className="quest-guide"
+          data-testid="quest-guide"
+          title={`${guide.name}: ${guide.label} (${guide.detail})`}
+          onClick={() => state.toggle('quests')}
+          aria-label={`Quest guidance: ${guide.name}. ${guide.label}. ${guide.detail}. Open quest log`}
+        >
+          <span
+            className="guide-arrow"
+            aria-hidden="true"
+            style={{ transform: `rotate(${guide.radians ?? 0}rad)` }}
+          >
+            {guide.radians === null ? '◇' : '↑'}
+          </span>
+          <span className="guide-copy">
+            <strong>{guide.name}</strong>
+            <span>{guide.label}</span>
+          </span>
+          <span className="guide-distance" data-testid="quest-distance">
+            {guide.detail}
+          </span>
+        </button>
+      )}
+      <div className="minimap" data-testid="minimap">
+        <canvas ref={canvas} aria-label="Minimap" />
+        <div className="minimap-label" data-testid="minimap-area">
+          {near}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

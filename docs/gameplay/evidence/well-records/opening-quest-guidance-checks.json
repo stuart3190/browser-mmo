@@ -1,0 +1,55 @@
+[
+  {
+    "name": "Fresh opening quest changes giver guidance into hunt objective",
+    "ok": true
+  },
+  {
+    "name": "Desktop compass and quest selection work",
+    "ok": true
+  },
+  {
+    "name": "Touch track target 390x844 is at least 44px",
+    "ok": true,
+    "detail": {
+      "x": 11,
+      "y": 603,
+      "width": 117.703125,
+      "height": 44
+    }
+  },
+  {
+    "name": "Touch compass 390x844 is in bounds",
+    "ok": true,
+    "detail": {
+      "x": 12,
+      "y": 114,
+      "width": 366,
+      "height": 48
+    }
+  },
+  {
+    "name": "Touch track target 844x390 is at least 44px",
+    "ok": true,
+    "detail": {
+      "x": 11,
+      "y": 160,
+      "width": 117.703125,
+      "height": 44
+    }
+  },
+  {
+    "name": "Touch compass 844x390 is in bounds",
+    "ok": true,
+    "detail": {
+      "x": 272,
+      "y": 98,
+      "width": 300,
+      "height": 48
+    }
+  },
+  {
+    "name": "No browser exceptions",
+    "ok": true,
+    "detail": []
+  }
+]

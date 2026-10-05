@@ -853,3 +853,26 @@ and recovery creates only missing new spawns. Original terrain, four quests and 
 Talk and kill objectives remain independent under the existing quest engine; each player must talk
 and turn in personally, while eligible party kills share credit and rotate only one loot award.
 Physical-device performance and broad encounter balancing remain player-feedback follow-ups.
+
+## 2026-10-05 — Content-driven quest guidance and personal exploration visits
+
+**Date:** 2026-10-05
+
+**Decision:** Derive north-up quest compass/minimap destinations from quest definitions, authored
+NPC/enemy/pickup spawns, known replicated entities and zone landmarks. Add server-only personal
+exploration credit within four metres of a referenced landmark, reusing persisted quest counters
+and the existing reward transaction. Use it for Maren's well/culvert continuation.
+
+**Reason:** Live playtesting found that handoffs and objectives disappear too easily. All quests
+need the same guidance, including newly unlocked offers and turn-ins. Exploration is the next
+unchecked quest capability and fits the recorded old-well investigation without another kill grind.
+
+**Alternatives considered:** Per-quest hard-coded pointers; client completion packets; shared
+party visit credit; a navigation/pathfinding or branching quest engine. Each adds avoidable
+coupling, trust issues or scope for this milestone.
+
+**Consequences:** Guidance is advisory and does not change authority. Coordinates are direct
+compass bearings, not paths through obstacles. Collection guidance names possible sources, not
+promised drops. Visits are personal, idempotent, alive/same-zone/range validated, bounded and
+committed before publication. Existing reward and party rules stay intact. No repeatables, dailies,
+escorts or abandonment are claimed. An exact additive hash migration preserves live checkpoints.

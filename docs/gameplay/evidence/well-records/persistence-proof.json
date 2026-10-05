@@ -1,0 +1,62 @@
+[
+  {
+    "username": "spark_muu9vm2y",
+    "level": 3,
+    "xp": "1195",
+    "status": "completed",
+    "progress": {
+      "survey_well": 1,
+      "survey_culvert": 1
+    },
+    "turn_in_id": "01a10b72-445b-7e61-8af6-ea0d67ab8350",
+    "reward_instances": 1,
+    "rewards": [
+      {
+        "template": "accessory.necklace.springward_pendant",
+        "location": "equipped",
+        "slot": "necklace"
+      }
+    ],
+    "currency_reward": 150
+  },
+  {
+    "username": "guard_muu9vm2y",
+    "level": 3,
+    "xp": "1316",
+    "status": "completed",
+    "progress": {
+      "survey_well": 1,
+      "survey_culvert": 1
+    },
+    "turn_in_id": "01a10b70-7766-7f1b-baf5-0a616f4ce5e2",
+    "reward_instances": 1,
+    "rewards": [
+      {
+        "template": "accessory.necklace.springward_pendant",
+        "location": "container",
+        "slot": null
+      }
+    ],
+    "currency_reward": 150
+  },
+  {
+    "username": "route_muuzc28m",
+    "level": 3,
+    "xp": "1482",
+    "status": "completed",
+    "progress": {
+      "survey_well": 1,
+      "survey_culvert": 1
+    },
+    "turn_in_id": "01a10b76-30f4-7e09-8e04-ba8bd6adbd7e",
+    "reward_instances": 1,
+    "rewards": [
+      {
+        "template": "accessory.necklace.springward_pendant",
+        "location": "equipped",
+        "slot": "necklace"
+      }
+    ],
+    "currency_reward": 150
+  }
+]

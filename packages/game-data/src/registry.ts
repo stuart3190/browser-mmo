@@ -293,8 +293,11 @@ export class GameData {
           errors.push(`quest ${q.id}: unknown item ${o.itemTemplateId}`);
         if (o.kind === 'talk' && !this.npcs.has(o.npcId))
           errors.push(`quest ${q.id}: unknown talk NPC ${o.npcId}`);
-        if (!q.placeholder && o.kind !== 'kill' && o.kind !== 'collect' && o.kind !== 'talk')
-          errors.push(`quest ${q.id}: objective kind ${o.kind} is not supported yet`);
+        if (
+          o.kind === 'explore' &&
+          !this.zones.get(o.zoneId)?.landmarks.some((l) => l.id === o.areaId)
+        )
+          errors.push(`quest ${q.id}: unknown exploration area ${o.zoneId}/${o.areaId}`);
       }
       for (const c of q.rewards.currency)
         if (!this.currencies.has(c.currencyId))

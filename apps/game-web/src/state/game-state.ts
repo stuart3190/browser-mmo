@@ -84,6 +84,18 @@ export class GameState {
   // --- quests (all server-provided) ---
   /** The authoritative quest log (replaced on every quest.log). */
   quests: QuestView[] = [];
+  /** Local guidance preference only; quest credit always comes from the server. */
+  trackedQuestId: string | null = null;
+
+  trackQuest(id: string): void {
+    this.trackedQuestId = id;
+    try {
+      localStorage.setItem(`quest-guide:${this.character.id}`, id);
+    } catch {
+      /* Storage is optional. */
+    }
+    this.emit();
+  }
   party: ServerPayload<'party.update'> = {
     partyId: null,
     leaderCharacterId: null,
@@ -101,6 +113,11 @@ export class GameState {
 
   constructor(character: PlayerCharacter) {
     this.character = character;
+    try {
+      this.trackedQuestId = localStorage.getItem(`quest-guide:${character.id}`);
+    } catch {
+      /* Storage is optional. */
+    }
     this.items.subscribe(() => this.emit());
   }
 

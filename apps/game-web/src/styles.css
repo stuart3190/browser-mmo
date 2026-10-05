@@ -831,7 +831,7 @@ kbd {
   width: 220px;
   font-size: 12px;
   padding: 6px 10px;
-  pointer-events: none;
+  pointer-events: auto;
   background: rgba(10, 12, 18, 0.72);
 }
 .tracked + .tracked {
@@ -1492,4 +1492,86 @@ body:has(.login) {
 /* Keep the optional fullscreen shortcut from covering dialogue and inventory actions. */
 body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscreen-return {
   display: none;
+}
+
+/* North-up bearings match the minimap; compact guidance stays visible when the full tracker hides. */
+.quest-guide {
+  pointer-events: auto;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(390px, 38vw);
+  min-height: 48px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(22, 30, 25, 0.88);
+  border-color: #a78e55;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.guide-copy {
+  min-width: 0;
+  flex: 1;
+}
+.guide-copy strong,
+.guide-copy > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.guide-copy > span {
+  color: #e5d8b4;
+  font-size: 11px;
+}
+.guide-arrow {
+  font-size: 22px;
+  color: #ffe39a;
+  flex-shrink: 0;
+}
+.guide-distance {
+  color: #ffe39a;
+  white-space: nowrap;
+  font-size: 11px;
+}
+.tracked-title.secondary {
+  text-align: left;
+  font-size: inherit;
+  padding: 2px 4px;
+}
+@media (pointer: coarse) and (min-height: 541px) {
+  .quest-guide {
+    top: 94px;
+    width: calc(100% - 24px);
+    max-width: 390px;
+  }
+}
+@media (pointer: coarse) and (max-height: 540px) {
+  .quest-guide {
+    top: 78px;
+    width: min(300px, 38vw);
+  }
+  .tracked-title.secondary {
+    min-height: 44px;
+  }
+}
+
+@media (pointer: coarse) and (min-height: 541px) {
+  .quest-tracker {
+    top: 150px;
+  }
+}
+
+@media (pointer: coarse) and (min-height: 541px) {
+  .ui-root.touch:has(.quest-tracker) .party-summary {
+    top: 270px;
+  }
+}
+@media (pointer: coarse) {
+  .quest-entry [data-testid='quest-track'] {
+    min-height: 44px;
+  }
 }

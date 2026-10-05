@@ -3,6 +3,14 @@ import { getGameData, questAvailability } from './index';
 it('adds the exact Root-Wound content without changing existing terrain or rewards', async () => {
   const gd = getGameData();
   const old = structuredClone(gd.raw);
+  old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.well_records');
+  old.itemTemplates = old.itemTemplates.filter(
+    (i) => i.id !== 'accessory.necklace.springward_pendant',
+  );
+  for (const z of old.zones)
+    z.landmarks = z.landmarks.filter(
+      (l) => !['landmark.greenvale.old_well', 'landmark.greenvale.spring_culvert'].includes(l.id),
+    );
   old.quests = old.quests.filter((q) => q.id !== 'quest.greenvale.stillwater');
   old.enemies = old.enemies.filter((e) => e.id !== 'enemy.greenvale.siltbound_warden');
   old.lootTables = old.lootTables.filter((l) => l.id !== 'loot.greenvale.siltbound_warden');
