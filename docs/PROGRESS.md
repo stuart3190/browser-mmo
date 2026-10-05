@@ -384,8 +384,18 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-04 · Codex · data/domain/gateway/recovery tests and seven browser checks;
     real NPC range, personal idempotent progress, touch dialogue/turn-in, persistent reward identity.
     Commit: the implementation commit containing `packages/game-data/src/waystone.test.ts`.
-- [ ] Repeatable / daily quests, explore objectives, abandoning, general quest-chain UI
-  - Repeatables/exploration remain rejected by content validation; the two-quest chain uses existing dialogue.
+- [x] Reusable active-objective, turn-in and newly unlocked handoff navigation
+  - Verified 2026-10-05 · Codex · content-driven north-up HUD/minimap bearings and metres;
+    kill/collect/talk/explore/NPC destinations, persistent local selection, desktop and touch UI.
+    Unit rules, fresh opening-quest UI and real continuation playtests; full verification green.
+    Commit: eb7c8a1a0968d5e077cd84f4729f27c3c513f52f.
+- [x] Personal server-authoritative exploration objectives
+  - Verified 2026-10-05 · Codex · living same-zone simulation position within 4 m of authored
+    landmark; bounded/coalesced server-only writes, idempotent persisted counters, crash/reconnect
+    recovery, no client completion packet. Domain/realtime/exploit tests and real well/culvert route.
+    Commit: eb7c8a1a0968d5e077cd84f4729f27c3c513f52f.
+- [ ] Repeatable / daily quests, abandoning and branching quest-map UI
+  - Repeatables remain rejected by validation; no abandonment or branching engine is implemented.
 
 # Dungeons
 
@@ -827,7 +837,7 @@ systems added; external follow-ups remain separate from development and merge ga
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
-22. **Quest scope is deliberately small.** Five quests, including an idempotent NPC-talk follow-on, the Hollow packleader hunt the Root-Wound Lantern and Maren’s Stillwater talk/ground-strike expedition; party-eligible kills share kill credit. No repeatables, abandoning, exploration/escort objectives or branching engine. Collection items remain personal; selling/vaulting pelts lowers progress.
+22. **Quest scope is deliberately small.** Six quests: the wolf hunt, Old Waystone talk, Hollow packleader, Root-Wound Lantern, Stillwater debrief/ground-strike expedition and personal well/culvert survey. Party-eligible kills share credit; talk, collection and exploration remain personal. No repeatables, abandonment, escorts or branching engine. Compass directions are bearings, not obstacle-avoiding paths. Selling/vaulting pelts still lowers collection progress.
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
@@ -838,11 +848,12 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Playtest the five-quest route with owner feedback, then investigate Maren's old well records.**
-Pay attention to Stillwater ground-mark readability on touch screens and repeated Waystone travel
-before tuning established rewards or kill requirements. Choose one focused deep-spring story
-continuation using current systems. No guilds, raids, PvP, crafting or giant quest engine;
-hosting/CI/physical-device follow-ups remain separate from gameplay development.
+**Follow the Keepers of the Last Door clue into one small ruined keeper outpost.**
+The well/culvert survey is now playable after Stillwater. Playtest the six-quest route with owner
+feedback, particularly compass clarity, Northwood travel and Stillwater's ground marks, before
+changing established combat/rewards. Build one focused outpost quest/encounter using current
+quest/combat/party/reward systems; no guilds, raids, PvP, crafting or giant quest engine.
+Hosting/CI/physical-device follow-ups stay separate from gameplay development.
 
 ## Mobile display follow-up — 2026-10-05
 
@@ -897,7 +908,7 @@ Known limits: one non-repeatable quest, one ranged single-target enemy, simple p
 no world phasing; existing party eligibility and loot rotation remain unchanged. Physical-device
 performance and encounter balance need player feedback, not another hosting qualification cycle.
 
-## Current Work — Maren / Stillwater continuation, 2026-10-05
+## Completed Work — Maren / Stillwater continuation, 2026-10-05
 
 Continues verified main `3d69bcca31ef9a2a6c860d7afcdf53c229f778b4`. Agent: Codex.
 Implementation/proof commit: the commit containing `packages/game-data/src/stillwater.test.ts`
@@ -955,3 +966,38 @@ party eligibility/loot rotation unchanged. Physical Android performance remains 
 Loot toasts currently show a merged stack’s total quantity rather than only that kill’s increment
 (e.g. existing three ore plus four dropped displays seven); persistent quantity/reward integrity is
 correct, but this existing presentation issue should be corrected during the next feedback pass.
+
+## Current Work — completed quest guidance and well survey, 2026-10-05
+
+- [x] General quest compass with active objective, distance/cardinal direction, minimap destination,
+      turn-in and automatic available follow-on giver. Desktop/touch log selection, optional per-character
+      stored preference, no fabricated coordinates or hidden moving-enemy positions.
+- [x] Next unchecked quest capability: personal exploration, from the owned server simulation only.
+      Four-metre 3D range and positive health; at most one task per connection/four globally, once per
+      second when actually eligible/in range. Transactional counters and reconnect/reconciliation reused.
+- [x] **The Water Remembers** after Stillwater: Maren's old well book/Last Door debrief, Old Well
+      (8, 12), Spring Culvert (8, 110), signs/water/seal rings and clear road spurs. Level 3; both sites
+      personally surveyed, either order; return to Maren. Reward: 450 XP, 150 copper, on-pickup-bound
+      Springward Pendant necklace (+4 stamina/+3 armour before the existing modifier roll).
+- [x] Playtest corrections: move the culvert beyond all three den spawn leash ranges so waiting
+      companions are safe; restore pointer events on the compass; keep touch selection at least 44 px;
+      separate portrait tracker/roster. No existing enemy stats, quest requirements or rewards changed.
+- [x] Additive checkpoint migration, preserving simulation/player/party/pending reward payloads.
+      `0012` and `0013` update only exact predecessor content hashes; applied migrations stay immutable.
+- [x] Verification: 2026-10-05 · Codex · full `NODE_ENV=production TEST_DATABASE_URL=... pnpm verify`
+      exit 0: format/lint/types, **151 unit + 130 PostgreSQL integration tests**, all production builds
+      and production debug-hook guard. Targeted tests cover wrong zone/range/death, concurrent visits,
+      personal credit, rollback/replay, persisted progress, crash/restart and forged exploration packets.
+- [x] **25 recorded browser assertions** across two-client continuation, corrected solo route and fresh
+      opening-quest guidance runs. Real travel plus actual touch joystick, selection, turn-in and equip;
+      portrait 390×844 and landscape 844×390 bounds/hit targets. Three read-only database proofs: both
+      surveys completed, exactly one pendant and 150-copper ledger reward per character; two UI equips.
+
+Implementation commit: **eb7c8a1a0968d5e077cd84f4729f27c3c513f52f**.
+Rules, route, proof files and honest resumed-run details: [quest guidance and well survey](gameplay/quest-guidance-and-well.md).
+The first candidate's real visits survived the authored culvert relocation; a third character freshly
+surveyed the corrected site, waited alive/out of combat at full health, then returned and equipped.
+The full check initially caught a test-only Node-crypto typing error; the final content test uses
+Web Crypto, and the complete final pass is green. Browser fixtures are previously played characters,
+not grants of the new quest/progress/rewards. SwiftShader/touch emulation is not physical Samsung
+performance proof. No gameplay work remains unfinished in this batch; continue with the outpost.
