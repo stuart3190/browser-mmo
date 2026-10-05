@@ -370,8 +370,9 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-05 · Codex · catalog tests: 24 named settlements/ports, 240 real NPC placements, stable role/service/stock references. Shops/lodging/training remain placeholders. Commit: `573a07b3f74454e7f2481a790d42ca9d4fbce3e5`.
 - [x] Greybox regional wilderness habitats
   - Verified 2026-10-05 · Codex · 24 regions, 72 actual creature placements from 10 families/72 variants; existing authoritative combat/rewards. Detailed terrain/density remain unfinished. Commit: `573a07b3f74454e7f2481a790d42ca9d4fbce3e5`.
-- [ ] Caves
-  - 24 fixed entrance POIs and cave/ruin/mine/crypt catalogs exist; dungeon entry/instances are not playable.
+- [x] Shared-world Broken Vault entry and catalog encounter foundation
+  - Verified 2026-10-05 · Codex · validated placed stonekin, atlas entry and personal exploration; latest Current Work.
+- [ ] Private caves/dungeon instances and remaining catalog entrances
 - [ ] Dynamic events
 
 # Quests
@@ -402,8 +403,9 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
     landmark; bounded/coalesced server-only writes, idempotent persisted counters, crash/reconnect
     recovery, no client completion packet. Domain/realtime/exploit tests and real well/culvert route.
     Commit: eb7c8a1a0968d5e077cd84f4729f27c3c513f52f.
-- [ ] Repeatable / daily quests, abandoning and branching quest-map UI
-  - Repeatables remain rejected by validation; no abandonment or branching engine is implemented.
+- [x] Explicit daily contracts with transactional reacceptance and cycle-specific rewards
+  - Verified 2026-10-05 · Codex · Greenvale contract domain/realtime tests; see latest Current Work.
+- [ ] Quest abandonment and branching quest-map UI
 
 # Dungeons
 
@@ -420,9 +422,12 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-05 · Codex · atomic grant/depletion, six competing claims, full-pouch rollback,
     stale recovery image, replay/reconnect, desktop + actual touch harvest and pouch persistence.
     Implementation commit: `d014293320384b94ca09ef9287128e290e624a8d`; see latest Current Work and `world/marches-gathering.md`.
-- [ ] Additional resource types, tools and profession progression
-- [ ] Recipes
-- [ ] Crafting
+- [x] Hardwood and iron-shard gathering using shared persistent resource nodes
+  - Verified 2026-10-05 · Codex · catalog, competing claims and recovery tests; latest Current Work.
+- [x] Three immediate material-to-equipment workshop recipes
+  - Verified 2026-10-05 · Codex · atomic NPC exchanges, rollback/receipt/provenance tests.
+- [ ] Tools and profession progression
+- [ ] General crafting queues, ranks and consumable effects
 
 # Social
 
@@ -849,7 +854,7 @@ systems added; external follow-ups remain separate from development and merge ga
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
-22. **Quest scope is deliberately small.** Six quests: the wolf hunt, Old Waystone talk, Hollow packleader, Root-Wound Lantern, Stillwater debrief/ground-strike expedition and personal well/culvert survey. Party-eligible kills share credit; talk, collection and exploration remain personal. No repeatables, abandonment, escorts or branching engine. Compass directions are bearings, not obstacle-avoiding paths. Selling/vaulting pelts still lowers collection progress.
+22. **Quest scope remains bounded.** Seventeen playable definitions and one retained placeholder: original seven-story sequence, five Marches continuation quests, four side quests and one daily contract. Party-eligible kills share credit; talk, collection and exploration remain personal. No abandonment, escorts or branching engine. Compass directions are bearings, not obstacle-avoiding paths. Selling/vaulting pelts still lowers collection progress.
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
@@ -860,14 +865,12 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Build one catalog-backed Greenvale Marches supply expedition.**
-Use the populated Roadhouse, Lantern Meadow, Bristlebank and Resource Hollow with existing
-inhabitants/monster variants/materials. Give gathered Wild Herb its first practical purpose through
-existing collection/turn-in/reward rules and a useful persistent reward; do not build a crafting engine
-or invent another bespoke monster/NPC/item. Keep solo/party progression and the active quest guide
-working. No bulk quest generation, UI polish pass or hosting/CI/physical-device qualification detour.
-Other resource types, tools/profession levels, shops, dungeon instances and cross-host travel remain
-separate future systems. See [Marches gathering](world/marches-gathering.md).
+**Finish the reusable private-party Broken Vault instance slice.**
+Build admission, instance identity/ownership, lifecycle/reset, reconnect and completion reward rules
+on the validated shared-world entrance/encounter foundation. Preserve the playable Greenvale route,
+existing party/authority/persistence and world catalogs. Do not expand to another continent or mass
+produce quests. Profession tools/ranks and timed crafting remain a separate later milestone.
+See [Greenvale Complete](gameplay/greenvale-complete.md).
 
 ## Mobile display follow-up — 2026-10-05
 
@@ -1211,3 +1214,65 @@ separate from gameplay development.
 
 Next gameplay task: one compact catalog-backed Marches supply expedition and a practical herb sink,
 using existing quest/reward/party/navigation systems. No mass quest generation or profession engine.
+
+## Current Work — Greenvale starter-region completion batch, 2026-10-05
+
+Agent: Codex. Baseline main/deployed: `138891dd19ed6932a50c32df3e050c7b9de55ce7`.
+Feature branch: `codex/greenvale-complete`. AGENTS.md / MASTER_PLAN.md unchanged.
+Design, scope and unfinished slices: [Greenvale Complete](gameplay/greenvale-complete.md).
+
+- [x] Validated catalog-backed authored route: eight additional places, six inhabitants, outlaw/stonekin
+      regional variants, river/vault roads and dressing. Marches totals: 26 places, 19 inhabitants,
+      19 creatures. Five continents, region bounds/bands, old place coordinates and deployed quest IDs
+      remain intact. Proof: 121 game-data unit tests, including full new road-corridor clearance.
+- [x] Version-3 service/entry content schema and compilation checks: missing/duplicate references,
+      impossible exchanges, input quantities and placed cave encounters. Earlier pack versions remain
+      compatible. Atomic NPC buy/material sell/workshop exchanges and explicit backpack instance sales;
+      ownership, locked/storage/equipment protection, optimistic versions, wallet/ledger/provenance and
+      durable UUID receipts. Proof: 12 targeted domain + 3 realtime PostgreSQL tests, including competing
+      requests, failed-cost rollback, replay and restart. Completion ACK now follows full reconciliation.
+- [x] Three real gathering types on five shared persistent nodes: herbs, hardwood and iron shards.
+      Three recipes produce actual cloak/sword/staff instances; vendor offers provide a material sink.
+      Existing depletion/regrowth/one-gatherer authority reused. Proof: catalog integrity and competing
+      hardwood/ore transaction/recovery tests; original gathering regressions remain green.
+- [x] Persistent server-position discovery and atlas indicators, independent of quest acceptance.
+      Alive/finite/range checks, insert deduplication and reconnect reconciliation verified in PG/realtime.
+- [x] Five linked main-story definitions, four side quests and one daily contract authored in one pack.
+      Existing main arc/rewards preserved. Repeat acceptance resets only after 24 hours, with cycle-specific
+      reward source references. Two-player closure transaction test verifies personal supplies/visits and
+      shared exact-once kills; its prerequisite setup is a domain fixture, not a claimed browser playthrough.
+      Main-story browser qualification remains in progress below.
+- [x] Shared-world Broken Vault entry/encounter foundation with actual catalog stonekin, personal boundary
+      inspection and typed atlas description. No private instance or completion chest is claimed.
+- [x] Staged genuine new-player completion of all original seven and five new main quests; actual
+      movement/combat/collection/dialogue and earned equipment, no grants or teleports. Timber and ore
+      side quests also complete. Saved screenshots and resumed-stage checks are in
+      `gameplay/evidence/greenvale-complete/`. Agent: Codex; verified 2026-10-05.
+- [x] Actual touch gathering/workshop, material sale, paid unique gear/exact-instance sale, banker,
+      discovered atlas, 390×844 / 844×390 reachable controls, real joystick and crafted-item relog.
+      Final touch-services script exited successfully without browser exceptions; saved checks/screenshots.
+- [ ] Finish river/remedy/daily solo browser flow and two-client contract browser qualification.
+      River helper failure was a nonexistent landmark radius producing NaN; corrected on 2026-10-06
+      to the existing authoritative exploration radius. Live rerun still required; game engine unchanged.
+- [ ] Push, fast-forward main, deploy and public smoke. Resumed managed execution cannot access
+      preview/GitHub networking; connected VPS command tool requires approval while policy is never.
+      Main and the public deployment remain the baseline SHA above. Restore the previous VPS execution
+      profile before these steps; do not mark release complete from local tests.
+- [ ] Private dungeon admission, instance ownership/lifecycle/reset, reconnect and completion rewards.
+- [ ] Profession ranks, tools, timed crafting and consumable effects; repair remains unsupported without wear.
+
+Verified code evidence so far: 229 unit tests; 81 domain / 65 initially-passing realtime cases plus
+10 corrected/targeted realtime cases; 8 API cases; production builds and debug-hook guard. The first
+full verification exposed an early NPC-service completion ACK and a timing-sensitive crash-test health
+bound. ACK ordering was fixed; the test-only no-regeneration fixture now verifies exact health
+preservation rather than confusing legitimate regeneration with rollback. Focused reruns pass.
+Resume checks on 2026-10-06: 121 game-data tests pass; browser scripts parse; local lint/format
+rechecked. Code commit and exact resume instructions are recorded with the saved evidence. The full
+suite was not repeated merely for the browser-harness radius correction. No hosted CI success,
+remaining party playthrough or new public deployment is claimed.
+
+Implementation commit: **1258bf5addb1346afaa9d6aebdc0927559458178**. Exact preserved actors, evidence and
+remaining qualification/deployment commands: [resume point](gameplay/evidence/greenvale-complete/README.md).
+Remote main confirmed unchanged through GitHub read access on 2026-10-06. GitHub write operations
+also require approval under the current never-approval policy. This batch is committed locally only;
+release qualification remains incomplete.

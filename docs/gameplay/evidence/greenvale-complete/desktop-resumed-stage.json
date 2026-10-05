@@ -1,0 +1,31 @@
+{
+  "user": "route_muvjmzr0",
+  "checks": [
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "armor.leather.trapper_cap"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.cloak.oathkeepers_mantle"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_home"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_timber"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_ore"
+    }
+  ],
+  "errors": []
+}

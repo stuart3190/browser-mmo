@@ -1,0 +1,55 @@
+{
+  "user": "herbs_muveurw6",
+  "checks": [
+    {
+      "name": "Real workshop equipment",
+      "ok": true
+    },
+    {
+      "name": "Vendor sell/buy via actual NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Exact purchased instance can be sold once",
+      "ok": true
+    },
+    {
+      "name": "Local banker opens existing real vault",
+      "ok": true
+    },
+    {
+      "name": "Persistent discovered atlas labels",
+      "ok": true
+    },
+    {
+      "name": "Touch controls reachable",
+      "ok": true,
+      "detail": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Touch controls reachable",
+      "ok": true,
+      "detail": {
+        "width": 844,
+        "height": 390
+      }
+    },
+    {
+      "name": "Actual touch joystick moves authoritative player",
+      "ok": true
+    },
+    {
+      "name": "Crafted equipment survives relog",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

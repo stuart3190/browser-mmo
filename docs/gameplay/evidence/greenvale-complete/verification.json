@@ -1,0 +1,54 @@
+{
+  "verifiedDate": "2026-10-05",
+  "agent": "Codex",
+  "baseline": "138891dd19ed6932a50c32df3e050c7b9de55ce7",
+  "unitTests": 229,
+  "postgresql": {
+    "domain": 81,
+    "realtime": 67,
+    "api": 8
+  },
+  "checks": [
+    "format",
+    "lint",
+    "monorepo typecheck",
+    "four production builds",
+    "production debug-hook absence"
+  ],
+  "fullRunCorrections": [
+    "NPC service completion ACK moved after reconciliation; targeted realtime rerun passed",
+    "Crash-test fixture removes legitimate regeneration, verifies exact retained health; corrected case passed"
+  ],
+  "populatedMigration": {
+    "zones": 25,
+    "proof": "Own preview hosts stopped; checkpoint images compared by zone ID; every field except contentHash unchanged; 30 existing item templates synced",
+    "finalContentHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94"
+  },
+  "browserQualification": {
+    "mainStory": "Actual fresh character completed all original seven and five new main quests, staged through ordinary movement/combat/UI inputs; no grants or teleports",
+    "sideQuests": "Timber and ore complete; river accepted, return flow incomplete; remedy and daily solo flow pending",
+    "touchServices": {
+      "checks": 10,
+      "result": "PASS: real gathering/craft, material sale, paid unique gear/exact-instance sale, bank, atlas, 390x844/844x390, joystick, relog, no browser exceptions"
+    },
+    "harnessCorrection": "Explore arrival mistakenly used nonexistent landmark.radius, producing NaN; now uses existing EXPLORATION_RADIUS minus 0.5. Live rerun still required.",
+    "partyContract": "Pending two-client browser qualification; domain shared-credit/reward regressions passed previously",
+    "physicalDevice": "Not tested; software-rendered emulation is functional evidence only"
+  },
+  "resumeDate": "2026-10-06",
+  "releaseStatus": {
+    "mainChanged": false,
+    "deployed": false,
+    "blocker": "Resumed managed shell cannot access preview/GitHub networking; connected VPS execution tool requires approval but approval policy is never.",
+    "remoteMainVerified": "138891dd19ed6932a50c32df3e050c7b9de55ce7"
+  },
+  "implementationCommit": "1258bf5addb1346afaa9d6aebdc0927559458178",
+  "resumeChecks": {
+    "gameDataTests": 121,
+    "lint": "pass",
+    "format": "pass",
+    "browserScriptsParse": "pass",
+    "explorationArrivalMetres": 3.5,
+    "riverAndQuayCentersWalkable": true
+  }
+}
