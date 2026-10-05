@@ -1,3 +1,4 @@
+import type { ContentReference } from '../content-loader';
 import type {
   ChunkPropSchema,
   DungeonDefinition,
@@ -371,41 +372,8 @@ chunks
     wanderRadius: 0,
   });
 
-// Stillwater expedition is appended after terrain scatter; old obstacle placement is unchanged.
-for (const spawn of [
-  {
-    id: 'spawn.greenvale.surveyor_tess',
-    kind: 'npc' as const,
-    refId: 'npc.greenvale.surveyor_tess',
-    position: { x: 63, y: 0, z: 38 },
-    respawnMs: null,
-    interactRadius: 4,
-  },
-  {
-    id: 'spawn.greenvale.siltbound_warden',
-    kind: 'enemy' as const,
-    refId: 'enemy.greenvale.siltbound_warden',
-    position: { x: 75, y: 0, z: 27 },
-    respawnMs: 60000,
-    interactRadius: 3,
-  },
-]) {
-  chunks
-    .find(
-      (c) =>
-        c.coord.cx === Math.floor(spawn.position.x / CHUNK) &&
-        c.coord.cz === Math.floor(spawn.position.z / CHUNK),
-    )!
-    .spawnPoints.push({
-      ...spawn,
-      rotationY: 0,
-      quantity: 1,
-      groupId: null,
-      wanderRadius: 0,
-    });
-}
+// Stillwater placements are loaded from its versioned pack after terrain scatter.
 
-// Shared geometry for the ruined pillars: visible footprint equals authoritative collision.
 export const keeperOutpostPillars = [
   [24, 115, 1.3],
   [24, 122, 1.7],
@@ -540,18 +508,8 @@ export const zones: WorldZone[] = [
   },
 ];
 
-export const npcs: NpcDefinition[] = [
-  {
-    id: 'npc.greenvale.surveyor_tess',
-    name: 'Surveyor Tess',
-    title: 'Keeper of the eastern records',
-    role: 'ambient',
-    modelId: null,
-    dialogue: [
-      'Maren sent you? These steps carried water to the village before the wardens sealed them. The siltbound guardian is drawing power from the same marks Rill found. ',
-      'Its surge fixes on the ground beneath you: move out of the blue circle before it breaks. Spread out if you travel together. I can read the inscription when it falls.',
-    ],
-  },
+export const npcs: (NpcDefinition | ContentReference)[] = [
+  { contentRef: 'npc.greenvale.surveyor_tess' },
   {
     id: 'npc.greenvale.keeper_rill',
     name: 'Keeper Rill',
@@ -575,7 +533,7 @@ export const npcs: NpcDefinition[] = [
   },
 ];
 
-export const enemies: EnemyDefinition[] = [
+export const enemies: (EnemyDefinition | ContentReference)[] = [
   {
     id: 'enemy.greenvale.last_door_sentinel',
     name: 'Aster, Last Door Sentinel',
@@ -600,30 +558,7 @@ export const enemies: EnemyDefinition[] = [
       corpseMs: 6000,
     },
   },
-  {
-    id: 'enemy.greenvale.siltbound_warden',
-    name: 'Siltbound Warden',
-    level: 4,
-    maxHealth: 280,
-    family: 'construct',
-    lootTableId: 'loot.greenvale.siltbound_warden',
-    xpReward: 220,
-    modelId: null,
-    isBoss: false,
-    isWorldBoss: false,
-    combat: {
-      damage: { min: 20, max: 28 },
-      attackSpeedMs: 3200,
-      windupMs: 1700,
-      groundStrikeRadius: 2.5,
-      attackRange: 9,
-      aggroRange: 8,
-      leashRange: 18,
-      moveSpeed: 2,
-      armor: 10,
-      corpseMs: 6000,
-    },
-  },
+  { contentRef: 'enemy.greenvale.siltbound_warden' },
   {
     id: 'enemy.greenvale.hollow_lantern',
     name: 'Hollow Lantern',
@@ -694,7 +629,7 @@ export const enemies: EnemyDefinition[] = [
   },
 ];
 
-export const quests: QuestDefinitionInput[] = [
+export const quests: (QuestDefinitionInput | ContentReference)[] = [
   {
     id: 'quest.greenvale.keeper_outpost',
     name: 'The Names Behind the Door',
@@ -775,45 +710,7 @@ export const quests: QuestDefinitionInput[] = [
         'The water remembers a door. Now we know where to look for its keepers. The seals must hold until we know what waits behind them.',
     },
   },
-  {
-    id: 'quest.greenvale.stillwater',
-    name: 'What the Ward Held',
-    description:
-      'Bring Rill’s discovery to Maren, then follow the east road. Turn north before the rock ridge, follow the pale steps around its north end, and speak to Surveyor Tess at Stillwater. Silence the Siltbound Warden below her camp and return to Maren. Step out of each blue ground mark before the surge; spread out in a party. Every member must accept and speak to Tess personally; eligible nearby members share the kill.',
-    giverNpcId: 'npc.greenvale.elder_maren',
-    minLevel: 3,
-    prerequisites: ['quest.greenvale.root_wound'],
-    objectives: [
-      {
-        id: 'speak_to_tess',
-        kind: 'talk',
-        npcId: 'npc.greenvale.surveyor_tess',
-        label: 'Read the ward records with Tess (Stillwater Steps)',
-      },
-      {
-        id: 'silence_warden',
-        kind: 'kill',
-        enemyId: 'enemy.greenvale.siltbound_warden',
-        count: 1,
-        label: 'Silence the Siltbound Warden (below Tess’s camp)',
-      },
-    ],
-    rewards: {
-      xp: 600,
-      currency: [{ currencyId: 'gold', amount: 250 }],
-      items: [{ itemTemplateId: 'accessory.ring.stillwater_seal', quantity: 1 }],
-    },
-    dialogue: {
-      offer:
-        'Rill’s ward was not a weapon. Our founders used those lights to hold something beneath Greenvale asleep. If its voice has reached the roots, another seal may be failing. Tess kept the eastern water records at Stillwater Steps. Follow the east road, turn north before the ridge, and round its north end to her camp. Hear her account, then silence the guardian. It marks the ground before its surge — move, and give your companions room. Bring the truth back to me.',
-      inProgress:
-        'Find Tess beyond the north end of the eastern ridge. The blue mark stays where it appeared: step clear before the Warden’s surge. Speak to Tess and silence the guardian, then return here.',
-      readyToTurnIn:
-        'Tess’s inscription says “Keep the deep spring sleeping.” So the voice was never Rill’s ward — it came from the water below it. The wardens sealed a living spring, and we have been drinking from its banks for generations. You have quieted its guardian without breaking the seal. Take this seal-ring; Greenvale trusts you with what our founders hid. I will compare Tess’s records with the old well book before we go further.',
-      completed:
-        'The eastern seal holds for now. Rill watches the roots, Tess watches the water, and I will find out why our founders feared the deep spring. You have given us a question we can finally name.',
-    },
-  },
+  { contentRef: 'quest.greenvale.stillwater' },
   {
     id: 'quest.greenvale.root_wound',
     name: 'The Light Beneath',

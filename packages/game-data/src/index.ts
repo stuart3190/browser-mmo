@@ -7,7 +7,11 @@ import { lootTables } from './content/loot';
 import { rarities } from './content/rarities';
 import { chunks, dungeons, enemies, npcs, quests, regions, zones } from './content/world';
 import { GameData } from './registry';
-import type { RawGameData } from './registry';
+import { compileContentCatalog, type ContentManifest } from './content-loader';
+import stillwaterPack from './content/packs/stillwater.json';
+export { compileContentCatalog } from './content-loader';
+export type { ContentManifest, ContentReference } from './content-loader';
+export const contentPacks = [stillwaterPack];
 
 export { GameData, RawGameDataSchema } from './registry';
 export type { RawGameData, ParsedGameData } from './registry';
@@ -28,7 +32,7 @@ export { propShapes, PLAYER_COLLISION_RADIUS, ENEMY_COLLISION_RADIUS } from './c
 export type { PropKind, PropShape } from './content/props';
 
 /** The raw authored content bundle. */
-export const rawGameData: RawGameData = {
+export const contentManifest: ContentManifest = {
   rarities,
   equipmentSlots,
   equipmentTypes,
@@ -51,6 +55,8 @@ export const rawGameData: RawGameData = {
   quests,
   dungeons,
 };
+
+export const rawGameData = compileContentCatalog(contentManifest, contentPacks);
 
 let cached: GameData | undefined;
 

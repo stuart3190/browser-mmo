@@ -915,3 +915,22 @@ existing unused filter helper disconnected; add favourites/junk/vendor flows in 
 **Consequences:** Sorting does not reorganise persisted slots or free capacity. Filters apply only
 to the chosen backpack/materials/recovered tab. Existing vault grids and item action authority
 remain unchanged. Mutation/favourites/junk systems are deliberately outside this milestone.
+
+## 2026-10-05 — Versioned authored packs compile to the existing GameData registry
+
+- **Date:** 2026-10-05
+- **Decision:** Introduce strict schema-version-1 JSON packs for quests, NPCs/placements, single-enemy
+  encounters and named quest/loot rewards. A pure adapter resolves explicit manifest references and
+  runs existing whole-catalog validation before any runtime consumes the data. Stable IDs and
+  definition order remain unchanged; Stillwater is the representative migration.
+- **Reason:** Content needs reusable validated authoring without rebuilding working authoritative
+  quest/combat/party/reward handlers. Explicit registration prevents silent overrides and preserves
+  seeded behavior and durable checkpoint hashes. Add iterative prerequisite cycle detection and
+  impossible loot-bound checks for both legacy and pack content.
+- **Alternatives considered:** Keep expanding inline TS; replace gameplay with a script interpreter;
+  auto-merge packs with overriding IDs; migrate every definition/world asset in one batch.
+- **Consequences:** Production/client use the same typed compiled catalog. Unsupported versions,
+  unknown fields, conflicting IDs and invalid links fail startup. No hot reload/editor/remote pack
+  endpoint, multi-stage encounter engine or gameplay additions. Future sections must define typed
+  links and have real authoritative consumers. Stillwater preserves the deployed canonical hash;
+  real semantic content changes still need the existing checkpoint migration procedure.

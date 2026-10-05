@@ -9,3 +9,5 @@ export * from './social';
 export * from './combat';
 export * from './world';
 export * from './api';
+
+export * from './content-pack';

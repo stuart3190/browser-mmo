@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "id": "pack.greenvale.stillwater",
+  "revision": 1,
+  "quests": [
+    {
+      "id": "quest.greenvale.stillwater",
+      "name": "What the Ward Held",
+      "description": "Bring Rill’s discovery to Maren, then follow the east road. Turn north before the rock ridge, follow the pale steps around its north end, and speak to Surveyor Tess at Stillwater. Silence the Siltbound Warden below her camp and return to Maren. Step out of each blue ground mark before the surge; spread out in a party. Every member must accept and speak to Tess personally; eligible nearby members share the kill.",
+      "giverNpcId": "npc.greenvale.elder_maren",
+      "turnInNpcId": null,
+      "minLevel": 3,
+      "prerequisites": ["quest.greenvale.root_wound"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "speak_to_tess",
+          "kind": "talk",
+          "npcId": "npc.greenvale.surveyor_tess",
+          "label": "Read the ward records with Tess (Stillwater Steps)"
+        },
+        {
+          "id": "silence_warden",
+          "kind": "kill",
+          "enemyId": "enemy.greenvale.siltbound_warden",
+          "count": 1,
+          "label": "Silence the Siltbound Warden (below Tess’s camp)"
+        }
+      ],
+      "dialogue": {
+        "offer": "Rill’s ward was not a weapon. Our founders used those lights to hold something beneath Greenvale asleep. If its voice has reached the roots, another seal may be failing. Tess kept the eastern water records at Stillwater Steps. Follow the east road, turn north before the ridge, and round its north end to her camp. Hear her account, then silence the guardian. It marks the ground before its surge — move, and give your companions room. Bring the truth back to me.",
+        "inProgress": "Find Tess beyond the north end of the eastern ridge. The blue mark stays where it appeared: step clear before the Warden’s surge. Speak to Tess and silence the guardian, then return here.",
+        "readyToTurnIn": "Tess’s inscription says “Keep the deep spring sleeping.” So the voice was never Rill’s ward — it came from the water below it. The wardens sealed a living spring, and we have been drinking from its banks for generations. You have quieted its guardian without breaking the seal. Take this seal-ring; Greenvale trusts you with what our founders hid. I will compare Tess’s records with the old well book before we go further.",
+        "completed": "The eastern seal holds for now. Rill watches the roots, Tess watches the water, and I will find out why our founders feared the deep spring. You have given us a question we can finally name."
+      },
+      "placeholder": false,
+      "rewardId": "reward.greenvale.stillwater"
+    }
+  ],
+  "npcs": [
+    {
+      "definition": {
+        "id": "npc.greenvale.surveyor_tess",
+        "name": "Surveyor Tess",
+        "title": "Keeper of the eastern records",
+        "role": "ambient",
+        "modelId": null,
+        "dialogue": [
+          "Maren sent you? These steps carried water to the village before the wardens sealed them. The siltbound guardian is drawing power from the same marks Rill found. ",
+          "Its surge fixes on the ground beneath you: move out of the blue circle before it breaks. Spread out if you travel together. I can read the inscription when it falls."
+        ]
+      },
+      "placements": [
+        {
+          "zoneId": "zone.greenvale.meadows",
+          "spawn": {
+            "id": "spawn.greenvale.surveyor_tess",
+            "kind": "npc",
+            "position": {
+              "x": 63,
+              "y": 0,
+              "z": 38
+            },
+            "rotationY": 0,
+            "refId": "npc.greenvale.surveyor_tess",
+            "quantity": 1,
+            "respawnMs": null,
+            "interactRadius": 4,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    }
+  ],
+  "encounters": [
+    {
+      "id": "encounter.greenvale.stillwater",
+      "enemy": {
+        "id": "enemy.greenvale.siltbound_warden",
+        "name": "Siltbound Warden",
+        "level": 4,
+        "maxHealth": 280,
+        "family": "construct",
+        "xpReward": 220,
+        "modelId": null,
+        "isBoss": false,
+        "isWorldBoss": false,
+        "combat": {
+          "windupMs": 1700,
+          "groundStrikeRadius": 2.5,
+          "damage": {
+            "min": 20,
+            "max": 28
+          },
+          "attackSpeedMs": 3200,
+          "attackRange": 9,
+          "aggroRange": 8,
+          "leashRange": 18,
+          "moveSpeed": 2,
+          "armor": 10,
+          "corpseMs": 6000
+        }
+      },
+      "lootRewardId": "loot.greenvale.siltbound_warden",
+      "placements": [
+        {
+          "zoneId": "zone.greenvale.meadows",
+          "spawn": {
+            "id": "spawn.greenvale.siltbound_warden",
+            "kind": "enemy",
+            "position": {
+              "x": 75,
+              "y": 0,
+              "z": 27
+            },
+            "rotationY": 0,
+            "refId": "enemy.greenvale.siltbound_warden",
+            "quantity": 1,
+            "respawnMs": 60000,
+            "interactRadius": 3,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.stillwater",
+      "value": {
+        "xp": 600,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 250
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "accessory.ring.stillwater_seal",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "kind": "loot",
+      "id": "loot.greenvale.siltbound_warden",
+      "value": {
+        "rolls": 1,
+        "emptyChance": 0,
+        "entries": [
+          {
+            "itemTemplateId": "material.ore.copper_ore",
+            "weight": 1,
+            "minQuantity": 4,
+            "maxQuantity": 4,
+            "rarityId": null
+          }
+        ],
+        "currency": {
+          "currencyId": "gold",
+          "min": 80,
+          "max": 100
+        }
+      }
+    }
+  ]
+}

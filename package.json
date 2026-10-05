@@ -25,7 +25,8 @@
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build",
     "assets:check": "tsx scripts/assets.ts check",
     "assets:promote": "tsx scripts/assets.ts promote",
-    "db:sync-content": "pnpm --filter @mmo/db db:sync-content"
+    "db:sync-content": "pnpm --filter @mmo/db db:sync-content",
+    "content:validate": "tsx scripts/validate-content.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -190,9 +190,16 @@ export class GameData {
     for (const lt of this.raw.lootTables) {
       lt.entries.forEach((e) => {
         need(this.itemTemplates, e.itemTemplateId, `loot ${lt.id}`);
+        if (e.minQuantity > e.maxQuantity) errors.push(`loot ${lt.id}: quantity min > max`);
+        const template = this.itemTemplates.get(e.itemTemplateId);
+        if (template && e.maxQuantity > template.maxStack)
+          errors.push(`loot ${lt.id}: ${e.itemTemplateId} exceeds max stack`);
         if (e.rarityId) need(this.rarities, e.rarityId, `loot ${lt.id}`);
       });
-      if (lt.currency) need(this.currencies, lt.currency.currencyId, `loot ${lt.id}`);
+      if (lt.currency) {
+        need(this.currencies, lt.currency.currencyId, `loot ${lt.id}`);
+        if (lt.currency.min > lt.currency.max) errors.push(`loot ${lt.id}: currency min > max`);
+      }
     }
     for (const r of this.raw.regions)
       r.zoneIds.forEach((z) => need(this.zones, z, `region ${r.id}`));
@@ -273,7 +280,35 @@ export class GameData {
   }
 
   private validateQuests(errors: string[]): void {
+    // Iterative graph walk avoids recursion limits for long content chains.
+    const visiting = new Set<string>();
+    const visited = new Set<string>();
+    for (const root of this.quests.keys()) {
+      const stack: { id: string; exit: boolean }[] = [{ id: root, exit: false }];
+      while (stack.length) {
+        const { id, exit } = stack.pop()!;
+        if (exit) {
+          visiting.delete(id);
+          visited.add(id);
+          continue;
+        }
+        if (visiting.has(id)) {
+          errors.push(`circular quest dependency at ${id}`);
+          continue;
+        }
+        if (visited.has(id)) continue;
+        visiting.add(id);
+        stack.push({ id, exit: true });
+        for (const pre of this.quests.get(id)?.prerequisites ?? [])
+          stack.push({ id: pre, exit: false });
+      }
+    }
     for (const q of this.quests.values()) {
+      if (new Set(q.prerequisites).size !== q.prerequisites.length)
+        errors.push(`quest ${q.id}: duplicate prerequisites`);
+      for (const pre of q.prerequisites)
+        if (!q.placeholder && this.quests.get(pre)?.placeholder)
+          errors.push(`quest ${q.id}: prerequisite ${pre} is not playable`);
       const npc = (id: string | null, what: string) => {
         if (id !== null && !this.npcs.has(id)) errors.push(`quest ${q.id}: unknown ${what} ${id}`);
       };
