@@ -30,7 +30,7 @@ export class PlayerController {
     start: Vec3,
     private readonly speed: number,
     private readonly sendMove: (pos: Vec3, rotationY: number) => void,
-    private readonly collision: CollisionWorld,
+    private collision: CollisionWorld,
     private readonly analog: AnalogInput,
   ) {
     this.actor = new ActorModel(scene, 'local_player', 'hero', '#397a70');
@@ -70,6 +70,17 @@ export class PlayerController {
     window.addEventListener('keyup', (e) => this.keys.delete(e.code));
     window.addEventListener('blur', () => this.keys.clear());
     canvas.focus();
+  }
+
+  private bounds?: { minX: number; minZ: number; maxX: number; maxZ: number };
+  changeZone(
+    collision: CollisionWorld,
+    bounds: { minX: number; minZ: number; maxX: number; maxZ: number },
+  ): void {
+    this.collision = collision;
+    this.bounds = bounds;
+    this.keys.clear();
+    this.analog.clear();
   }
 
   get position(): Vector3 {
@@ -142,6 +153,10 @@ export class PlayerController {
         { x: from.x + dir.x * step, z: from.z + dir.z * step },
         PLAYER_COLLISION_RADIUS,
       );
+      if (this.bounds) {
+        to.x = Math.max(this.bounds.minX + 0.6, Math.min(this.bounds.maxX - 0.6, to.x));
+        to.z = Math.max(this.bounds.minZ + 0.6, Math.min(this.bounds.maxZ - 0.6, to.z));
+      }
       this.mesh.position.x = to.x;
       this.mesh.position.z = to.z;
       this.mesh.rotation.y = Math.atan2(dir.x, dir.z);

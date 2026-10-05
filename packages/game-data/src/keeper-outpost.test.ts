@@ -1,5 +1,6 @@
+import { getStarterGameData as getGameData } from './starter-testing';
 import { expect, it } from 'vitest';
-import { getGameData, inAttackSector, applyExploration, questAvailability } from './index';
+import { inAttackSector, applyExploration, questAvailability } from './index';
 const gd = getGameData(),
   q = gd.quest('quest.greenvale.keeper_outpost');
 it('uses the existing prerequisite, personal survey and kill flow with a usable cloak', () => {

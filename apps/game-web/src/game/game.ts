@@ -24,6 +24,7 @@ import { AnalogInput } from './analog-input';
 import { PlayerController } from './player-controller';
 import { createEngine } from './renderer';
 import { WorldView } from './world-view';
+import { travelAt } from '@mmo/game-data';
 
 const INTERACT_RANGE = 3;
 
@@ -61,6 +62,10 @@ export async function startGame(args: {
   /** E key / touch "Interact" button: pick up a nearby item or talk to a nearby NPC. */
   const interact = () => {
     if (!entities || !player || state.vitals?.dead) return;
+    if (zoneId && travelAt(gameData.raw.worldCatalog, zoneId, player.position).length) {
+      state.update((s) => s.open.add('world'));
+      return;
+    }
     const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
     if (pickup) {
       net.send('interact.pickup', { entityId: pickup.id });
@@ -96,6 +101,7 @@ export async function startGame(args: {
     gameData,
     controls: {
       analog,
+      travel: (travelId) => net.send('world.travel', { travelId }),
       interact,
       targetNearest,
       zoneId: () => zoneId,
@@ -113,6 +119,7 @@ export async function startGame(args: {
     () => player,
     () => entities?.markers() ?? [],
     () => ({
+      loadedChunks: worldView.loadedChunkCount,
       meshes: scene.meshes.length,
       materials: scene.materials.length,
       textures: scene.textures.length,
@@ -160,13 +167,16 @@ export async function startGame(args: {
     if (m.ack !== undefined) state.toast(m.d.message, 'error');
   });
 
+  const worldView = new WorldView(scene, gameData);
   let entities: EntityViews | undefined;
   let player: PlayerController | undefined;
   let firstJoin: ((v: void) => void) | undefined;
   const joined = new Promise<void>((r) => (firstJoin = r));
 
   net.on('auth.ok', (m) => {
+    const changedZone = zoneId !== m.d.zoneId;
     zoneId = m.d.zoneId;
+    if (changedZone) worldView.loadZone(m.d.zoneId);
     state.update((s) => {
       s.character = m.d.character;
       s.zoneName = gameData.zone(m.d.zoneId).name;
@@ -177,7 +187,6 @@ export async function startGame(args: {
       s.dialogue = null;
     });
     if (!entities) {
-      new WorldView(scene, gameData).loadZone(m.d.zoneId);
       entities = new EntityViews(scene, m.d.entityId);
       const speed = gameData.characterClass(m.d.character.classId).baseStats.movement_speed ?? 6;
       player = new PlayerController(
@@ -194,8 +203,18 @@ export async function startGame(args: {
       // Reconnected: the server sends fresh snapshots; drop everything we knew about the world.
       entities.reset(m.d.entityId);
       player?.correct(m.d.character.position, 0);
-      state.addLog('Reconnected');
+      state.addLog(changedZone ? `Arrived in ${gameData.zone(m.d.zoneId).name}` : 'Reconnected');
     }
+    const z = gameData.zone(m.d.zoneId),
+      b = z.bounds,
+      size = z.chunkSize;
+    player?.changeZone(gameData.collisionWorld(m.d.zoneId), {
+      minX: b.minCx * size,
+      minZ: b.minCz * size,
+      maxX: (b.maxCx + 1) * size,
+      maxZ: (b.maxCz + 1) * size,
+    });
+    worldView.update(m.d.character.position);
   });
   net.on('zone.snapshot', (m) => {
     for (const e of m.d.entities) {
@@ -456,15 +475,19 @@ export async function startGame(args: {
     const dt = engine.getDeltaTime() / 1000;
     if (!player || !entities) return;
     player.update(dt);
+    worldView.update(player.position);
     entities.update(dt);
     effects.update(dt);
     const pickup = entities.nearest('pickup', player.position, INTERACT_RANGE);
     const npc = pickup ? undefined : entities.nearest('npc', player.position, INTERACT_RANGE + 1);
-    const prompt = pickup
-      ? `Press E to pick up ${pickup.name}`
-      : npc
-        ? `Press E to talk to ${npc.name}`
-        : null;
+    const passage = zoneId && travelAt(gameData.raw.worldCatalog, zoneId, player.position).length;
+    const prompt = passage
+      ? 'Press E to choose a passage'
+      : pickup
+        ? `Press E to pick up ${pickup.name}`
+        : npc
+          ? `Press E to talk to ${npc.name}`
+          : null;
     if (prompt !== lastPrompt) state.update((s) => (s.prompt = lastPrompt = prompt));
     scene.render();
   });

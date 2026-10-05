@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { WorldCatalogSchema } from '@mmo/schemas';
+import { validateWorldCatalog } from './world-catalog';
 import {
   AbilityDefinitionSchema,
   CombatRulesSchema,
@@ -44,6 +46,7 @@ import { CollisionWorld, chunkColliders } from './rules/collision';
 import { ENEMY_COLLISION_RADIUS, PLAYER_COLLISION_RADIUS } from './content/props';
 
 export const RawGameDataSchema = z.object({
+  worldCatalog: WorldCatalogSchema.optional(),
   rarities: z.array(ItemRarityDefinitionSchema),
   equipmentSlots: z.array(EquipmentSlotDefinitionSchema),
   equipmentTypes: z.array(EquipmentTypeDefinitionSchema),
@@ -277,6 +280,13 @@ export class GameData {
     const spawnIds = this.raw.chunks.flatMap((c) => c.spawnPoints.map((s) => s.id));
     if (new Set(spawnIds).size !== spawnIds.length) errors.push('duplicate spawn point ids');
     this.validateQuests(errors);
+    if (this.raw.worldCatalog) {
+      try {
+        validateWorldCatalog(this.raw, this.raw.worldCatalog);
+      } catch (error) {
+        errors.push(String(error));
+      }
+    }
   }
 
   private validateQuests(errors: string[]): void {
@@ -399,6 +409,28 @@ export class GameData {
       this.collisionWorlds.set(zoneId, w);
     }
     return w;
+  }
+
+  worldChunk(zoneId: string, coord: { cx: number; cz: number }): WorldChunk {
+    const existing = this.chunks.get(`${zoneId}|${chunkKey(coord)}`);
+    if (existing) return existing;
+    const zone = this.zone(zoneId);
+    if (
+      coord.cx < zone.bounds.minCx ||
+      coord.cx > zone.bounds.maxCx ||
+      coord.cz < zone.bounds.minCz ||
+      coord.cz > zone.bounds.maxCz
+    )
+      throw new Error('Chunk outside zone');
+    return {
+      zoneId,
+      coord,
+      terrainAssetId: null,
+      groundColor: zone.environment.ambientColor,
+      props: [],
+      colliders: [],
+      spawnPoints: [],
+    };
   }
 
   chunksForZone(zoneId: string): WorldChunk[] {

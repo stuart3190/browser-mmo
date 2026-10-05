@@ -8,7 +8,7 @@ import type {
 } from '@mmo/schemas';
 import { ItemStore } from '@mmo/ui';
 
-export type WindowId = 'inventory' | 'character' | 'bank' | 'quests' | 'party';
+export type WindowId = 'inventory' | 'character' | 'bank' | 'quests' | 'party' | 'world';
 
 export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 
@@ -86,6 +86,7 @@ export class GameState {
   quests: QuestView[] = [];
   /** Local guidance preference only; quest credit always comes from the server. */
   trackedQuestId: string | null = null;
+  worldDestinationId: string | null = null;
 
   trackQuest(id: string): void {
     this.trackedQuestId = id;

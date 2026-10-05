@@ -1,0 +1,66 @@
+{
+  "verifiedDate": "2026-10-05",
+  "characters": [
+    {
+      "username": "world_muvaozmo",
+      "id": "01a10c49-62eb-71ce-95ce-2f92d44826f4",
+      "zone_id": "zone.greenvale.meadows",
+      "pos_x": 0,
+      "pos_z": 116,
+      "current_health": 144,
+      "level": 1,
+      "xp": "23"
+    },
+    {
+      "username": "shore_muvaozmo",
+      "id": "01a10c49-75f4-72e0-a521-948a73ffe430",
+      "zone_id": "zone.aurelian.greenvale_marches",
+      "pos_x": 256,
+      "pos_z": 378.23223749990393,
+      "current_health": 106,
+      "level": 1,
+      "xp": "0"
+    }
+  ],
+  "items": [
+    {
+      "id": "01a10c49-cb42-7778-90f9-91423cdc2717",
+      "template_id": "weapon.sword.iron_longsword",
+      "quantity": 1,
+      "owner_character_id": "01a10c49-62eb-71ce-95ce-2f92d44826f4",
+      "location_kind": "equipped",
+      "equip_slot": "main_hand",
+      "source_ref": "world_pickup:spawn.greenvale.sword_rack:01a10c47-2a7d-7122-9d23-39956920ebbc"
+    },
+    {
+      "id": "01a10c56-f438-7a28-8549-931a6c7c543c",
+      "template_id": "material.world.field_hide",
+      "quantity": 2,
+      "owner_character_id": "01a10c49-62eb-71ce-95ce-2f92d44826f4",
+      "location_kind": "container",
+      "equip_slot": null,
+      "source_ref": "kill:01a10c56-f34f-701c-8d17-69722289aa63:01a10c49-62eb-71ce-95ce-2f92d44826f4:0"
+    }
+  ],
+  "rewards": [
+    {
+      "kill_id": "01a10c56-f34f-701c-8d17-69722289aa63",
+      "character_id": "01a10c49-62eb-71ce-95ce-2f92d44826f4",
+      "enemy_id": "enemy.world.greenvale_marches.wildlife.1",
+      "zone_id": "zone.aurelian.greenvale_marches",
+      "xp": 23,
+      "item_count": 1
+    }
+  ],
+  "events": [
+    {
+      "kill_id": "01a10c56-f34f-701c-8d17-69722289aa63",
+      "enemy_id": "enemy.world.greenvale_marches.wildlife.1",
+      "zone_id": "zone.aurelian.greenvale_marches",
+      "status": "rewarded",
+      "loot_character_id": "01a10c49-62eb-71ce-95ce-2f92d44826f4",
+      "recipients": ["01a10c49-62eb-71ce-95ce-2f92d44826f4"]
+    }
+  ],
+  "assertionsPassed": 6
+}

@@ -1,0 +1,235 @@
+[
+  {
+    "name": "Travel retains the same equipped unique sword",
+    "ok": true
+  },
+  {
+    "name": "Other client remains on Greenvale without cross-zone ghost",
+    "ok": true
+  },
+  {
+    "name": "Settlement inhabitants have actual replicated world presence",
+    "ok": true,
+    "detail": [
+      "Greenvale Marches Provisioner",
+      "Greenvale Marches Mentor",
+      "Greenvale Marches Steward",
+      "Greenvale Marches Scout",
+      "Greenvale Marches Vault Steward",
+      "Greenvale Marches Warden",
+      "Greenvale Marches Host",
+      "Greenvale Marches Healer",
+      "Greenvale Marches Gamekeeper"
+    ]
+  },
+  {
+    "name": "Regional wildlife exists independently of quests",
+    "ok": true,
+    "detail": "Greenvale Marches Meadow Hart"
+  },
+  {
+    "name": "Real regional combat produces persistent catalog loot and XP",
+    "ok": true
+  },
+  {
+    "name": "World compass guides location.greenvale_marches.port",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.greenvale_marches.port -> location.brinebreak.port",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 20,
+      "meshes": 61,
+      "materials": 20,
+      "textures": 1,
+      "activeMeshes": 44,
+      "entities": 1
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.brinebreak.port -> location.ashstrand.port",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 20,
+      "meshes": 61,
+      "materials": 20,
+      "textures": 1,
+      "activeMeshes": 44,
+      "entities": 1
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.ashstrand.port -> location.oasis_reach.port",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 20,
+      "meshes": 61,
+      "materials": 20,
+      "textures": 1,
+      "activeMeshes": 44,
+      "entities": 1
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.oasis_reach.port -> location.mistwood.port",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 20,
+      "meshes": 61,
+      "materials": 20,
+      "textures": 1,
+      "activeMeshes": 44,
+      "entities": 1
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.mistwood.port -> location.brinebreak.port",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 20,
+      "meshes": 61,
+      "materials": 20,
+      "textures": 1,
+      "activeMeshes": 44,
+      "entities": 1
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.brinebreak.port -> location.greenvale_marches.port",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 20,
+      "meshes": 61,
+      "materials": 20,
+      "textures": 2,
+      "activeMeshes": 44,
+      "entities": 1
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "Cross-continent relog retains unique loot/equipment/XP and zone",
+    "ok": true
+  },
+  {
+    "name": "World compass guides location.greenvale.north_gate",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.greenvale.north_gate -> location.greenvale_marches.starter_gate",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 25,
+      "meshes": 224,
+      "materials": 63,
+      "textures": 3,
+      "activeMeshes": 91,
+      "entities": 9
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "Both clients reconcile into the same new region",
+    "ok": true
+  },
+  {
+    "name": "Actual touch joystick works after region transfer",
+    "ok": true
+  },
+  {
+    "name": "390x844 atlas exposes all five continents and 24 regions",
+    "ok": true
+  },
+  {
+    "name": "390x844 travel hit target reachable",
+    "ok": true,
+    "detail": {
+      "x": 309.4375,
+      "y": 383.875,
+      "width": 69.5625,
+      "height": 44
+    }
+  },
+  {
+    "name": "390x844 joystick/action bar not clipped",
+    "ok": true,
+    "detail": [
+      {
+        "x": 10,
+        "y": 652,
+        "w": 116,
+        "h": 116
+      },
+      {
+        "x": 0,
+        "y": 788,
+        "w": 390,
+        "h": 44
+      }
+    ]
+  },
+  {
+    "name": "844x390 atlas exposes all five continents and 24 regions",
+    "ok": true
+  },
+  {
+    "name": "844x390 travel hit target reachable",
+    "ok": true,
+    "detail": {
+      "x": 763.4375,
+      "y": 156.875,
+      "width": 69.5625,
+      "height": 44
+    }
+  },
+  {
+    "name": "844x390 joystick/action bar not clipped",
+    "ok": true,
+    "detail": [
+      {
+        "x": 18,
+        "y": 202,
+        "w": 112,
+        "h": 112
+      },
+      {
+        "x": 0,
+        "y": 334,
+        "w": 844,
+        "h": 44
+      }
+    ]
+  },
+  {
+    "name": "No browser exceptions",
+    "ok": true,
+    "detail": []
+  }
+]

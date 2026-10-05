@@ -9,9 +9,11 @@ import { chunks, dungeons, enemies, npcs, quests, regions, zones } from './conte
 import { GameData } from './registry';
 import { compileContentCatalog, type ContentManifest } from './content-loader';
 import stillwaterPack from './content/packs/stillwater.json';
+import worldPack from './content/packs/world-greybox.json';
+export { travelAt, worldDestination } from './world-catalog';
 export { compileContentCatalog } from './content-loader';
 export type { ContentManifest, ContentReference } from './content-loader';
-export const contentPacks = [stillwaterPack];
+export const contentPacks = [stillwaterPack, worldPack];
 
 export { GameData, RawGameDataSchema } from './registry';
 export type { RawGameData, ParsedGameData } from './registry';
@@ -69,3 +71,5 @@ export function getGameData(): GameData {
 export const DEMO_ZONE_ID = 'zone.greenvale.meadows';
 
 export { keeperOutpostPillars } from './content/world';
+
+export { clipRoad } from './rules/world-roads';

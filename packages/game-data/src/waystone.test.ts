@@ -1,5 +1,6 @@
+import { getStarterGameData as getGameData } from './starter-testing';
 import { describe, it, expect } from 'vitest';
-import { getGameData } from './index';
+
 import { applyTalk, objectiveProgress, questAvailability } from './rules/quests';
 const gd = getGameData();
 const Q = gd.quest('quest.greenvale.old_waystone');

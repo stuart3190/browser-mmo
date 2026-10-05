@@ -1,5 +1,6 @@
+import { getStarterGameData as getGameData } from './starter-testing';
 import { expect, it } from 'vitest';
-import { getGameData, questAvailability } from './index';
+import { questAvailability } from './index';
 it('adds the exact Root-Wound content without changing existing terrain or rewards', async () => {
   const gd = getGameData();
   const old = structuredClone(gd.raw);

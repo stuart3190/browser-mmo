@@ -1,4 +1,5 @@
 import type { GameData } from '@mmo/game-data';
+import { worldDestination } from '@mmo/game-data';
 import type { QuestView } from '@mmo/schemas';
 
 export interface QuestDestination {
@@ -100,7 +101,15 @@ export function questDestination(
       c.zoneId === zoneId ? Math.hypot(c.position.x - me.x, c.position.z - me.z) : Infinity;
     return distance(a) - distance(b);
   });
-  const target = candidates[0];
+  let target = candidates[0];
+  if (target && target.zoneId !== zoneId && gd.raw.worldCatalog) {
+    const place = gd.raw.worldCatalog.locations.find((l) => l.zoneId === target!.zoneId);
+    const route = place && worldDestination(gd.raw.worldCatalog, place.id, zoneId);
+    if (route) {
+      target = { zoneId: route.location.zoneId, position: route.location.position };
+      label = `Travel via ${route.location.name} · ${label}`;
+    }
+  }
   return {
     questId: q.questId,
     questName: q.name,

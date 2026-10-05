@@ -23,7 +23,12 @@ const server = createRealtimeServer({
   changeFeedUrl: env.DATABASE_URL,
   logger,
   metrics: new Metrics(),
-  zoneIds: splitList(env.REALTIME_ZONES),
+  zoneIds:
+    env.REALTIME_ZONES === '*'
+      ? getGameData()
+          .raw.zones.filter((z) => !z.instanced)
+          .map((z) => z.id)
+      : splitList(env.REALTIME_ZONES),
   tickHz: env.REALTIME_TICK_HZ,
   allowedOrigins: splitList(env.REALTIME_ALLOWED_ORIGINS),
 });

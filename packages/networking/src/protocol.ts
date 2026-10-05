@@ -101,6 +101,8 @@ export const CombatRespawnMsg = clientMsg('combat.respawn', z.object({}));
  * Talk to an NPC entity. The server checks the entity is an NPC in the player's zone, the player
  * is alive and in range, and answers with `npc.dialogue` (or an error).
  */
+export const WorldTravelMsg = clientMsg('world.travel', z.object({ travelId: ContentIdSchema }));
+
 export const NpcInteractMsg = clientMsg('npc.interact', z.object({ entityId: EntityIdSchema }));
 
 /** Accept a quest offered by the NPC entity the player is standing next to. */
@@ -136,6 +138,7 @@ export const ClientMessageSchema = z.discriminatedUnion('t', [
   PartyDisbandMsg,
   AbilityUseMsg,
   NpcInteractMsg,
+  WorldTravelMsg,
   QuestAcceptMsg,
   QuestTurnInMsg,
   AuthHelloMsg,

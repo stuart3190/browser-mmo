@@ -1,5 +1,6 @@
+import { getStarterGameData as getGameData } from './starter-testing';
 import { expect, it } from 'vitest';
-import { getGameData, applyExploration, objectiveProgress } from './index';
+import { applyExploration, objectiveProgress } from './index';
 const gd = getGameData(),
   q = gd.quest('quest.greenvale.well_records'),
   zone = gd.zone('zone.greenvale.meadows');

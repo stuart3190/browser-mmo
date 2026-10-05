@@ -1,0 +1,44 @@
+{
+  "verifiedDate": "2026-10-05",
+  "agent": "Codex",
+  "verification": {
+    "command": "NODE_ENV=production TEST_DATABASE_URL=<disposable mmo_party_test> pnpm verify",
+    "exitCode": 0,
+    "format": true,
+    "lint": true,
+    "typecheck": true,
+    "unitTests": 216,
+    "postgresIntegrationTests": 136,
+    "realtimeIntegrationTests": 63,
+    "domainIntegrationTests": 65,
+    "apiIntegrationTests": 8,
+    "productionBuilds": 4,
+    "productionDebugHookGuard": true
+  },
+  "compiledHash": "96afea3256a20111a723829672002fc96e7b5151ecb0d809fa27f4d6c3899081",
+  "originalCatalogUnchanged": true,
+  "landmasses": 5,
+  "regions": 24,
+  "runtimeZones": 25,
+  "materialTemplatesAdded": 10,
+  "npcPopulationAdded": 240,
+  "enemyVariantsAdded": 72,
+  "directedTravelLinks": 114,
+  "browserAssertions": 35,
+  "readOnlyEconomyAssertions": 6,
+  "populatedPreviewCheckpointMigration": {
+    "migration": "0015_world_foundation_content.sql",
+    "allFieldsExceptContentHashPreserved": true,
+    "templatesSynced": 30
+  },
+  "limitations": [
+    "Greybox sparse terrain and representative populations; not finished continent content.",
+    "Shops, gathering, professions, lodging, NPC healing and dungeon instances are placeholders.",
+    "Same-host transfers; cross-host transfer and cross-zone persistent parties not implemented.",
+    "Chromium/SwiftShader touch emulation is not physical Android performance proof."
+  ],
+  "verificationNotes": [
+    "First aggregate attempt stopped at a test-only JSON fixture typing error, before suites; schema-parsed fixture corrected and the complete final aggregate exited zero.",
+    "Browser started with fresh characters and resumed earned state after harness timeout/selector/port-ferryman expectation corrections; no position/progression/reward/stat injection. Starter prefix records six passes and the corrected NPC-count failure; final tour and guidance scripts exited zero."
+  ]
+}

@@ -8,6 +8,7 @@ import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import type { Scene } from '@babylonjs/core/scene';
 import type { WorldEntity } from '@mmo/schemas';
 import { ActorModel } from './actor-model';
+import { getGameData } from '@mmo/game-data';
 
 interface View {
   entity: WorldEntity;
@@ -282,7 +283,14 @@ export class EntityViews {
             : e.refId === 'enemy.greenvale.hollow_lantern'
               ? 'lantern'
               : e.kind === 'enemy'
-                ? 'wolf'
+                ? ((
+                    {
+                      'greybox:humanoid': 'hero',
+                      'greybox:construct': 'warden',
+                      'greybox:elemental': 'lantern',
+                    } as const
+                  )[getGameData().enemies.get(e.refId ?? '')?.modelId as 'greybox:humanoid'] ??
+                  'wolf')
                 : 'hero',
         e.kind === 'npc' ? '#94744c' : '#526b98',
       );

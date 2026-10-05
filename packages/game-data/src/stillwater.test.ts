@@ -1,5 +1,6 @@
+import { getStarterGameData as getGameData } from './starter-testing';
 import { expect, it } from 'vitest';
-import { getGameData, questAvailability } from './index';
+import { questAvailability } from './index';
 it('adds Stillwater to the exact existing content, keeps terrain/progression, and gates it after Root-Wound', async () => {
   const gd = getGameData(),
     old = structuredClone(gd.raw);

@@ -53,7 +53,7 @@ export const RealtimeEnvSchema = CommonEnvSchema.extend({
   REALTIME_TICK_HZ: z.coerce.number().int().min(1).max(60).default(20),
   REALTIME_MAX_CONNECTIONS: z.coerce.number().int().min(1).max(256).default(5),
   /** Zones hosted by this realtime process (comma separated). */
-  REALTIME_ZONES: z.string().default('zone.greenvale.meadows'),
+  REALTIME_ZONES: z.string().default('*'),
 });
 export type RealtimeEnv = z.infer<typeof RealtimeEnvSchema>;
 

@@ -1,0 +1,49 @@
+[
+  {
+    "name": "Existing Greenvale multiplayer and opening guidance work",
+    "ok": true
+  },
+  {
+    "name": "World compass guides location.greenvale.north_gate",
+    "ok": true
+  },
+  {
+    "name": "UI travel location.greenvale.north_gate -> location.greenvale_marches.starter_gate",
+    "ok": true,
+    "detail": {
+      "loadedChunks": 25,
+      "meshes": 224,
+      "materials": 63,
+      "textures": 3,
+      "activeMeshes": 158,
+      "entities": 9
+    }
+  },
+  {
+    "name": "Streamed ground stays bounded",
+    "ok": true
+  },
+  {
+    "name": "Travel retains the same equipped unique sword",
+    "ok": true
+  },
+  {
+    "name": "Other client remains on Greenvale without cross-zone ghost",
+    "ok": true
+  },
+  {
+    "name": "Settlement inhabitants have actual replicated world presence",
+    "ok": false,
+    "detail": [
+      "Greenvale Marches Provisioner",
+      "Greenvale Marches Mentor",
+      "Greenvale Marches Steward",
+      "Greenvale Marches Scout",
+      "Greenvale Marches Vault Steward",
+      "Greenvale Marches Warden",
+      "Greenvale Marches Host",
+      "Greenvale Marches Healer",
+      "Greenvale Marches Gamekeeper"
+    ]
+  }
+]

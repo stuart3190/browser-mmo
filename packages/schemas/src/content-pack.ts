@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { WorldCatalogSchema } from './world-catalog';
 import { ContentIdSchema } from './common';
 import { DamageRangeSchema, EnemyCombatSchema } from './combat';
 import { LootTableSchema, QuestDefinitionSchema } from './content';
@@ -74,7 +75,7 @@ export const ContentEncounterSchema = z.strictObject({
   lootRewardId: ContentIdSchema.nullable(),
   placements: z.array(ContentPlacementSchema).min(1),
 });
-export const ContentPackSchema = z.strictObject({
+const ContentPackV1Schema = z.strictObject({
   schemaVersion: z.literal(1),
   id: ContentIdSchema,
   revision: z.number().int().positive(),
@@ -83,5 +84,13 @@ export const ContentPackSchema = z.strictObject({
   encounters: z.array(ContentEncounterSchema),
   rewards: z.array(ContentRewardSchema),
 });
+export const ContentPackV2Schema = ContentPackV1Schema.extend({
+  schemaVersion: z.literal(2),
+  world: WorldCatalogSchema,
+});
+export const ContentPackSchema = z.discriminatedUnion('schemaVersion', [
+  ContentPackV1Schema,
+  ContentPackV2Schema,
+]);
 export type ContentPackInput = z.input<typeof ContentPackSchema>;
 export type ContentPack = z.output<typeof ContentPackSchema>;

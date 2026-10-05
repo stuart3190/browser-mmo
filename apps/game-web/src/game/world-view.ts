@@ -5,15 +5,22 @@ import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTexture';
 import type { Scene } from '@babylonjs/core/scene';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { propShapes, keeperOutpostPillars } from '@mmo/game-data';
+import {
+  propShapes,
+  keeperOutpostPillars,
+  chunkCoordFor,
+  chunksInRadius,
+  chunkKey,
+  clipRoad,
+} from '@mmo/game-data';
 import type { GameData, PropKind } from '@mmo/game-data';
 import type { WorldChunk } from '@mmo/schemas';
 import { starterRoads } from './starter-roads';
 
 /**
- * Static world rendering from chunk data. Each chunk is built/disposed independently, which is the
- * hook for real streaming later (load chunks around the camera, dispose far ones). For the demo
- * zone every chunk is loaded at once.
+ * Static world rendering from the validated registry. Atlas regions stream a bounded nearby
+ * chunk window and dispose distant geometry/resources. The small original Greenvale enclave
+ * retains its existing all-chunk presentation.
  */
 export class WorldView {
   private readonly loaded = new Map<string, () => void>();
@@ -24,11 +31,67 @@ export class WorldView {
     private readonly gameData: GameData,
   ) {}
 
+  private zoneId: string | null = null;
+  private centerKey = '';
+  private extras: Mesh[] = [];
+
+  dispose(): void {
+    for (const dispose of this.loaded.values()) dispose();
+    this.loaded.clear();
+    const shared = new Set(this.materials.values());
+    for (const mesh of this.extras) {
+      if (mesh.material && !shared.has(mesh.material as StandardMaterial))
+        mesh.material.dispose(true, true);
+      mesh.dispose();
+    }
+    this.extras = [];
+    for (const material of this.materials.values()) material.dispose(true, true);
+    this.materials.clear();
+    this.centerKey = '';
+  }
+
+  update(position: { x: number; z: number }): void {
+    if (!this.zoneId || this.zoneId === 'zone.greenvale.meadows') return;
+    const zone = this.gameData.zone(this.zoneId),
+      coord = chunkCoordFor(zone, position),
+      key = chunkKey(coord);
+    if (key === this.centerKey) return;
+    this.centerKey = key;
+    const wanted = new Set(chunksInRadius(zone, coord, 2).map((c) => `${zone.id}|${chunkKey(c)}`));
+    for (const [key, dispose] of this.loaded)
+      if (!wanted.has(key)) {
+        dispose();
+        this.loaded.delete(key);
+      }
+    for (const c of chunksInRadius(zone, coord, 2))
+      this.loadChunk(this.gameData.worldChunk(zone.id, c), zone.chunkSize);
+  }
+
+  get loadedChunkCount(): number {
+    return this.loaded.size;
+  }
+
   loadZone(zoneId: string): void {
+    this.dispose();
+    this.zoneId = zoneId;
+    let before = new Set(this.scene.meshes);
     const zone = this.gameData.zone(zoneId);
     this.scene.clearColor.set(...hexToRgb(zone.environment.ambientColor), 1);
-    for (const chunk of this.gameData.chunksForZone(zoneId)) this.loadChunk(chunk, zone.chunkSize);
-    this.paths();
+    if (zoneId === 'zone.greenvale.meadows') {
+      for (const chunk of this.gameData.chunksForZone(zoneId))
+        this.loadChunk(chunk, zone.chunkSize);
+      before = new Set(this.scene.meshes);
+      this.paths();
+      for (const node of this.gameData.raw.worldCatalog?.locations.filter(
+        (l) => l.zoneId === zoneId && l.kind === 'gate',
+      ) ?? [])
+        this.sign(
+          node.position.x,
+          node.position.z,
+          node.name,
+          'E or World / Travel to follow the road',
+        );
+    }
     this.scene.fogMode = 3;
     this.scene.fogColor = Color3.FromHexString('#b4ccbf');
     this.scene.fogStart = 65;
@@ -44,6 +107,7 @@ export class WorldView {
       ring.material = this.material('#c9b46a');
       ring.isPickable = false;
     }
+    this.extras = this.scene.meshes.filter((m) => !before.has(m)) as Mesh[];
   }
 
   /** Visible roads follow the clear corridors already reserved by authoritative world data. */
@@ -323,9 +387,110 @@ export class WorldView {
       this.scene,
     );
     ground.position.set(chunk.coord.cx * size + size / 2, 0, chunk.coord.cz * size + size / 2);
-    ground.material = this.material('#64865b');
+    ground.material = this.material(
+      chunk.zoneId === 'zone.greenvale.meadows' ? '#64865b' : chunk.groundColor,
+    );
     ground.isPickable = false;
     disposables.push(ground);
+
+    const atlas = this.gameData.raw.worldCatalog;
+    if (atlas?.regions.some((r) => r.zoneId === chunk.zoneId)) {
+      const bounds = {
+        minX: chunk.coord.cx * size,
+        minZ: chunk.coord.cz * size,
+        maxX: (chunk.coord.cx + 1) * size,
+        maxZ: (chunk.coord.cz + 1) * size,
+      };
+      for (const road of atlas.roads.filter((r) => r.zoneId === chunk.zoneId))
+        for (let i = 1; i < road.points.length; i++) {
+          const line = clipRoad(road.points[i - 1]!, road.points[i]!, bounds);
+          if (!line) continue;
+          const path = MeshBuilder.CreateGround(
+            `road_${key}_${road.id}`,
+            { width: road.width, height: Math.hypot(line.b.x - line.a.x, line.b.z - line.a.z) },
+            this.scene,
+          );
+          path.position.set((line.a.x + line.b.x) / 2, 0.025, (line.a.z + line.b.z) / 2);
+          path.rotation.y = Math.atan2(line.b.x - line.a.x, line.b.z - line.a.z);
+          path.material = this.material('#ac9c79');
+          path.isPickable = false;
+          path.freezeWorldMatrix();
+          disposables.push(path);
+        }
+      for (const l of atlas.locations.filter(
+        (l) =>
+          l.zoneId === chunk.zoneId &&
+          Math.floor(l.position.x / size) === chunk.coord.cx &&
+          Math.floor(l.position.z / size) === chunk.coord.cz,
+      )) {
+        const label = MeshBuilder.CreatePlane(
+            `label_${l.id}`,
+            { width: 12, height: 3 },
+            this.scene,
+          ),
+          texture = new DynamicTexture(
+            `name_${l.id}`,
+            { width: 512, height: 128 },
+            this.scene,
+            false,
+          );
+        texture.drawText(l.name, undefined, 76, 'bold 24px sans-serif', '#fff1cc', '#24342b', true);
+        const material = new StandardMaterial(`label_mat_${l.id}`, this.scene);
+        material.diffuseTexture = texture;
+        material.emissiveColor = Color3.White();
+        material.backFaceCulling = false;
+        label.position.set(l.position.x, 5, l.position.z);
+        label.billboardMode = 7;
+        label.material = material;
+        label.isPickable = false;
+        disposables.push(label, { dispose: () => material.dispose(true, true) });
+        if (l.kind === 'port') {
+          const basin = MeshBuilder.CreateGround(
+            `water_${l.id}`,
+            { width: 32, height: 20 },
+            this.scene,
+          );
+          basin.position.set(l.position.x, 0.02, l.position.z - 14);
+          basin.material = this.material('#537b8b');
+          basin.isPickable = false;
+          disposables.push(basin);
+          const boat = MeshBuilder.CreateBox(
+            `boat_${l.id}`,
+            { width: 5, height: 1.5, depth: 11 },
+            this.scene,
+          );
+          boat.position.set(l.position.x + 7, 0.9, l.position.z - 12);
+          boat.material = this.material('#876545');
+          boat.isPickable = false;
+          disposables.push(boat);
+        }
+      }
+      const zone = this.gameData.zone(chunk.zoneId),
+        b = zone.bounds;
+      for (const [edge, x, z, w, d] of [
+        ['west', bounds.minX, bounds.minZ + size / 2, 2, size],
+        ['east', bounds.maxX, bounds.minZ + size / 2, 2, size],
+        ['south', bounds.minX + size / 2, bounds.minZ, size, 2],
+        ['north', bounds.minX + size / 2, bounds.maxZ, size, 2],
+      ] as const) {
+        if (!(
+          (edge === 'west' && chunk.coord.cx === b.minCx) ||
+          (edge === 'east' && chunk.coord.cx === b.maxCx) ||
+          (edge === 'south' && chunk.coord.cz === b.minCz) ||
+          (edge === 'north' && chunk.coord.cz === b.maxCz)
+        ))
+          continue;
+        const cliff = MeshBuilder.CreateBox(
+          `cliff_${key}_${edge}`,
+          { width: w, height: 8, depth: d },
+          this.scene,
+        );
+        cliff.position.set(x, 3, z);
+        cliff.material = this.material('#77766f');
+        cliff.isPickable = false;
+        disposables.push(cliff);
+      }
+    }
 
     // Props: mesh dimensions come from the same shape table as the gameplay colliders.
     for (const prop of chunk.props) {

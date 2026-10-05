@@ -37,7 +37,7 @@ import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
 import type { KillEvent, OutMessage } from '@mmo/world';
 import type { QuestView } from '@mmo/schemas';
-import { applyExploration } from '@mmo/game-data';
+import { applyExploration, travelAt } from '@mmo/game-data';
 import type { Rng } from '@mmo/game-data';
 import { TokenBucket } from './rate-limit';
 import { AccountSync, loadContainerIds } from './sync';
@@ -119,6 +119,7 @@ interface Connection {
   rateViolations: number;
   workBucket: TokenBucket;
   working: boolean;
+  transferring?: boolean;
   token?: string;
   sessionUntil: number;
   sessionCheckedAt: number;
@@ -400,6 +401,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       'npc.interact',
       'quest.accept',
       'quest.turn_in',
+      'world.travel',
     ].includes(msg.t);
     if (expensive && (conn.working || activeWork >= 8 || !conn.workBucket.take(now))) {
       return sendError(conn, ErrorCode.RATE_LIMITED, 'Database work limit reached', msg.seq);
@@ -419,6 +421,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       ) {
         return sendError(conn, ErrorCode.UNAUTHENTICATED, 'Session no longer valid', msg.seq, true);
       }
+      if (conn.transferring && msg.t !== 'ping')
+        return sendError(conn, ErrorCode.CONFLICT, 'Travel in progress', msg.seq);
       await handleGameMessage(conn, conn.player, msg, now);
     } catch (err) {
       if (err instanceof DomainError) return sendError(conn, err.code, err.message, msg.seq);
@@ -555,6 +559,142 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     }
   }
 
+  async function travel(
+    conn: Connection,
+    player: NonNullable<Connection['player']>,
+    travelId: string,
+    seq: number,
+  ) {
+    const world = ctx.gameData.raw.worldCatalog;
+    const route = world?.travel.find((t) => t.id === travelId);
+    const origin = route && world?.locations.find((l) => l.id === route.fromLocationId);
+    const destination = route && world?.locations.find((l) => l.id === route.toLocationId);
+    const target = destination && zones.get(destination.zoneId);
+    const source = player.zone;
+    const check = () => {
+      const p = source.getPlayer(player.characterId);
+      if (
+        !route ||
+        !origin ||
+        !destination ||
+        !target ||
+        !p ||
+        !travelAt(world, source.zone.id, p.position).some((t) => t.id === travelId)
+      )
+        throw new DomainError(
+          ErrorCode.FORBIDDEN,
+          'Stand within five metres of a hosted travel node',
+        );
+      if (
+        source.isThreatened(player.characterId) ||
+        p.dead ||
+        p.attacking ||
+        (p.lastCombatAtMs > 0 &&
+          Date.now() - p.lastCombatAtMs < ctx.gameData.raw.combatRules.combatTimeoutMs)
+      )
+        throw new DomainError(ErrorCode.CONFLICT, 'Leave combat before travelling');
+      if (
+        route.requiredQuestId &&
+        !conn.questLog?.some((q) => q.questId === route.requiredQuestId && q.state === 'completed')
+      )
+        throw new DomainError(ErrorCode.FORBIDDEN, 'Travel route is not unlocked');
+      return p;
+    };
+    check();
+    if (admitting.has(player.characterId))
+      throw new DomainError(ErrorCode.CONFLICT, 'Character is reconnecting');
+    admitting.add(player.characterId);
+    conn.transferring = true;
+    try {
+      const row = await requireOwnedCharacter(ctx.db, player.accountId, player.characterId);
+      if (!(await deps.sessions.resolve(ctx, conn.token!)))
+        throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Invalid session');
+      await checkpoint; // No old-zone snapshot can overtake the atomic transfer image.
+      if (
+        !ownership.active ||
+        byCharacter.get(player.characterId) !== conn ||
+        conn.ws.readyState !== conn.ws.OPEN
+      )
+        throw new DomainError(ErrorCode.UNAUTHENTICATED, 'Controller no longer valid');
+      if (target!.getPlayer(player.characterId))
+        throw new DomainError(ErrorCode.CONFLICT, 'Destination already contains character');
+      const p = check(),
+        state = source.persistentState(player.characterId)!;
+      if (source.parties.view(player.characterId).partyId)
+        source.parties.leave(player.characterId, false);
+      source.removePlayer(player.characterId);
+      source.syncParties();
+      pendingSend.delete(conn); // Drop queued old-zone frames; full state follows the new auth image.
+      target!.addPlayer(
+        {
+          characterId: player.characterId,
+          name: row.name,
+          maxSpeed: ctx.gameData.characterClass(row.classId).baseStats.movement_speed ?? 6,
+          combat: {
+            classId: p.classId,
+            level: p.level,
+            stats: p.stats,
+            maxHealth: p.maxHealth,
+            health: state.health,
+            weapon: p.weapon,
+            abilityCooldowns: state.abilityCooldowns,
+          },
+        },
+        destination!.position,
+        state.rotationY,
+        Date.now(),
+      );
+      player.zone = target!;
+      inWorld.set(player.characterId, {
+        accountId: player.accountId,
+        characterId: player.characterId,
+        name: row.name,
+        zone: target!,
+        lingerUntil: null,
+      });
+      target!.setConnected(player.characterId, true, Date.now());
+      target!.syncParties(player.characterId);
+      const placed = target!.getPlayer(player.characterId)!;
+      send(
+        conn,
+        {
+          t: 'auth.ok',
+          d: {
+            connectionId: conn.id,
+            entityId: placed.entityId,
+            character: {
+              ...characterFromRow(row),
+              zoneId: target!.zone.id,
+              position: placed.position,
+            },
+            zoneId: target!.zone.id,
+            tickHz: deps.tickHz,
+            serverTime: Date.now(),
+          },
+        },
+        seq,
+      );
+      flush();
+      await checkpoint;
+      if (!ownership.active) throw new Error('Travel checkpoint failed');
+      await sync.fullState(syncTarget(conn));
+      conn.questLog = null;
+      await pushQuestLog(conn, true);
+      logger.info(
+        {
+          characterId: player.characterId,
+          travelId,
+          fromZone: source.zone.id,
+          toZone: target!.zone.id,
+        },
+        'player travelled',
+      );
+    } finally {
+      conn.transferring = false;
+      admitting.delete(player.characterId);
+    }
+  }
+
   async function handleGameMessage(
     conn: Connection,
     player: NonNullable<Connection['player']>,
@@ -562,6 +702,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     now: number,
   ) {
     switch (msg.t) {
+      case 'world.travel':
+        await travel(conn, player, msg.d.travelId, msg.seq);
+        break;
       case 'party.invite':
         player.zone.parties.invite(player.characterId, msg.d.characterId, now);
         player.zone.syncParties();
@@ -1105,6 +1248,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       });
   }
 
+  const savedPayloads = new Map<string, string>();
+
   async function persistAndPublish() {
     if (!ownership.active || crashed) return;
     for (const zone of zones.values()) {
@@ -1152,7 +1297,11 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       };
     });
     const started = performance.now();
-    await ownership.commit(writes);
+    const changed = writes.filter(
+      (w) => w.characters.length > 0 || savedPayloads.get(w.zoneId) !== w.payload,
+    );
+    if (changed.length) await ownership.commit(changed);
+    for (const write of changed) savedPayloads.set(write.zoneId, write.payload);
     for (const id of capturedKills) durableKills.add(id);
     deps.metrics
       .gauge('world_checkpoint_ms', 'Last durable checkpoint latency')
@@ -1338,7 +1487,12 @@ export function createRealtimeServer(deps: RealtimeDeps) {
                 conn.ws.terminate();
             }
             deps.metrics.counter('world_ticks_total', 'Completed simulation ticks').inc();
-            for (const zone of zones.values()) zone.step(now);
+            for (const zone of zones.values())
+              if (
+                zone.playerCount() > 0 ||
+                !ctx.gameData.raw.worldCatalog?.regions.some((r) => r.zoneId === zone.zone.id)
+              )
+                zone.step(now);
             pumpExploration(now);
             pumpKills(now);
             expireLingering(now);

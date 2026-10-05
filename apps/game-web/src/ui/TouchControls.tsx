@@ -54,7 +54,11 @@ export function TouchControls() {
             data-testid="touch-interact"
             aria-label={interactLabel}
           >
-            {interactLabel.split(' ')[0] === 'talk' ? 'Talk' : 'Take'}
+            {interactLabel.includes('passage')
+              ? 'Travel'
+              : interactLabel.split(' ')[0] === 'talk'
+                ? 'Talk'
+                : 'Take'}
           </button>
         )}
         {!dead && (

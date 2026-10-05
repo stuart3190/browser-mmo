@@ -1,5 +1,6 @@
+import { getStarterGameData as getGameData } from './starter-testing';
 import { expect, it } from 'vitest';
-import { getGameData } from './index';
+
 it('Hollow is additive to the exact prior content hash; existing terrain is unchanged', async () => {
   const raw = getGameData().raw;
   const old = structuredClone(raw);

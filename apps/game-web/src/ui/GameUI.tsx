@@ -14,11 +14,13 @@ import { ItemTooltip } from './ItemTooltip';
 import { PartyPanel, PartySummary } from './PartyUI';
 import { FirstSteps } from './FirstSteps';
 import { AbilityBar } from './AbilityBar';
+import { WorldWindow } from './WorldWindow';
 import { Minimap } from './Minimap';
 import { DialoguePanel, QuestLogWindow, QuestTracker } from './QuestUI';
 import { TouchControls, useTouchControls } from './TouchControls';
 
 const SHORTCUTS: Record<string, WindowId> = {
+  KeyM: 'world',
   KeyP: 'party',
   KeyB: 'inventory',
   KeyI: 'inventory',
@@ -45,7 +47,12 @@ function GameUI() {
   }, [partyOpen, controls]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.repeat) return;
+      if (
+        e.repeat ||
+        (e.target instanceof HTMLElement &&
+          (e.target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)))
+      )
+        return;
       if (e.code === 'Escape') {
         if (state.dialogue) {
           state.update((s) => (s.dialogue = null));
@@ -104,6 +111,7 @@ function GameUI() {
         <BankWindow />
         <QuestLogWindow />
         <PartyPanel />
+        <WorldWindow />
       </div>
       <DialoguePanel />
       <ItemDetails />
@@ -215,6 +223,7 @@ function ActionBar() {
 
       {btn('quests', 'Quests', 'J')}
       {btn('party', 'Party', 'P')}
+      {btn('world', 'World', 'M')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button
           className={state.target.attacking ? 'action attack active' : 'action attack'}

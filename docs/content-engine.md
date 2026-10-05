@@ -80,6 +80,26 @@ Each extension needs schema/link/failure tests and a runtime consumer before bei
 V1 intentionally cannot express arbitrary effects, repeatables, branching quest logic, talents,
 raid encounters or a general scripting language. Adding unsupported mechanics to JSON is rejected.
 
-The highest-leverage next milestone is migrating the remaining live Greenvale quest/NPC/enemy/reward
-catalog using this adapter, with validation tooling that reports source-pack locations for errors.
-Keep geometry/art and new mechanics out of that migration, and preserve the same canonical hash.
+## Version 2: world catalogs (2026-10-05)
+
+The owner prioritised WORLD FIRST over further quest migration. Version 2 retains the version-1
+sections and adds the strict `world` catalog in `packages/schemas/src/world-catalog.ts`.
+`world-greybox.json` contains five continents, 24 regional zones, fixed places, adjacency/travel,
+biomes, monster families/variants, settlement archetypes/populations, material templates,
+resource/loot catalogs and dungeon archetypes. Version 1 remains accepted unchanged.
+
+`appendWorldCatalog` feeds these records into the existing GameData region/zone/chunk/NPC/enemy/
+item/loot registries. It never overrides legacy IDs; the existing whole-catalog checks still run.
+Additional checks enforce rectangular coverage, no overlaps, in-bounds coordinates, reciprocal
+adjacency and travel, neighboring level-band overlap, reachable zones and catalog dependencies.
+`pnpm content:validate` includes both versions and the resulting canonical hash. This additive
+content change uses migration `0015` to preserve the exact predecessor Greenvale checkpoint.
+Golden starter tests still protect the earlier catalog; new tests also compare every original
+definition/chunk against the live extended registry rather than testing only a frozen fixture.
+
+See [world foundation](world/world-foundation.md) for dimensions, locations, catalog counts,
+runtime travel/streaming and honest placeholders. No quests were added or bulk-migrated.
+Other live quests remain TS; final terrain/art/formulas remain code. World events, professions,
+dungeon instances and world-state effects still require the authoritative consumers listed above.
+Next, densify one region from these catalogs and add a bounded resource interaction; do not
+generate a mass of quests before its inhabitants, habitats and routes are convincing.

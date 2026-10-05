@@ -7,7 +7,11 @@ const fixture = () => ({
   manifest: structuredClone(contentManifest),
   pack: ContentPackSchema.parse(structuredClone(contentPacks[0]!)),
 });
-const compile = () => compileContentCatalog(contentManifest, contentPacks);
+const compile = () =>
+  compileContentCatalog(
+    contentManifest,
+    contentPacks.filter((p) => p.schemaVersion === 1),
+  );
 describe('versioned content factory', () => {
   it('preserves the exact deployed catalog, rewards, collision and checkpoint hash', async () => {
     const bytes = new TextEncoder().encode(JSON.stringify(GameData.load(compile()).raw));

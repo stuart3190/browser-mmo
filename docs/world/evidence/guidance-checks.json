@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Existing quest handoff guides to a real return travel node",
+    "ok": true
+  },
+  {
+    "name": "Atlas keyboard selection does not trigger game menu shortcuts",
+    "ok": true
+  },
+  {
+    "name": "Selected distant world place remains guided after changing zones",
+    "ok": true
+  },
+  {
+    "name": "Explicit resume restores the original quest handoff",
+    "ok": true
+  }
+]

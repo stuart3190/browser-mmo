@@ -364,11 +364,14 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-04 · Claude Opus 5.5 · prop-shape table drives visuals + colliders; explicit chunk colliders; registry validation (no spawns/respawns inside geometry, no enemies in safe zones); server rejects moves into/through geometry (collision + world-population tests) · 6db82ba
 - [x] Enemy population (spawn groups)
   - Verified 2026-10-04 · Claude Opus 5.5 · Greenvale: 3 wolf dens + roamers, maxAlive limits, randomised respawn windows, min player distance, tick-driven (no timers); restart restores pending slots (world-population tests; 8 wolves in World E2E) · 6db82ba
-- [ ] Streaming
-  - Per-chunk build/dispose exists; all chunks of the zone (now 4×4 × 64 m) load at once.
-- [ ] Towns
-- [ ] Wilderness
+- [x] Bounded client chunk streaming for atlas regions
+  - Verified 2026-10-05 · Codex · WorldView regression: at most 25 chunks, distant ground removed, zone changes release meshes/materials/textures. Greenvale keeps its original 16 chunks. Commit: the world-foundation implementation commit.
+- [x] Greybox towns and reusable settlement inhabitants
+  - Verified 2026-10-05 · Codex · catalog tests: 24 named settlements/ports, 240 real NPC placements, stable role/service/stock references. Shops/lodging/training remain placeholders. Commit: the world-foundation implementation commit.
+- [x] Greybox regional wilderness habitats
+  - Verified 2026-10-05 · Codex · 24 regions, 72 actual creature placements from 10 families/72 variants; existing authoritative combat/rewards. Detailed terrain/density remain unfinished. Commit: the world-foundation implementation commit.
 - [ ] Caves
+  - 24 fixed entrance POIs and cave/ruin/mine/crypt catalogs exist; dungeon entry/instances are not playable.
 - [ ] Dynamic events
 
 # Quests
@@ -825,7 +828,7 @@ systems added; external follow-ups remain separate from development and merge ga
 2. **Change feed is not durable.** Reconnection and failed queries now request full reconciliation, including simulation gear; a 30 s reconciliation sweep covers otherwise missed notifications. Delivery is eventually consistent, not instantaneous. Needs a direct DB connection (not PgBouncer transaction mode).
 3. **Reconnect = full snapshot.** No session resume/replay buffer; an expired session cannot reconnect (client shows "Disconnected"; reload to log in). The game client keeps the token in memory only.
 4. **Bank opens anywhere.** No banker NPC/proximity rule yet (server would need the player's position from the realtime service).
-5. **No drag-and-drop, sorting, search, split-stack or loadout UI.** Actions are via the details sheet. Icons are text placeholders.
+5. **No drag-and-drop, split-stack or loadout UI.** Sorting/name/rarity filtering is now implemented; mutations use the details sheet. Icons are text placeholders.
 6. **Client bundle remains substantial.** Current measured main chunk 456.56 kB raw / 140.32 kB gzip; Babylon 1,952.23 kB raw / 461.57 kB gzip. See the sustained browser evidence; no hardware-phone performance pass is claimed.
 7. **One-handed weapons always equip to the main hand.** Off-hand one-handers are possible via the API but not from the UI; dual-wield rules are undesigned.
 8. **Expired listings with a full bag** stay in escrow until the seller has space (the mailbox exists now but the marketplace does not use it yet). The expiry sweep runs in every API process (safe, wasteful with replicas).
@@ -835,7 +838,7 @@ systems added; external follow-ups remain separate from development and merge ga
 12. **Camera tests:** desktop drag is now asserted in the slice browser run; wheel input is exercised but zoom distance is not numerically asserted. Physical-device pinch usability remains external.
 13. drizzle-kit pulls deprecated `@esbuild-kit/*` sub-dependencies (warning only).
 14. **A full mailbox delays the whole kill reward** (XP included) until there is room; the event retries with backoff (capped at 5 min). No UI tells the player their mailbox is full.
-15. **Navigation limits.** 2D collision only (no terrain height/levels), static obstacles only, enemies do not collide with each other or with players; NavGrid is rebuilt per zone load (fine at 256 m, not for very large zones).
+15. **Navigation limits.** 2D/static collision only, no terrain height or actor collision. Atlas regions now use bounded local nav windows for short-leash enemies; long-leash encounters/dense populations need targeted extension, not a whole-continent grid.
 16. **`kill_events` grows forever.** Needs a retention/archive job for rewarded rows older than the longest respawn window.
 17. **Durable feedback includes database latency.** Death/reward feedback waits for checkpoint/kill writes; failed ownership/checkpoint writes fence the gateway and require recovery. First-hit tags now freeze eligible party credit under the documented shared-hunt rules.
 18. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
@@ -853,13 +856,14 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Continue the content-engine pivot: migrate the remaining live Greenvale catalog through versioned packs.**
-Use the validated factory in [content-engine.md](content-engine.md), preserving stable IDs, exact
-runtime ordering/compiled hash, party/reward rules and deployed behavior. Improve source-pack error
-diagnostics where they help authoring. Keep existing world geometry/art and mechanics; do not resume
-one-off quest expansion or build an editor/general scripting engine before the catalog migration.
-Future item/location/event/profession/dungeon/world-state sections are extension points, not implemented
-systems. Hosting/CI/physical-device follow-ups remain separate from this content milestone.
+**Densify Greenvale Marches using the world catalogs before expanding quest output.**
+Use [world foundation](world/world-foundation.md): improve bounded road/habitat dressing and settlement
+identity, then add one persistent resource interaction using its existing materials/profession references
+and item economy. Playtest solo/party travel and regional danger transitions. Do not invent a new enemy,
+NPC or item just for a quest, bulk-generate quests, build an editor/general scripting engine, or chase
+hosting benchmarks. Other live Greenvale quests may migrate incrementally without changing their IDs
+or behavior. Shops, profession progression, dungeon instances and cross-host travel remain explicit
+future systems. Hosting/CI/physical-device follow-ups are separate from gameplay development.
 
 ## Mobile display follow-up — 2026-10-05
 
@@ -1096,3 +1100,62 @@ runtime reload. Stable persisted IDs must not be renamed; real semantic content 
 existing content-hash/checkpoint migration discipline. No new gameplay/content was added.
 Deployment uses the existing script after merge; final deployed SHA/public proof is reported in the
 completion message and `https://brokenodyssey.com/release.json`.
+
+## Current Work — five-continent greybox world foundation, 2026-10-05
+
+- [x] Owner-corrected five substantial landmasses / 24 named regions, stable IDs, atlas/local bounds,
+      adjacency, overlapping neighbor bands, transition intent and preserved Greenvale enclave.
+      64 m chunks / 6 m/s; straight continent-axis crossings 17.1–34.1 minutes (estimates, not timings).
+- [x] Version-2 world pack extends the existing content compiler: 24 biome intents, 24 settlements,
+      24 ports, 24 entrance POIs, camps/beacons/resource hollows/habitats; 10 monster families / 72
+      variants and actual creature spawns; 10 NPC archetypes / 240 actual inhabitants; 10 material
+      templates / 10 resource definitions / 10 loot profiles; four dungeon archetypes. No new quests.
+- [x] Link/duplicate/global-ID/bounds/coverage/overlap/physical adjacency/progression/stock/loot/
+      travel/reachability checks. Ordinary authored packs can use world NPC/enemy/material references
+      and valid sparse chunk placements; five dedicated extension/failure tests prove these seams.
+      Future quest-giver role promotion is authored data, preserving the inhabitant ID/placement.
+- [x] 114 directed travel links: reciprocal boundary roads, coastal boat circuits and six
+      intercontinental boat connections. World / M atlas, Guide compass/distance, real node departures.
+      Existing quest handoffs route back through travel nodes; world destinations survive transfers.
+      Desktop shortcut handler respects native atlas-select input. Touch targets remain at least 44 px.
+- [x] Server validates authenticated/replay-limited range/alive/threat/combat/unlock/hosted destination;
+      removes old controller and atomically commits source/destination recovery plus character zone,
+      position, health and cooldowns before publication. Zone parties leave cleanly. Five PostgreSQL
+      travel tests cover unhosted/range/death/replays, party/inventory, distinct continents, committed
+      crash recovery and rejected durable transfer. Existing ownership/economy/reward suites pass.
+- [x] Nearby client streaming capped at 25 chunks, clipped roads, geometry/label/material/texture
+      disposal on movement/zone changes; old Greenvale presentation retained. Local nav capped at
+      eight 192 m grids per region; actual pursuit regression. Empty new regions skip simulation;
+      unchanged inactive recovery images avoid DB rewrites. Default/sample/deploy assignment hosts
+      all catalog zones; explicit host subsets remain supported.
+- [x] Additive `0015` exact predecessor checkpoint migration. Populated preview migrated after owner
+      shutdown: every checkpoint field except contentHash compared equal; 30 item templates synced.
+      Original definitions/chunks remain deep-equal and golden starter hashes remain unchanged.
+- [x] Final full `NODE_ENV=production TEST_DATABASE_URL=.../mmo_party_test pnpm verify` exited zero:
+      format/lint/types, **216 unit + 136 PostgreSQL integration tests** (realtime 63/domain 65/API 8),
+      all four production builds, production debug-hook guard. First aggregate stopped early on a
+      test-fixture typing error; schema-parsed fixture fixed before the complete passing aggregate.
+- [x] Actual browser route: Greenvale gate, populated Marches, real Hart combat/Field Hide/23 XP,
+      all five continents by boat, return/relog with the same unique loot/gear/XP. Two clients remain
+      correctly isolated across zones then reconcile in the Marches. Real touch joystick; 390×844
+      and 844×390 atlas/travel/control bounds. **31 tour + 4 final navigation assertions**, both final
+      scripts exit zero; **six read-only PostgreSQL reward/ownership assertions**. No grants/teleports.
+
+Verified 2026-10-05 · Codex · implementation commit: the commit containing
+`packages/game-data/src/content/packs/world-greybox.json` (resolve with `git log -1 --` that path).
+Layout/names/bands/catalogs/travel/loading/extension rules: [world foundation](world/world-foundation.md).
+Evidence: `docs/world/evidence/`; repeatable playthrough: `scripts/e2e/world-foundation.cjs`,
+`scripts/e2e/world-guidance.cjs`. AGENTS.md / MASTER_PLAN.md unchanged.
+
+Known limits: intentionally sparse flat terrain, repeated settlement/prop/creature rigs, generic melee
+variants and provisional higher-level balance. Shops, lodging, training, NPC healing, gathering,
+professions and dungeon entry/instances are catalog placeholders. Same-host zone transfers only;
+parties do not persist across zones. Dense server chunk activation/long-leash navigation remain future
+work. No 54-level content or player-capacity/physical-device performance claim. Browser harness
+resumed earned state after deadline/selector/ferryman-count corrections; the prefix failure is retained
+in evidence and final flows pass. Current build: main JS 811.56 kB raw / 180.19 kB gzip, Babylon
+1,952.23 kB / 461.57 kB gzip; not a hardware benchmark. Development preview deploys with the existing
+script after merge; public final SHA is in `/release.json` and the completion report.
+
+Next gameplay task: densify Greenvale Marches from these catalogs, improve bounded regional routes/
+habitats, then one persistent resource interaction. WORLD FIRST; no mass quest generation yet.

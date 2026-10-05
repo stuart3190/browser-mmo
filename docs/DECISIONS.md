@@ -934,3 +934,42 @@ remain unchanged. Mutation/favourites/junk systems are deliberately outside this
   endpoint, multi-stage encounter engine or gameplay additions. Future sections must define typed
   links and have real authoritative consumers. Stillwater preserves the deployed canonical hash;
   real semantic content changes still need the existing checkpoint migration procedure.
+
+## 2026-10-05 — Five-continent atlas extends the existing content engine
+
+- **Date:** 2026-10-05
+- **Decision:** Keep Greenvale's deployed enclave unchanged; author five substantial continents
+  with 24 adjacent regional simulation zones in a strict version-2 world pack. Use zone-local
+  coordinates plus fixed continent-atlas bounds, stable places and reusable biome/monster/NPC/
+  material/resource/loot/dungeon catalogs. Require overlapping neighboring progression bands,
+  reciprocal node travel and reachable zones. No quest generation or bulk quest migration.
+- **Reason:** Future content must reference real places and inhabitants. Multi-kilometre landmasses
+  need bounded loading instead of growing Greenvale's all-chunk rendering/whole-zone navigation.
+  The owner explicitly corrected the initial three-landmass plan to five without shrinking scale.
+- **Alternatives considered:** One globally active enormous map; three tightly packed landmasses;
+  quest-specific monsters/locations; replace the content engine; immediately build distributed
+  zone handoff, final terrain, professions or a general dungeon engine.
+- **Consequences:** The pure adapter appends to existing authoritative registries. The client streams
+  at most 25 nearby chunks and disposes old geometry/resources. Sparse representative populations
+  reuse existing AOI/combat/rewards; empty new regions sleep and local navigation is bounded.
+  Scale is 6 m/s and 64 m chunks; continent straight crossings span 17–34 minutes per axis.
+  Cataloged shops/professions/gathering/dungeon entrances remain explicit placeholders. Additional
+  continents are data additions under the same contracts. Detailed terrain and dense habitats
+  remain regional follow-ups; no claim of finished high-level content or measured player capacity.
+
+## 2026-10-05 — Durable same-host node travel preserves character authority
+
+- **Date:** 2026-10-05
+- **Decision:** Add an authenticated, replay/rate-limited `world.travel` command at enabled nodes
+  within 5 m. Require alive/out-of-combat state, no active enemy threat, unlocks and a hosted
+  destination. Transfer the existing controller between owned zone simulations and atomically
+  commit both recovery images with character zone/position/health/cooldowns before publishing.
+- **Reason:** A client-provided zone/position write or independently committed transfer would
+  permit stale recovery images, health/cooldown resets or two authoritative owners after a crash.
+- **Alternatives considered:** Client teleports; separate DB writes around the transfer; reset
+  character health on travel; broker-based cross-host handoff in this greybox milestone.
+- **Consequences:** Existing inventory/equipment/XP/quests and economy transactions are retained;
+  a failed write fences the host and recovery uses the last durable image. Existing zone parties
+  leave cleanly when travelling. Same-host multi-continent players work now; cross-host transfer
+  and cross-zone persistent parties are explicit later systems. Boat/road travel is instantaneous
+  node interaction, not a ship simulation. Existing checkpoint hash migration is additive and exact.

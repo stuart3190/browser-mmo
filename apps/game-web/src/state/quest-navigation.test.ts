@@ -57,3 +57,19 @@ it('automatically guides newly unlocked handoffs, uses live known enemies, handl
   ).toBeNull();
   expect(questDestination(gd, [wolf], null, 'zone.other', me)?.zoneId).toBe(z);
 });
+it('guides existing quest handoffs back through world travel without changing their objectives', () => {
+  const q = log('quest.greenvale.well_records');
+  q.state = 'ready_to_turn_in';
+  const march = questDestination(gd, [q], null, 'zone.aurelian.greenvale_marches', me);
+  expect(march).toMatchObject({
+    zoneId: 'zone.aurelian.greenvale_marches',
+    position: { x: 256, z: 376 },
+    stage: 'turn_in',
+  });
+  expect(march?.label).toContain('Return to Elder Maren');
+  expect(questDestination(gd, [q], null, 'zone.frostmere.brinebreak', me)?.position).toMatchObject({
+    x: 256,
+    z: 96,
+  });
+  expect(questDestination(gd, [q], null, z, me)?.label).toBe('Return to Elder Maren');
+});

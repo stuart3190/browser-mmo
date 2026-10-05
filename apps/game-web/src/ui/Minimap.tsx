@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGame } from './context';
 import { questBearing, questDestination } from '../state/quest-navigation';
+import { worldDestination } from '@mmo/game-data';
 import { starterRoads } from '../game/starter-roads';
 
 /** Metres from the player to the minimap edge. */
@@ -72,7 +73,17 @@ export function Minimap() {
         ctx.stroke();
       }
       ctx.strokeStyle = '#a99972';
-      for (const [ax, az, bx, bz, width] of starterRoads) {
+      const roads =
+        zoneId === 'zone.greenvale.meadows'
+          ? starterRoads
+          : (gameData.raw.worldCatalog?.roads
+              .filter((r) => r.zoneId === zoneId)
+              .flatMap((r) =>
+                r.points
+                  .slice(1)
+                  .map((p, i) => [r.points[i]!.x, r.points[i]!.z, p.x, p.z, r.width] as const),
+              ) ?? []);
+      for (const [ax, az, bx, bz, width] of roads) {
         ctx.lineWidth = Math.max(1, width * k);
         ctx.beginPath();
         ctx.moveTo(sx(ax), sy(az));
@@ -100,14 +111,25 @@ export function Minimap() {
         ctx.arc(sx(m.x), sy(m.z), m.kind === 'enemy' ? 3 : 2.5, 0, Math.PI * 2);
         ctx.fill();
       }
-      const destination = questDestination(
-        gameData,
-        state.quests,
-        state.trackedQuestId,
-        zoneId,
-        me,
-        controls.markers().map((m) => ({ ...m, refId: state.world.get(m.id)?.refId })),
-      );
+      const place = worldDestination(gameData.raw.worldCatalog, state.worldDestinationId, zoneId);
+      const destination = place
+        ? {
+            questName: place.destination.name,
+            label:
+              place.location.id === place.destination.id
+                ? `Go to ${place.location.name}`
+                : `Travel via ${place.location.name}`,
+            zoneId: place.location.zoneId,
+            position: place.location.position,
+          }
+        : questDestination(
+            gameData,
+            state.quests,
+            state.trackedQuestId,
+            zoneId,
+            me,
+            controls.markers().map((m) => ({ ...m, refId: state.world.get(m.id)?.refId })),
+          );
       const bearing =
         destination?.position && destination.zoneId === zoneId
           ? questBearing(me, destination.position)
@@ -176,8 +198,8 @@ export function Minimap() {
           className="quest-guide"
           data-testid="quest-guide"
           title={`${guide.name}: ${guide.label} (${guide.detail})`}
-          onClick={() => state.toggle('quests')}
-          aria-label={`Quest guidance: ${guide.name}. ${guide.label}. ${guide.detail}. Open quest log`}
+          onClick={() => state.toggle(state.worldDestinationId ? 'world' : 'quests')}
+          aria-label={`${state.worldDestinationId ? 'World' : 'Quest'} guidance: ${guide.name}. ${guide.label}. ${guide.detail}. Open ${state.worldDestinationId ? 'atlas' : 'quest log'}`}
         >
           <span
             className="guide-arrow"

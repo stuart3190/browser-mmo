@@ -254,6 +254,7 @@ export class ZoneSimulation {
   private lastStepMs: number | null = null;
   readonly collision: CollisionWorld;
   private navGrid: NavGrid | undefined;
+  private readonly localNav = new Map<string, NavGrid>();
   private readonly groups = new Map<string, GroupState>();
 
   constructor(
@@ -397,6 +398,30 @@ export class ZoneSimulation {
     return this.navGrid;
   }
 
+  private navFor(position: { x: number; z: number }): NavGrid {
+    const b = this.zone.bounds,
+      s = this.zone.chunkSize;
+    if ((b.maxCx - b.minCx + 1) * (b.maxCz - b.minCz + 1) <= 64) return this.nav;
+    const c = chunkCoordFor(this.zone, position),
+      key = chunkKey(c);
+    let nav = this.localNav.get(key);
+    if (!nav) {
+      nav = new NavGrid(
+        this.collision,
+        {
+          minX: Math.max(b.minCx * s, (c.cx - 1) * s),
+          minZ: Math.max(b.minCz * s, (c.cz - 1) * s),
+          maxX: Math.min((b.maxCx + 1) * s, (c.cx + 2) * s),
+          maxZ: Math.min((b.maxCz + 1) * s, (c.cz + 2) * s),
+        },
+        ENEMY_COLLISION_RADIUS,
+      );
+      if (this.localNav.size >= 8) this.localNav.delete(this.localNav.keys().next().value!);
+      this.localNav.set(key, nav);
+    }
+    return nav;
+  }
+
   get tick(): number {
     return this.tickCount;
   }
@@ -498,6 +523,12 @@ export class ZoneSimulation {
     this.sendAbilityState(p, nowMs);
   }
 
+  isThreatened(characterId: string): boolean {
+    return [...this.enemies.values()].some(
+      (e) => e.mode === 'engaged' && e.targetCharacterId === characterId,
+    );
+  }
+
   persistentState(characterId: string) {
     const p = this.players.get(characterId);
     return p
@@ -558,6 +589,7 @@ export class ZoneSimulation {
         stats: StatBlock;
         level: number;
         classId: string;
+        lastCombatAtMs: number;
       }>
     | undefined {
     return this.players.get(characterId);
@@ -1492,7 +1524,7 @@ export class ZoneSimulation {
       enemy.path = null;
     } else {
       if (!enemy.path || nowMs >= enemy.repathAtMs || distance2D(enemy.pathGoal, goal) > 2) {
-        enemy.path = this.nav.findPath(pos, goal);
+        enemy.path = this.navFor(enemy.spawn.position).findPath(pos, goal);
         enemy.pathGoal = { x: goal.x, z: goal.z };
         enemy.repathAtMs = nowMs + 750;
       }

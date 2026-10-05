@@ -13,8 +13,8 @@ function check(name, ok, detail) {
   if (!ok) throw new Error(name);
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-async function walk(page, x, z, range = 1.6) {
-  const until = Date.now() + 90000;
+async function walk(page, x, z, range = 1.6, timeout = 90000) {
+  const until = Date.now() + timeout;
   let held = [];
   try {
     while (Date.now() < until) {

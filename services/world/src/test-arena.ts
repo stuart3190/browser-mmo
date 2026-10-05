@@ -68,7 +68,7 @@ export function arenaGameData(
       wanderRadius: 0,
     },
   ];
-  raw.regions = [{ ...raw.regions[0]!, zoneIds: [...raw.regions[0]!.zoneIds, ARENA] }];
+  raw.regions = raw.regions.map((r, i) => (i === 0 ? { ...r, zoneIds: [...r.zoneIds, ARENA] } : r));
   raw.zones = [
     ...raw.zones,
     {

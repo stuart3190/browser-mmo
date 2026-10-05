@@ -1613,3 +1613,31 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     top: 76px;
   }
 }
+
+.world-locations > div,
+.world-departure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #ffffff18;
+}
+.world-locations span,
+.world-departure span {
+  flex: 1;
+  min-width: 0;
+}
+.world-locations small,
+.world-departure small {
+  display: block;
+  opacity: 0.7;
+}
+.world-locations button,
+.world-departure button {
+  min-height: 44px;
+  padding: 6px 10px;
+}
+.window select[aria-label='Atlas region'] {
+  max-width: 100%;
+  min-height: 44px;
+}

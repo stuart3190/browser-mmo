@@ -10,6 +10,7 @@ export interface Controls {
   /** Joystick output, read by the player controller every frame. */
   analog: AnalogInput;
   interact: () => void;
+  travel: (travelId: string) => void;
   targetNearest: () => void;
   /** Zone the character is in (null before the first join). */
   zoneId: () => string | null;

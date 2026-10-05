@@ -44,6 +44,13 @@ install -m 644 "$release/ops/broken-odyssey/Caddyfile" /etc/brokenodyssey/Caddyf
 systemctl daemon-reload
 systemctl stop brokenodyssey-ingress.service brokenodyssey-web.service brokenodyssey-realtime.service brokenodyssey-api.service
 # A failed migration intentionally leaves only this preview stopped. Never roll back its DB automatically.
+python3 - <<'PYZONES'
+from pathlib import Path
+p = Path('/etc/brokenodyssey/runtime.env')
+lines = [line for line in p.read_text().splitlines() if not line.startswith('REALTIME_ZONES=')]
+p.write_text('\n'.join(lines + ['REALTIME_ZONES=*']) + '\n')
+p.chmod(0o600)
+PYZONES
 set -a
 source /etc/brokenodyssey/runtime.env
 set +a

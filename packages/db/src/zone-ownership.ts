@@ -82,13 +82,13 @@ export class ZoneOwnership {
         on conflict(zone_id) do update set payload=excluded.payload,version=1,updated_at=now()
         returning zone_id
       ), states as (
-        select s.* from input w cross join lateral jsonb_to_recordset(w.characters)
+        select s.*,w."zoneId" as zone_id from input w cross join lateral jsonb_to_recordset(w.characters)
         as s(id uuid,x double precision,y double precision,z double precision,
              rotation double precision,health integer,cooldowns jsonb)
-      ) update characters c set pos_x=s.x,pos_y=s.y,pos_z=s.z,rotation_y=s.rotation,
+      ) update characters c set zone_id=s.zone_id,pos_x=s.x,pos_y=s.y,pos_z=s.z,rotation_y=s.rotation,
         current_health=s.health,ability_cooldowns=s.cooldowns,updated_at=now()
-        from states s where c.id=s.id and (c.pos_x,c.pos_y,c.pos_z,c.rotation_y,c.current_health,c.ability_cooldowns)
-        is distinct from (s.x,s.y,s.z,s.rotation,s.health,s.cooldowns)`,
+        from states s where c.id=s.id and (c.zone_id,c.pos_x,c.pos_y,c.pos_z,c.rotation_y,c.current_health,c.ability_cooldowns)
+        is distinct from (s.zone_id,s.x,s.y,s.z,s.rotation,s.health,s.cooldowns)`,
         [JSON.stringify(writes)],
       );
       if (!this.active) throw new Error('Ownership lost during commit');

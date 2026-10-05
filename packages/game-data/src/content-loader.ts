@@ -1,5 +1,6 @@
 import { ContentPackSchema, type ContentPack } from '@mmo/schemas';
 import { GameData, type RawGameData } from './registry';
+import { appendWorldCatalog } from './world-catalog';
 
 export type ContentReference = { contentRef: string };
 type ReferenceList<T> = (T | ContentReference)[];
@@ -33,6 +34,12 @@ export function compileContentCatalog(
   const rewards = new Map<string, ContentPack['rewards'][number]>();
   for (const pack of packs) {
     claim(pack.id);
+    if (pack.schemaVersion === 2) {
+      for (const values of Object.values(pack.world))
+        if (Array.isArray(values)) for (const entry of values) claim(entry.id as string);
+      for (const family of pack.world.monsterFamilies)
+        for (const variant of family.variants) claim(variant.id);
+    }
     for (const reward of pack.rewards) {
       claim(reward.id);
       rewards.set(reward.id, reward);
@@ -83,7 +90,7 @@ export function compileContentCatalog(
       throw new Error(`Unregistered pack definitions: ${[...remaining.keys()].join(', ')}`);
     return result;
   };
-  const raw: RawGameData = {
+  let raw: RawGameData = {
     ...manifest,
     quests: resolve(manifest.quests, quests),
     npcs: resolve(manifest.npcs, npcs),
@@ -91,6 +98,8 @@ export function compileContentCatalog(
     lootTables: resolve(manifest.lootTables, lootTables),
     chunks: manifest.chunks.map((c) => ({ ...c, spawnPoints: [...c.spawnPoints] })),
   };
+  // Install catalog dependencies before ordinary packs resolve world placements/reward items.
+  for (const pack of packs) if (pack.schemaVersion === 2) raw = appendWorldCatalog(raw, pack.world);
   for (const pack of packs) {
     const owners = [
       ...pack.npcs.map((n) => ({ id: n.definition.id, kind: 'npc', placements: n.placements })),
@@ -103,7 +112,7 @@ export function compileContentCatalog(
             `Placement ${spawn.id} must reference its ${owner.kind} owner ${owner.id}`,
           );
         const zone = raw.zones.find((z) => z.id === zoneId);
-        const chunk =
+        let chunk =
           zone &&
           raw.chunks.find(
             (c) =>
@@ -111,6 +120,30 @@ export function compileContentCatalog(
               c.coord.cx === Math.floor(spawn.position.x / zone.chunkSize) &&
               c.coord.cz === Math.floor(spawn.position.z / zone.chunkSize),
           );
+        if (!chunk && zone && raw.worldCatalog?.regions.some((r) => r.zoneId === zoneId)) {
+          const coord = {
+            cx: Math.floor(spawn.position.x / zone.chunkSize),
+            cz: Math.floor(spawn.position.z / zone.chunkSize),
+          };
+          const b = zone.bounds;
+          if (
+            coord.cx >= b.minCx &&
+            coord.cx <= b.maxCx &&
+            coord.cz >= b.minCz &&
+            coord.cz <= b.maxCz
+          ) {
+            chunk = {
+              zoneId,
+              coord,
+              terrainAssetId: null,
+              groundColor: zone.environment.ambientColor,
+              props: [],
+              colliders: [],
+              spawnPoints: [],
+            };
+            raw.chunks.push(chunk);
+          }
+        }
         if (!chunk) throw new Error(`Placement ${spawn.id}: unknown zone/chunk ${zoneId}`);
         chunk.spawnPoints.push(spawn);
       }
