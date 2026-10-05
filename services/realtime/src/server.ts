@@ -13,6 +13,10 @@ import {
   characterFromRow,
   claimWorldPickup,
   harvestResource,
+  exchangeAtNpc,
+  sellAtNpc,
+  getDiscoveries,
+  discoverLocations,
   dueKillEvents,
   getCombatProfile,
   getQuestLog,
@@ -401,6 +405,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       'auth.hello',
       'interact.pickup',
       'npc.interact',
+      'npc.service',
+      'npc.sell',
       'quest.accept',
       'quest.turn_in',
       'world.travel',
@@ -535,6 +541,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         },
         msg.seq,
       );
+      const known = new Set(await getDiscoveries(ctx, row.id));
+      discoveries.set(conn, known);
+      send(conn, { t: 'world.discoveries', d: { locationIds: [...known], newlyDiscovered: [] } });
       await sync.fullState(syncTarget(conn));
       conn.questLog = null;
       await pushQuestLog(conn, true);
@@ -679,6 +688,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       flush();
       await checkpoint;
       if (!ownership.active) throw new Error('Travel checkpoint failed');
+      const known = new Set(await getDiscoveries(ctx, row.id));
+      discoveries.set(conn, known);
+      send(conn, { t: 'world.discoveries', d: { locationIds: [...known], newlyDiscovered: [] } });
       await sync.fullState(syncTarget(conn));
       conn.questLog = null;
       await pushQuestLog(conn, true);
@@ -779,6 +791,51 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         const r = player.zone.useAbility(player.characterId, msg.d.abilityId, now);
         abilityUses.inc({ outcome: r.outcome });
         flush();
+        return;
+      }
+      case 'npc.sell':
+      case 'npc.service': {
+        const { npcId } = player.zone.npcInteraction(player.characterId, msg.d.entityId);
+        const servicePlayer = player.zone.getPlayer(player.characterId)!;
+        if (
+          (servicePlayer.lastCombatAtMs > 0 &&
+            now - servicePlayer.lastCombatAtMs < ctx.gameData.raw.combatRules.combatTimeoutMs) ||
+          player.zone.isThreatened(player.characterId) ||
+          player.zone.getPlayer(player.characterId)?.attacking
+        )
+          throw new DomainError(ErrorCode.CONFLICT, 'Leave combat before using a service');
+        const result =
+          msg.t === 'npc.sell'
+            ? await sellAtNpc(ctx, {
+                accountId: player.accountId,
+                characterId: player.characterId,
+                npcId,
+                itemId: msg.d.itemId,
+                expectedVersion: msg.d.expectedVersion,
+                requestId: msg.d.requestId,
+              })
+            : await exchangeAtNpc(ctx, {
+                accountId: player.accountId,
+                characterId: player.characterId,
+                npcId,
+                offerId: msg.d.offerId,
+                requestId: msg.d.requestId,
+              });
+        send(conn, {
+          t: 'inventory.updated',
+          d: { reason: 'sync', items: result.items, removed: [] },
+        });
+        send(conn, { t: 'wallet.updated', d: { balances: result.balances } });
+        await sync.fullState(syncTarget(conn));
+        await pushQuestLog(conn, true);
+        await sendDialogue(conn, msg.d.entityId, npcId);
+        // Completion acknowledgement follows all reconciliation work. An early ACK lets a
+        // fast client start its next exchange while this connection still owns the work slot.
+        send(
+          conn,
+          { t: 'inventory.updated', d: { reason: 'sync', items: [], removed: [] } },
+          msg.seq,
+        );
         return;
       }
       case 'npc.interact': {
@@ -912,6 +969,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   // Only unfinished exploration near an actual site causes DB work. One task per connection,
   // at most four globally, sampled once per second. Failed writes retry while inside the area;
   // reconnect/full quest-log reconciliation reuses persisted progress. No per-tick DB polling.
+  const discoveries = new WeakMap<Connection, Set<string>>();
   const exploration = new WeakMap<Connection, { nextAt: number; busy: boolean }>();
   let explorationsInFlight = 0;
   function pumpExploration(now: number) {
@@ -927,22 +985,54 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       if (task.busy || task.nextAt > now || explorationsInFlight >= 4) continue;
       task.nextAt = now + 1_000;
       const sample = p.zone.persistentState(p.characterId);
+      const nearby =
+        sample && sample.health > 0
+          ? (ctx.gameData.raw.worldCatalog?.locations.filter(
+              (l) =>
+                l.zoneId === p.zone.zone.id &&
+                !discoveries.get(conn)?.has(l.id) &&
+                Math.hypot(l.position.x - sample.position.x, l.position.z - sample.position.z) <=
+                  24,
+            ) ?? [])
+          : [];
       if (
         !sample ||
-        !conn.questLog.some((q) => {
-          if (q.state !== 'active') return false;
-          const def = ctx.gameData.quest(q.questId);
-          const progress = Object.fromEntries(q.objectives.map((o) => [o.id, o.current]));
-          return (
-            applyExploration(def, progress, p.zone.zone, sample.position, sample.health) !== null
-          );
-        })
+        (!nearby.length &&
+          !conn.questLog.some((q) => {
+            if (q.state !== 'active') return false;
+            const def = ctx.gameData.quest(q.questId);
+            const progress = Object.fromEntries(q.objectives.map((o) => [o.id, o.current]));
+            return (
+              applyExploration(def, progress, p.zone.zone, sample.position, sample.health) !== null
+            );
+          }))
       )
         continue;
       task.busy = true;
       explorationsInFlight++;
       void recordExploration(ctx, { characterId: p.characterId, zoneId: p.zone.zone.id, ...sample })
         .then(async (changed) => {
+          const fresh = nearby.length
+            ? await discoverLocations(ctx, {
+                characterId: p.characterId,
+                zoneId: p.zone.zone.id,
+                ...sample,
+              })
+            : [];
+          if (
+            nearby.length &&
+            !crashed &&
+            ownership.active &&
+            byCharacter.get(p.characterId) === conn
+          ) {
+            const known = discoveries.get(conn) ?? new Set<string>();
+            for (const location of nearby) known.add(location.id);
+            discoveries.set(conn, known);
+            send(conn, {
+              t: 'world.discoveries',
+              d: { locationIds: [...known], newlyDiscovered: fresh },
+            });
+          }
           if (changed && !crashed && ownership.active && byCharacter.get(p.characterId) === conn)
             await pushQuestLog(conn);
         })

@@ -995,3 +995,63 @@ remain unchanged. Mutation/favourites/junk systems are deliberately outside this
   New resource entity/inventory reason fields are additive; ship client/server together. Shops,
   profession progression, tools, recipes and other harvesting types remain future systems. The
   five-continent map, bands, original Greenvale quests and existing economy architecture remain intact.
+
+## 2026-10-05 — Declarative NPC exchanges reuse the content engine and economy
+
+- **Date:** 2026-10-05
+- **Decision:** Version-3 packs add fixed immediate buy/sell/craft offers and explicitly shared-world
+  dungeon-entry metadata. Compilation checks all NPC/item/location/placed-encounter links and exchange
+  shapes. Services use the existing owning realtime host, NPC range/life/combat/replay/work limits,
+  character/item locks, item grants/consumption, currency ledger and provenance. A durable
+  `(character, request UUID)` receipt commits with all costs and output. Specific gear sales require
+  an acknowledged backpack instance ID/version and reject equipped, stored and locked items.
+- **Reason:** Greenvale needs practical services/material sinks without per-quest handlers or a second
+  economy. Partial cost/grant writes and process-local deduplication could duplicate value after races
+  or reconnects. An early service ACK was found by the full regression run; completion now follows
+  all inventory/quest/dialogue reconciliation before the next operation can be accepted.
+- **Alternatives considered:** Client-authored recipes/prices; HTTP-only world actions; bespoke shop
+  handlers; process-local request caches; timed crafting/profession ranks now; selling by template ID
+  without showing the exact gear instance.
+- **Consequences:** Three immediate field-gear recipes are real crafting, but there is no queue, tool
+  requirement or profession progression claim. Base vendor value and selected whole-stack quantity
+  are shown before gear sale. Durable receipts are replay tombstones; pruning needs an explicit
+  operation-expiry policy. Other continents can add authored offers without new handlers. Remote vault
+  access stays intact; the local banker opens the existing interface rather than imposing a fake rule.
+
+## 2026-10-05 — Explicit repeat cycles and independent world discovery
+
+- **Date:** 2026-10-05
+- **Decision:** Repeatable contracts require an authored cooldown and fresh NPC acceptance. Reaccepting
+  after completion resets only that character/quest row under its existing lock, increments its version
+  and gives reward source references an accepted-cycle timestamp. Permanent story prerequisites cannot
+  reference repeatables until historical completion flags exist. Independent discoveries are server-only
+  alive-position visits, deduplicated by `(character, location)` and reconciled on re-entry.
+- **Reason:** Existing current quest rows already provide the atomic reward boundary. Reusing a permanent
+  item source reference would suppress later legitimate rewards; retaining old counters would pay for
+  stockpiled kills. Quest-only exploration does not remember visits outside an active objective.
+- **Alternatives considered:** A new quest engine/event bus; client visit claims; one row per daily cycle;
+  automatic reacceptance; immediate general achievements; repeatable prerequisites without history.
+- **Consequences:** Daily Roadwatch waits 24 hours after completion; kills before reacceptance never count.
+  Nonrepeatable IDs/source references stay unchanged. Discovery writes reuse the bounded once-per-second
+  exploration pump; atlas indicators do not award XP or items. Detailed quest history, abandonment,
+  branching and achievements remain separate future systems.
+
+## 2026-10-05 — Bounded required hunt drops and an honest shared cave foundation
+
+- **Date:** 2026-10-05
+- **Decision:** Keep normal loot tables intact, but supplement at most one missing required collection
+  unit per active matching hunt/template/kill, only when that template already belongs to the creature's
+  table and only for the existing single loot owner. Commit it inside the existing exact-once kill
+  transaction, with provenance and Recovered overflow. Broken Vault uses a typed `shared_world` entry,
+  existing streamed region, catalog stonekin, personal investigation and normal party rewards.
+- **Reason:** A genuine new-player run hit a prolonged unlucky pelt streak before the first handoff.
+  The starter hunt must not require an unbounded grind. Private instancing also needs ownership,
+  admission, saved lifecycle/reset and reconnect rules; calling an open ruin an instance would hide
+  missing correctness work.
+- **Alternatives considered:** Change old quest IDs/rewards or rarity tables; multiply drops per party
+  member; grant quest materials outside the kill transaction; fake a private dungeon/completion chest;
+  build a general instancing engine during this already substantial regional batch.
+- **Consequences:** Actual retained stock bounds supplementation; party non-loot recipients receive no
+  extra item. Existing collection consumption remains personal. The old tables and reward IDs are
+  preserved. The cave is playable shared content and a reusable entry/encounter foundation; private
+  party instances and dungeon completion rewards remain explicitly unchecked.

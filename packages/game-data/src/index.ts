@@ -9,11 +9,12 @@ import { chunks, dungeons, enemies, npcs, quests, regions, zones } from './conte
 import { GameData } from './registry';
 import { compileContentCatalog, type ContentManifest } from './content-loader';
 import stillwaterPack from './content/packs/stillwater.json';
+import completePack from './content/packs/greenvale-complete.json';
 import worldPack from './content/packs/world-greybox.json';
 export { travelAt, worldDestination } from './world-catalog';
 export { compileContentCatalog } from './content-loader';
 export type { ContentManifest, ContentReference } from './content-loader';
-export const contentPacks = [stillwaterPack, worldPack];
+export const contentPacks = [stillwaterPack, worldPack, completePack];
 
 export { GameData, RawGameDataSchema } from './registry';
 export type { RawGameData, ParsedGameData } from './registry';
@@ -34,7 +35,7 @@ export { propShapes, PLAYER_COLLISION_RADIUS, ENEMY_COLLISION_RADIUS } from './c
 export type { PropKind, PropShape } from './content/props';
 
 /** The raw authored content bundle. */
-export const contentManifest: ContentManifest = {
+export const legacyContentManifest: ContentManifest = {
   rarities,
   equipmentSlots,
   equipmentTypes,
@@ -56,6 +57,11 @@ export const contentManifest: ContentManifest = {
   enemies,
   quests,
   dungeons,
+};
+
+export const contentManifest: ContentManifest = {
+  ...legacyContentManifest,
+  quests: [...quests, ...completePack.quests.map((q) => ({ contentRef: q.id }))],
 };
 
 export const rawGameData = compileContentCatalog(contentManifest, contentPacks);

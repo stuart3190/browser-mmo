@@ -13,3 +13,5 @@ export * from './api';
 export * from './content-pack';
 
 export * from './world-catalog';
+
+export * from './services';

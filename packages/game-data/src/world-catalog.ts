@@ -180,7 +180,7 @@ export function appendWorldCatalog(raw: RawGameData, world: WorldCatalog): RawGa
       id: pop.id,
       name: pop.name,
       title: archetype.name,
-      role: archetype.runtimeRole,
+      role: pop.runtimeRole ?? archetype.runtimeRole,
       modelId: null,
       dialogue: pop.dialogue,
     });

@@ -32,7 +32,11 @@ export function questAvailability(
   if (def.placeholder || !def.giverNpcId) return { ok: false, reason: 'PLACEHOLDER' };
   const mine = records.get(def.id);
   if (mine?.status === 'active') return { ok: false, reason: 'ALREADY_ACTIVE' };
-  if (mine?.status === 'completed' && !def.repeatable)
+  if (
+    mine?.status === 'completed' &&
+    (!def.repeatable ||
+      Date.now() < Date.parse(mine.completedAt ?? '') + (def.repeatCooldownMs ?? 86400000))
+  )
     return { ok: false, reason: 'ALREADY_COMPLETED' };
   if (level < def.minLevel) return { ok: false, reason: 'LEVEL_TOO_LOW' };
   for (const pre of def.prerequisites)
@@ -80,7 +84,8 @@ export function questState(
   itemCount: (templateId: string) => number,
 ): QuestState {
   const mine = records.get(def.id);
-  if (mine?.status === 'completed') return 'completed';
+  if (mine?.status === 'completed')
+    return def.repeatable && questAvailability(def, level, records).ok ? 'available' : 'completed';
   if (mine?.status === 'active')
     return objectiveProgress(def, mine, itemCount).every((o) => o.done)
       ? 'ready_to_turn_in'

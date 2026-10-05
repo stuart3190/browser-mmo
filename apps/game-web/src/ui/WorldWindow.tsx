@@ -67,11 +67,22 @@ export function WorldWindow() {
               <span>
                 {l.name}
                 <small>
+                  {state.discoveries.includes(l.id) ? '✓ Discovered · ' : 'Unvisited · '}
                   {l.kind.replace('_', ' ')}
+                  {gameData.raw.dungeonEntries?.find((d) => d.locationId === l.id)
+                    ? ' · shared ruin'
+                    : ''}
                   {l.zoneId === controls.zoneId() && pos
                     ? ` · ${Math.round(distance2D(pos, l.position))} m`
                     : ''}
                 </small>
+                {gameData.raw.dungeonEntries
+                  ?.filter((d) => d.locationId === l.id)
+                  .map((d) => (
+                    <small key={d.id}>
+                      {d.name} · recommended level {d.recommendedLevel}. {d.description}
+                    </small>
+                  ))}
               </span>
               <button data-guide-location={l.id} onClick={() => guide(l.id)}>
                 Guide
@@ -132,8 +143,8 @@ export function WorldWindow() {
         Resume quest guidance
       </button>
       <p className="small">
-        Greybox world: populated hubs and representative habitats. Gathering, shops, lodging,
-        profession training and dungeon entry remain placeholders.
+        Greenvale offers gathering, shops, field-gear crafting and a shared Broken Vault ruin. Other
+        regions remain greybox; private dungeon instances and profession training are not built.
       </p>
     </Window>
   );

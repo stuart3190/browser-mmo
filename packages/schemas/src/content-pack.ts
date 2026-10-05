@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ServiceOfferSchema, DungeonEntrySchema } from './services';
 import { WorldCatalogSchema } from './world-catalog';
 import { ContentIdSchema } from './common';
 import { DamageRangeSchema, EnemyCombatSchema } from './combat';
@@ -88,9 +89,15 @@ export const ContentPackV2Schema = ContentPackV1Schema.extend({
   schemaVersion: z.literal(2),
   world: WorldCatalogSchema,
 });
+export const ContentPackV3Schema = ContentPackV1Schema.extend({
+  schemaVersion: z.literal(3),
+  serviceOffers: z.array(ServiceOfferSchema),
+  dungeonEntries: z.array(DungeonEntrySchema),
+});
 export const ContentPackSchema = z.discriminatedUnion('schemaVersion', [
   ContentPackV1Schema,
   ContentPackV2Schema,
+  ContentPackV3Schema,
 ]);
 export type ContentPackInput = z.input<typeof ContentPackSchema>;
 export type ContentPack = z.output<typeof ContentPackSchema>;

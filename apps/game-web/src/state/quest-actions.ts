@@ -25,6 +25,26 @@ export class QuestActions {
     if (d) this.net.send('quest.turn_in', { entityId: d.entityId, questId });
   }
 
+  service(offerId: string): void {
+    const d = this.state.dialogue;
+    if (d)
+      this.net.send('npc.service', {
+        entityId: d.entityId,
+        offerId,
+        requestId: crypto.randomUUID(),
+      });
+  }
+
+  sell(itemId: string, expectedVersion: number): void {
+    const d = this.state.dialogue;
+    if (d)
+      this.net.send('npc.sell', {
+        entityId: d.entityId,
+        itemId,
+        expectedVersion,
+        requestId: crypto.randomUUID(),
+      });
+  }
   closeDialogue(): void {
     this.state.update((s) => (s.dialogue = null));
   }

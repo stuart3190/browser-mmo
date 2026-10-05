@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "id": "pack.world.greybox",
-  "revision": 2,
+  "revision": 3,
   "quests": [],
   "npcs": [],
   "encounters": [],
@@ -267,9 +267,16 @@
         "monsterVariantIds": [
           "enemy.world.greenvale_marches.wildlife.1",
           "enemy.world.greenvale_marches.boar.2",
-          "enemy.world.greenvale_marches.boar.5"
+          "enemy.world.greenvale_marches.boar.5",
+          "enemy.world.greenvale_marches.outlaw.3",
+          "enemy.world.greenvale_marches.stonekin.5"
         ],
-        "resourceIds": ["resource.wild_herb", "resource.hardwood", "resource.field_hide"],
+        "resourceIds": [
+          "resource.wild_herb",
+          "resource.hardwood",
+          "resource.field_hide",
+          "resource.iron_shard"
+        ],
         "npcArchetypeIds": [
           "npc_archetype.guard",
           "npc_archetype.merchant",
@@ -1316,7 +1323,12 @@
           "z": 1000
         },
         "variantIds": [],
-        "resourceIds": ["resource.wild_herb", "resource.hardwood", "resource.field_hide"],
+        "resourceIds": [
+          "resource.wild_herb",
+          "resource.hardwood",
+          "resource.field_hide",
+          "resource.iron_shard"
+        ],
         "dungeonArchetypeId": null
       },
       {
@@ -1748,7 +1760,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -1763,7 +1775,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -1776,7 +1788,7 @@
         "zoneId": "zone.aurelian.greenvale_marches",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 4080
         },
@@ -1791,7 +1803,7 @@
         "zoneId": "zone.aurelian.elderwood",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -1806,7 +1818,7 @@
         "zoneId": "zone.aurelian.amber_coast",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 4080
         },
@@ -1821,7 +1833,7 @@
         "zoneId": "zone.aurelian.crownspine",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -1838,7 +1850,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -1853,7 +1865,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -2408,7 +2420,7 @@
         "position": {
           "x": 5104,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -2423,7 +2435,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -2436,7 +2448,7 @@
         "zoneId": "zone.frostmere.brinebreak",
         "kind": "gate",
         "position": {
-          "x": 2560.0,
+          "x": 2560,
           "y": 0,
           "z": 4080
         },
@@ -2451,7 +2463,7 @@
         "zoneId": "zone.frostmere.rimefen",
         "kind": "gate",
         "position": {
-          "x": 2560.0,
+          "x": 2560,
           "y": 0,
           "z": 16
         },
@@ -2466,7 +2478,7 @@
         "zoneId": "zone.frostmere.whitepine",
         "kind": "gate",
         "position": {
-          "x": 2560.0,
+          "x": 2560,
           "y": 0,
           "z": 4080
         },
@@ -2481,7 +2493,7 @@
         "zoneId": "zone.frostmere.glasspeak",
         "kind": "gate",
         "position": {
-          "x": 2560.0,
+          "x": 2560,
           "y": 0,
           "z": 16
         },
@@ -2498,7 +2510,7 @@
         "position": {
           "x": 5104,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -2513,7 +2525,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -3068,7 +3080,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 1536.0
+          "z": 1536
         },
         "variantIds": [],
         "resourceIds": [],
@@ -3083,7 +3095,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 1536.0
+          "z": 1536
         },
         "variantIds": [],
         "resourceIds": [],
@@ -3096,7 +3108,7 @@
         "zoneId": "zone.cinderwake.ashstrand",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 3056
         },
@@ -3111,7 +3123,7 @@
         "zoneId": "zone.cinderwake.redroot",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -3126,7 +3138,7 @@
         "zoneId": "zone.cinderwake.embersteppe",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 3056
         },
@@ -3141,7 +3153,7 @@
         "zoneId": "zone.cinderwake.blackglass",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -3158,7 +3170,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 1536.0
+          "z": 1536
         },
         "variantIds": [],
         "resourceIds": [],
@@ -3173,7 +3185,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 1536.0
+          "z": 1536
         },
         "variantIds": [],
         "resourceIds": [],
@@ -3998,7 +4010,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -4013,7 +4025,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -4026,7 +4038,7 @@
         "zoneId": "zone.duneshara.oasis_reach",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 4080
         },
@@ -4041,7 +4053,7 @@
         "zoneId": "zone.duneshara.saltmarch",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -4058,7 +4070,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -4073,7 +4085,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -4086,7 +4098,7 @@
         "zoneId": "zone.duneshara.windcut",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 4080
         },
@@ -4101,7 +4113,7 @@
         "zoneId": "zone.duneshara.broken_steps",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -4116,7 +4128,7 @@
         "zoneId": "zone.duneshara.sunsea",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 4080
         },
@@ -4131,7 +4143,7 @@
         "zoneId": "zone.duneshara.high_saffron",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -4148,7 +4160,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -4163,7 +4175,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -4178,7 +4190,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -4193,7 +4205,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2048.0
+          "z": 2048
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5018,7 +5030,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5033,7 +5045,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5046,7 +5058,7 @@
         "zoneId": "zone.veilreach.mistwood",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 5104
         },
@@ -5061,7 +5073,7 @@
         "zoneId": "zone.veilreach.crystal_vale",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -5078,7 +5090,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5093,7 +5105,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5106,7 +5118,7 @@
         "zoneId": "zone.veilreach.moonfen",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 5104
         },
@@ -5121,7 +5133,7 @@
         "zoneId": "zone.veilreach.forgotten_march",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -5136,7 +5148,7 @@
         "zoneId": "zone.veilreach.silver_heath",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 5104
         },
@@ -5151,7 +5163,7 @@
         "zoneId": "zone.veilreach.veiled_spires",
         "kind": "gate",
         "position": {
-          "x": 2048.0,
+          "x": 2048,
           "y": 0,
           "z": 16
         },
@@ -5168,7 +5180,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5183,7 +5195,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5198,7 +5210,7 @@
         "position": {
           "x": 4080,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5213,7 +5225,7 @@
         "position": {
           "x": 16,
           "y": 0,
-          "z": 2560.0
+          "z": 2560
         },
         "variantIds": [],
         "resourceIds": [],
@@ -5488,12 +5500,139 @@
         ],
         "resourceIds": [],
         "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.timber_yard",
+        "name": "Roadhouse Timber Yard",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 335,
+          "y": 0,
+          "z": 455
+        },
+        "kind": "resource_area",
+        "variantIds": [],
+        "resourceIds": ["resource.hardwood"],
+        "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.quarry",
+        "name": "Bristlebank Quarry",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 510,
+          "y": 0,
+          "z": 660
+        },
+        "kind": "resource_area",
+        "variantIds": [],
+        "resourceIds": ["resource.iron_shard"],
+        "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.river_post",
+        "name": "Willow River Post",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 420,
+          "y": 0,
+          "z": 760
+        },
+        "kind": "settlement",
+        "variantIds": [],
+        "resourceIds": [],
+        "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.road_cut",
+        "name": "Old Toll Cut",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 600,
+          "y": 0,
+          "z": 850
+        },
+        "kind": "habitat",
+        "variantIds": [
+          "enemy.world.greenvale_marches.outlaw.3",
+          "enemy.world.greenvale_marches.outlaw.3",
+          "enemy.world.greenvale_marches.outlaw.3"
+        ],
+        "resourceIds": [],
+        "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.vault_watch",
+        "name": "Broken Vault Watch",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 1440,
+          "y": 0,
+          "z": 1020
+        },
+        "kind": "quest_hub",
+        "variantIds": [],
+        "resourceIds": [],
+        "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.vault_outer",
+        "name": "Broken Vault Outer Gallery",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 1520,
+          "y": 0,
+          "z": 1040
+        },
+        "kind": "habitat",
+        "variantIds": ["enemy.world.greenvale_marches.stonekin.5"],
+        "resourceIds": [],
+        "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.vault_inner",
+        "name": "Broken Vault Bell Chamber",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 1570,
+          "y": 0,
+          "z": 1080
+        },
+        "kind": "habitat",
+        "variantIds": [
+          "enemy.world.greenvale_marches.stonekin.5",
+          "enemy.world.greenvale_marches.stonekin.5"
+        ],
+        "resourceIds": [],
+        "dungeonArchetypeId": null
+      },
+      {
+        "id": "location.greenvale_marches.spring_marker",
+        "name": "Marches Spring Boundary",
+        "regionId": "region.aurelian.greenvale_marches",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 1580,
+          "y": 0,
+          "z": 1100
+        },
+        "kind": "landmark",
+        "variantIds": [],
+        "resourceIds": [],
+        "dungeonArchetypeId": null
       }
     ],
     "travel": [
       {
         "id": "travel.greenvale_marches.pass_01.to.amber_coast.pass_01",
-        "name": "Greenvale Marches \u2014 Amber Coast Road",
+        "name": "Greenvale Marches — Amber Coast Road",
         "fromLocationId": "location.greenvale_marches.pass_01",
         "toLocationId": "location.amber_coast.pass_01",
         "mode": "road",
@@ -5502,7 +5641,7 @@
       },
       {
         "id": "travel.amber_coast.pass_01.to.greenvale_marches.pass_01",
-        "name": "Greenvale Marches \u2014 Amber Coast Road",
+        "name": "Greenvale Marches — Amber Coast Road",
         "fromLocationId": "location.amber_coast.pass_01",
         "toLocationId": "location.greenvale_marches.pass_01",
         "mode": "road",
@@ -5511,7 +5650,7 @@
       },
       {
         "id": "travel.greenvale_marches.pass_02.to.elderwood.pass_02",
-        "name": "Greenvale Marches \u2014 Elderwood Road",
+        "name": "Greenvale Marches — Elderwood Road",
         "fromLocationId": "location.greenvale_marches.pass_02",
         "toLocationId": "location.elderwood.pass_02",
         "mode": "road",
@@ -5520,7 +5659,7 @@
       },
       {
         "id": "travel.elderwood.pass_02.to.greenvale_marches.pass_02",
-        "name": "Greenvale Marches \u2014 Elderwood Road",
+        "name": "Greenvale Marches — Elderwood Road",
         "fromLocationId": "location.elderwood.pass_02",
         "toLocationId": "location.greenvale_marches.pass_02",
         "mode": "road",
@@ -5529,7 +5668,7 @@
       },
       {
         "id": "travel.amber_coast.pass_13.to.crownspine.pass_13",
-        "name": "Amber Coast \u2014 Crownspine Road",
+        "name": "Amber Coast — Crownspine Road",
         "fromLocationId": "location.amber_coast.pass_13",
         "toLocationId": "location.crownspine.pass_13",
         "mode": "road",
@@ -5538,7 +5677,7 @@
       },
       {
         "id": "travel.crownspine.pass_13.to.amber_coast.pass_13",
-        "name": "Amber Coast \u2014 Crownspine Road",
+        "name": "Amber Coast — Crownspine Road",
         "fromLocationId": "location.crownspine.pass_13",
         "toLocationId": "location.amber_coast.pass_13",
         "mode": "road",
@@ -5547,7 +5686,7 @@
       },
       {
         "id": "travel.elderwood.pass_23.to.crownspine.pass_23",
-        "name": "Elderwood \u2014 Crownspine Road",
+        "name": "Elderwood — Crownspine Road",
         "fromLocationId": "location.elderwood.pass_23",
         "toLocationId": "location.crownspine.pass_23",
         "mode": "road",
@@ -5556,7 +5695,7 @@
       },
       {
         "id": "travel.crownspine.pass_23.to.elderwood.pass_23",
-        "name": "Elderwood \u2014 Crownspine Road",
+        "name": "Elderwood — Crownspine Road",
         "fromLocationId": "location.crownspine.pass_23",
         "toLocationId": "location.elderwood.pass_23",
         "mode": "road",
@@ -5565,7 +5704,7 @@
       },
       {
         "id": "travel.brinebreak.pass_01.to.whitepine.pass_01",
-        "name": "Brinebreak \u2014 Whitepine Road",
+        "name": "Brinebreak — Whitepine Road",
         "fromLocationId": "location.brinebreak.pass_01",
         "toLocationId": "location.whitepine.pass_01",
         "mode": "road",
@@ -5574,7 +5713,7 @@
       },
       {
         "id": "travel.whitepine.pass_01.to.brinebreak.pass_01",
-        "name": "Brinebreak \u2014 Whitepine Road",
+        "name": "Brinebreak — Whitepine Road",
         "fromLocationId": "location.whitepine.pass_01",
         "toLocationId": "location.brinebreak.pass_01",
         "mode": "road",
@@ -5583,7 +5722,7 @@
       },
       {
         "id": "travel.brinebreak.pass_02.to.rimefen.pass_02",
-        "name": "Brinebreak \u2014 Rimefen Road",
+        "name": "Brinebreak — Rimefen Road",
         "fromLocationId": "location.brinebreak.pass_02",
         "toLocationId": "location.rimefen.pass_02",
         "mode": "road",
@@ -5592,7 +5731,7 @@
       },
       {
         "id": "travel.rimefen.pass_02.to.brinebreak.pass_02",
-        "name": "Brinebreak \u2014 Rimefen Road",
+        "name": "Brinebreak — Rimefen Road",
         "fromLocationId": "location.rimefen.pass_02",
         "toLocationId": "location.brinebreak.pass_02",
         "mode": "road",
@@ -5601,7 +5740,7 @@
       },
       {
         "id": "travel.whitepine.pass_13.to.glasspeak.pass_13",
-        "name": "Whitepine \u2014 Glasspeak Road",
+        "name": "Whitepine — Glasspeak Road",
         "fromLocationId": "location.whitepine.pass_13",
         "toLocationId": "location.glasspeak.pass_13",
         "mode": "road",
@@ -5610,7 +5749,7 @@
       },
       {
         "id": "travel.glasspeak.pass_13.to.whitepine.pass_13",
-        "name": "Whitepine \u2014 Glasspeak Road",
+        "name": "Whitepine — Glasspeak Road",
         "fromLocationId": "location.glasspeak.pass_13",
         "toLocationId": "location.whitepine.pass_13",
         "mode": "road",
@@ -5619,7 +5758,7 @@
       },
       {
         "id": "travel.rimefen.pass_23.to.glasspeak.pass_23",
-        "name": "Rimefen \u2014 Glasspeak Road",
+        "name": "Rimefen — Glasspeak Road",
         "fromLocationId": "location.rimefen.pass_23",
         "toLocationId": "location.glasspeak.pass_23",
         "mode": "road",
@@ -5628,7 +5767,7 @@
       },
       {
         "id": "travel.glasspeak.pass_23.to.rimefen.pass_23",
-        "name": "Rimefen \u2014 Glasspeak Road",
+        "name": "Rimefen — Glasspeak Road",
         "fromLocationId": "location.glasspeak.pass_23",
         "toLocationId": "location.rimefen.pass_23",
         "mode": "road",
@@ -5637,7 +5776,7 @@
       },
       {
         "id": "travel.ashstrand.pass_01.to.embersteppe.pass_01",
-        "name": "Ashstrand \u2014 Embersteppe Road",
+        "name": "Ashstrand — Embersteppe Road",
         "fromLocationId": "location.ashstrand.pass_01",
         "toLocationId": "location.embersteppe.pass_01",
         "mode": "road",
@@ -5646,7 +5785,7 @@
       },
       {
         "id": "travel.embersteppe.pass_01.to.ashstrand.pass_01",
-        "name": "Ashstrand \u2014 Embersteppe Road",
+        "name": "Ashstrand — Embersteppe Road",
         "fromLocationId": "location.embersteppe.pass_01",
         "toLocationId": "location.ashstrand.pass_01",
         "mode": "road",
@@ -5655,7 +5794,7 @@
       },
       {
         "id": "travel.ashstrand.pass_02.to.redroot.pass_02",
-        "name": "Ashstrand \u2014 Redroot Road",
+        "name": "Ashstrand — Redroot Road",
         "fromLocationId": "location.ashstrand.pass_02",
         "toLocationId": "location.redroot.pass_02",
         "mode": "road",
@@ -5664,7 +5803,7 @@
       },
       {
         "id": "travel.redroot.pass_02.to.ashstrand.pass_02",
-        "name": "Ashstrand \u2014 Redroot Road",
+        "name": "Ashstrand — Redroot Road",
         "fromLocationId": "location.redroot.pass_02",
         "toLocationId": "location.ashstrand.pass_02",
         "mode": "road",
@@ -5673,7 +5812,7 @@
       },
       {
         "id": "travel.embersteppe.pass_13.to.blackglass.pass_13",
-        "name": "Embersteppe \u2014 Blackglass Heights Road",
+        "name": "Embersteppe — Blackglass Heights Road",
         "fromLocationId": "location.embersteppe.pass_13",
         "toLocationId": "location.blackglass.pass_13",
         "mode": "road",
@@ -5682,7 +5821,7 @@
       },
       {
         "id": "travel.blackglass.pass_13.to.embersteppe.pass_13",
-        "name": "Embersteppe \u2014 Blackglass Heights Road",
+        "name": "Embersteppe — Blackglass Heights Road",
         "fromLocationId": "location.blackglass.pass_13",
         "toLocationId": "location.embersteppe.pass_13",
         "mode": "road",
@@ -5691,7 +5830,7 @@
       },
       {
         "id": "travel.redroot.pass_23.to.blackglass.pass_23",
-        "name": "Redroot \u2014 Blackglass Heights Road",
+        "name": "Redroot — Blackglass Heights Road",
         "fromLocationId": "location.redroot.pass_23",
         "toLocationId": "location.blackglass.pass_23",
         "mode": "road",
@@ -5700,7 +5839,7 @@
       },
       {
         "id": "travel.blackglass.pass_23.to.redroot.pass_23",
-        "name": "Redroot \u2014 Blackglass Heights Road",
+        "name": "Redroot — Blackglass Heights Road",
         "fromLocationId": "location.blackglass.pass_23",
         "toLocationId": "location.redroot.pass_23",
         "mode": "road",
@@ -5709,7 +5848,7 @@
       },
       {
         "id": "travel.oasis_reach.pass_01.to.windcut.pass_01",
-        "name": "Oasis Reach \u2014 Windcut Valleys Road",
+        "name": "Oasis Reach — Windcut Valleys Road",
         "fromLocationId": "location.oasis_reach.pass_01",
         "toLocationId": "location.windcut.pass_01",
         "mode": "road",
@@ -5718,7 +5857,7 @@
       },
       {
         "id": "travel.windcut.pass_01.to.oasis_reach.pass_01",
-        "name": "Oasis Reach \u2014 Windcut Valleys Road",
+        "name": "Oasis Reach — Windcut Valleys Road",
         "fromLocationId": "location.windcut.pass_01",
         "toLocationId": "location.oasis_reach.pass_01",
         "mode": "road",
@@ -5727,7 +5866,7 @@
       },
       {
         "id": "travel.oasis_reach.pass_03.to.saltmarch.pass_03",
-        "name": "Oasis Reach \u2014 Saltmarch Road",
+        "name": "Oasis Reach — Saltmarch Road",
         "fromLocationId": "location.oasis_reach.pass_03",
         "toLocationId": "location.saltmarch.pass_03",
         "mode": "road",
@@ -5736,7 +5875,7 @@
       },
       {
         "id": "travel.saltmarch.pass_03.to.oasis_reach.pass_03",
-        "name": "Oasis Reach \u2014 Saltmarch Road",
+        "name": "Oasis Reach — Saltmarch Road",
         "fromLocationId": "location.saltmarch.pass_03",
         "toLocationId": "location.oasis_reach.pass_03",
         "mode": "road",
@@ -5745,7 +5884,7 @@
       },
       {
         "id": "travel.windcut.pass_12.to.sunsea.pass_12",
-        "name": "Windcut Valleys \u2014 Sunsea Dunes Road",
+        "name": "Windcut Valleys — Sunsea Dunes Road",
         "fromLocationId": "location.windcut.pass_12",
         "toLocationId": "location.sunsea.pass_12",
         "mode": "road",
@@ -5754,7 +5893,7 @@
       },
       {
         "id": "travel.sunsea.pass_12.to.windcut.pass_12",
-        "name": "Windcut Valleys \u2014 Sunsea Dunes Road",
+        "name": "Windcut Valleys — Sunsea Dunes Road",
         "fromLocationId": "location.sunsea.pass_12",
         "toLocationId": "location.windcut.pass_12",
         "mode": "road",
@@ -5763,7 +5902,7 @@
       },
       {
         "id": "travel.windcut.pass_14.to.broken_steps.pass_14",
-        "name": "Windcut Valleys \u2014 Broken Steps Road",
+        "name": "Windcut Valleys — Broken Steps Road",
         "fromLocationId": "location.windcut.pass_14",
         "toLocationId": "location.broken_steps.pass_14",
         "mode": "road",
@@ -5772,7 +5911,7 @@
       },
       {
         "id": "travel.broken_steps.pass_14.to.windcut.pass_14",
-        "name": "Windcut Valleys \u2014 Broken Steps Road",
+        "name": "Windcut Valleys — Broken Steps Road",
         "fromLocationId": "location.broken_steps.pass_14",
         "toLocationId": "location.windcut.pass_14",
         "mode": "road",
@@ -5781,7 +5920,7 @@
       },
       {
         "id": "travel.sunsea.pass_25.to.high_saffron.pass_25",
-        "name": "Sunsea Dunes \u2014 High Saffron Road",
+        "name": "Sunsea Dunes — High Saffron Road",
         "fromLocationId": "location.sunsea.pass_25",
         "toLocationId": "location.high_saffron.pass_25",
         "mode": "road",
@@ -5790,7 +5929,7 @@
       },
       {
         "id": "travel.high_saffron.pass_25.to.sunsea.pass_25",
-        "name": "Sunsea Dunes \u2014 High Saffron Road",
+        "name": "Sunsea Dunes — High Saffron Road",
         "fromLocationId": "location.high_saffron.pass_25",
         "toLocationId": "location.sunsea.pass_25",
         "mode": "road",
@@ -5799,7 +5938,7 @@
       },
       {
         "id": "travel.saltmarch.pass_34.to.broken_steps.pass_34",
-        "name": "Saltmarch \u2014 Broken Steps Road",
+        "name": "Saltmarch — Broken Steps Road",
         "fromLocationId": "location.saltmarch.pass_34",
         "toLocationId": "location.broken_steps.pass_34",
         "mode": "road",
@@ -5808,7 +5947,7 @@
       },
       {
         "id": "travel.broken_steps.pass_34.to.saltmarch.pass_34",
-        "name": "Saltmarch \u2014 Broken Steps Road",
+        "name": "Saltmarch — Broken Steps Road",
         "fromLocationId": "location.broken_steps.pass_34",
         "toLocationId": "location.saltmarch.pass_34",
         "mode": "road",
@@ -5817,7 +5956,7 @@
       },
       {
         "id": "travel.broken_steps.pass_45.to.high_saffron.pass_45",
-        "name": "Broken Steps \u2014 High Saffron Road",
+        "name": "Broken Steps — High Saffron Road",
         "fromLocationId": "location.broken_steps.pass_45",
         "toLocationId": "location.high_saffron.pass_45",
         "mode": "road",
@@ -5826,7 +5965,7 @@
       },
       {
         "id": "travel.high_saffron.pass_45.to.broken_steps.pass_45",
-        "name": "Broken Steps \u2014 High Saffron Road",
+        "name": "Broken Steps — High Saffron Road",
         "fromLocationId": "location.high_saffron.pass_45",
         "toLocationId": "location.broken_steps.pass_45",
         "mode": "road",
@@ -5835,7 +5974,7 @@
       },
       {
         "id": "travel.mistwood.pass_01.to.moonfen.pass_01",
-        "name": "Mistwood Shore \u2014 Moonfen Road",
+        "name": "Mistwood Shore — Moonfen Road",
         "fromLocationId": "location.mistwood.pass_01",
         "toLocationId": "location.moonfen.pass_01",
         "mode": "road",
@@ -5844,7 +5983,7 @@
       },
       {
         "id": "travel.moonfen.pass_01.to.mistwood.pass_01",
-        "name": "Mistwood Shore \u2014 Moonfen Road",
+        "name": "Mistwood Shore — Moonfen Road",
         "fromLocationId": "location.moonfen.pass_01",
         "toLocationId": "location.mistwood.pass_01",
         "mode": "road",
@@ -5853,7 +5992,7 @@
       },
       {
         "id": "travel.mistwood.pass_03.to.crystal_vale.pass_03",
-        "name": "Mistwood Shore \u2014 Crystal Vale Road",
+        "name": "Mistwood Shore — Crystal Vale Road",
         "fromLocationId": "location.mistwood.pass_03",
         "toLocationId": "location.crystal_vale.pass_03",
         "mode": "road",
@@ -5862,7 +6001,7 @@
       },
       {
         "id": "travel.crystal_vale.pass_03.to.mistwood.pass_03",
-        "name": "Mistwood Shore \u2014 Crystal Vale Road",
+        "name": "Mistwood Shore — Crystal Vale Road",
         "fromLocationId": "location.crystal_vale.pass_03",
         "toLocationId": "location.mistwood.pass_03",
         "mode": "road",
@@ -5871,7 +6010,7 @@
       },
       {
         "id": "travel.moonfen.pass_12.to.silver_heath.pass_12",
-        "name": "Moonfen \u2014 Silver Heath Road",
+        "name": "Moonfen — Silver Heath Road",
         "fromLocationId": "location.moonfen.pass_12",
         "toLocationId": "location.silver_heath.pass_12",
         "mode": "road",
@@ -5880,7 +6019,7 @@
       },
       {
         "id": "travel.silver_heath.pass_12.to.moonfen.pass_12",
-        "name": "Moonfen \u2014 Silver Heath Road",
+        "name": "Moonfen — Silver Heath Road",
         "fromLocationId": "location.silver_heath.pass_12",
         "toLocationId": "location.moonfen.pass_12",
         "mode": "road",
@@ -5889,7 +6028,7 @@
       },
       {
         "id": "travel.moonfen.pass_14.to.forgotten_march.pass_14",
-        "name": "Moonfen \u2014 Forgotten March Road",
+        "name": "Moonfen — Forgotten March Road",
         "fromLocationId": "location.moonfen.pass_14",
         "toLocationId": "location.forgotten_march.pass_14",
         "mode": "road",
@@ -5898,7 +6037,7 @@
       },
       {
         "id": "travel.forgotten_march.pass_14.to.moonfen.pass_14",
-        "name": "Moonfen \u2014 Forgotten March Road",
+        "name": "Moonfen — Forgotten March Road",
         "fromLocationId": "location.forgotten_march.pass_14",
         "toLocationId": "location.moonfen.pass_14",
         "mode": "road",
@@ -5907,7 +6046,7 @@
       },
       {
         "id": "travel.silver_heath.pass_25.to.veiled_spires.pass_25",
-        "name": "Silver Heath \u2014 Veiled Spires Road",
+        "name": "Silver Heath — Veiled Spires Road",
         "fromLocationId": "location.silver_heath.pass_25",
         "toLocationId": "location.veiled_spires.pass_25",
         "mode": "road",
@@ -5916,7 +6055,7 @@
       },
       {
         "id": "travel.veiled_spires.pass_25.to.silver_heath.pass_25",
-        "name": "Silver Heath \u2014 Veiled Spires Road",
+        "name": "Silver Heath — Veiled Spires Road",
         "fromLocationId": "location.veiled_spires.pass_25",
         "toLocationId": "location.silver_heath.pass_25",
         "mode": "road",
@@ -5925,7 +6064,7 @@
       },
       {
         "id": "travel.crystal_vale.pass_34.to.forgotten_march.pass_34",
-        "name": "Crystal Vale \u2014 Forgotten March Road",
+        "name": "Crystal Vale — Forgotten March Road",
         "fromLocationId": "location.crystal_vale.pass_34",
         "toLocationId": "location.forgotten_march.pass_34",
         "mode": "road",
@@ -5934,7 +6073,7 @@
       },
       {
         "id": "travel.forgotten_march.pass_34.to.crystal_vale.pass_34",
-        "name": "Crystal Vale \u2014 Forgotten March Road",
+        "name": "Crystal Vale — Forgotten March Road",
         "fromLocationId": "location.forgotten_march.pass_34",
         "toLocationId": "location.crystal_vale.pass_34",
         "mode": "road",
@@ -5943,7 +6082,7 @@
       },
       {
         "id": "travel.forgotten_march.pass_45.to.veiled_spires.pass_45",
-        "name": "Forgotten March \u2014 Veiled Spires Road",
+        "name": "Forgotten March — Veiled Spires Road",
         "fromLocationId": "location.forgotten_march.pass_45",
         "toLocationId": "location.veiled_spires.pass_45",
         "mode": "road",
@@ -5952,7 +6091,7 @@
       },
       {
         "id": "travel.veiled_spires.pass_45.to.forgotten_march.pass_45",
-        "name": "Forgotten March \u2014 Veiled Spires Road",
+        "name": "Forgotten March — Veiled Spires Road",
         "fromLocationId": "location.veiled_spires.pass_45",
         "toLocationId": "location.forgotten_march.pass_45",
         "mode": "road",
@@ -5961,7 +6100,7 @@
       },
       {
         "id": "travel.greenvale_marches.port.to.brinebreak.port",
-        "name": "Aurelian Reach \u2014 Frostmere Passage",
+        "name": "Aurelian Reach — Frostmere Passage",
         "fromLocationId": "location.greenvale_marches.port",
         "toLocationId": "location.brinebreak.port",
         "mode": "boat",
@@ -5970,7 +6109,7 @@
       },
       {
         "id": "travel.brinebreak.port.to.greenvale_marches.port",
-        "name": "Aurelian Reach \u2014 Frostmere Passage",
+        "name": "Aurelian Reach — Frostmere Passage",
         "fromLocationId": "location.brinebreak.port",
         "toLocationId": "location.greenvale_marches.port",
         "mode": "boat",
@@ -5979,7 +6118,7 @@
       },
       {
         "id": "travel.amber_coast.port.to.ashstrand.port",
-        "name": "Aurelian Reach \u2014 Cinderwake Passage",
+        "name": "Aurelian Reach — Cinderwake Passage",
         "fromLocationId": "location.amber_coast.port",
         "toLocationId": "location.ashstrand.port",
         "mode": "boat",
@@ -5988,7 +6127,7 @@
       },
       {
         "id": "travel.ashstrand.port.to.amber_coast.port",
-        "name": "Aurelian Reach \u2014 Cinderwake Passage",
+        "name": "Aurelian Reach — Cinderwake Passage",
         "fromLocationId": "location.ashstrand.port",
         "toLocationId": "location.amber_coast.port",
         "mode": "boat",
@@ -5997,7 +6136,7 @@
       },
       {
         "id": "travel.brinebreak.port.to.ashstrand.port",
-        "name": "Frostmere \u2014 Cinderwake Passage",
+        "name": "Frostmere — Cinderwake Passage",
         "fromLocationId": "location.brinebreak.port",
         "toLocationId": "location.ashstrand.port",
         "mode": "boat",
@@ -6006,7 +6145,7 @@
       },
       {
         "id": "travel.ashstrand.port.to.brinebreak.port",
-        "name": "Frostmere \u2014 Cinderwake Passage",
+        "name": "Frostmere — Cinderwake Passage",
         "fromLocationId": "location.ashstrand.port",
         "toLocationId": "location.brinebreak.port",
         "mode": "boat",
@@ -6015,7 +6154,7 @@
       },
       {
         "id": "travel.ashstrand.port.to.oasis_reach.port",
-        "name": "Cinderwake \u2014 Duneshara Passage",
+        "name": "Cinderwake — Duneshara Passage",
         "fromLocationId": "location.ashstrand.port",
         "toLocationId": "location.oasis_reach.port",
         "mode": "boat",
@@ -6024,7 +6163,7 @@
       },
       {
         "id": "travel.oasis_reach.port.to.ashstrand.port",
-        "name": "Cinderwake \u2014 Duneshara Passage",
+        "name": "Cinderwake — Duneshara Passage",
         "fromLocationId": "location.oasis_reach.port",
         "toLocationId": "location.ashstrand.port",
         "mode": "boat",
@@ -6033,7 +6172,7 @@
       },
       {
         "id": "travel.oasis_reach.port.to.mistwood.port",
-        "name": "Duneshara \u2014 Veilreach Passage",
+        "name": "Duneshara — Veilreach Passage",
         "fromLocationId": "location.oasis_reach.port",
         "toLocationId": "location.mistwood.port",
         "mode": "boat",
@@ -6042,7 +6181,7 @@
       },
       {
         "id": "travel.mistwood.port.to.oasis_reach.port",
-        "name": "Duneshara \u2014 Veilreach Passage",
+        "name": "Duneshara — Veilreach Passage",
         "fromLocationId": "location.mistwood.port",
         "toLocationId": "location.oasis_reach.port",
         "mode": "boat",
@@ -6051,7 +6190,7 @@
       },
       {
         "id": "travel.brinebreak.port.to.mistwood.port",
-        "name": "Frostmere \u2014 Veilreach Passage",
+        "name": "Frostmere — Veilreach Passage",
         "fromLocationId": "location.brinebreak.port",
         "toLocationId": "location.mistwood.port",
         "mode": "boat",
@@ -6060,7 +6199,7 @@
       },
       {
         "id": "travel.mistwood.port.to.brinebreak.port",
-        "name": "Frostmere \u2014 Veilreach Passage",
+        "name": "Frostmere — Veilreach Passage",
         "fromLocationId": "location.mistwood.port",
         "toLocationId": "location.brinebreak.port",
         "mode": "boat",
@@ -6069,7 +6208,7 @@
       },
       {
         "id": "travel.greenvale.north_gate.to.greenvale_marches.starter_gate",
-        "name": "Greenvale \u2014 Greenvale Marches",
+        "name": "Greenvale — Greenvale Marches",
         "fromLocationId": "location.greenvale.north_gate",
         "toLocationId": "location.greenvale_marches.starter_gate",
         "mode": "road",
@@ -6078,7 +6217,7 @@
       },
       {
         "id": "travel.greenvale_marches.starter_gate.to.greenvale.north_gate",
-        "name": "Greenvale \u2014 Greenvale Marches",
+        "name": "Greenvale — Greenvale Marches",
         "fromLocationId": "location.greenvale_marches.starter_gate",
         "toLocationId": "location.greenvale.north_gate",
         "mode": "road",
@@ -7075,7 +7214,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -7092,7 +7231,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -7107,7 +7246,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 4080
           }
@@ -7124,7 +7263,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -7141,7 +7280,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 4080
           }
@@ -7158,7 +7297,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -7177,7 +7316,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -7194,7 +7333,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -7755,7 +7894,7 @@
           {
             "x": 5104,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -7772,7 +7911,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -7787,7 +7926,7 @@
             "z": 400
           },
           {
-            "x": 2560.0,
+            "x": 2560,
             "y": 0,
             "z": 4080
           }
@@ -7804,7 +7943,7 @@
             "z": 400
           },
           {
-            "x": 2560.0,
+            "x": 2560,
             "y": 0,
             "z": 16
           }
@@ -7821,7 +7960,7 @@
             "z": 400
           },
           {
-            "x": 2560.0,
+            "x": 2560,
             "y": 0,
             "z": 4080
           }
@@ -7838,7 +7977,7 @@
             "z": 400
           },
           {
-            "x": 2560.0,
+            "x": 2560,
             "y": 0,
             "z": 16
           }
@@ -7857,7 +7996,7 @@
           {
             "x": 5104,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -7874,7 +8013,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -8435,7 +8574,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 1536.0
+            "z": 1536
           }
         ],
         "width": 5
@@ -8452,7 +8591,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 1536.0
+            "z": 1536
           }
         ],
         "width": 5
@@ -8467,7 +8606,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 3056
           }
@@ -8484,7 +8623,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -8501,7 +8640,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 3056
           }
@@ -8518,7 +8657,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -8537,7 +8676,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 1536.0
+            "z": 1536
           }
         ],
         "width": 5
@@ -8554,7 +8693,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 1536.0
+            "z": 1536
           }
         ],
         "width": 5
@@ -9387,7 +9526,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -9404,7 +9543,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -9419,7 +9558,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 4080
           }
@@ -9436,7 +9575,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -9455,7 +9594,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -9472,7 +9611,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -9487,7 +9626,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 4080
           }
@@ -9504,7 +9643,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -9521,7 +9660,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 4080
           }
@@ -9538,7 +9677,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -9557,7 +9696,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -9574,7 +9713,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -9591,7 +9730,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -9608,7 +9747,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2048.0
+            "z": 2048
           }
         ],
         "width": 5
@@ -10441,7 +10580,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10458,7 +10597,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10473,7 +10612,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 5104
           }
@@ -10490,7 +10629,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -10509,7 +10648,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10526,7 +10665,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10541,7 +10680,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 5104
           }
@@ -10558,7 +10697,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -10575,7 +10714,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 5104
           }
@@ -10592,7 +10731,7 @@
             "z": 400
           },
           {
-            "x": 2048.0,
+            "x": 2048,
             "y": 0,
             "z": 16
           }
@@ -10611,7 +10750,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10628,7 +10767,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10645,7 +10784,7 @@
           {
             "x": 4080,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10662,7 +10801,7 @@
           {
             "x": 16,
             "y": 0,
-            "z": 2560.0
+            "z": 2560
           }
         ],
         "width": 5
@@ -10698,6 +10837,160 @@
           }
         ],
         "width": 5
+      },
+      {
+        "id": "road.greenvale_marches.river_route",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "points": [
+          {
+            "x": 470,
+            "y": 0,
+            "z": 610
+          },
+          {
+            "x": 488.5,
+            "y": 0,
+            "z": 638.5
+          },
+          {
+            "x": 491.5,
+            "y": 0,
+            "z": 639.5
+          },
+          {
+            "x": 502,
+            "y": 0,
+            "z": 644
+          },
+          {
+            "x": 503,
+            "y": 0,
+            "z": 645
+          },
+          {
+            "x": 503,
+            "y": 0,
+            "z": 646
+          },
+          {
+            "x": 502.5,
+            "y": 0,
+            "z": 646.5
+          },
+          {
+            "x": 510,
+            "y": 0,
+            "z": 660
+          },
+          {
+            "x": 490,
+            "y": 0,
+            "z": 669.5
+          },
+          {
+            "x": 489.5,
+            "y": 0,
+            "z": 672.5
+          },
+          {
+            "x": 421,
+            "y": 0,
+            "z": 743
+          },
+          {
+            "x": 420.5,
+            "y": 0,
+            "z": 747.5
+          },
+          {
+            "x": 420,
+            "y": 0,
+            "z": 760
+          },
+          {
+            "x": 444.5,
+            "y": 0,
+            "z": 764.5
+          },
+          {
+            "x": 447.5,
+            "y": 0,
+            "z": 767.5
+          },
+          {
+            "x": 600,
+            "y": 0,
+            "z": 850
+          },
+          {
+            "x": 618.5,
+            "y": 0,
+            "z": 876.5
+          },
+          {
+            "x": 743,
+            "y": 0,
+            "z": 983
+          },
+          {
+            "x": 744,
+            "y": 0,
+            "z": 983
+          },
+          {
+            "x": 768,
+            "y": 0,
+            "z": 1000
+          }
+        ],
+        "width": 6
+      },
+      {
+        "id": "road.greenvale_marches.vault_route",
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "points": [
+          {
+            "x": 768,
+            "y": 0,
+            "z": 1000
+          },
+          {
+            "x": 1100,
+            "y": 0,
+            "z": 1000
+          },
+          {
+            "x": 1400,
+            "y": 0,
+            "z": 900
+          },
+          {
+            "x": 1440,
+            "y": 0,
+            "z": 1020
+          },
+          {
+            "x": 1536,
+            "y": 0,
+            "z": 1024
+          },
+          {
+            "x": 1539.5,
+            "y": 0,
+            "z": 1053.5
+          },
+          {
+            "x": 1540.5,
+            "y": 0,
+            "z": 1053.5
+          },
+          {
+            "x": 1570,
+            "y": 0,
+            "z": 1080
+          }
+        ],
+        "width": 6
       }
     ],
     "monsterFamilies": [
@@ -11315,7 +11608,14 @@
       {
         "id": "family.outlaw",
         "name": "Road Outlaws",
-        "biomeIds": ["biome.canyon", "biome.coast", "biome.haunted", "biome.steppe", "biome.taiga"],
+        "biomeIds": [
+          "biome.canyon",
+          "biome.coast",
+          "biome.haunted",
+          "biome.steppe",
+          "biome.taiga",
+          "biome.meadow"
+        ],
         "variants": [
           {
             "id": "enemy.world.amber_coast.outlaw.6",
@@ -11536,6 +11836,28 @@
             },
             "lootProfileId": "loot.world.outlaw",
             "xpReward": 383
+          },
+          {
+            "id": "enemy.world.greenvale_marches.outlaw.3",
+            "name": "Marches Road Outlaw",
+            "level": 3,
+            "maxHealth": 110,
+            "disposition": "hostile",
+            "combat": {
+              "damage": {
+                "min": 7,
+                "max": 11
+              },
+              "attackSpeedMs": 2400,
+              "attackRange": 2.4,
+              "aggroRange": 9,
+              "leashRange": 28,
+              "moveSpeed": 2.6,
+              "armor": 3,
+              "corpseMs": 4500
+            },
+            "lootProfileId": "loot.world.outlaw",
+            "xpReward": 70
           }
         ]
       },
@@ -11687,7 +12009,8 @@
           "biome.glacier",
           "biome.mesa",
           "biome.mountain",
-          "biome.volcanic"
+          "biome.volcanic",
+          "biome.meadow"
         ],
         "variants": [
           {
@@ -11953,6 +12276,28 @@
             },
             "lootProfileId": "loot.world.stonekin",
             "xpReward": 359
+          },
+          {
+            "id": "enemy.world.greenvale_marches.stonekin.5",
+            "name": "Marches Vault Stonekin",
+            "level": 5,
+            "maxHealth": 260,
+            "disposition": "hostile",
+            "combat": {
+              "damage": {
+                "min": 10,
+                "max": 16
+              },
+              "attackSpeedMs": 2400,
+              "attackRange": 2.4,
+              "aggroRange": 9,
+              "leashRange": 28,
+              "moveSpeed": 2.6,
+              "armor": 5,
+              "corpseMs": 4500
+            },
+            "lootProfileId": "loot.world.stonekin",
+            "xpReward": 150
           }
         ]
       },
@@ -12483,7 +12828,7 @@
     "populations": [
       {
         "id": "npc.world.greenvale_marches.guard",
-        "name": "Greenvale Marches Warden",
+        "name": "Roadwarden Bram",
         "locationId": "location.greenvale_marches.town",
         "archetypeId": "npc_archetype.guard",
         "offset": {
@@ -12491,13 +12836,13 @@
           "z": 3
         },
         "dialogue": [
-          "Greenvale Marches welcomes travellers. These roads connect our camp, resource hollow and watch beacon.",
-          "This is an early world greybox. Shops, lodging and professions are catalogued but not yet playable."
-        ]
+          "The bristlebacks press against our safe meadow. My daily patrol contract keeps the road clear."
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.merchant",
-        "name": "Greenvale Marches Provisioner",
+        "name": "Provisioner Vale",
         "locationId": "location.greenvale_marches.town",
         "archetypeId": "npc_archetype.merchant",
         "offset": {
@@ -12505,9 +12850,9 @@
           "z": 3
         },
         "dialogue": [
-          "Greenvale Marches welcomes travellers. These roads connect our camp, resource hollow and watch beacon.",
-          "This is an early world greybox. Shops, lodging and professions are catalogued but not yet playable."
-        ]
+          "Supplies for the Marches: I buy gathered stock and sell field equipment. All prices are in copper."
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.innkeeper",
@@ -12521,7 +12866,8 @@
         "dialogue": [
           "Welcome to the Greenvale Roadhouse. Willow Quay is south; Lantern Meadow opens east, beyond the safe lanterns.",
           "Bristlebank is rougher ground. Keep to the road until your party is ready for the Hollow."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.profession",
@@ -12535,7 +12881,8 @@
         "dialogue": [
           "Wild Herb grows in the beds east of the Roadhouse and at the Resource Hollow. Gather a patch with Interact; the herbs go into your material pouch.",
           "A picked patch needs time to regrow. Share the road, and leave the bristlebacks room."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.faction",
@@ -12549,7 +12896,8 @@
         "dialogue": [
           "Greenvale Marches welcomes travellers. These roads connect our camp, resource hollow and watch beacon.",
           "This is an early world greybox. Shops, lodging and professions are catalogued but not yet playable."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.scout",
@@ -12562,7 +12910,8 @@
         },
         "dialogue": [
           "Grazers shelter beside the east road. Bristlebacks hold the thickets, with older beasts deeper toward Watch Ridge."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.ferryman",
@@ -12576,7 +12925,8 @@
         "dialogue": [
           "Use World / Travel to select a passage while standing at this port.",
           "Leave combat and your zone party before departure. Your equipment and progress travel with you."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.amber_coast.guard",
@@ -14844,7 +15194,8 @@
         "dialogue": [
           "Our settlement keeps these roads open for travellers.",
           "This role is part of the world population. NPC-specific healing and profession services are not yet implemented."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.banker",
@@ -14856,9 +15207,9 @@
           "z": -10
         },
         "dialogue": [
-          "Our settlement keeps these roads open for travellers.",
-          "This role is part of the world population. NPC-specific healing and profession services are not yet implemented."
-        ]
+          "Your character and account vaults are available from the Vault button. Remote access is still supported; this is not a banker-only restriction."
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.wildlife_keeper",
@@ -14872,7 +15223,8 @@
         "dialogue": [
           "Our settlement keeps these roads open for travellers.",
           "This role is part of the world population. NPC-specific healing and profession services are not yet implemented."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.amber_coast.healer",
@@ -15851,7 +16203,8 @@
         },
         "dialogue": [
           "The lantern road is watched. Beyond it, grazing herds give way to bristleback thickets."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.camp_scout",
@@ -15864,7 +16217,8 @@
         },
         "dialogue": [
           "The Resource Hollow lies west of camp. Gather herbs with care: bristlebacks patrol its eastern bank."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
       },
       {
         "id": "npc.world.greenvale_marches.herbalist_assistant",
@@ -15877,7 +16231,92 @@
         },
         "dialogue": [
           "These Wild Herb beds are shared. A gathered patch regrows after a minute; herbs stay in your material pouch."
-        ]
+        ],
+        "runtimeRole": "quest_giver"
+      },
+      {
+        "id": "npc.world.greenvale_marches.river_guard",
+        "name": "River Warden Edda",
+        "locationId": "location.greenvale_marches.river_post",
+        "archetypeId": "npc_archetype.guard",
+        "offset": {
+          "x": -7,
+          "z": 3
+        },
+        "dialogue": [
+          "Stay on the lit route. The old spring marks are boundaries, not treasure. Speak to the Roadhouse keepers for work."
+        ],
+        "runtimeRole": "quest_giver"
+      },
+      {
+        "id": "npc.world.greenvale_marches.river_merchant",
+        "name": "River Trader Corin",
+        "locationId": "location.greenvale_marches.river_post",
+        "archetypeId": "npc_archetype.merchant",
+        "offset": {
+          "x": 7,
+          "z": 3
+        },
+        "dialogue": [
+          "Stay on the lit route. The old spring marks are boundaries, not treasure. Speak to the Roadhouse keepers for work."
+        ],
+        "runtimeRole": "quest_giver"
+      },
+      {
+        "id": "npc.world.greenvale_marches.vault_scout",
+        "name": "Vault Watcher Iven",
+        "locationId": "location.greenvale_marches.vault_watch",
+        "archetypeId": "npc_archetype.scout",
+        "offset": {
+          "x": 0,
+          "z": 0
+        },
+        "dialogue": [
+          "Stay on the lit route. The old spring marks are boundaries, not treasure. Speak to the Roadhouse keepers for work."
+        ],
+        "runtimeRole": "quest_giver"
+      },
+      {
+        "id": "npc.world.greenvale_marches.timber_keeper",
+        "name": "Woodkeeper Senn",
+        "locationId": "location.greenvale_marches.timber_yard",
+        "archetypeId": "npc_archetype.profession",
+        "offset": {
+          "x": -7,
+          "z": 0
+        },
+        "dialogue": [
+          "Stay on the lit route. The old spring marks are boundaries, not treasure. Speak to the Roadhouse keepers for work."
+        ],
+        "runtimeRole": "quest_giver"
+      },
+      {
+        "id": "npc.world.greenvale_marches.quarry_keeper",
+        "name": "Quarryhand Orla",
+        "locationId": "location.greenvale_marches.quarry",
+        "archetypeId": "npc_archetype.profession",
+        "offset": {
+          "x": -7,
+          "z": 0
+        },
+        "dialogue": [
+          "Stay on the lit route. The old spring marks are boundaries, not treasure. Speak to the Roadhouse keepers for work."
+        ],
+        "runtimeRole": "quest_giver"
+      },
+      {
+        "id": "npc.world.greenvale_marches.quay_guard",
+        "name": "Quay Guard Hollis",
+        "locationId": "location.greenvale_marches.port",
+        "archetypeId": "npc_archetype.guard",
+        "offset": {
+          "x": -8,
+          "z": 8
+        },
+        "dialogue": [
+          "Stay on the lit route. The old spring marks are boundaries, not treasure. Speak to the Roadhouse keepers for work."
+        ],
+        "runtimeRole": "quest_giver"
       }
     ],
     "materials": [
@@ -16152,7 +16591,7 @@
           "biome.volcanic"
         ],
         "profession": "logging",
-        "gatheringImplemented": false
+        "gatheringImplemented": true
       },
       {
         "id": "resource.marsh_reed",
@@ -16187,10 +16626,11 @@
           "biome.mesa",
           "biome.saltflat",
           "biome.taiga",
-          "biome.tundra"
+          "biome.tundra",
+          "biome.meadow"
         ],
         "profession": "mining",
-        "gatheringImplemented": false
+        "gatheringImplemented": true
       },
       {
         "id": "resource.frost_salt",
@@ -16526,6 +16966,42 @@
         },
         "quantity": 3,
         "regrowMs": 90000
+      },
+      {
+        "id": "node.greenvale_marches.timber_stack",
+        "name": "Hardwood Stack",
+        "locationId": "location.greenvale_marches.timber_yard",
+        "resourceId": "resource.hardwood",
+        "offset": {
+          "x": 0,
+          "z": 0
+        },
+        "quantity": 2,
+        "regrowMs": 60000
+      },
+      {
+        "id": "node.greenvale_marches.quarry_vein",
+        "name": "Iron Shard Vein",
+        "locationId": "location.greenvale_marches.quarry",
+        "resourceId": "resource.iron_shard",
+        "offset": {
+          "x": 0,
+          "z": 0
+        },
+        "quantity": 2,
+        "regrowMs": 60000
+      },
+      {
+        "id": "node.greenvale_marches.hollow_vein",
+        "name": "Iron Shard Vein",
+        "locationId": "location.greenvale_marches.deposits",
+        "resourceId": "resource.iron_shard",
+        "offset": {
+          "x": -10,
+          "z": 8
+        },
+        "quantity": 2,
+        "regrowMs": 60000
       }
     ],
     "dressing": [
@@ -16538,7 +17014,7 @@
           "z": 16
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.town.1",
@@ -16604,7 +17080,7 @@
           "z": 7
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.herb_garden.1",
@@ -16626,7 +17102,7 @@
           "z": 20
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.pocket_meadow.1",
@@ -16659,7 +17135,7 @@
           "z": 18
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.pocket_bristle.1",
@@ -16692,7 +17168,7 @@
           "z": 20
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.pocket_roadwatch.1",
@@ -16714,7 +17190,7 @@
           "z": 20
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.deposits.1",
@@ -16747,7 +17223,7 @@
           "z": 18
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.pocket_hollow.1",
@@ -16769,7 +17245,7 @@
           "z": 18
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.camp.1",
@@ -16791,7 +17267,7 @@
           "z": 18
         },
         "scale": 1.1,
-        "rotationY": 0.0
+        "rotationY": 0
       },
       {
         "id": "dressing.marches.beacon.1",
@@ -16803,6 +17279,193 @@
         },
         "scale": 1.3,
         "rotationY": 0.7
+      },
+      {
+        "id": "prop.greenvale_marches.river_post.0",
+        "locationId": "location.greenvale_marches.river_post",
+        "kind": "building",
+        "offset": {
+          "x": -16,
+          "z": -8
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.river_post.1",
+        "locationId": "location.greenvale_marches.river_post",
+        "kind": "tree",
+        "offset": {
+          "x": 17,
+          "z": 9
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.river_post.2",
+        "locationId": "location.greenvale_marches.river_post",
+        "kind": "rock",
+        "offset": {
+          "x": -13,
+          "z": 13
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_watch.0",
+        "locationId": "location.greenvale_marches.vault_watch",
+        "kind": "building",
+        "offset": {
+          "x": -16,
+          "z": -8
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_watch.1",
+        "locationId": "location.greenvale_marches.vault_watch",
+        "kind": "tree",
+        "offset": {
+          "x": 17,
+          "z": 9
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_watch.2",
+        "locationId": "location.greenvale_marches.vault_watch",
+        "kind": "rock",
+        "offset": {
+          "x": -13,
+          "z": 13
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.quarry.0",
+        "locationId": "location.greenvale_marches.quarry",
+        "kind": "building",
+        "offset": {
+          "x": -16,
+          "z": -8
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.quarry.1",
+        "locationId": "location.greenvale_marches.quarry",
+        "kind": "tree",
+        "offset": {
+          "x": 17,
+          "z": 9
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.quarry.2",
+        "locationId": "location.greenvale_marches.quarry",
+        "kind": "rock",
+        "offset": {
+          "x": -13,
+          "z": 13
+        },
+        "scale": 1,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.0",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": -10,
+          "z": 8
+        },
+        "scale": 2,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.1",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": 10,
+          "z": 8
+        },
+        "scale": 2,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.2",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": -10,
+          "z": 24
+        },
+        "scale": 2,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.3",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": 10,
+          "z": 24
+        },
+        "scale": 2,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.4",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": -10,
+          "z": 42
+        },
+        "scale": 2,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.5",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": 10,
+          "z": 42
+        },
+        "scale": 2,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.6",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": -10,
+          "z": 60
+        },
+        "scale": 2,
+        "rotationY": 0
+      },
+      {
+        "id": "prop.greenvale_marches.vault_wall.7",
+        "locationId": "location.greenvale_marches.cave",
+        "kind": "rock",
+        "offset": {
+          "x": 10,
+          "z": 60
+        },
+        "scale": 2,
+        "rotationY": 0
       }
     ]
   }

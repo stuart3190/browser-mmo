@@ -40,9 +40,19 @@ function returnTo(quest: QuestView, npcName: (id: string) => string | undefined)
 
 /** NPC dialogue: greeting, then each quest line with the single action the server offered. */
 export function DialoguePanel() {
-  const { state, quests } = useGame();
+  const { state, quests, gameData } = useGame();
+  const [sellId, setSellId] = useState('');
   const d = state.dialogue;
   if (!d) return null;
+  const vendor = gameData.raw.serviceOffers?.some((o) => o.npcId === d.npcId && o.kind === 'buy');
+  const stock = state.items
+    .inContainer('backpack')
+    .filter((i) => !i.instance.flags.locked && i.template.vendorValue > 0);
+  const selected = stock.find((i) => i.instance.id === sellId);
+  const population = gameData.raw.worldCatalog?.populations.find((p) => p.id === d.npcId);
+  const banker =
+    gameData.raw.worldCatalog?.npcArchetypes.find((a) => a.id === population?.archetypeId)?.role ===
+    'banker';
   return (
     <aside
       className="panel dialogue"
@@ -63,35 +73,124 @@ export function DialoguePanel() {
           ×
         </button>
       </header>
-      {d.quests.length === 0 && <p className="dialogue-line">“{d.greeting}”</p>}
-      {d.quests.map(({ quest, line, action }) => (
-        <section
-          key={quest.questId}
-          className="dialogue-quest"
-          data-quest={quest.questId}
-          data-state={quest.state}
+      {banker && (
+        <button
+          data-testid="banker-vault"
+          onClick={() => {
+            quests.closeDialogue();
+            state.toggle('bank', true);
+          }}
         >
-          <h3>{quest.name}</h3>
-          <p className="dialogue-line">“{line}”</p>
-          {action === 'accept' && <p className="small muted">{quest.description}</p>}
-          {(quest.state === 'active' || quest.state === 'ready_to_turn_in') && (
-            <Objectives quest={quest} />
-          )}
-          {quest.state !== 'completed' && <Rewards quest={quest} />}
-          <div className="dialogue-actions">
-            {action === 'accept' && (
-              <button onClick={() => quests.accept(quest.questId)} data-testid="quest-accept">
-                Accept quest
-              </button>
-            )}
-            {action === 'turn_in' && (
-              <button onClick={() => quests.turnIn(quest.questId)} data-testid="quest-turn-in">
-                Complete quest
-              </button>
-            )}
-          </div>
+          Open vault
+        </button>
+      )}
+      {vendor && (
+        <section className="dialogue-quest">
+          <label>
+            Sell a carried item{' '}
+            <select
+              aria-label="Sell backpack item"
+              style={{ display: 'block', width: '100%', maxWidth: '100%' }}
+              value={selected?.instance.id ?? ''}
+              onChange={(e) => setSellId(e.target.value)}
+            >
+              <option value="">Choose an item…</option>
+              {stock.map((i) => (
+                <option key={i.instance.id} value={i.instance.id}>
+                  {i.template.name} ·{' '}
+                  {gameData.rarities.get(i.instance.rarityId)?.name ?? i.instance.rarityId} ×
+                  {i.instance.quantity} · {i.template.vendorValue * i.instance.quantity} copper
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="small">
+            Sells the selected whole stack at base vendor value. Equipped, vaulted and locked items
+            are protected.
+          </p>
+          <button
+            data-testid="vendor-sell"
+            disabled={
+              !selected ||
+              state.connection !== 'open' ||
+              state.vitals?.inCombat ||
+              state.vitals?.dead
+            }
+            onClick={() => selected && quests.sell(selected.instance.id, selected.instance.version)}
+          >
+            Sell selected stack
+            {selected
+              ? ` · ${selected.template.vendorValue * selected.instance.quantity} copper`
+              : ''}
+          </button>
         </section>
-      ))}
+      )}
+      {d.quests.length === 0 && <p className="dialogue-line">“{d.greeting}”</p>}
+      {[...d.quests]
+        .sort((a, b) => {
+          const rank = (e: typeof a) =>
+            e.action === 'turn_in'
+              ? 0
+              : e.action === 'accept'
+                ? 1
+                : e.quest.state === 'completed'
+                  ? 3
+                  : 2;
+          return rank(a) - rank(b);
+        })
+        .map(({ quest, line, action }) => (
+          <section
+            key={quest.questId}
+            className="dialogue-quest"
+            data-quest={quest.questId}
+            data-state={quest.state}
+          >
+            <h3>{quest.name}</h3>
+            <p className="dialogue-line">“{line}”</p>
+            {action === 'accept' && <p className="small muted">{quest.description}</p>}
+            {(quest.state === 'active' || quest.state === 'ready_to_turn_in') && (
+              <Objectives quest={quest} />
+            )}
+            {quest.state !== 'completed' && <Rewards quest={quest} />}
+            <div className="dialogue-actions">
+              {action === 'accept' && (
+                <button onClick={() => quests.accept(quest.questId)} data-testid="quest-accept">
+                  Accept quest
+                </button>
+              )}
+              {action === 'turn_in' && (
+                <button onClick={() => quests.turnIn(quest.questId)} data-testid="quest-turn-in">
+                  Complete quest
+                </button>
+              )}
+            </div>
+          </section>
+        ))}
+      {(gameData.raw.serviceOffers ?? [])
+        .filter((o) => o.npcId === d.npcId)
+        .map((o) => (
+          <section key={o.id} className="dialogue-quest">
+            <strong>{o.name}</strong>
+            <p className="small">
+              {o.inputs
+                .map((i) => `${i.quantity} ${gameData.template(i.itemTemplateId).name}`)
+                .join(' + ')}
+              {o.copper < 0
+                ? ` · ${-o.copper} copper`
+                : o.copper > 0
+                  ? ` → ${o.copper} copper`
+                  : ''}
+              {o.output ? ` → ${gameData.template(o.output.itemTemplateId).name}` : ''}
+            </p>
+            <button
+              data-service={o.id}
+              disabled={state.connection !== 'open' || state.vitals?.dead || state.vitals?.inCombat}
+              onClick={() => quests.service(o.id)}
+            >
+              {o.kind === 'buy' ? 'Buy' : o.kind === 'sell' ? 'Sell one' : 'Craft'}
+            </button>
+          </section>
+        ))}
       <div className="dialogue-actions">
         <button
           className="secondary"
@@ -108,12 +207,23 @@ export function DialoguePanel() {
 /** Compact always-on tracker for quests in progress. */
 export function QuestTracker() {
   const { state, gameData } = useGame();
-  const tracked = state.quests.filter(
+  const allTracked = state.quests.filter(
     (q) => q.state === 'active' || q.state === 'ready_to_turn_in',
   );
-  if (tracked.length === 0) return null;
+  if (allTracked.length === 0) return null;
+  const tracked = [...allTracked]
+    .sort(
+      (a, b) =>
+        Number(b.questId === state.trackedQuestId) - Number(a.questId === state.trackedQuestId),
+    )
+    .slice(0, 3);
   return (
     <div className="panel quest-tracker" data-testid="quest-tracker" aria-label="Quest tracker">
+      {allTracked.length > 3 && (
+        <button className="secondary" onClick={() => state.toggle('quests', true)}>
+          {allTracked.length} active quests · Open log
+        </button>
+      )}
       {tracked.map((q) => (
         <div key={q.questId} className="tracked" data-quest={q.questId} data-state={q.state}>
           <button

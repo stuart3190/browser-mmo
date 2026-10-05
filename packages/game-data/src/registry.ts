@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ServiceOfferSchema, DungeonEntrySchema } from '@mmo/schemas';
 import { WorldCatalogSchema } from '@mmo/schemas';
 import { validateWorldCatalog } from './world-catalog';
 import {
@@ -47,6 +48,8 @@ import { ENEMY_COLLISION_RADIUS, PLAYER_COLLISION_RADIUS } from './content/props
 
 export const RawGameDataSchema = z.object({
   worldCatalog: WorldCatalogSchema.optional(),
+  serviceOffers: z.array(ServiceOfferSchema).optional(),
+  dungeonEntries: z.array(DungeonEntrySchema).optional(),
   rarities: z.array(ItemRarityDefinitionSchema),
   equipmentSlots: z.array(EquipmentSlotDefinitionSchema),
   equipmentTypes: z.array(EquipmentTypeDefinitionSchema),
@@ -319,6 +322,11 @@ export class GameData {
       for (const pre of q.prerequisites)
         if (!q.placeholder && this.quests.get(pre)?.placeholder)
           errors.push(`quest ${q.id}: prerequisite ${pre} is not playable`);
+      for (const pre of q.prerequisites)
+        if (this.quests.get(pre)?.repeatable)
+          errors.push(
+            `quest ${q.id}: repeatable prerequisite ${pre} needs a permanent unlock; unsupported`,
+          );
       const npc = (id: string | null, what: string) => {
         if (id !== null && !this.npcs.has(id)) errors.push(`quest ${q.id}: unknown ${what} ${id}`);
       };
@@ -354,7 +362,8 @@ export class GameData {
           errors.push(`quest ${q.id}: reward ${i.itemTemplateId} exceeds max stack`);
       }
       if (!q.placeholder) {
-        if (q.repeatable) errors.push(`quest ${q.id}: repeatable quests are not supported yet`);
+        if (q.repeatable && !q.repeatCooldownMs)
+          errors.push(`quest ${q.id}: repeatable quest needs cooldown`);
         if (!q.giverNpcId) errors.push(`quest ${q.id}: needs a giver NPC`);
         else if (this.npcs.get(q.giverNpcId)?.role !== 'quest_giver')
           errors.push(`quest ${q.id}: giver ${q.giverNpcId} is not a quest giver`);

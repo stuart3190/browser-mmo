@@ -783,3 +783,60 @@ export async function getItemHistory(db: DbOrTx, itemInstanceId: string) {
     .where(eq(schema.itemHistory.itemInstanceId, itemInstanceId))
     .orderBy(asc(schema.itemHistory.occurredAt), asc(schema.itemHistory.id));
 }
+
+/** Consume a specific unlocked backpack instance at its acknowledged version. Caller credits
+ * the wallet in the SAME transaction. Never accepts equipped/storage/escrow items. */
+export async function sellBackpackItemInTx(
+  tx: Tx,
+  ctx: DomainContext,
+  input: {
+    accountId: string;
+    characterId: string;
+    itemId: string;
+    expectedVersion: number;
+    actor: Actor;
+    correlationId: string;
+  },
+) {
+  const item = await lockItem(tx, input.itemId);
+  if (item.ownerAccountId !== input.accountId || item.ownerCharacterId !== input.characterId)
+    throw new DomainError(ErrorCode.FORBIDDEN, 'Item is not yours');
+  if (item.version !== input.expectedVersion)
+    throw new DomainError(ErrorCode.CONFLICT, 'Item changed; reopen the shop');
+  if (item.isLocked) throw new DomainError(ErrorCode.CONFLICT, 'Unlock this item before selling');
+  const container = item.containerId
+    ? (
+        await tx.select().from(schema.containers).where(eq(schema.containers.id, item.containerId))
+      )[0]
+    : undefined;
+  if (
+    item.locationKind !== 'container' ||
+    container?.kind !== 'backpack' ||
+    container.ownerCharacterId !== input.characterId
+  )
+    throw new DomainError(
+      ErrorCode.ITEM_NOT_IN_EXPECTED_LOCATION,
+      'Only carried backpack items can be sold',
+    );
+  const value = ctx.gameData.template(item.templateId).vendorValue * item.quantity;
+  if (value <= 0 || !Number.isSafeInteger(value))
+    throw new DomainError(ErrorCode.FORBIDDEN, 'This item cannot be sold');
+  const from = await resolveLocation(tx, item),
+    to: ItemLocation = { kind: 'destroyed', reason: 'vendor_sold' },
+    now = ctx.now();
+  const updated = await updateItem(tx, item, now, locationColumns(to));
+  await recordItemHistory(tx, [
+    {
+      itemInstanceId: item.id,
+      eventType: 'destroyed',
+      actor: input.actor,
+      fromLocation: from,
+      toLocation: to,
+      quantity: item.quantity,
+      correlationId: input.correlationId,
+      details: { reason: 'vendor_sold', copper: value },
+      occurredAt: now,
+    },
+  ]);
+  return { item: updated, copper: value };
+}

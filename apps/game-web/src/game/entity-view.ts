@@ -332,7 +332,14 @@ export class EntityViews {
       mat.emissiveColor = new Color3(0.4, 0.2, 0.0);
       if (e.kind === 'resource_node') {
         mesh.scaling.set(2, 0.6, 2);
-        mat.diffuseColor = new Color3(0.3, 0.75, 0.35);
+        if (e.refId?.includes('iron_shard')) {
+          mesh.scaling.set(1.6, 1.8, 1.6);
+        }
+        mat.diffuseColor = e.refId?.includes('iron_shard')
+          ? new Color3(0.55, 0.6, 0.68)
+          : e.refId?.includes('hardwood')
+            ? new Color3(0.5, 0.3, 0.12)
+            : new Color3(0.3, 0.75, 0.35);
         mat.emissiveColor = new Color3(0.05, 0.15, 0.04);
       }
     } else {

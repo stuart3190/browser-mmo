@@ -15,7 +15,7 @@ import type { DomainContext } from './context';
 import { ensureMailbox } from './containers';
 import { adjustBalanceInTx } from './currency';
 import { applyKillToQuestsInTx } from './quests';
-import { grantItemInTx } from './items';
+import { grantItemInTx, countCharacterItems } from './items';
 import type { ItemRow } from './items';
 import { itemViews } from './mappers';
 import { getCharacterStats } from './stats';
@@ -222,6 +222,59 @@ export async function awardKillInTx(
       const res = await grantItemInTx(tx, ctx, { ...grant, containerKind: 'mailbox' });
       changed.push(...res.changed);
       mailedItems.push({ itemTemplateId: drop.itemTemplateId, quantity: drop.quantity });
+    }
+  }
+  // Required hunt collections must not become an unbounded unlucky-drop grind. Preserve the
+  // normal loot table; at most one missing unit per required template goes to the single loot
+  // owner, inside this same exactly-once reward transaction. Party non-loot recipients get no copy.
+  if (input.receivesLoot !== false && table) {
+    const rows = await tx
+      .select()
+      .from(schema.characterQuests)
+      .where(
+        and(
+          eq(schema.characterQuests.characterId, character.id),
+          eq(schema.characterQuests.status, 'active'),
+        ),
+      );
+    const counts = await countCharacterItems(tx, character.id, [
+      'mailbox',
+      'material_pouch',
+      'backpack',
+    ]);
+    const needed = new Map<string, number>();
+    for (const row of rows) {
+      const quest = ctx.gameData.quests.get(row.questId);
+      if (!quest?.objectives.some((o) => o.kind === 'kill' && o.enemyId === enemy.id)) continue;
+      for (const o of quest.objectives)
+        if (
+          o.kind === 'collect' &&
+          table.entries.some((e) => e.itemTemplateId === o.itemTemplateId) &&
+          (counts.get(o.itemTemplateId) ?? 0) < o.count
+        )
+          needed.set(o.itemTemplateId, o.count);
+    }
+    for (const templateId of needed.keys()) {
+      const grant = {
+        accountId: character.accountId,
+        characterId: character.id,
+        templateId,
+        quantity: 1,
+        method: 'loot_drop' as const,
+        sourceRef: `kill:${input.killId}:${character.id}:quest_supply:${templateId}`,
+        actor,
+        correlationId: input.killId,
+      };
+      try {
+        changed.push(...(await tx.transaction((sp) => grantItemInTx(sp, ctx, grant))).changed);
+      } catch (err) {
+        if (!(err instanceof DomainError && err.code === ErrorCode.CONTAINER_FULL)) throw err;
+        await ensureMailbox(tx, character.accountId, character.id);
+        changed.push(
+          ...(await grantItemInTx(tx, ctx, { ...grant, containerKind: 'mailbox' })).changed,
+        );
+        mailedItems.push({ itemTemplateId: templateId, quantity: 1 });
+      }
     }
   }
   let gold = 0;

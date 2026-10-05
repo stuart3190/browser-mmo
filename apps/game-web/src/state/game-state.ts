@@ -87,6 +87,7 @@ export class GameState {
   /** Local guidance preference only; quest credit always comes from the server. */
   trackedQuestId: string | null = null;
   worldDestinationId: string | null = null;
+  discoveries: string[] = [];
 
   trackQuest(id: string): void {
     this.trackedQuestId = id;

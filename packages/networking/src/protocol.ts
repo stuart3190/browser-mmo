@@ -103,6 +103,19 @@ export const CombatRespawnMsg = clientMsg('combat.respawn', z.object({}));
  */
 export const WorldTravelMsg = clientMsg('world.travel', z.object({ travelId: ContentIdSchema }));
 
+export const NpcSellMsg = clientMsg(
+  'npc.sell',
+  z.object({
+    entityId: EntityIdSchema,
+    itemId: UuidSchema,
+    expectedVersion: z.number().int().nonnegative(),
+    requestId: UuidSchema,
+  }),
+);
+export const NpcServiceMsg = clientMsg(
+  'npc.service',
+  z.object({ entityId: EntityIdSchema, offerId: ContentIdSchema, requestId: UuidSchema }),
+);
 export const NpcInteractMsg = clientMsg('npc.interact', z.object({ entityId: EntityIdSchema }));
 
 /** Accept a quest offered by the NPC entity the player is standing next to. */
@@ -138,6 +151,8 @@ export const ClientMessageSchema = z.discriminatedUnion('t', [
   PartyDisbandMsg,
   AbilityUseMsg,
   NpcInteractMsg,
+  NpcServiceMsg,
+  NpcSellMsg,
   WorldTravelMsg,
   QuestAcceptMsg,
   QuestTurnInMsg,
@@ -473,9 +488,14 @@ export const QuestCompletedMsg = serverMsg(
   }),
 );
 
+export const WorldDiscoveriesMsg = serverMsg(
+  'world.discoveries',
+  z.object({ locationIds: z.array(ContentIdSchema), newlyDiscovered: z.array(ContentIdSchema) }),
+);
 export const ServerMessageSchema = z.discriminatedUnion('t', [
   AbilityStateMsg,
   NpcDialogueMsg,
+  WorldDiscoveriesMsg,
   QuestLogMsg,
   QuestCompletedMsg,
   AuthOkMsg,

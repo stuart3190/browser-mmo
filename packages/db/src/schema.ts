@@ -608,3 +608,28 @@ export const resourceHarvests = pgTable('resource_harvests', {
   nodeId: text('node_id').primaryKey(),
   readyAt: timestamp('ready_at', { withTimezone: true }).notNull(),
 });
+
+/** Durable idempotency key for an NPC exchange. Costs and grants commit with this receipt. */
+export const serviceReceipts = pgTable(
+  'service_receipts',
+  {
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    requestId: uuid('request_id').notNull(),
+    offerId: text('offer_id').notNull(),
+    occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.characterId, t.requestId] })],
+);
+export const characterDiscoveries = pgTable(
+  'character_discoveries',
+  {
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    locationId: text('location_id').notNull(),
+    discoveredAt: timestamp('discovered_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.characterId, t.locationId] })],
+);

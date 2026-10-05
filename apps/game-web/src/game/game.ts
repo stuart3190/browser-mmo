@@ -371,6 +371,13 @@ export async function startGame(args: {
     state.addLog(`Looted ${parts.join(', ') || 'nothing'}`);
   });
   // ---- NPCs and quests (server state only) ----
+  net.on('world.discoveries', (m) => {
+    state.update((s) => (s.discoveries = m.d.locationIds));
+    for (const id of m.d.newlyDiscovered)
+      state.toast(
+        `Discovered ${gameData.raw.worldCatalog?.locations.find((l) => l.id === id)?.name ?? id}`,
+      );
+  });
   net.on('npc.dialogue', (m) => state.update((s) => (s.dialogue = m.d)));
   net.on('quest.log', (m) => {
     state.update((s) => (s.quests = m.d.quests));

@@ -145,8 +145,9 @@ export const QuestDefinitionSchema = z.object({
   minLevel: z.number().int().min(1),
   /** Quests that must be completed first. */
   prerequisites: z.array(ContentIdSchema).default([]),
-  /** Only non-repeatable quests are supported by the runtime today. */
+  /** Repeatable contracts require an explicit cooldown and fresh acceptance. */
   repeatable: z.boolean().default(false),
+  repeatCooldownMs: z.number().int().min(60000).max(604800000).optional(),
   objectives: z.array(QuestObjectiveSchema),
   rewards: z.object({
     xp: z.number().int().nonnegative(),

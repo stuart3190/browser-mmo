@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { schema } from '@mmo/db';
 import type { DbOrTx, Tx } from '@mmo/db';
 import {
@@ -165,6 +165,28 @@ export async function acceptQuest(
             : 'That quest is not available to you',
         { reason: ok.reason },
       );
+    }
+    const previous = records.get(def.id);
+    if (previous?.status === 'completed' && def.repeatable) {
+      await tx
+        .update(schema.characterQuests)
+        .set({
+          status: 'active',
+          progress: {},
+          acceptedAt: ctx.now(),
+          completedAt: null,
+          rewardedAt: null,
+          turnInId: null,
+          version: sql`${schema.characterQuests.version} + 1`,
+          updatedAt: ctx.now(),
+        })
+        .where(
+          and(
+            eq(schema.characterQuests.characterId, input.characterId),
+            eq(schema.characterQuests.questId, def.id),
+          ),
+        );
+      return;
     }
     const inserted = await tx
       .insert(schema.characterQuests)
@@ -343,7 +365,9 @@ export async function turnInQuest(
           templateId: reward.itemTemplateId,
           quantity: reward.quantity,
           method: 'quest_reward' as const,
-          sourceRef: `quest:${def.id}:${character.id}:${n}`,
+          sourceRef: def.repeatable
+            ? `quest:${def.id}:${character.id}:${row!.acceptedAt.toISOString()}:${n}`
+            : `quest:${def.id}:${character.id}:${n}`,
           actor,
           correlationId,
         };

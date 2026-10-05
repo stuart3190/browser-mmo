@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ContentPackSchema } from '@mmo/schemas';
 import { compileContentCatalog, type ContentManifest } from './content-loader';
-import { contentManifest, contentPacks, getGameData, GameData } from './index';
+import {
+  legacyContentManifest as contentManifest,
+  contentPacks,
+  getGameData,
+  GameData,
+} from './index';
 
 const fixture = () => ({
   manifest: structuredClone(contentManifest),

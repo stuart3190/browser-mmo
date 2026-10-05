@@ -1,0 +1,700 @@
+{
+  "schemaVersion": 3,
+  "id": "pack.greenvale.complete",
+  "revision": 1,
+  "quests": [
+    {
+      "id": "quest.greenvale.marches_call",
+      "name": "Beyond the Village Ward",
+      "description": "The watchpost oath ends with a bell beneath the roots. Take the north gate into the Marches and speak to Roadkeeper Ada. The village has endured because its neighbours kept the outer boundary. We must know whether they still do.",
+      "giverNpcId": "npc.greenvale.elder_maren",
+      "turnInNpcId": "npc.world.greenvale_marches.innkeeper",
+      "minLevel": 3,
+      "prerequisites": ["quest.greenvale.keeper_outpost"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "ada",
+          "kind": "talk",
+          "npcId": "npc.world.greenvale_marches.innkeeper",
+          "label": "Bring Maren\u2019s warning to Ada at the Roadhouse"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_call",
+      "dialogue": {
+        "offer": "The watchpost oath ends with a bell beneath the roots. Take the north gate into the Marches and speak to Roadkeeper Ada. The village has endured because its neighbours kept the outer boundary. We must know whether they still do.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "Ada has agreed to open her road records. The village and the Marches must keep the same promise.",
+        "completed": "Ada has agreed to open her road records. The village and the Marches must keep the same promise."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_supply",
+      "name": "Keeping the Road Lit",
+      "description": "Our lamps are not weapons. Herbs quiet the fever; hardwood shelters the road watch. Gather supplies from the beds and timber yard, follow the Hollow road to Scout Ren, then return. The camp marks the safe approach to the Broken Vault.",
+      "giverNpcId": "npc.world.greenvale_marches.innkeeper",
+      "turnInNpcId": null,
+      "minLevel": 3,
+      "prerequisites": ["quest.greenvale.marches_call"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "herbs",
+          "kind": "collect",
+          "itemTemplateId": "material.world.wild_herb",
+          "count": 4,
+          "consumeOnTurnIn": true,
+          "label": "Gather four Wild Herbs"
+        },
+        {
+          "id": "wood",
+          "kind": "collect",
+          "itemTemplateId": "material.world.hardwood",
+          "count": 2,
+          "consumeOnTurnIn": true,
+          "label": "Gather two Hardwood"
+        },
+        {
+          "id": "ren",
+          "kind": "talk",
+          "npcId": "npc.world.greenvale_marches.camp_scout",
+          "label": "Check the Hollow expedition camp"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_supply",
+      "dialogue": {
+        "offer": "Our lamps are not weapons. Herbs quiet the fever; hardwood shelters the road watch. Gather supplies from the beds and timber yard, follow the Hollow road to Scout Ren, then return. The camp marks the safe approach to the Broken Vault.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "The camp still stands. Ren saw toll raiders pulling stones from the old boundary. Find their route before they wake what lies below.",
+        "completed": "The camp still stands. Ren saw toll raiders pulling stones from the old boundary. Find their route before they wake what lies below."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_boundary",
+      "name": "The Broken Boundary",
+      "description": "Follow the river route beyond the quarry to the Old Toll Cut. Stop the raiders, then follow the pale road past the expedition camp to Iven at the Broken Vault Watch. Do not cross the stone gallery until he explains its warning.",
+      "giverNpcId": "npc.world.greenvale_marches.innkeeper",
+      "turnInNpcId": "npc.world.greenvale_marches.vault_scout",
+      "minLevel": 3,
+      "prerequisites": ["quest.greenvale.marches_supply"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "outlaws",
+          "kind": "kill",
+          "enemyId": "enemy.world.greenvale_marches.outlaw.3",
+          "count": 2,
+          "label": "Drive off two Road Outlaws at the Toll Cut"
+        },
+        {
+          "id": "watcher",
+          "kind": "talk",
+          "npcId": "npc.world.greenvale_marches.vault_scout",
+          "label": "Read the boundary with Vault Watcher Iven"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_boundary",
+      "dialogue": {
+        "offer": "Follow the river route beyond the quarry to the Old Toll Cut. Stop the raiders, then follow the pale road past the expedition camp to Iven at the Broken Vault Watch. Do not cross the stone gallery until he explains its warning.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "The raiders wanted copper, not a catastrophe. Iven says the stonekin guard the spring\u2019s sleeping breath. Quiet their damaged watch without breaking the seal.",
+        "completed": "The raiders wanted copper, not a catastrophe. Iven says the stonekin guard the spring\u2019s sleeping breath. Quiet their damaged watch without breaking the seal."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_vault",
+      "name": "A Bell Left Sleeping",
+      "description": "Enter the open Broken Vault gallery along the pale road. Quiet two stonekin, read the spring boundary beyond the bell chamber, then return. This is a shared ruin: nearby companions share kill credit, but everyone must read the boundary. We are here to mend a promise, not claim a treasure.",
+      "giverNpcId": "npc.world.greenvale_marches.vault_scout",
+      "turnInNpcId": null,
+      "minLevel": 4,
+      "prerequisites": ["quest.greenvale.marches_boundary"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "outer",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.greenvale_marches",
+          "areaId": "location.greenvale_marches.vault_outer",
+          "label": "Inspect the Broken Vault outer gallery"
+        },
+        {
+          "id": "stonekin",
+          "kind": "kill",
+          "enemyId": "enemy.world.greenvale_marches.stonekin.5",
+          "count": 2,
+          "label": "Quiet two Vault Stonekin"
+        },
+        {
+          "id": "boundary",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.greenvale_marches",
+          "areaId": "location.greenvale_marches.spring_marker",
+          "label": "Read the spring boundary beyond the bell chamber"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_vault",
+      "dialogue": {
+        "offer": "Enter the open Broken Vault gallery along the pale road. Quiet two stonekin, read the spring boundary beyond the bell chamber, then return. This is a shared ruin: nearby companions share kill credit, but everyone must read the boundary. We are here to mend a promise, not claim a treasure.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "The inscription says the spring chose sleep while the land healed. Its bell was a warning for keepers, never a summons. Bring that truth home before another generation mistakes the seal for a weapon.",
+        "completed": "The inscription says the spring chose sleep while the land healed. Its bell was a warning for keepers, never a summons. Bring that truth home before another generation mistakes the seal for a weapon."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_home",
+      "name": "A Promise Kept",
+      "description": "Return along the lit road and share the record with Ada. Then use the starter gate and bring it to Maren. Greenvale\u2019s ward is a promise to let the land heal; the watch will keep it together.",
+      "giverNpcId": "npc.world.greenvale_marches.vault_scout",
+      "turnInNpcId": "npc.greenvale.elder_maren",
+      "minLevel": 4,
+      "prerequisites": ["quest.greenvale.marches_vault"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "ada",
+          "kind": "talk",
+          "npcId": "npc.world.greenvale_marches.innkeeper",
+          "label": "Share the boundary record with Ada"
+        },
+        {
+          "id": "maren",
+          "kind": "talk",
+          "npcId": "npc.greenvale.elder_maren",
+          "label": "Bring the sleeping spring\u2019s truth to Elder Maren"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_home",
+      "dialogue": {
+        "offer": "Return along the lit road and share the record with Ada. Then use the starter gate and bring it to Maren. Greenvale\u2019s ward is a promise to let the land heal; the watch will keep it together.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "We will repair the watch, not ring the bell. Rill guards the roots, Ada keeps the road, and our children will know why. Greenvale is safe because you learned when to stop. The Marches remain open for supplies, patrols and exploration.",
+        "completed": "We will repair the watch, not ring the bell. Rill guards the roots, Ada keeps the road, and our children will know why. Greenvale is safe because you learned when to stop. The Marches remain open for supplies, patrols and exploration."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_timber",
+      "name": "Timber for the Watch",
+      "description": "The watch needs shelter before winter. Gather four Hardwood from this yard and bring them here. The stacks recover after a minute; all gathers are shared, so companions should take turns.",
+      "giverNpcId": "npc.world.greenvale_marches.timber_keeper",
+      "turnInNpcId": null,
+      "minLevel": 1,
+      "prerequisites": [],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "wood",
+          "kind": "collect",
+          "itemTemplateId": "material.world.hardwood",
+          "count": 4,
+          "consumeOnTurnIn": true,
+          "label": "Gather four Hardwood for the watch"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_timber",
+      "dialogue": {
+        "offer": "The watch needs shelter before winter. Gather four Hardwood from this yard and bring them here. The stacks recover after a minute; all gathers are shared, so companions should take turns.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "A sound watch starts with dry shelter. You can use hardwood at Fen\u2019s workshop for field gear.",
+        "completed": "A sound watch starts with dry shelter. You can use hardwood at Fen\u2019s workshop for field gear."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_ore",
+      "name": "Quarryhands, Not Treasure Hunters",
+      "description": "The vein above Bristlebank yields small iron fragments. Bring four, and I will pay the quarry\u2019s fair rate. Stay on the path: boars guard the nearby thickets.",
+      "giverNpcId": "npc.world.greenvale_marches.quarry_keeper",
+      "turnInNpcId": null,
+      "minLevel": 1,
+      "prerequisites": [],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "ore",
+          "kind": "collect",
+          "itemTemplateId": "material.world.iron_shard",
+          "count": 4,
+          "consumeOnTurnIn": true,
+          "label": "Mine four Iron Shards at the quarry"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_ore",
+      "dialogue": {
+        "offer": "The vein above Bristlebank yields small iron fragments. Bring four, and I will pay the quarry\u2019s fair rate. Stay on the path: boars guard the nearby thickets.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "Iron is useful when it stays in a tool, not a broken boundary. Fen can shape more shards into a field weapon.",
+        "completed": "Iron is useful when it stays in a tool, not a broken boundary. Fen can shape more shards into a field weapon."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_river",
+      "name": "The Road and the River",
+      "description": "Our supplies follow water before they follow roads. Visit Willow River Post and the quay, then return. The atlas records the places you discover even when no quest is active.",
+      "giverNpcId": "npc.world.greenvale_marches.scout",
+      "turnInNpcId": null,
+      "minLevel": 1,
+      "prerequisites": [],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "river",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.greenvale_marches",
+          "areaId": "location.greenvale_marches.river_post",
+          "label": "Visit the Willow River Post"
+        },
+        {
+          "id": "port",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.greenvale_marches",
+          "areaId": "location.greenvale_marches.port",
+          "label": "Survey Willow Quay"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_river",
+      "dialogue": {
+        "offer": "Our supplies follow water before they follow roads. Visit Willow River Post and the quay, then return. The atlas records the places you discover even when no quest is active.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "The quay and the road watch depend on each other. These are places worth returning to, not stops to forget.",
+        "completed": "The quay and the road watch depend on each other. These are places worth returning to, not stops to forget."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_remedy",
+      "name": "Leather for the Long Walk",
+      "description": "Herbs soften the hides from the meadow hunt. Bring two hides and two herbs; I will show why gathering matters to a traveller. You can make more field gear through my workshop.",
+      "giverNpcId": "npc.world.greenvale_marches.profession",
+      "turnInNpcId": null,
+      "minLevel": 1,
+      "prerequisites": [],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "hide",
+          "kind": "collect",
+          "itemTemplateId": "material.world.field_hide",
+          "count": 2,
+          "consumeOnTurnIn": true,
+          "label": "Bring two Field Hides"
+        },
+        {
+          "id": "herb",
+          "kind": "collect",
+          "itemTemplateId": "material.world.wild_herb",
+          "count": 2,
+          "consumeOnTurnIn": true,
+          "label": "Bring two Wild Herbs"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_remedy",
+      "dialogue": {
+        "offer": "Herbs soften the hides from the meadow hunt. Bring two hides and two herbs; I will show why gathering matters to a traveller. You can make more field gear through my workshop.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "These materials belong in useful gear. Take a cap for the trail; the workshop can shape your next cloak or weapon.",
+        "completed": "These materials belong in useful gear. Take a cap for the trail; the workshop can shape your next cloak or weapon."
+      },
+      "placeholder": false
+    },
+    {
+      "id": "quest.greenvale.marches_patrol",
+      "name": "Daily Roadwatch Contract",
+      "description": "Clear two Bristlebacks from the road habitats and return. This contract can be taken once every 24 hours after completion. Nearby eligible party members share kills; each traveller returns for their own pay.",
+      "giverNpcId": "npc.world.greenvale_marches.guard",
+      "turnInNpcId": null,
+      "minLevel": 1,
+      "prerequisites": [],
+      "repeatable": true,
+      "objectives": [
+        {
+          "id": "boars",
+          "kind": "kill",
+          "enemyId": "enemy.world.greenvale_marches.boar.2",
+          "count": 2,
+          "label": "Clear two Bristlebacks near the road"
+        }
+      ],
+      "rewardId": "reward.greenvale.marches_patrol",
+      "dialogue": {
+        "offer": "Clear two Bristlebacks from the road habitats and return. This contract can be taken once every 24 hours after completion. Nearby eligible party members share kills; each traveller returns for their own pay.",
+        "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
+        "readyToTurnIn": "The road is clear for today. Return tomorrow if you want another patrol; no stockpiled kills count before acceptance.",
+        "completed": "The road is clear for today. Return tomorrow if you want another patrol; no stockpiled kills count before acceptance."
+      },
+      "placeholder": false,
+      "repeatCooldownMs": 86400000
+    }
+  ],
+  "npcs": [],
+  "encounters": [],
+  "rewards": [
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_call",
+      "value": {
+        "xp": 300,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 180
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_supply",
+      "value": {
+        "xp": 400,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 200
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_boundary",
+      "value": {
+        "xp": 500,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 240
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_vault",
+      "value": {
+        "xp": 650,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 350
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "material.world.iron_shard",
+            "quantity": 4
+          }
+        ]
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_home",
+      "value": {
+        "xp": 800,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 600
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "accessory.ring.copper_band",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_timber",
+      "value": {
+        "xp": 160,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 90
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_ore",
+      "value": {
+        "xp": 180,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 100
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_river",
+      "value": {
+        "xp": 200,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 120
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_remedy",
+      "value": {
+        "xp": 200,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 100
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "armor.leather.trapper_cap",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "kind": "quest",
+      "id": "reward.greenvale.marches_patrol",
+      "value": {
+        "xp": 100,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 80
+          }
+        ],
+        "items": []
+      }
+    }
+  ],
+  "serviceOffers": [
+    {
+      "id": "service.greenvale.buy_sword",
+      "name": "Buy Sword",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "buy",
+      "minLevel": 1,
+      "inputs": [],
+      "output": {
+        "itemTemplateId": "weapon.sword.iron_longsword",
+        "quantity": 1
+      },
+      "copper": -300
+    },
+    {
+      "id": "service.greenvale.buy_staff",
+      "name": "Buy Staff",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "buy",
+      "minLevel": 1,
+      "inputs": [],
+      "output": {
+        "itemTemplateId": "weapon.staff.oak_staff",
+        "quantity": 1
+      },
+      "copper": -300
+    },
+    {
+      "id": "service.greenvale.buy_cloak",
+      "name": "Buy Cloak",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "buy",
+      "minLevel": 1,
+      "inputs": [],
+      "output": {
+        "itemTemplateId": "accessory.cloak.wayfarer_cloak",
+        "quantity": 1
+      },
+      "copper": -160
+    },
+    {
+      "id": "service.greenvale.buy_cap",
+      "name": "Buy Cap",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "buy",
+      "minLevel": 1,
+      "inputs": [],
+      "output": {
+        "itemTemplateId": "armor.leather.trapper_cap",
+        "quantity": 1
+      },
+      "copper": -120
+    },
+    {
+      "id": "service.greenvale.sell_wild_herb",
+      "name": "Sell one wild herb",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "sell",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.wild_herb",
+          "quantity": 1
+        }
+      ],
+      "output": null,
+      "copper": 8
+    },
+    {
+      "id": "service.greenvale.sell_hardwood",
+      "name": "Sell one hardwood",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "sell",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.hardwood",
+          "quantity": 1
+        }
+      ],
+      "output": null,
+      "copper": 12
+    },
+    {
+      "id": "service.greenvale.sell_iron_shard",
+      "name": "Sell one iron shard",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "sell",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.iron_shard",
+          "quantity": 1
+        }
+      ],
+      "output": null,
+      "copper": 15
+    },
+    {
+      "id": "service.greenvale.sell_field_hide",
+      "name": "Sell one field hide",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "sell",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.field_hide",
+          "quantity": 1
+        }
+      ],
+      "output": null,
+      "copper": 12
+    },
+    {
+      "id": "service.greenvale.sell_cloth_scrap",
+      "name": "Sell one cloth scrap",
+      "npcId": "npc.world.greenvale_marches.merchant",
+      "kind": "sell",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.cloth_scrap",
+          "quantity": 1
+        }
+      ],
+      "output": null,
+      "copper": 10
+    },
+    {
+      "id": "service.greenvale.craft_cloak",
+      "name": "Craft Cloak",
+      "npcId": "npc.world.greenvale_marches.profession",
+      "kind": "craft",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.wild_herb",
+          "quantity": 2
+        },
+        {
+          "itemTemplateId": "material.world.field_hide",
+          "quantity": 2
+        }
+      ],
+      "output": {
+        "itemTemplateId": "accessory.cloak.wayfarer_cloak",
+        "quantity": 1
+      },
+      "copper": 0
+    },
+    {
+      "id": "service.greenvale.craft_sword",
+      "name": "Craft Sword",
+      "npcId": "npc.world.greenvale_marches.profession",
+      "kind": "craft",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.iron_shard",
+          "quantity": 4
+        },
+        {
+          "itemTemplateId": "material.world.hardwood",
+          "quantity": 2
+        }
+      ],
+      "output": {
+        "itemTemplateId": "weapon.sword.iron_longsword",
+        "quantity": 1
+      },
+      "copper": 0
+    },
+    {
+      "id": "service.greenvale.craft_staff",
+      "name": "Craft Staff",
+      "npcId": "npc.world.greenvale_marches.profession",
+      "kind": "craft",
+      "minLevel": 1,
+      "inputs": [
+        {
+          "itemTemplateId": "material.world.hardwood",
+          "quantity": 4
+        },
+        {
+          "itemTemplateId": "material.world.wild_herb",
+          "quantity": 2
+        }
+      ],
+      "output": {
+        "itemTemplateId": "weapon.staff.oak_staff",
+        "quantity": 1
+      },
+      "copper": 0
+    }
+  ],
+  "dungeonEntries": [
+    {
+      "id": "dungeon.greenvale.broken_vault",
+      "name": "Broken Vault",
+      "locationId": "location.greenvale_marches.cave",
+      "enemyIds": ["enemy.world.greenvale_marches.stonekin.5"],
+      "recommendedLevel": 4,
+      "mode": "shared_world",
+      "description": "Open shared ruin: follow the outer gallery into the bell chamber. Private party instances, admission locks and dungeon completion rewards are not implemented."
+    }
+  ]
+}

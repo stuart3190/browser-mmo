@@ -129,6 +129,7 @@ export const WorldCatalogSchema = z.strictObject({
   populations: z.array(
     z.strictObject({
       ...named,
+      runtimeRole: NpcDefinitionSchema.shape.role.optional(),
       locationId: ContentIdSchema,
       archetypeId: ContentIdSchema,
       offset: z.strictObject({ x: z.number().finite(), z: z.number().finite() }),

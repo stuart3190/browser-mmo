@@ -1641,3 +1641,12 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   max-width: 100%;
   min-height: 44px;
 }
+
+/* New NPC services keep reliable touch targets inside the existing scrollable dialogue. */
+.ui-root.touch .dialogue [data-service],
+.ui-root.touch .dialogue [data-testid='vendor-sell'],
+.ui-root.touch .dialogue [data-testid='banker-vault'],
+.ui-root.touch .dialogue select[aria-label='Sell backpack item'] {
+  min-height: 44px;
+  max-width: 100%;
+}

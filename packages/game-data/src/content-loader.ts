@@ -40,6 +40,10 @@ export function compileContentCatalog(
       for (const family of pack.world.monsterFamilies)
         for (const variant of family.variants) claim(variant.id);
     }
+    if (pack.schemaVersion === 3) {
+      for (const offer of pack.serviceOffers) claim(offer.id);
+      for (const entry of pack.dungeonEntries) claim(entry.id);
+    }
     for (const reward of pack.rewards) {
       claim(reward.id);
       rewards.set(reward.id, reward);
@@ -160,6 +164,42 @@ export function compileContentCatalog(
           throw new Error(`Reward ${reward.id}: invalid item/quantity ${i.itemTemplateId}`);
       }
     }
+  const extensions = packs.filter((p) => p.schemaVersion === 3);
+  if (extensions.length) {
+    raw.serviceOffers = extensions.flatMap((p) => p.serviceOffers);
+    raw.dungeonEntries = extensions.flatMap((p) => p.dungeonEntries);
+  }
+  for (const offer of raw.serviceOffers ?? []) {
+    if (!raw.npcs.some((n) => n.id === offer.npcId))
+      throw new Error(`Service ${offer.id}: missing NPC`);
+    if (new Set(offer.inputs.map((i) => i.itemTemplateId)).size !== offer.inputs.length)
+      throw new Error(`Service ${offer.id}: duplicate inputs`);
+    for (const i of [...offer.inputs, ...(offer.output ? [offer.output] : [])]) {
+      const t = raw.itemTemplates.find((t) => t.id === i.itemTemplateId);
+      if (!t || i.quantity > t.maxStack)
+        throw new Error(`Service ${offer.id}: invalid item/quantity`);
+    }
+    if (
+      (offer.kind === 'sell' && (offer.output || !offer.inputs.length || offer.copper <= 0)) ||
+      (offer.kind === 'buy' && (!offer.output || offer.inputs.length || offer.copper >= 0)) ||
+      (offer.kind === 'craft' && (!offer.output || !offer.inputs.length || offer.copper > 0))
+    )
+      throw new Error(`Service ${offer.id}: invalid exchange`);
+  }
+  for (const entry of raw.dungeonEntries ?? []) {
+    const location = raw.worldCatalog?.locations.find((l) => l.id === entry.locationId);
+    if (
+      location?.kind !== 'dungeon' ||
+      !entry.enemyIds.every(
+        (id) =>
+          raw.enemies.some((e) => e.id === id) &&
+          raw.chunks.some(
+            (c) => c.zoneId === location.zoneId && c.spawnPoints.some((s) => s.refId === id),
+          ),
+      )
+    )
+      throw new Error(`Dungeon ${entry.id}: invalid entrance/encounter`);
+  }
   GameData.load(raw); // All legacy and new links, collision/spawn safety, rewards and prerequisites.
   return raw;
 }

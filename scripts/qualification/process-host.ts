@@ -1,5 +1,6 @@
 /** IPC-only destructive-test host. Not a production entrypoint. */
 import type { AddressInfo } from 'node:net';
+import { GameData } from '../../packages/game-data/src/index';
 import { createDb } from '../../packages/db/src/index';
 import { createDomainContext, SessionService } from '../../packages/domain/src/index';
 import { createLogger, Metrics } from '../../packages/server-kit/src/index';
@@ -17,8 +18,16 @@ if (phase === 'beforeRecord' || phase === 'afterRecord' || phase === 'afterRewar
     process.send!({ kind: 'fault', phase });
     return new Promise<never>(() => undefined);
   };
+const base = arenaGameData();
+const gameData =
+  phase === 'noRegen'
+    ? GameData.load({
+        ...base.raw,
+        combatRules: { ...base.raw.combatRules, regenFractionPerSecond: 0 },
+      })
+    : base;
 const server = createRealtimeServer({
-  ctx: createDomainContext({ db: handle.db, gameData: arenaGameData() }),
+  ctx: createDomainContext({ db: handle.db, gameData }),
   sessions: new SessionService(1),
   logger: createLogger({ service: 'process-proof', level: 'silent' }),
   metrics: new Metrics(),

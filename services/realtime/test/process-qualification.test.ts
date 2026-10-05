@@ -132,7 +132,7 @@ it(
   'SIGKILL preserves acknowledged movement, health and cooldown through rapid concurrent takeover',
   { timeout: 60000 },
   async () => {
-    const owner = await boot();
+    const owner = await boot('noRegen');
     const p = await player();
     const c = await join(owner, p);
     c.send('move.input', { position: { x: 0.5, y: 0, z: -8 }, rotationY: 0.9 });
@@ -140,7 +140,7 @@ it(
     await until(() => c.messages.find((m) => m.t === 'pong' && m.d.clientTime === 123));
     const before = (await state(owner, p.id)).state!;
     await kill(owner.child);
-    const contenders = await Promise.all([boot(), boot(), boot()]);
+    const contenders = await Promise.all([boot('noRegen'), boot('noRegen'), boot('noRegen')]);
     expect(contenders.filter((c) => c.kind === 'ready')).toHaveLength(1);
     expect(
       contenders.filter((c) => c.kind === 'refused' && c.error?.includes('already owned')),
@@ -149,8 +149,8 @@ it(
     await join(next, p);
     const after = (await state(next, p.id)).state!;
     expect(after.position).toEqual(before.position);
-    expect(after.health).toBeGreaterThanOrEqual(before.health);
-    expect(after.health).toBeLessThan(80);
+    // Isolate durability from legitimate regeneration during variable child startup time.
+    expect(after.health).toBe(before.health);
     expect(after.abilityCooldowns['ability.warrior.heavy_strike']).toBe(p.cd);
   },
 );
