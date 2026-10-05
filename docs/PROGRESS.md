@@ -414,9 +414,13 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 # Crafting / Gathering
 
-- [ ] Materials
-  - Material templates exist and stack into the pouch; no gathering/crafting use.
-- [ ] Gathering
+- [x] Catalog materials and persistent material pouch
+  - Ten world material templates; real Wild Herb harvesting and stack persistence verified.
+- [x] First shared gathering interaction — Wild Herb
+  - Verified 2026-10-05 · Codex · atomic grant/depletion, six competing claims, full-pouch rollback,
+    stale recovery image, replay/reconnect, desktop + actual touch harvest and pouch persistence.
+    Implementation commit: `d014293320384b94ca09ef9287128e290e624a8d`; see latest Current Work and `world/marches-gathering.md`.
+- [ ] Additional resource types, tools and profession progression
 - [ ] Recipes
 - [ ] Crafting
 
@@ -856,14 +860,14 @@ systems added; external follow-ups remain separate from development and merge ga
 
 ## Next Recommended Task
 
-**Densify Greenvale Marches using the world catalogs before expanding quest output.**
-Use [world foundation](world/world-foundation.md): improve bounded road/habitat dressing and settlement
-identity, then add one persistent resource interaction using its existing materials/profession references
-and item economy. Playtest solo/party travel and regional danger transitions. Do not invent a new enemy,
-NPC or item just for a quest, bulk-generate quests, build an editor/general scripting engine, or chase
-hosting benchmarks. Other live Greenvale quests may migrate incrementally without changing their IDs
-or behavior. Shops, profession progression, dungeon instances and cross-host travel remain explicit
-future systems. Hosting/CI/physical-device follow-ups are separate from gameplay development.
+**Build one catalog-backed Greenvale Marches supply expedition.**
+Use the populated Roadhouse, Lantern Meadow, Bristlebank and Resource Hollow with existing
+inhabitants/monster variants/materials. Give gathered Wild Herb its first practical purpose through
+existing collection/turn-in/reward rules and a useful persistent reward; do not build a crafting engine
+or invent another bespoke monster/NPC/item. Keep solo/party progression and the active quest guide
+working. No bulk quest generation, UI polish pass or hosting/CI/physical-device qualification detour.
+Other resource types, tools/profession levels, shops, dungeon instances and cross-host travel remain
+separate future systems. See [Marches gathering](world/marches-gathering.md).
 
 ## Mobile display follow-up — 2026-10-05
 
@@ -1158,3 +1162,52 @@ script after merge; public final SHA is in `/release.json` and the completion re
 
 Next gameplay task: densify Greenvale Marches from these catalogs, improve bounded regional routes/
 habitats, then one persistent resource interaction. WORLD FIRST; no mass quest generation yet.
+
+## Current Work — Greenvale Marches population and persistent gathering, 2026-10-05
+
+- [x] Catalog-backed Marches density pass: five two-creature habitat pockets, Roadhouse herb beds,
+      Hollow access road, 25 authored tree/rock props plus ten habitat grove trees, three inhabitants,
+      and local directions from named existing roles. 13 creatures / 13 inhabitants in the Marches.
+      Original five continents, dimensions, progression bands, place coordinates and eight quests stay intact.
+- [x] Optional typed location-relative dressing/resource nodes in the existing version-2 world pack;
+      duplicate/reference/bounds/biome/yield checks. Repeated variants at independent habitats retain
+      original spawn IDs and use distinct additional placement IDs without regional handler branches.
+- [x] One genuine resource type: Wild Herb. Beds (290,400) yield two / regrow 60 s; Hollow patch
+      (772,1008) yields three / regrow 90 s. E / touch Gather, green minimap dot, result feedback,
+      real item provenance, stacked material pouch and persistence. No profession or combat XP.
+- [x] Shared patch, one gatherer, no party material multiplication. Existing zone/range/life/threat/
+      attack/replay/work-limit checks; short locked DB transaction commits item grant plus regrowth
+      deadline atomically. Failure leaves the patch available. One durable row per authored node.
+- [x] Resource recovery rebuilds only resource entities/timers from DB after the owned checkpoint,
+      covering a grant committed before a stale recovery image. Fresh runtime IDs, replay protection,
+      regrowth/reconnect and party visibility verified; working combat/economy architecture reused.
+- [x] Additive 0016 migration: exact previous hash to new hash across all recovery images. Actual
+      UPDATE checked against 25 populated preview checkpoints by zone ID; every other field equal.
+      Three migration regressions and existing ownership/migration checks pass.
+- [x] Full `NODE_ENV=production TEST_DATABASE_URL=.../mmo_party_test pnpm verify` exit zero:
+      format/lint/types, **218 unit + 141 PostgreSQL integration tests** (domain 69/realtime 64/API 8),
+      four production builds and production debug-hook guard. Final catalog/client delta also checked
+      with 30 authoring tests, both package typechecks and another format/lint pass.
+- [x] Actual two-client keyboard/touch browser flow: real north-gate entry, shared herb entity,
+      one harvest, both-client depletion, pouch UI, actual regrowth + touch harvest, login retention,
+      persistent party, road-to-meadow exploration and no browser exceptions. **12 assertions**;
+      390×844 / 844×390 controls remain within viewport. No teleports or synthetic item grants.
+      Read-only PostgreSQL proof: both earned totals equal distinct grant counts × two (**7 assertions**).
+
+Verified 2026-10-05 · Codex · implementation commit: **d014293320384b94ca09ef9287128e290e624a8d**.
+Architecture/coordinates/rules/extensions: [Marches gathering](world/marches-gathering.md).
+Proof: `docs/world/evidence/marches-*`; repeatable browser flow: `scripts/e2e/marches-gathering.cjs`.
+AGENTS.md / MASTER_PLAN.md unchanged. Existing deployment script deploys verified origin/main;
+public release SHA/result are provided in the completion report and `/release.json`.
+
+Known limits: only Wild Herb is harvestable; it is collectible stock until a later supply/recipe use.
+Tools, profession levels, extra resources and crafting remain unchecked. Two patches share first-winner
+rules, not combat-loot rotation. Beds are the browser-tested interaction; Hollow uses the same validated
+runtime path with a different authored yield/deadline. Regional population/art remains greybox and most
+of the multi-kilometre region is still reserved space. Browser proof resumed genuinely earned state
+through harness selector/route corrections; ordinary collision requires walking around trees. Software
+GPU/touch emulation is functional proof, not physical Android performance. External follow-ups remain
+separate from gameplay development.
+
+Next gameplay task: one compact catalog-backed Marches supply expedition and a practical herb sink,
+using existing quest/reward/party/navigation systems. No mass quest generation or profession engine.

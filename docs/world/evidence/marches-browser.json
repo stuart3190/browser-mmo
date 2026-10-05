@@ -1,0 +1,95 @@
+{
+  "users": ["gather_muveurw6", "herbs_muveurw6"],
+  "checks": [
+    {
+      "name": "Herb beds discoverable on real road from enclave",
+      "ok": true
+    },
+    {
+      "name": "Herb beds discoverable on real road from enclave",
+      "ok": true
+    },
+    {
+      "name": "Both party browsers see the same herb entity",
+      "ok": true
+    },
+    {
+      "name": "Shared depletion grants exactly two herbs to gatherer, no party duplicates",
+      "ok": true
+    },
+    {
+      "name": "Material pouch visibly contains real Wild Herb",
+      "ok": true
+    },
+    {
+      "name": "Regrowth allows a new touch harvest",
+      "ok": true
+    },
+    {
+      "name": "390x844 controls remain within viewport",
+      "ok": true,
+      "detail": [
+        {
+          "x": 10,
+          "y": 652,
+          "w": 116,
+          "h": 116
+        },
+        {
+          "x": 260,
+          "y": 636,
+          "w": 120,
+          "h": 132
+        },
+        {
+          "x": 0,
+          "y": 788,
+          "w": 390,
+          "h": 44
+        }
+      ]
+    },
+    {
+      "name": "844x390 controls remain within viewport",
+      "ok": true,
+      "detail": [
+        {
+          "x": 18,
+          "y": 202,
+          "w": 112,
+          "h": 112
+        },
+        {
+          "x": 648,
+          "y": 198,
+          "w": 180,
+          "h": 116
+        },
+        {
+          "x": 0,
+          "y": 334,
+          "w": 844,
+          "h": 44
+        }
+      ]
+    },
+    {
+      "name": "Gathered herbs persist after login",
+      "ok": true
+    },
+    {
+      "name": "Party survives gather and reconnect",
+      "ok": true
+    },
+    {
+      "name": "Roadside catalog habitat and guard visible",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "implementationCommit": "d014293320384b94ca09ef9287128e290e624a8d"
+}

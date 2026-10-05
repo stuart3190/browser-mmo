@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-05T15:53:41.140Z",
+  "rows": [
+    {
+      "username": "gather_muveurw6",
+      "character_id": "01a10cb4-05b7-7425-bca2-24db0f343dc0",
+      "zone_id": "zone.aurelian.greenvale_marches",
+      "herbs": 8,
+      "grants": 4,
+      "unique_sources": 4
+    },
+    {
+      "username": "herbs_muveurw6",
+      "character_id": "01a10cb7-a075-702b-9c25-712df0961141",
+      "zone_id": "zone.aurelian.greenvale_marches",
+      "herbs": 4,
+      "grants": 2,
+      "unique_sources": 2
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "node.greenvale_marches.herb_beds",
+      "ready_at": "2026-10-05T15:52:22.307Z"
+    }
+  ],
+  "assertions": 7,
+  "notes": "Repeated harness runs resumed genuinely earned herbs; every grant maps to exactly two pouch herbs and one distinct provenance source. No DB writes or synthetic loot.",
+  "implementationCommit": "d014293320384b94ca09ef9287128e290e624a8d"
+}
