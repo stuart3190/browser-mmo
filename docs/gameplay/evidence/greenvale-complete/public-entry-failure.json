@@ -1,0 +1,7 @@
+{
+  "checks": [],
+  "errors": [],
+  "exitCode": 1,
+  "failure": "page.waitForFunction timed out after 90000ms before any assertion",
+  "cause": "Touch entry choice must precede networking; diagnostic screenshot showed Continue in browser and no WebSocket frames"
+}

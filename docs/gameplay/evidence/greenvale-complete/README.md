@@ -1,11 +1,12 @@
 # Greenvale batch qualification and release evidence
 
-Baseline main/deployed: `138891dd19ed6932a50c32df3e050c7b9de55ce7`.
+Baseline before qualification: `138891dd19ed6932a50c32df3e050c7b9de55ce7`.
 Implementation: `1258bf5addb1346afaa9d6aebdc0927559458178`, branch `codex/greenvale-complete`.
 Agent: Codex. Successful browser work dated 2026-10-05; interruption/resume documented 2026-10-06.
 Resumed from clean pushed branch commit `e3265b2358beace3d3e79344ec1779153427c360` on 2026-10-06.
 VPS execution/network access is restored. SSH read access confirms origin/main is still the baseline
-and the remote feature branch matches the resume commit. Merge and deployment remain pending.
+and the remote feature branch matched the resume commit. Qualification commit `f47eff5d3eb7260a65e7781e4ae2c2b3360bd784`
+was pushed, main fast-forwarded/pushed, and that release is deployed and publicly qualified.
 
 ## Passed evidence
 
@@ -73,16 +74,37 @@ The prior river helper read absent `landmark.radius`, producing NaN. Its existin
 The initial aggregate verification was not repeated for these browser-only harness changes;
 monorepo typecheck, repository lint, production builds/debug-artifact guard and script syntax pass.
 
-## Remaining release steps
+## Release — qualified 2026-10-06
 
-1. Commit the qualification evidence/PROGRESS, push the feature branch, verify
-   origin/main still matches the baseline, then fast-forward/push main. Preserve history.
-2. Run the existing `bash scripts/deploy-broken-odyssey.sh` from clean verified main. It owns only
-   Broken Odyssey preview services and performs its database backup/migration/release checks.
-3. Run `scripts/e2e/greenvale-public.cjs` with `EXPECTED_DEPLOY_SHA` set to actual final main. The
-   reserved password comes from `/etc/brokenodyssey/check-password`; never copy it into evidence.
-   Verify actual HTTPS release SHA, password auth, production debug-hook absence, herb/vendor/banker/
-   atlas persistence and realtime readiness. Do not claim hosted CI or physical-device performance.
+Qualification/merge/deployment: `f47eff5d3eb7260a65e7781e4ae2c2b3360bd784`.
+Main fast-forwarded from the unchanged baseline; both feature and main pushes succeeded.
+`deployment-qualified.json`: existing deployment script exited 0, local PostgreSQL backup retained,
+migrations/content sync completed (30 templates), public SHA matched, API and all 25 zones ready.
+
+`public-qualified.json`: **15 assertions, exit 0** against actual HTTPS/password authentication:
+release SHA, production debug-hook absence, five new story definitions, real shared herb grant,
+material sale, paid unique equipment/exact-instance sale, phone vendor bounds, banker, new atlas
+places, material/item/discovery relog persistence, no observed protocol/browser errors, 25 zones ready.
+Reviewed actual screenshots: `public-vendor.png`, `public-banker.png`, `public-atlas.png`.
+The first public run timed out with zero assertions because the harness waited for networking
+before choosing the normal touch-entry screen. `public-entry-failure.json` and
+`public-entry-diagnostic.png` preserve that failure; corrected entry ordering passes.
+Credentials remain solely in `/etc/brokenodyssey/check-password`, never in this evidence.
+
+This release record and the harness correction form a final evidence commit. Deploy that clean
+final main with the same existing script, then run:
+
+```sh
+PLAYWRIGHT_PATH=/opt/aria-browser/node_modules/playwright \
+  EXPECTED_DEPLOY_SHA=$(git rev-parse HEAD) \
+  node scripts/e2e/greenvale-public.cjs /tmp/greenvale-public-final
+```
+
+That final deployment rerun must check the actual final main SHA. The archived public proof above
+records the first successful release; `/release.json` and the final run record the final evidence
+commit. SHA-bearing final proof is retained at `/tmp/greenvale-public-final/proof.json` on this VPS,
+avoiding a recursive evidence-only commit. No runtime code changed between them. Hosted CI and
+physical-device performance are not claimed.
 
 No private instance lifecycle, profession ranks/tools, timed crafting or live durability repair is
 complete. These stay unchecked. Shared Broken Vault is the explicitly allowed entry/encounter

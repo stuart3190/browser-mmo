@@ -1,0 +1,73 @@
+{
+  "url": "https://brokenodyssey.com",
+  "release": {
+    "commit": "f47eff5d3eb7260a65e7781e4ae2c2b3360bd784",
+    "environment": "development-preview"
+  },
+  "checks": [
+    {
+      "name": "Public final release SHA",
+      "ok": true,
+      "detail": "f47eff5d3eb7260a65e7781e4ae2c2b3360bd784"
+    },
+    {
+      "name": "Production debug hook absent",
+      "ok": true
+    },
+    {
+      "name": "All five new main quests delivered by server",
+      "ok": true
+    },
+    {
+      "name": "Reserved fixture is in Marches",
+      "ok": true
+    },
+    {
+      "name": "Public shared herb grant",
+      "ok": true
+    },
+    {
+      "name": "Real public NPC material sale",
+      "ok": true
+    },
+    {
+      "name": "Public paid unique equipment",
+      "ok": true
+    },
+    {
+      "name": "Public specific-instance sale",
+      "ok": true
+    },
+    {
+      "name": "Touch vendor stays within phone viewport",
+      "ok": true
+    },
+    {
+      "name": "Public local banker opens real vault",
+      "ok": true
+    },
+    {
+      "name": "New places visible in public atlas",
+      "ok": true
+    },
+    {
+      "name": "Sale/material stock survive password relog",
+      "ok": true
+    },
+    {
+      "name": "Discovery survives public relog",
+      "ok": true
+    },
+    {
+      "name": "No protocol/browser errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Public realtime ready",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "hostedZones": 25
+}

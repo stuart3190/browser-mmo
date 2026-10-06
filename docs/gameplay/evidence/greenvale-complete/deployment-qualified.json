@@ -1,0 +1,55 @@
+{
+  "verifiedAt": "2026-10-06T00:38:00.736553+00:00",
+  "agent": "Codex",
+  "commit": "f47eff5d3eb7260a65e7781e4ae2c2b3360bd784",
+  "deployCommand": "bash scripts/deploy-broken-odyssey.sh",
+  "exitCode": 0,
+  "release": {
+    "commit": "f47eff5d3eb7260a65e7781e4ae2c2b3360bd784",
+    "environment": "development-preview"
+  },
+  "api": {
+    "status": "ok",
+    "checks": {
+      "database": "ok"
+    }
+  },
+  "realtime": {
+    "status": "ok",
+    "zones": [
+      "zone.greenvale.meadows",
+      "zone.aurelian.greenvale_marches",
+      "zone.aurelian.amber_coast",
+      "zone.aurelian.elderwood",
+      "zone.aurelian.crownspine",
+      "zone.frostmere.brinebreak",
+      "zone.frostmere.whitepine",
+      "zone.frostmere.rimefen",
+      "zone.frostmere.glasspeak",
+      "zone.cinderwake.ashstrand",
+      "zone.cinderwake.embersteppe",
+      "zone.cinderwake.redroot",
+      "zone.cinderwake.blackglass",
+      "zone.duneshara.oasis_reach",
+      "zone.duneshara.windcut",
+      "zone.duneshara.sunsea",
+      "zone.duneshara.saltmarch",
+      "zone.duneshara.broken_steps",
+      "zone.duneshara.high_saffron",
+      "zone.veilreach.mistwood",
+      "zone.veilreach.moonfen",
+      "zone.veilreach.silver_heath",
+      "zone.veilreach.crystal_vale",
+      "zone.veilreach.forgotten_march",
+      "zone.veilreach.veiled_spires"
+    ],
+    "players": 0,
+    "changeFeed": "ok"
+  },
+  "backup": {
+    "path": "/srv/brokenodyssey/backups/pre-f47eff5d3eb7260a65e7781e4ae2c2b3360bd784-1791246721.dump",
+    "bytes": 88549
+  },
+  "migrationsAndContentSync": "Deployment script exited 0; synced 30 item templates",
+  "finalEvidenceCommit": "After archiving this qualification, deploy clean final main and rerun the same public harness with its actual SHA. release.json and the final run are authoritative for that final SHA."
+}

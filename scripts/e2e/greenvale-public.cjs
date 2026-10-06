@@ -85,11 +85,17 @@ function check(name, ok, detail) {
     await p.locator('#char-list button').first().click();
     await p.waitForFunction(
       () =>
-        window.proofFrames.some((m) => m.t === 'zone.snapshot') &&
-        window.proofFrames.some((m) => m.t === 'inventory.snapshot'),
+        document.querySelector('[data-testid=continue-browser]') ||
+        (window.proofFrames.some((m) => m.t === 'zone.snapshot') &&
+          window.proofFrames.some((m) => m.t === 'inventory.snapshot')),
     );
     if (await p.locator('[data-testid=continue-browser]').isVisible())
       await p.locator('[data-testid=continue-browser]').tap();
+    await p.waitForFunction(
+      () =>
+        window.proofFrames.some((m) => m.t === 'zone.snapshot') &&
+        window.proofFrames.some((m) => m.t === 'inventory.snapshot'),
+    );
   }
   async function walk(x, z) {
     let held = [];

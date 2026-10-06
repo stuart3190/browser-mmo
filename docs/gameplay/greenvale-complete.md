@@ -102,8 +102,9 @@ There is no private-instance badge or invented completion chest.
 - Physical Android performance remains an external test, not something emulation can prove.
 
 Local browser qualification is complete, including the preserved 17-quest actor and staged shared
-hunt/contract. Evidence and remaining deployment/public gates are recorded in PROGRESS and
-[evidence](evidence/greenvale-complete/README.md). This batch is not yet deployed.
+hunt/contract. Main is fast-forwarded/pushed, deployed and publicly verified with 15 HTTPS/password
+browser assertions. Exact release evidence and final-main deployment verification are recorded in
+PROGRESS and [evidence](evidence/greenvale-complete/README.md).
 
 ## Verification paths
 

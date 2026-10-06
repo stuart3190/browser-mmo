@@ -1215,7 +1215,7 @@ separate from gameplay development.
 Next gameplay task: one compact catalog-backed Marches supply expedition and a practical herb sink,
 using existing quest/reward/party/navigation systems. No mass quest generation or profession engine.
 
-## Current Work — Greenvale starter-region completion batch, 2026-10-05
+## Completed Work — Greenvale starter-region qualification, 2026-10-06
 
 Agent: Codex. Baseline main/deployed: `138891dd19ed6932a50c32df3e050c7b9de55ce7`.
 Feature branch: `codex/greenvale-complete`. AGENTS.md / MASTER_PLAN.md unchanged.
@@ -1265,8 +1265,14 @@ Design, scope and unfinished slices: [Greenvale Complete](gameplay/greenvale-com
       all 14 original completion timestamps unchanged. Original earned evidence retained.
 - [x] Feature branch pushed at `e3265b2358beace3d3e79344ec1779153427c360` before this resume.
       VPS process/network access restored; SSH read confirms origin/main remains the baseline.
-- [ ] Finish qualification evidence, fast-forward/push main, deploy and public smoke.
-      Main/public deployment still baseline; no release completion is claimed before live checks.
+- [x] Qualification evidence committed/pushed, main fast-forwarded/pushed, deployed and publicly verified.
+      Verified 2026-10-06 · Codex · `f47eff5d3eb7260a65e7781e4ae2c2b3360bd784`; existing deployment
+      script exited 0 with backup/migrations/content sync and public SHA/readiness. Public browser:
+      15 assertions, exit 0, real password/HTTPS, no production debug hook, herb/vendor/banker/atlas
+      and persistent stock/sale/discovery; all 25 zones ready. Initial smoke harness waited before
+      the touch-entry choice; corrected normal UI ordering passes. Public proof/screenshots preserved.
+      After archiving this first release, the final evidence commit receives the same deployment/
+      browser checks; `/release.json` and `/tmp/greenvale-public-final/proof.json` identify its SHA.
 - [ ] Private dungeon admission, instance ownership/lifecycle/reset, reconnect and completion rewards.
 - [ ] Profession ranks, tools, timed crafting and consumable effects; repair remains unsupported without wear.
 
@@ -1279,13 +1285,16 @@ Resume checks on 2026-10-06: 121 game-data tests pass; browser scripts parse; lo
 rechecked. Resumed browser qualification now passes: 18 solo + 17 hunt-stage + 10 zero-exit party
 closure assertions, plus read-only PostgreSQL proof and reviewed screenshots. Monorepo typecheck,
 repository lint and all four production builds/debug-artifact guard pass. The original aggregate
-suite was not repeated for browser-only harness corrections. No hosted CI/device performance or
-new public deployment is claimed before the remaining release steps.
+suite was not repeated for browser-only harness corrections. No hosted CI/device performance is claimed. Public deployment/password/browser qualification now passes
+separately in the archived release evidence (15 assertions; first release `f47eff5`).
 
 Implementation commit: **1258bf5addb1346afaa9d6aebdc0927559458178**. Exact preserved actors, evidence and
-remaining qualification/deployment commands: [resume point](gameplay/evidence/greenvale-complete/README.md).
-Remote main confirmed unchanged through GitHub read access on 2026-10-06. GitHub write operations
+qualification/deployment commands: [qualification record](gameplay/evidence/greenvale-complete/README.md).
+At resume, remote main was confirmed at the baseline on 2026-10-06. GitHub write operations
 were previously blocked by the execution profile. Access is restored and the feature branch was
-already pushed at `e3265b2`; all remaining browser qualification now passes. Main/deployment/public
-release checks remain pending. Next gameplay task remains private-party Broken Vault lifecycle,
-admission, recovery/reset and completion rewards; profession tools/ranks/timed crafting remain later.
+already pushed at `e3265b2`; all remaining browser qualification now passes. Main fast-forward/push,
+deployment and public browser checks pass at qualification release `f47eff5`; final evidence commit
+receives the same deployment/browser checks, with SHA-bearing output retained at
+`/tmp/greenvale-public-final/proof.json` and public `/release.json`. Next gameplay task remains
+private-party Broken Vault lifecycle/admission/recovery/reset/completion rewards; profession
+tools/ranks/timed crafting remain later.

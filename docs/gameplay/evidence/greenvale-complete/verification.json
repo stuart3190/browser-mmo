@@ -48,12 +48,13 @@
   },
   "resumeDate": "2026-10-06",
   "releaseStatus": {
-    "mainChanged": false,
-    "deployed": false,
+    "mainChanged": true,
+    "deployed": true,
     "blocker": null,
-    "remoteMainVerified": "138891dd19ed6932a50c32df3e050c7b9de55ce7",
+    "remoteMainVerified": "f47eff5d3eb7260a65e7781e4ae2c2b3360bd784",
     "qualified": true,
-    "resolvedBlocker": "VPS execution/network access restored; original feature branch push already succeeded. Qualification complete; merge/deploy/public gates pending."
+    "resolvedBlocker": "Prior execution-profile blocker resolved; feature pushed, main fast-forwarded/pushed, deployment and public qualification passed.",
+    "deployedCommit": "f47eff5d3eb7260a65e7781e4ae2c2b3360bd784"
   },
   "implementationCommit": "1258bf5addb1346afaa9d6aebdc0927559458178",
   "resumeChecks": {
@@ -69,5 +70,13 @@
     "soloBrowser": "pass; exit 0",
     "repositoryLintAfterHarnessChanges": "pass"
   },
-  "qualificationResumeCommit": "e3265b2358beace3d3e79344ec1779153427c360"
+  "qualificationResumeCommit": "e3265b2358beace3d3e79344ec1779153427c360",
+  "publicQualification": {
+    "commit": "f47eff5d3eb7260a65e7781e4ae2c2b3360bd784",
+    "checks": 15,
+    "exitCode": 0,
+    "hostedZones": 25,
+    "result": "Actual HTTPS/password/UI/transport; expected SHA, production debug-hook absence, all five new main definitions, herb/vendor/exact-instance sale/banker/atlas, relog and readiness",
+    "harnessCorrection": "First run waited for snapshots before choosing Continue in browser and timed out with zero assertions; normal touch entry must precede networking. Corrected ordering passes; gameplay unchanged."
+  }
 }
