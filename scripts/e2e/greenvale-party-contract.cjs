@@ -4,6 +4,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const { enter, walk } = require('./vertical-slice.cjs');
 const fs = require('node:fs');
 const OUT = process.argv[2] || '/tmp/greenvale-party-contract';
+const FINISH_ONLY = process.env.GREENVALE_PARTY_FINISH_ONLY === '1';
 fs.mkdirSync(OUT, { recursive: true });
 const users =
   process.env.GREENVALE_PARTY_USERS?.split(',') ||
@@ -27,7 +28,12 @@ function check(name, ok, detail) {
   });
   const contexts = await Promise.all(
     [false, true].map((t) =>
-      browser.newContext({ viewport: { width: 640, height: 480 }, hasTouch: t, isMobile: t }),
+      browser.newContext({
+        viewport: { width: 640, height: 480 },
+        deviceScaleFactor: Number(process.env.GREENVALE_DPR ?? 1),
+        hasTouch: t,
+        isMobile: t,
+      }),
     ),
   );
   for (const c of contexts)
@@ -63,6 +69,8 @@ function check(name, ok, detail) {
   });
   const click = (p, l) => (p === pages[1] ? l.tap() : l.click());
   async function go(p, x, z, range = 1.8) {
+    await p.bringToFront();
+    let clearance = 2;
     for (let n = 0; n < 80; n++) {
       const s = await p.evaluate(() => window.__mmo.position),
         d = Math.hypot(x - s.x, z - s.z);
@@ -77,11 +85,26 @@ function check(name, ok, detail) {
           maxX: Math.max(s.x, to.x) + 20,
           maxZ: Math.max(s.z, to.z) + 20,
         },
-        d > 20 ? 2 : 0.8,
+        d > 20 ? clearance : 0.8,
       );
       const path = nav.findPath(s, to);
       if (!path) throw Error('No route');
-      for (const pt of path) await walk(p, pt.x, pt.z, 1.3, 90000);
+      for (const pt of path) {
+        const here = await p.evaluate(() => window.__mmo.position);
+        try {
+          await walk(
+            p,
+            pt.x,
+            pt.z,
+            Math.min(range, 1.3),
+            Math.max(10000, Math.hypot(pt.x - here.x, pt.z - here.z) * 600),
+          );
+        } catch (e) {
+          if (!e.message.startsWith('Walk deadline')) throw e;
+          clearance = Math.min(5, clearance + 1);
+          break;
+        }
+      }
     }
     throw Error('Route iterations');
   }
@@ -103,6 +126,11 @@ function check(name, ok, detail) {
     for (let i = 0; i < 2; i++) {
       const p = pages[i];
       await enter(p, users[i], false);
+      if (await p.locator('[data-testid=respawn]').isVisible()) {
+        await click(p, p.locator('[data-testid=respawn]'));
+        await p.waitForFunction(() => !window.__mmo.vitals.dead, null, { timeout: 120000 });
+        check('Normal respawn preserves earned contract', true);
+      }
       check(
         'Existing earned Marches character',
         (await p.evaluate(
@@ -110,7 +138,10 @@ function check(name, ok, detail) {
         )) == zone,
       );
       await npc(p, 'npc.world.greenvale_marches.guard');
-      if (await p.locator(`[data-quest="${Q}"] [data-testid=quest-accept]`).count())
+      if (
+        !FINISH_ONLY &&
+        (await p.locator(`[data-quest="${Q}"] [data-testid=quest-accept]`).count())
+      )
         await click(p, p.locator(`[data-quest="${Q}"] [data-testid=quest-accept]`));
       await close(p);
       const armed = await p.evaluate(() =>
@@ -163,107 +194,125 @@ function check(name, ok, detail) {
       () => window.__events.filter((m) => m.t === 'party.update').at(-1)?.d.members.length === 2,
     );
     check('Persistent two-player party retained', true);
-    for (const p of pages) await go(p, 435, 616, 2);
-    const lootOwners = [];
-    for (let k = 0; k < 2; k++) {
-      await a.waitForFunction(
-        () =>
-          window.__mmo.enemies.some(
+    if (!FINISH_ONLY) {
+      for (const p of pages) await go(p, 435, 616, 2);
+      const lootOwners = [];
+      for (let k = 0; k < 2; k++) {
+        await a.waitForFunction(
+          () =>
+            window.__mmo.enemies.some(
+              (e) => e.refId === 'enemy.world.greenvale_marches.boar.2' && !e.dead,
+            ),
+          null,
+          { timeout: 120000 },
+        );
+        const enemy = await a.evaluate(() =>
+          window.__mmo.enemies.find(
             (e) => e.refId === 'enemy.world.greenvale_marches.boar.2' && !e.dead,
           ),
-        null,
-        { timeout: 120000 },
-      );
-      const enemy = await a.evaluate(() =>
-        window.__mmo.enemies.find(
-          (e) => e.refId === 'enemy.world.greenvale_marches.boar.2' && !e.dead,
-        ),
-      );
-      check('Catalog Bristleback visible', !!enemy);
-      const ep = await a.evaluate((id) => window.__mmo.entityPos(id), enemy.id);
-      for (const p of pages) await go(p, ep.x, ep.z, 3);
-      for (const p of pages) {
-        for (
-          let i = 0;
-          i < 15 && (await p.evaluate(() => window.__mmo.target.id)) !== enemy.id;
-          i++
-        ) {
-          if (p === b) await p.locator('[data-testid=touch-target]').tap();
-          else await p.keyboard.press('Tab');
-          await p.waitForTimeout(200);
-        }
-        check(
-          'Same authoritative target',
-          (await p.evaluate(() => window.__mmo.target.id)) === enemy.id,
         );
-        if (p === b) await p.locator('[data-testid=touch-attack]').tap();
-        else await p.keyboard.press('KeyF');
-      }
-      for (let n = 0; n < 60; n++) {
+        check('Catalog Bristleback visible', !!enemy);
+        const ep = await a.evaluate((id) => window.__mmo.entityPos(id), enemy.id);
+        for (const p of pages) await go(p, ep.x, ep.z, 3);
         for (const p of pages) {
-          const ability = p.locator('[data-testid="ability-ability.warrior.heavy_strike"]');
-          if (await ability.isEnabled()) await click(p, ability);
+          for (
+            let i = 0;
+            i < 15 && (await p.evaluate(() => window.__mmo.target.id)) !== enemy.id;
+            i++
+          ) {
+            if (p === b) await p.locator('[data-testid=touch-target]').tap();
+            else await p.keyboard.press('Tab');
+            await p.waitForTimeout(200);
+          }
+          check(
+            'Same authoritative target',
+            (await p.evaluate(() => window.__mmo.target.id)) === enemy.id,
+          );
+          if (p === b) await p.locator('[data-testid=touch-attack]').tap();
+          else await p.keyboard.press('KeyF');
         }
-        await a.waitForTimeout(1100);
-        if (
-          await a.evaluate(
-            (id) => !window.__mmo.enemies.some((e) => e.id === id && !e.dead),
-            enemy.id,
+        for (let n = 0; n < 60; n++) {
+          for (const p of pages) {
+            const ability = p.locator('[data-testid="ability-ability.warrior.heavy_strike"]');
+            if (await ability.isEnabled()) await click(p, ability);
+          }
+          await a.waitForTimeout(1100);
+          if (
+            await a.evaluate(
+              (id) => !window.__mmo.enemies.some((e) => e.id === id && !e.dead),
+              enemy.id,
+            )
           )
-        )
-          break;
-      }
-      for (const p of pages)
-        await p.waitForFunction(
-          (n) => window.__events.filter((m) => m.t === 'combat.loot').length >= n,
-          k + 1,
-        );
-      const rewards = await Promise.all(
-        pages.map((p) =>
-          p.evaluate(
-            (n) => ({
-              loot: window.__events.filter((m) => m.t === 'combat.loot')[n].d,
-              xp: window.__events.filter((m) => m.t === 'character.progress' && m.d.xpGained > 0)[n]
-                ?.d.xpGained,
-            }),
-            k,
+            break;
+        }
+        for (const p of pages)
+          await p.waitForFunction(
+            (n) => window.__events.filter((m) => m.t === 'combat.loot').length >= n,
+            k + 1,
+          );
+        const rewards = await Promise.all(
+          pages.map((p) =>
+            p.evaluate(
+              (n) => ({
+                loot: window.__events.filter((m) => m.t === 'combat.loot')[n].d,
+                xp: window.__events.filter((m) => m.t === 'character.progress' && m.d.xpGained > 0)[
+                  n
+                ]?.d.xpGained,
+              }),
+              k,
+            ),
           ),
-        ),
-      );
-      check(
-        'Shared XP and one loot owner',
-        rewards.every((r) => r.xp > 0) &&
-          rewards.filter(
+        );
+        check(
+          'Shared XP and one loot owner',
+          rewards.every((r) => r.xp > 0) &&
+            rewards.filter(
+              (r) => r.loot.items.length + r.loot.mailedItems.length > 0 || r.loot.gold > 0,
+            ).length === 1,
+          rewards.map((r) => ({
+            xp: r.xp,
+            items: r.loot.items.length + r.loot.mailedItems.length,
+            gold: r.loot.gold,
+          })),
+        );
+        lootOwners.push(
+          rewards.findIndex(
             (r) => r.loot.items.length + r.loot.mailedItems.length > 0 || r.loot.gold > 0,
-          ).length === 1,
-        rewards.map((r) => ({
-          xp: r.xp,
-          items: r.loot.items.length + r.loot.mailedItems.length,
-          gold: r.loot.gold,
-        })),
+          ),
+        );
+        for (const p of pages)
+          check(
+            'Exactly one contract credit per shared kill',
+            (await p.evaluate(
+              (q) => window.__mmo.quests.find((x) => x.questId === q)?.objectives[0].current,
+              Q,
+            )) ===
+              k + 1,
+          );
+      }
+      check(
+        'Loot ownership rotates fairly across two kills',
+        lootOwners.length === 2 && lootOwners[0] !== lootOwners[1],
       );
-      lootOwners.push(
-        rewards.findIndex(
-          (r) => r.loot.items.length + r.loot.mailedItems.length > 0 || r.loot.gold > 0,
-        ),
-      );
+      // Keep both hunters clear of ordinary respawns during the individual return routes.
+      await Promise.all(pages.map((p) => go(p, 435, 616, 2)));
+    } else {
       for (const p of pages)
         check(
-          'Exactly one contract credit per shared kill',
+          'Previously earned two kill credits retained',
           (await p.evaluate(
             (q) => window.__mmo.quests.find((x) => x.questId === q)?.objectives[0].current,
             Q,
-          )) ===
-            k + 1,
+          )) === 2,
         );
     }
-    check(
-      'Loot ownership rotates fairly across two kills',
-      lootOwners.length === 2 && lootOwners[0] !== lootOwners[1],
-    );
     for (const p of pages) {
       await npc(p, 'npc.world.greenvale_marches.guard');
-      await click(p, p.locator(`[data-quest="${Q}"] [data-testid=quest-turn-in]`));
+      if (
+        (await p.evaluate((q) => window.__mmo.quests.find((x) => x.questId === q)?.state, Q)) !==
+        'completed'
+      )
+        await click(p, p.locator(`[data-quest="${Q}"] [data-testid=quest-turn-in]`));
       await p.waitForFunction(
         (q) => window.__mmo.quests.find((x) => x.questId === q)?.state === 'completed',
         Q,

@@ -1,0 +1,68 @@
+[
+  {
+    "attempt": "qualified",
+    "reason": "Stopped before kills to add tab focus",
+    "result": {
+      "users": ["gather_muveurw6", "herbs_muveurw6"],
+      "checks": [
+        {
+          "name": "Existing earned Marches character",
+          "ok": true
+        },
+        {
+          "name": "Existing earned Marches character",
+          "ok": true
+        },
+        {
+          "name": "Persistent two-player party retained",
+          "ok": true
+        }
+      ],
+      "errors": []
+    }
+  },
+  {
+    "attempt": "focused",
+    "reason": "Stopped before kills to use recorded DPR setting",
+    "result": {
+      "users": ["gather_muveurw6", "herbs_muveurw6"],
+      "checks": [
+        {
+          "name": "Existing earned Marches character",
+          "ok": true
+        },
+        {
+          "name": "Existing earned Marches character",
+          "ok": true
+        },
+        {
+          "name": "Persistent two-player party retained",
+          "ok": true
+        }
+      ],
+      "errors": []
+    }
+  },
+  {
+    "attempt": "final",
+    "reason": "Walking waypoint stopped at a tree; added existing solo adaptive route logic",
+    "result": {
+      "users": ["gather_muveurw6", "herbs_muveurw6"],
+      "checks": [
+        {
+          "name": "Existing earned Marches character",
+          "ok": true
+        },
+        {
+          "name": "Existing earned Marches character",
+          "ok": true
+        },
+        {
+          "name": "Persistent two-player party retained",
+          "ok": true
+        }
+      ],
+      "errors": []
+    }
+  }
+]

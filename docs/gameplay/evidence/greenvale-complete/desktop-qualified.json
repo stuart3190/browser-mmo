@@ -1,0 +1,88 @@
+{
+  "user": "route_muvjmzr0",
+  "checks": [
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "armor.leather.trapper_cap"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.ring.copper_band"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_river"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.wildlife.1"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.wildlife.1"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_remedy"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.boar.2"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.boar.2"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_patrol"
+    },
+    {
+      "name": "Specific carried gear sold through NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Real workshop equipment",
+      "ok": true
+    },
+    {
+      "name": "Vendor sell/buy via actual NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Exact purchased instance can be sold once",
+      "ok": true
+    },
+    {
+      "name": "Local banker opens existing real vault",
+      "ok": true
+    },
+    {
+      "name": "Persistent discovered atlas labels",
+      "ok": true
+    },
+    {
+      "name": "Closure survives relog",
+      "ok": true
+    },
+    {
+      "name": "Crafted equipment survives relog",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

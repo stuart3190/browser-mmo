@@ -1251,13 +1251,22 @@ Design, scope and unfinished slices: [Greenvale Complete](gameplay/greenvale-com
 - [x] Actual touch gathering/workshop, material sale, paid unique gear/exact-instance sale, banker,
       discovered atlas, 390×844 / 844×390 reachable controls, real joystick and crafted-item relog.
       Final touch-services script exited successfully without browser exceptions; saved checks/screenshots.
-- [ ] Finish river/remedy/daily solo browser flow and two-client contract browser qualification.
-      River helper failure was a nonexistent landmark radius producing NaN; corrected on 2026-10-06
-      to the existing authoritative exploration radius. Live rerun still required; game engine unchanged.
-- [ ] Push, fast-forward main, deploy and public smoke. Resumed managed execution cannot access
-      preview/GitHub networking; connected VPS command tool requires approval while policy is never.
-      Main and the public deployment remain the baseline SHA above. Restore the previous VPS execution
-      profile before these steps; do not mark release complete from local tests.
+- [x] Staged two-client daily contract/shared hunt on preserved earned gatherers.
+      Verified 2026-10-06 · Codex · 17 hunt-stage + 10 zero-exit closure assertions; two shared kills,
+      17 XP per player per kill, two credits each, one alternating loot owner, personal turn-ins,
+      cooldown and party/completion relog. Read-only PostgreSQL verifies unique kills and one reward
+      ledger entry each. Waiting touch actor died at a respawn habitat; normal UI respawn retained
+      credits and the closure continued without replaying kills/rewards. Harness-only route/focus/DPR/
+      closure fixes; original earned-state evidence retained. See party evidence in the resume point.
+- [x] River/quay return, remedy and daily solo browser completion plus desktop services/final relog.
+      Verified 2026-10-06 · Codex · `desktop-qualified.json`: 18 assertions, exit 0, no browser
+      exceptions; actual gathering, crafting, material/gear vendor exchange, banker/atlas and
+      closure/crafted equipment relog. `story-db.json`: all 17 completed, one reward ledger row each,
+      all 14 original completion timestamps unchanged. Original earned evidence retained.
+- [x] Feature branch pushed at `e3265b2358beace3d3e79344ec1779153427c360` before this resume.
+      VPS process/network access restored; SSH read confirms origin/main remains the baseline.
+- [ ] Finish qualification evidence, fast-forward/push main, deploy and public smoke.
+      Main/public deployment still baseline; no release completion is claimed before live checks.
 - [ ] Private dungeon admission, instance ownership/lifecycle/reset, reconnect and completion rewards.
 - [ ] Profession ranks, tools, timed crafting and consumable effects; repair remains unsupported without wear.
 
@@ -1267,12 +1276,16 @@ full verification exposed an early NPC-service completion ACK and a timing-sensi
 bound. ACK ordering was fixed; the test-only no-regeneration fixture now verifies exact health
 preservation rather than confusing legitimate regeneration with rollback. Focused reruns pass.
 Resume checks on 2026-10-06: 121 game-data tests pass; browser scripts parse; local lint/format
-rechecked. Code commit and exact resume instructions are recorded with the saved evidence. The full
-suite was not repeated merely for the browser-harness radius correction. No hosted CI success,
-remaining party playthrough or new public deployment is claimed.
+rechecked. Resumed browser qualification now passes: 18 solo + 17 hunt-stage + 10 zero-exit party
+closure assertions, plus read-only PostgreSQL proof and reviewed screenshots. Monorepo typecheck,
+repository lint and all four production builds/debug-artifact guard pass. The original aggregate
+suite was not repeated for browser-only harness corrections. No hosted CI/device performance or
+new public deployment is claimed before the remaining release steps.
 
 Implementation commit: **1258bf5addb1346afaa9d6aebdc0927559458178**. Exact preserved actors, evidence and
 remaining qualification/deployment commands: [resume point](gameplay/evidence/greenvale-complete/README.md).
 Remote main confirmed unchanged through GitHub read access on 2026-10-06. GitHub write operations
-also require approval under the current never-approval policy. This batch is committed locally only;
-release qualification remains incomplete.
+were previously blocked by the execution profile. Access is restored and the feature branch was
+already pushed at `e3265b2`; all remaining browser qualification now passes. Main/deployment/public
+release checks remain pending. Next gameplay task remains private-party Broken Vault lifecycle,
+admission, recovery/reset and completion rewards; profession tools/ranks/timed crafting remain later.

@@ -1,0 +1,163 @@
+{
+  "user": "route_muvjmzr0",
+  "completedQuests": 17,
+  "preservedOriginalRewardTimes": 14,
+  "checks": "All 17 completed; exactly one quest reward ledger entry each; all 14 original completion timestamps unchanged",
+  "quests": [
+    {
+      "questId": "quest.greenvale.hollow_trail",
+      "status": "completed",
+      "progress": {
+        "slay_brackenmaw": 1
+      },
+      "rewardedAt": "2026-10-05T20:06:18.028+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.keeper_outpost",
+      "status": "completed",
+      "progress": {
+        "read_oath": 1,
+        "quiet_aster": 1
+      },
+      "rewardedAt": "2026-10-05T20:32:18.891+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_boundary",
+      "status": "completed",
+      "progress": {
+        "outlaws": 2,
+        "watcher": 1
+      },
+      "rewardedAt": "2026-10-05T21:09:25.141+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_call",
+      "status": "completed",
+      "progress": {
+        "ada": 1
+      },
+      "rewardedAt": "2026-10-05T20:34:18.694+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_home",
+      "status": "completed",
+      "progress": {
+        "ada": 1,
+        "maren": 1
+      },
+      "rewardedAt": "2026-10-05T21:30:26.111+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_ore",
+      "status": "completed",
+      "progress": {},
+      "rewardedAt": "2026-10-05T21:37:11.898+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_patrol",
+      "status": "completed",
+      "progress": {
+        "boars": 2
+      },
+      "rewardedAt": "2026-10-06T02:18:17.261+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_remedy",
+      "status": "completed",
+      "progress": {},
+      "rewardedAt": "2026-10-06T02:11:56.652+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_river",
+      "status": "completed",
+      "progress": {
+        "port": 1,
+        "river": 1
+      },
+      "rewardedAt": "2026-10-06T02:08:14.949+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_supply",
+      "status": "completed",
+      "progress": {
+        "ren": 1
+      },
+      "rewardedAt": "2026-10-05T20:57:58.958+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_timber",
+      "status": "completed",
+      "progress": {},
+      "rewardedAt": "2026-10-05T21:34:25.409+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.marches_vault",
+      "status": "completed",
+      "progress": {
+        "outer": 1,
+        "boundary": 1,
+        "stonekin": 2
+      },
+      "rewardedAt": "2026-10-05T21:13:15.691+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.old_waystone",
+      "status": "completed",
+      "progress": {
+        "speak_to_rill": 1
+      },
+      "rewardedAt": "2026-10-05T20:03:41.989+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.root_wound",
+      "status": "completed",
+      "progress": {
+        "silence_lantern": 1
+      },
+      "rewardedAt": "2026-10-05T20:08:21.94+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.stillwater",
+      "status": "completed",
+      "progress": {
+        "speak_to_tess": 1,
+        "silence_warden": 1
+      },
+      "rewardedAt": "2026-10-05T20:18:23.892+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.well_records",
+      "status": "completed",
+      "progress": {
+        "survey_well": 1,
+        "survey_culvert": 1
+      },
+      "rewardedAt": "2026-10-05T20:21:16.602+02:00",
+      "rewardLedgerRows": 1
+    },
+    {
+      "questId": "quest.greenvale.wolves_at_the_edge",
+      "status": "completed",
+      "progress": {
+        "kill_wolves": 5
+      },
+      "rewardedAt": "2026-10-05T19:59:13.59+02:00",
+      "rewardLedgerRows": 1
+    }
+  ]
+}

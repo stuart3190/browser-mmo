@@ -26,21 +26,34 @@
   },
   "browserQualification": {
     "mainStory": "Actual fresh character completed all original seven and five new main quests, staged through ordinary movement/combat/UI inputs; no grants or teleports",
-    "sideQuests": "Timber and ore complete; river accepted, return flow incomplete; remedy and daily solo flow pending",
+    "sideQuests": "All four side quests and daily complete through genuine earned-state browser inputs; 17 persisted completions, all 14 original reward timestamps unchanged",
     "touchServices": {
       "checks": 10,
       "result": "PASS: real gathering/craft, material sale, paid unique gear/exact-instance sale, bank, atlas, 390x844/844x390, joystick, relog, no browser exceptions"
     },
-    "harnessCorrection": "Explore arrival mistakenly used nonexistent landmark.radius, producing NaN; now uses existing EXPLORATION_RADIUS minus 0.5. Live rerun still required.",
-    "partyContract": "Pending two-client browser qualification; domain shared-credit/reward regressions passed previously",
-    "physicalDevice": "Not tested; software-rendered emulation is functional evidence only"
+    "harnessCorrection": "Exploration arrival uses EXPLORATION_RADIUS minus 0.5; live river/quay return passed. Party harness adds tab focus/DPR, existing adaptive navigation, normal respawn and finish-only earned-state continuation.",
+    "partyContract": {
+      "huntStageChecks": 17,
+      "closureChecks": 10,
+      "closureExitCode": 0,
+      "result": "Two real shared kills, 17 XP per player each, one alternating loot owner, two credits each, personal turn-ins/cooldown, normal respawn preserves credits, party/completion relog; no browser exceptions",
+      "caveat": "The hunt prefix stopped after first turn-in when the waiting touch actor died at a normal respawn habitat; successful closure retained all earned state without replaying kills/rewards"
+    },
+    "physicalDevice": "Not tested; software-rendered emulation is functional evidence only",
+    "desktopContinuation": {
+      "checks": 18,
+      "exitCode": 0,
+      "result": "River/quay return, remedy, solo daily, actual gather/craft/vendor/exact-instance sale/banker/atlas, closure and equipment relog; no browser exceptions"
+    }
   },
   "resumeDate": "2026-10-06",
   "releaseStatus": {
     "mainChanged": false,
     "deployed": false,
-    "blocker": "Resumed managed shell cannot access preview/GitHub networking; connected VPS execution tool requires approval but approval policy is never.",
-    "remoteMainVerified": "138891dd19ed6932a50c32df3e050c7b9de55ce7"
+    "blocker": null,
+    "remoteMainVerified": "138891dd19ed6932a50c32df3e050c7b9de55ce7",
+    "qualified": true,
+    "resolvedBlocker": "VPS execution/network access restored; original feature branch push already succeeded. Qualification complete; merge/deploy/public gates pending."
   },
   "implementationCommit": "1258bf5addb1346afaa9d6aebdc0927559458178",
   "resumeChecks": {
@@ -49,6 +62,12 @@
     "format": "pass",
     "browserScriptsParse": "pass",
     "explorationArrivalMetres": 3.5,
-    "riverAndQuayCentersWalkable": true
-  }
+    "riverAndQuayCentersWalkable": true,
+    "monorepoTypecheck": "pass",
+    "productionBuild": "pass (four unchanged-source Turbo cache hits; debug-artifact guard executed)",
+    "partyBrowser": "staged pass",
+    "soloBrowser": "pass; exit 0",
+    "repositoryLintAfterHarnessChanges": "pass"
+  },
+  "qualificationResumeCommit": "e3265b2358beace3d3e79344ec1779153427c360"
 }

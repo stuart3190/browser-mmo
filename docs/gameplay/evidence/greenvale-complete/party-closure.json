@@ -1,0 +1,47 @@
+{
+  "users": ["gather_muveurw6", "herbs_muveurw6"],
+  "checks": [
+    {
+      "name": "Existing earned Marches character",
+      "ok": true
+    },
+    {
+      "name": "Normal respawn preserves earned contract",
+      "ok": true
+    },
+    {
+      "name": "Existing earned Marches character",
+      "ok": true
+    },
+    {
+      "name": "Persistent two-player party retained",
+      "ok": true
+    },
+    {
+      "name": "Previously earned two kill credits retained",
+      "ok": true
+    },
+    {
+      "name": "Previously earned two kill credits retained",
+      "ok": true
+    },
+    {
+      "name": "Personal daily turn-in, no immediate reacceptance",
+      "ok": true
+    },
+    {
+      "name": "Personal daily turn-in, no immediate reacceptance",
+      "ok": true
+    },
+    {
+      "name": "Daily completion and party survive relog",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

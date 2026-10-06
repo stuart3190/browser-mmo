@@ -1,0 +1,65 @@
+{
+  "checks": "two rewarded kills, two 17-XP recipients each, exactly one rotating loot owner",
+  "kills": [
+    {
+      "kill_id": "01a10e7b-252b-7e65-9afc-25196af6fb29",
+      "status": "rewarded",
+      "enemy_id": "enemy.world.greenvale_marches.boar.2",
+      "loot_character_id": "01a10cb7-a075-702b-9c25-712df0961141",
+      "rewards": [
+        {
+          "user": "gather_muveurw6",
+          "xp": 17,
+          "gold": 0,
+          "items": 0
+        },
+        {
+          "user": "herbs_muveurw6",
+          "xp": 17,
+          "gold": 9,
+          "items": 1
+        }
+      ]
+    },
+    {
+      "kill_id": "01a10e7a-b911-70a4-b36b-5671f1904afa",
+      "status": "rewarded",
+      "enemy_id": "enemy.world.greenvale_marches.boar.2",
+      "loot_character_id": "01a10cb4-05b7-7425-bca2-24db0f343dc0",
+      "rewards": [
+        {
+          "user": "gather_muveurw6",
+          "xp": 17,
+          "gold": 5,
+          "items": 1
+        },
+        {
+          "user": "herbs_muveurw6",
+          "xp": 17,
+          "gold": 0,
+          "items": 0
+        }
+      ]
+    }
+  ],
+  "personalTurnIns": [
+    {
+      "username": "gather_muveurw6",
+      "status": "completed",
+      "progress": {
+        "boars": 2
+      },
+      "rewarded_at": "2026-10-06T01:55:23.235+02:00",
+      "reward_ledger_rows": 1
+    },
+    {
+      "username": "herbs_muveurw6",
+      "status": "completed",
+      "progress": {
+        "boars": 2
+      },
+      "rewarded_at": "2026-10-06T01:57:36.641+02:00",
+      "reward_ledger_rows": 1
+    }
+  ]
+}

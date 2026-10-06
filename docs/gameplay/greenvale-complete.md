@@ -6,17 +6,17 @@ Marches coordinates, continents, existing progression and reward IDs remain inta
 
 ## Existing / missing dependency checklist
 
-| Area         | Existing at start                                                 | This pass                                                                                             |
-| ------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Authority    | movement, combat, parties, durable rewards, inventory and storage | reuse; no parallel simulation                                                                         |
-| Population   | Roadhouse, port, 13 creatures/13 inhabitants, two herb patches    | river post, quarry, timber yard, toll cut, vault watch and gallery; outlaw/stonekin regional variants |
-| Services     | dialogue, remote vaults                                           | authored atomic buy/sell/craft offers with durable idempotency receipts                               |
-| Resources    | herbs with persistent depletion                                   | same framework for iron shards and hardwood; useful field-gear recipes                                |
-| Story        | original village ward investigation                               | five-quest Marches closure, authored as one linked batch                                              |
-| Side work    | original hunt                                                     | four local collection/exploration quests and one daily patrol                                         |
-| Cave         | catalog entrance only                                             | shared-world entry/encounter data and explorable gallery; private instances explicitly unfinished     |
-| Discovery    | quest visits only                                                 | independent persistent world-location discoveries, atlas indicators                                   |
-| Verification | prior deployed evidence                                           | new targeted economy/link/replay/discovery tests and real browser flow; pending until recorded        |
+| Area         | Existing at start                                                 | This pass                                                                                                      |
+| ------------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Authority    | movement, combat, parties, durable rewards, inventory and storage | reuse; no parallel simulation                                                                                  |
+| Population   | Roadhouse, port, 13 creatures/13 inhabitants, two herb patches    | river post, quarry, timber yard, toll cut, vault watch and gallery; outlaw/stonekin regional variants          |
+| Services     | dialogue, remote vaults                                           | authored atomic buy/sell/craft offers with durable idempotency receipts                                        |
+| Resources    | herbs with persistent depletion                                   | same framework for iron shards and hardwood; useful field-gear recipes                                         |
+| Story        | original village ward investigation                               | five-quest Marches closure, authored as one linked batch                                                       |
+| Side work    | original hunt                                                     | four local collection/exploration quests and one daily patrol                                                  |
+| Cave         | catalog entrance only                                             | shared-world entry/encounter data and explorable gallery; private instances explicitly unfinished              |
+| Discovery    | quest visits only                                                 | independent persistent world-location discoveries, atlas indicators                                            |
+| Verification | prior deployed evidence                                           | new targeted economy/link/replay/discovery tests and real browser flow; recorded in the qualification evidence |
 
 ## Playable geography and content
 
@@ -101,7 +101,9 @@ There is no private-instance badge or invented completion chest.
 - Full wilderness densification/final art: the authored route is populated, distant reserved space remains.
 - Physical Android performance remains an external test, not something emulation can prove.
 
-Verified stages and pending release gates are recorded in PROGRESS; this batch is not yet deployed.
+Local browser qualification is complete, including the preserved 17-quest actor and staged shared
+hunt/contract. Evidence and remaining deployment/public gates are recorded in PROGRESS and
+[evidence](evidence/greenvale-complete/README.md). This batch is not yet deployed.
 
 ## Verification paths
 
@@ -126,6 +128,8 @@ then four side quests and the contract. `GREENVALE_TOUCH=1` runs touch interacti
 banker and discovery without requiring story completion. The party contract flow takes two existing
 Marches characters via `GREENVALE_PARTY_USERS=name_a,name_b` and
 `scripts/e2e/greenvale-party-contract.cjs`; it must run before their daily contract is completed.
+`GREENVALE_PARTY_FINISH_ONLY=1` resumes already-earned two-credit contracts through normal respawn,
+personal turn-ins/cooldown and relog, without accepting a fresh cycle or repeating shared kills.
 All progress comes from ordinary UI/movement/combat inputs; observations use development-only hooks.
 Software-rendered Chromium/emulated touch do not establish Android frame rate or GPU performance.
 

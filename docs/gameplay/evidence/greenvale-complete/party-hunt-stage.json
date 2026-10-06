@@ -1,0 +1,98 @@
+{
+  "users": ["gather_muveurw6", "herbs_muveurw6"],
+  "checks": [
+    {
+      "name": "Existing earned Marches character",
+      "ok": true
+    },
+    {
+      "name": "Existing earned Marches character",
+      "ok": true
+    },
+    {
+      "name": "Persistent two-player party retained",
+      "ok": true
+    },
+    {
+      "name": "Catalog Bristleback visible",
+      "ok": true
+    },
+    {
+      "name": "Same authoritative target",
+      "ok": true
+    },
+    {
+      "name": "Same authoritative target",
+      "ok": true
+    },
+    {
+      "name": "Shared XP and one loot owner",
+      "ok": true,
+      "detail": [
+        {
+          "xp": 17,
+          "items": 1,
+          "gold": 5
+        },
+        {
+          "xp": 17,
+          "items": 0,
+          "gold": 0
+        }
+      ]
+    },
+    {
+      "name": "Exactly one contract credit per shared kill",
+      "ok": true
+    },
+    {
+      "name": "Exactly one contract credit per shared kill",
+      "ok": true
+    },
+    {
+      "name": "Catalog Bristleback visible",
+      "ok": true
+    },
+    {
+      "name": "Same authoritative target",
+      "ok": true
+    },
+    {
+      "name": "Same authoritative target",
+      "ok": true
+    },
+    {
+      "name": "Shared XP and one loot owner",
+      "ok": true,
+      "detail": [
+        {
+          "xp": 17,
+          "items": 0,
+          "gold": 0
+        },
+        {
+          "xp": 17,
+          "items": 1,
+          "gold": 9
+        }
+      ]
+    },
+    {
+      "name": "Exactly one contract credit per shared kill",
+      "ok": true
+    },
+    {
+      "name": "Exactly one contract credit per shared kill",
+      "ok": true
+    },
+    {
+      "name": "Loot ownership rotates fairly across two kills",
+      "ok": true
+    },
+    {
+      "name": "Personal daily turn-in, no immediate reacceptance",
+      "ok": true
+    }
+  ],
+  "errors": []
+}
