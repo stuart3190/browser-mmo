@@ -1,0 +1,41 @@
+{
+  "checks": [
+    {
+      "name": "Public final release SHA",
+      "ok": true,
+      "detail": "826b8ba617466c305c053a178db17671de22be85"
+    },
+    {
+      "name": "Production debug hook absent",
+      "ok": true
+    },
+    {
+      "name": "All five new main quests delivered by server",
+      "ok": true
+    },
+    {
+      "name": "Reserved fixture is in Marches",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "exitCode": 1,
+  "failure": "Timed out before Gather prompt; four assertions passed",
+  "diagnosis": {
+    "source": "Read-only production PostgreSQL after the failed run",
+    "position": {
+      "x": 288.3444171535593,
+      "z": 397.3546745103567
+    },
+    "resourcePosition": {
+      "x": 290,
+      "z": 400
+    },
+    "distanceMetres": 3.120689268028042,
+    "uiInteractRangeMetres": 3,
+    "materialQuantity": 3,
+    "resourceReadyBeforeObservation": true,
+    "cause": "Old destination (290,398) plus 1.8 m arrival tolerance could stop outside the interaction radius",
+    "fix": "Walk to actual node center (290,400); same runtime release then passed all 15 assertions"
+  }
+}

@@ -91,7 +91,15 @@ before choosing the normal touch-entry screen. `public-entry-failure.json` and
 `public-entry-diagnostic.png` preserve that failure; corrected entry ordering passes.
 Credentials remain solely in `/etc/brokenodyssey/check-password`, never in this evidence.
 
-This release record and the harness correction form a final evidence commit. Deploy that clean
+The subsequent evidence release `826b8ba617466c305c053a178db17671de22be85` deployed successfully.
+Its first smoke stopped before Gather: the offset destination/tolerance left the actor 3.12 m
+from the herb node, outside the existing 3 m UI interaction range. Read-only DB inspection showed
+expired regrowth and unchanged stock. `public-offset-failure.json` preserves the four passing prefix
+assertions and diagnosis. The harness now walks to the actual node center and saves credential-free
+failure diagnostics. `public-second-release.json`: **15 assertions, exit 0** on that same runtime
+release with the corrected route. No resource-state, inventory or runtime change was required.
+
+These release records and harness corrections form the final evidence commit. Deploy that clean
 final main with the same existing script, then run:
 
 ```sh

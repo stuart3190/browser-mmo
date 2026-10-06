@@ -168,7 +168,7 @@ function check(name, ok, detail) {
       (await p.evaluate(() => window.proofFrames.find((m) => m.t === 'auth.ok').d.zoneId)) ===
         'zone.aurelian.greenvale_marches',
     );
-    await walk(290, 398);
+    await walk(290, 400);
     await p.waitForFunction(() =>
       document.querySelector('.prompt')?.textContent.toLowerCase().includes('gather'),
     );
@@ -276,10 +276,27 @@ function check(name, ok, detail) {
       ),
     );
   } finally {
+    try {
+      await p.screenshot({ path: OUT + '/last.png' });
+      const diagnostic = await p.evaluate(() => ({
+        body: document.body.innerText,
+        position: window.proofPosition,
+        items: window.proofItems().map((i) => ({
+          id: i.instance.id,
+          templateId: i.template.id,
+          quantity: i.instance.quantity,
+        })),
+        errors: window.proofFrames.filter((m) => m.t === 'error'),
+      }));
+      fs.writeFileSync(
+        OUT + '/diagnostic.json',
+        JSON.stringify(diagnostic, null, 2).replaceAll(password, '[redacted]'),
+      );
+    } catch {}
     await browser.close();
     fs.writeFileSync(OUT + '/checks.json', JSON.stringify({ checks, errors }, null, 2));
   }
 })().catch((e) => {
-  console.error(String(e.message).replaceAll(password, '[redacted]'));
+  console.error(String(e.stack || e.message).replaceAll(password, '[redacted]'));
   process.exitCode = 1;
 });

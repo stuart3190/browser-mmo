@@ -1271,6 +1271,10 @@ Design, scope and unfinished slices: [Greenvale Complete](gameplay/greenvale-com
       15 assertions, exit 0, real password/HTTPS, no production debug hook, herb/vendor/banker/atlas
       and persistent stock/sale/discovery; all 25 zones ready. Initial smoke harness waited before
       the touch-entry choice; corrected normal UI ordering passes. Public proof/screenshots preserved.
+      Evidence release `826b8ba` also deployed and passed 15 public assertions after correcting the
+      harness herb destination to the actual node center. Its failed four-assertion prefix was an
+      out-of-range arrival (3.12 m), not a regrowth fault; read-only DB proof/failed prefix retained.
+      The harness now saves credential-free failure diagnostics. Runtime gameplay remains unchanged.
       After archiving this first release, the final evidence commit receives the same deployment/
       browser checks; `/release.json` and `/tmp/greenvale-public-final/proof.json` identify its SHA.
 - [ ] Private dungeon admission, instance ownership/lifecycle/reset, reconnect and completion rewards.

@@ -77,6 +77,12 @@
     "exitCode": 0,
     "hostedZones": 25,
     "result": "Actual HTTPS/password/UI/transport; expected SHA, production debug-hook absence, all five new main definitions, herb/vendor/exact-instance sale/banker/atlas, relog and readiness",
-    "harnessCorrection": "First run waited for snapshots before choosing Continue in browser and timed out with zero assertions; normal touch entry must precede networking. Corrected ordering passes; gameplay unchanged."
+    "harnessCorrection": "First run waited for snapshots before choosing Continue in browser and timed out with zero assertions; normal touch entry must precede networking. Corrected ordering passes; gameplay unchanged.",
+    "subsequentRelease": {
+      "commit": "826b8ba617466c305c053a178db17671de22be85",
+      "checks": 15,
+      "exitCode": 0,
+      "correction": "Actual node center prevents old 1.8 m arrival tolerance from stopping outside 3 m UI range; expired regrowth and unchanged stock verified read-only. Failed four-check prefix retained."
+    }
   }
 }
