@@ -1,3 +1,4 @@
+import { craftDuration } from '@mmo/game-data';
 import { useState } from 'react';
 import type { QuestView } from '@mmo/schemas';
 import { formatCurrency } from '@mmo/ui';
@@ -181,10 +182,16 @@ export function DialoguePanel() {
                   ? ` → ${o.copper} copper`
                   : ''}
               {o.output ? ` → ${gameData.template(o.output.itemTemplateId).name}` : ''}
+              {craftDuration(o) ? ` · ${craftDuration(o) / 1000}s · Fieldcraft +20 XP` : ''}
             </p>
             <button
               data-service={o.id}
-              disabled={state.connection !== 'open' || state.vitals?.dead || state.vitals?.inCombat}
+              disabled={
+                state.connection !== 'open' ||
+                state.vitals?.dead ||
+                state.vitals?.inCombat ||
+                (o.kind === 'craft' && state.systems.jobs.some((j) => !j.completed))
+              }
               onClick={() => quests.service(o.id)}
             >
               {o.kind === 'buy' ? 'Buy' : o.kind === 'sell' ? 'Sell one' : 'Craft'}

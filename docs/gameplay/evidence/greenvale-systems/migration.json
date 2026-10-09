@@ -1,0 +1,206 @@
+{
+  "restoredEarnedBackup": true,
+  "originalDatabaseUntouched": true,
+  "checkpoints": [
+    {
+      "zoneId": "zone.aurelian.amber_coast",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.aurelian.crownspine",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.aurelian.elderwood",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.aurelian.greenvale_marches",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.cinderwake.ashstrand",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.cinderwake.blackglass",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.cinderwake.embersteppe",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.cinderwake.redroot",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.duneshara.broken_steps",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.duneshara.high_saffron",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.duneshara.oasis_reach",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.duneshara.saltmarch",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.duneshara.sunsea",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.duneshara.windcut",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.frostmere.brinebreak",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.frostmere.glasspeak",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.frostmere.rimefen",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.frostmere.whitepine",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.greenvale.meadows",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.veilreach.crystal_vale",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.veilreach.forgotten_march",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.veilreach.mistwood",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.veilreach.moonfen",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.veilreach.silver_heath",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    },
+    {
+      "zoneId": "zone.veilreach.veiled_spires",
+      "oldHash": "d22461380e9af16206f663e294bf1d462eaa47d4d2ce4b5cf5b4dc4a391fbc94",
+      "newHash": "8525863b6eb671ef0cafbbd47098c9aa4041cded93aaa08217bcaf2c11cfea85",
+      "payloadUnchanged": true,
+      "versionUnchanged": true,
+      "updatedAtUnchanged": true
+    }
+  ]
+}

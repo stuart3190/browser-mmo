@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { eq, like, sql } from 'drizzle-orm';
+import { and, inArray, eq, like, sql } from 'drizzle-orm';
 import { schema } from '@mmo/db';
 import { harvestResource, getCharacterItems, inTransaction, grantItemInTx } from '../src/index';
 import { expectCode, makePlayer, setupContext } from './helpers';
@@ -23,7 +23,15 @@ it('serializes competing shared harvests and persists one grant, provenance and 
   const grants = await ctx.db
     .select()
     .from(schema.itemInstances)
-    .where(like(schema.itemInstances.sourceRef, `resource:${nodeId}:%`));
+    .where(
+      and(
+        like(schema.itemInstances.sourceRef, `resource:${nodeId}:%`),
+        inArray(
+          schema.itemInstances.ownerCharacterId,
+          players.map((p) => p.characterId),
+        ),
+      ),
+    );
   expect(grants).toHaveLength(1);
   expect(grants[0]!.quantity).toBe(2);
   const winner = players.find((p) => p.characterId === grants[0]!.ownerCharacterId)!;

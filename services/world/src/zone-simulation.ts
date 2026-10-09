@@ -201,6 +201,7 @@ export interface PickupReservation {
 }
 
 export interface ZoneSimulationOptions {
+  runtimeId?: string;
   interestRadiusChunks?: number;
   /** Extra allowance on top of max speed for latency/jitter (multiplier). */
   /** Extra metres allowed for interaction range checks. */
@@ -215,6 +216,8 @@ export interface ZoneSimulationOptions {
 
 export class ZoneSimulation {
   readonly parties: Parties;
+  readonly runtimeId: string;
+  readonly appliedEffects = new Set<string>();
   private partyViews = new Map<string, string>();
   private nextPartyUpdate = 0;
   setConnected(id: string, online: boolean, now: number): void {
@@ -264,6 +267,7 @@ export class ZoneSimulation {
     opts: ZoneSimulationOptions = {},
   ) {
     this.zone = gameData.zone(zoneId);
+    this.runtimeId = opts.runtimeId ?? zoneId;
     this.parties = new Parties((id) => this.players.get(id), zoneId);
     this.interestRadius = opts.interestRadiusChunks ?? 2;
     this.interactTolerance = opts.interactTolerance ?? 1.0;
@@ -298,6 +302,7 @@ export class ZoneSimulation {
       {
         version: 2,
         parties: this.parties.checkpoint(),
+        appliedEffects: this.appliedEffects,
         tickCount: this.tickCount,
         nextEntity: this.nextEntity,
         entities: this.entities,
@@ -328,6 +333,7 @@ export class ZoneSimulation {
       return value;
     }) as {
       version: number;
+      appliedEffects?: Set<string>;
       parties?: ReturnType<Parties['checkpoint']>;
       tickCount: number;
       nextEntity: number;
@@ -342,6 +348,8 @@ export class ZoneSimulation {
     };
     if ((state.version !== 1 && state.version !== 2) || !(state.players instanceof Map))
       throw new Error('Unsupported zone checkpoint; explicit migration required');
+    this.appliedEffects.clear();
+    for (const id of state.appliedEffects ?? []) this.appliedEffects.add(id);
     this.parties.restore(state.parties, Date.now());
     this.partyViews.clear();
     this.tickCount = state.tickCount;
@@ -1031,6 +1039,18 @@ export class ZoneSimulation {
     });
   }
 
+  /** Durable consumable outbox application; checkpoint includes the receipt alongside health. */
+  applyConsumable(characterId: string, id: string, heal: number): boolean {
+    const player = this.players.get(characterId);
+    if (!player || this.appliedEffects.has(id)) return false;
+    this.appliedEffects.add(id);
+    if (!player.dead) {
+      player.health = Math.min(player.maxHealth, player.health + heal);
+      this.syncEntityHealth(player.entityId, Math.round(player.health), player.maxHealth, false);
+      this.sendVitals(player, Date.now());
+    }
+    return true;
+  }
   /** Current health for persistence. */
   getHealth(characterId: string): number | undefined {
     const p = this.players.get(characterId);
@@ -1141,7 +1161,9 @@ export class ZoneSimulation {
   // -------------------------------------------------------------------------
 
   private newEntityId(): string {
-    return `e:${this.nextEntity++}`;
+    return this.zone.instanced
+      ? `${this.runtimeId}:e:${this.nextEntity++}`
+      : `e:${this.nextEntity++}`;
   }
 
   private push(characterId: string, msg: OutMessage): void {
@@ -1440,7 +1462,7 @@ export class ZoneSimulation {
       enemyName: enemy.def.name,
       enemyEntityId: enemy.entityId,
       characterId: enemy.taggedBy ?? killer.characterId,
-      zoneId: this.zone.id,
+      zoneId: this.runtimeId,
       spawnPointId: enemy.spawn.id,
       groupId: enemy.spawn.groupId,
       diedAtMs: nowMs,

@@ -1,0 +1,44 @@
+{
+  "mode": "party",
+  "users": ["route_muvjmzr0", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Entered a private owned run",
+      "ok": true,
+      "detail": {
+        "id": "01a1229d-222b-7a98-a5f3-e1ab1f023c8b",
+        "status": "completed",
+        "expiresAtMs": 1791589285672,
+        "kills": 3,
+        "required": 3,
+        "inside": true,
+        "owner": true
+      }
+    },
+    {
+      "name": "Both party members join the same private instance",
+      "ok": true
+    },
+    {
+      "name": "All encounters authoritatively complete the run",
+      "ok": true
+    },
+    {
+      "name": "Completed private state survives relog",
+      "ok": true
+    },
+    {
+      "name": "Exit returns to the real entrance",
+      "ok": true
+    },
+    {
+      "name": "Reset creates a fresh identity with no stale objective state",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

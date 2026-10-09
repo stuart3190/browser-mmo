@@ -4,10 +4,16 @@ import { createServer } from 'node:http';
 import type { IncomingMessage, Server, ServerResponse } from 'node:http';
 import { WebSocketServer } from 'ws';
 import type { WebSocket } from 'ws';
-import { sql } from 'drizzle-orm';
+import { and, eq, isNull, ne, sql } from 'drizzle-orm';
 import { schema } from '@mmo/db';
 import type { DomainContext, SessionService } from '@mmo/domain';
 import {
+  admitDungeon,
+  completeDungeon,
+  instanceKey,
+  professionState,
+  finishCraft,
+  consumeRemedy,
   acceptQuest,
   activeRespawns,
   characterFromRow,
@@ -43,7 +49,7 @@ import { DomainError, ErrorCode, uuidv7 } from '@mmo/shared';
 import { ZoneSimulation } from '@mmo/world';
 import type { KillEvent, OutMessage } from '@mmo/world';
 import type { QuestView } from '@mmo/schemas';
-import { applyExploration, travelAt } from '@mmo/game-data';
+import { brokenVault, applyExploration, travelAt } from '@mmo/game-data';
 import type { Rng } from '@mmo/game-data';
 import { TokenBucket } from './rate-limit';
 import { AccountSync, loadContainerIds } from './sync';
@@ -158,6 +164,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   const { ctx, logger } = deps;
   /** Zone simulations are created in start(), after durable respawn state has been loaded. */
   const zones = new Map<string, ZoneSimulation>();
+  const instanceDeadlines = new Map<string, number>();
   const byCharacter = new Map<string, Connection>();
   const inWorld = new Map<string, InWorld>();
   const admitting = new Set<string>();
@@ -410,6 +417,10 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       'quest.accept',
       'quest.turn_in',
       'world.travel',
+      'dungeon.command',
+      'craft.finish',
+      'consumable.use',
+      'systems.inspect',
     ].includes(msg.t);
     if (expensive && (conn.working || activeWork >= 8 || !conn.workBucket.take(now))) {
       return sendError(conn, ErrorCode.RATE_LIMITED, 'Database work limit reached', msg.seq);
@@ -460,7 +471,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         () => null,
       );
       if (!row) return sendError(conn, ErrorCode.FORBIDDEN, 'Not your character', msg.seq, true);
-      const zone = zones.get(row.zoneId);
+      const zone = zones.get(row.instanceId ? instanceKey(row.instanceId) : row.zoneId);
       if (!zone)
         return sendError(
           conn,
@@ -545,6 +556,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       discoveries.set(conn, known);
       send(conn, { t: 'world.discoveries', d: { locationIds: [...known], newlyDiscovered: [] } });
       await sync.fullState(syncTarget(conn));
+      await sendSystems(conn);
       conn.questLog = null;
       await pushQuestLog(conn, true);
       send(conn, {
@@ -575,37 +587,46 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     player: NonNullable<Connection['player']>,
     travelId: string,
     seq: number,
+    dungeonTarget?: {
+      zone: ZoneSimulation;
+      position: { x: number; y: number; z: number };
+      force?: boolean;
+    },
   ) {
     const world = ctx.gameData.raw.worldCatalog;
     const route = world?.travel.find((t) => t.id === travelId);
     const origin = route && world?.locations.find((l) => l.id === route.fromLocationId);
-    const destination = route && world?.locations.find((l) => l.id === route.toLocationId);
-    const target = destination && zones.get(destination.zoneId);
+    const destination = dungeonTarget
+      ? { zoneId: dungeonTarget.zone.zone.id, position: dungeonTarget.position }
+      : route && world?.locations.find((l) => l.id === route.toLocationId);
+    const target = dungeonTarget?.zone ?? (destination && zones.get(destination.zoneId));
     const source = player.zone;
     const check = () => {
       const p = source.getPlayer(player.characterId);
       if (
-        !route ||
-        !origin ||
-        !destination ||
-        !target ||
         !p ||
-        !travelAt(world, source.zone.id, p.position).some((t) => t.id === travelId)
+        !target ||
+        !destination ||
+        (!dungeonTarget &&
+          (!route ||
+            !origin ||
+            !travelAt(world, source.zone.id, p.position).some((t) => t.id === travelId)))
       )
         throw new DomainError(
           ErrorCode.FORBIDDEN,
           'Stand within five metres of a hosted travel node',
         );
       if (
-        source.isThreatened(player.characterId) ||
-        p.dead ||
-        p.attacking ||
-        (p.lastCombatAtMs > 0 &&
+        (!dungeonTarget?.force && source.isThreatened(player.characterId)) ||
+        (p.dead && !(dungeonTarget && source.zone.instanced)) ||
+        (!dungeonTarget?.force && p.attacking) ||
+        (!dungeonTarget?.force &&
+          p.lastCombatAtMs > 0 &&
           Date.now() - p.lastCombatAtMs < ctx.gameData.raw.combatRules.combatTimeoutMs)
       )
         throw new DomainError(ErrorCode.CONFLICT, 'Leave combat before travelling');
       if (
-        route.requiredQuestId &&
+        route?.requiredQuestId &&
         !conn.questLog?.some((q) => q.questId === route.requiredQuestId && q.state === 'completed')
       )
         throw new DomainError(ErrorCode.FORBIDDEN, 'Travel route is not unlocked');
@@ -692,6 +713,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       discoveries.set(conn, known);
       send(conn, { t: 'world.discoveries', d: { locationIds: [...known], newlyDiscovered: [] } });
       await sync.fullState(syncTarget(conn));
+      if (!dungeonTarget) await sendSystems(conn);
       conn.questLog = null;
       await pushQuestLog(conn, true);
       logger.info(
@@ -709,17 +731,409 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     }
   }
 
+  function entrance() {
+    const place = ctx.gameData.raw.worldCatalog?.locations.find(
+      (l) => l.id === brokenVault.entranceLocationId,
+    );
+    if (!place) throw new Error('Broken Vault entrance missing');
+    return place;
+  }
+  async function sendSystems(conn: Connection, ack?: number) {
+    const player = conn.player;
+    if (!player) return;
+    const state = await professionState(ctx, player.characterId);
+    const rows = await ctx.db
+      .select({ instance: schema.dungeonInstances })
+      .from(schema.dungeonMembers)
+      .innerJoin(
+        schema.dungeonInstances,
+        eq(schema.dungeonMembers.instanceId, schema.dungeonInstances.id),
+      )
+      .where(
+        and(
+          eq(schema.dungeonMembers.characterId, player.characterId),
+          ne(schema.dungeonInstances.status, 'expired'),
+        ),
+      );
+    const instance = rows.find((r) => r.instance.expiresAt.getTime() > Date.now())?.instance;
+    const kills = instance
+      ? await ctx.db
+          .select({ spawn: schema.killEvents.spawnPointId })
+          .from(schema.killEvents)
+          .where(eq(schema.killEvents.zoneId, instanceKey(instance.id)))
+      : [];
+    send(
+      conn,
+      {
+        t: 'systems.state',
+        d: {
+          ...state,
+          instance: instance
+            ? {
+                id: instance.id,
+                status: instance.status,
+                expiresAtMs: instance.expiresAt.getTime(),
+                kills: brokenVault.objectives.filter((id) => kills.some((k) => k.spawn === id))
+                  .length,
+                required: brokenVault.objectives.length,
+                inside: player.zone.runtimeId === instanceKey(instance.id),
+                owner: instance.ownerCharacterId === player.characterId,
+              }
+            : null,
+        },
+      },
+      ack,
+    );
+  }
+  async function deliverEffects(conn: Connection) {
+    const player = conn.player;
+    if (!player) return;
+    const effects = await ctx.db
+      .select()
+      .from(schema.consumableUses)
+      .where(
+        and(
+          eq(schema.consumableUses.characterId, player.characterId),
+          isNull(schema.consumableUses.appliedAt),
+        ),
+      );
+    if (!effects.length) return;
+    await checkpoint;
+    for (const effect of effects)
+      player.zone.applyConsumable(player.characterId, effect.id, effect.heal);
+    flush();
+    await checkpoint;
+    if (!ownership.active || crashed) return;
+    for (const effect of effects.filter((e) => player.zone.appliedEffects.has(e.id))) {
+      await ctx.db
+        .update(schema.consumableUses)
+        .set({ appliedAt: new Date() })
+        .where(eq(schema.consumableUses.id, effect.id));
+      player.zone.appliedEffects.delete(effect.id);
+    }
+  }
+  let sweepingSystems = false;
+  async function sweepSystems() {
+    if (sweepingSystems || !ownership.active || crashed) return;
+    sweepingSystems = true;
+    try {
+      const pendingUses = await ctx.db
+        .select({ characterId: schema.consumableUses.characterId })
+        .from(schema.consumableUses)
+        .where(isNull(schema.consumableUses.appliedAt));
+      for (const conn of byCharacter.values()) {
+        if (
+          conn.working ||
+          conn.transferring ||
+          !conn.player ||
+          !pendingUses.some((e) => e.characterId === conn.player!.characterId)
+        )
+          continue;
+        conn.working = true;
+        try {
+          await deliverEffects(conn);
+        } finally {
+          conn.working = false;
+        }
+      }
+      const instances = await ctx.db
+        .select()
+        .from(schema.dungeonInstances)
+        .where(ne(schema.dungeonInstances.status, 'expired'));
+      for (const instance of instances) {
+        const zone = zones.get(instanceKey(instance.id));
+        if (!zone) continue;
+        if (instance.expiresAt.getTime() <= Date.now()) {
+          // Connected players leave through the normal durable transfer; offline characters retain
+          // the expired child until their next login, then return before accepting gameplay.
+          await ctx.db
+            .update(schema.dungeonInstances)
+            .set({ status: 'expired' })
+            .where(eq(schema.dungeonInstances.id, instance.id));
+        } else if (instance.status === 'active' && (await completeDungeon(ctx, instance.id))) {
+          for (const conn of byCharacter.values())
+            if (conn.player?.zone === zone) {
+              await sync.fullState(syncTarget(conn));
+              await sendSystems(conn);
+            }
+        }
+      }
+      for (const conn of byCharacter.values()) {
+        if (!conn.player?.zone.zone.instanced || conn.working || conn.transferring) continue;
+        const [instance] = await ctx.db
+          .select()
+          .from(schema.dungeonInstances)
+          .where(eq(schema.dungeonInstances.id, conn.player.zone.runtimeId.slice(9)));
+        if (instance?.status === 'expired') {
+          conn.working = true;
+          try {
+            await dungeonCommand(conn, conn.player, 'exit', 0, true);
+          } finally {
+            conn.working = false;
+          }
+        }
+      }
+      for (const [key, zone] of [...zones]) {
+        if (!zone.zone.instanced || [...inWorld.values()].some((e) => e.zone === zone)) continue;
+        const [instance] = await ctx.db
+          .select()
+          .from(schema.dungeonInstances)
+          .where(eq(schema.dungeonInstances.id, key.slice(9)));
+        if (instance?.status !== 'expired') continue;
+        const [occupied] = await ctx.db
+          .select({ id: schema.characters.id })
+          .from(schema.characters)
+          .where(eq(schema.characters.instanceId, instance.id));
+        const [pending] = await ctx.db
+          .select({ id: schema.killEvents.killId })
+          .from(schema.killEvents)
+          .where(and(eq(schema.killEvents.zoneId, key), eq(schema.killEvents.status, 'pending')));
+        if (occupied || pending || [...pendingRecords.values()].some((k) => k.zoneId === key))
+          continue;
+        await checkpoint;
+        zones.delete(key);
+        instanceDeadlines.delete(key);
+        await checkpoint; // Drain every captured write after removing the child from future batches.
+        savedPayloads.delete(key);
+        await ctx.db.delete(schema.zoneCheckpoints).where(eq(schema.zoneCheckpoints.zoneId, key));
+        await ownership.releaseChild(key);
+      }
+    } catch (err) {
+      logger.warn({ err }, 'systems recovery sweep failed');
+    } finally {
+      sweepingSystems = false;
+    }
+  }
+  let dungeonAdmission = false;
+  async function dungeonCommand(
+    conn: Connection,
+    player: NonNullable<Connection['player']>,
+    action: 'enter' | 'exit' | 'reset',
+    seq: number,
+    expired = false,
+  ) {
+    if (dungeonAdmission)
+      throw new DomainError(ErrorCode.CONFLICT, 'Another dungeon transfer is in progress');
+    dungeonAdmission = true;
+    try {
+      const place = entrance();
+      const p = player.zone.getPlayer(player.characterId);
+      if (!p) throw new DomainError(ErrorCode.NOT_FOUND, 'Player missing');
+      if (action === 'exit') {
+        if (!player.zone.zone.instanced)
+          throw new DomainError(ErrorCode.CONFLICT, 'You are outside the dungeon');
+        if (!expired && Math.hypot(p.position.x - 8, p.position.z - 32) > 6 && !p.dead)
+          throw new DomainError(ErrorCode.FORBIDDEN, 'Return to the Vault Threshold to exit');
+        // Expiry must evacuate even threatened players. Stop attacks; ordinary exit still requires no combat.
+        await travel(conn, player, 'dungeon.exit', seq, {
+          zone: zones.get(place.zoneId)!,
+          position: place.position,
+          force: expired,
+        });
+        await sendSystems(conn, seq);
+        return;
+      }
+      if (
+        player.zone.zone.id !== place.zoneId ||
+        Math.hypot(p.position.x - place.position.x, p.position.z - place.position.z) > 6 ||
+        p.dead ||
+        player.zone.isThreatened(player.characterId) ||
+        p.attacking ||
+        (p.lastCombatAtMs > 0 &&
+          Date.now() - p.lastCombatAtMs < ctx.gameData.raw.combatRules.combatTimeoutMs)
+      )
+        throw new DomainError(
+          ErrorCode.FORBIDDEN,
+          'Stand alive and out of combat at the Broken Vault entrance',
+        );
+      if (action === 'reset') {
+        const rows = await ctx.db
+          .select({ instance: schema.dungeonInstances })
+          .from(schema.dungeonMembers)
+          .innerJoin(
+            schema.dungeonInstances,
+            eq(schema.dungeonMembers.instanceId, schema.dungeonInstances.id),
+          )
+          .where(
+            and(
+              eq(schema.dungeonMembers.characterId, player.characterId),
+              ne(schema.dungeonInstances.status, 'expired'),
+            ),
+          );
+        const instance = rows.find((r) => r.instance.expiresAt.getTime() > Date.now())?.instance;
+        if (!instance || instance.ownerCharacterId !== player.characterId)
+          throw new DomainError(ErrorCode.FORBIDDEN, 'Only the run owner may reset');
+        const key = instanceKey(instance.id);
+        const [occupied] = await ctx.db
+          .select({ id: schema.characters.id })
+          .from(schema.characters)
+          .where(eq(schema.characters.instanceId, instance.id));
+        if (occupied || [...inWorld.values()].some((e) => e.zone.runtimeId === key))
+          throw new DomainError(ErrorCode.CONFLICT, 'Every member must exit before reset');
+        const [pendingReward] = await ctx.db
+          .select({ id: schema.killEvents.killId })
+          .from(schema.killEvents)
+          .where(and(eq(schema.killEvents.zoneId, key), eq(schema.killEvents.status, 'pending')));
+        if (pendingReward || [...pendingRecords.values()].some((k) => k.zoneId === key))
+          throw new DomainError(
+            ErrorCode.CONFLICT,
+            'Wait for pending encounter rewards before resetting',
+          );
+        await checkpoint;
+        await ctx.db
+          .update(schema.dungeonInstances)
+          .set({ status: 'expired' })
+          .where(eq(schema.dungeonInstances.id, instance.id));
+        // Keep reward/kill/provenance tombstones; remove only the abandoned simulation image.
+        zones.delete(key);
+        instanceDeadlines.delete(key);
+        await checkpoint; // Drain every captured write after removing the child from future batches.
+        savedPayloads.delete(key);
+        await ctx.db.delete(schema.zoneCheckpoints).where(eq(schema.zoneCheckpoints.zoneId, key));
+        await ownership.releaseChild(key);
+        await sendSystems(conn, seq);
+        return;
+      }
+      const cohort = player.zone.parties.cohort(player.characterId);
+      // Existing reservation authorizes individual rejoin; first creation requires the leader and every member nearby.
+      const own = await ctx.db
+        .select({ instance: schema.dungeonInstances })
+        .from(schema.dungeonMembers)
+        .innerJoin(
+          schema.dungeonInstances,
+          eq(schema.dungeonMembers.instanceId, schema.dungeonInstances.id),
+        )
+        .where(
+          and(
+            eq(schema.dungeonMembers.characterId, player.characterId),
+            ne(schema.dungeonInstances.status, 'expired'),
+          ),
+        );
+      const reserved = own.find((r) => r.instance.expiresAt.getTime() > Date.now())?.instance;
+      if (!reserved) {
+        if ([...zones.values()].filter((z) => z.zone.instanced).length >= 64)
+          throw new DomainError(
+            ErrorCode.CONFLICT,
+            'Dungeon capacity reached. Retry after an empty run expires',
+          );
+        const view = player.zone.parties.view(player.characterId);
+        if (cohort.partyId && view.leaderCharacterId !== player.characterId)
+          throw new DomainError(ErrorCode.FORBIDDEN, 'The party leader starts the run');
+        for (const id of cohort.members) {
+          const member = player.zone.getPlayer(id),
+            c = byCharacter.get(id);
+          if (
+            !member ||
+            !c ||
+            (c.working && c !== conn) ||
+            c.player?.zone !== player.zone ||
+            member.dead ||
+            member.attacking ||
+            player.zone.isThreatened(id) ||
+            Math.hypot(member.position.x - place.position.x, member.position.z - place.position.z) >
+              6 ||
+            (member.lastCombatAtMs > 0 &&
+              Date.now() - member.lastCombatAtMs < ctx.gameData.raw.combatRules.combatTimeoutMs)
+          )
+            throw new DomainError(
+              ErrorCode.CONFLICT,
+              'Gather every living party member at the entrance, out of combat',
+            );
+        }
+      }
+      const instance =
+        reserved ??
+        (await admitDungeon(ctx, {
+          accountId: player.accountId,
+          characterId: player.characterId,
+          memberIds: cohort.members,
+          partyId: cohort.partyId,
+        }));
+      if (instance.status !== 'active')
+        throw new DomainError(
+          ErrorCode.CONFLICT,
+          'This run is complete. Exit and reset for a new run',
+        );
+      const key = instanceKey(instance.id);
+      instanceDeadlines.set(key, instance.expiresAt.getTime());
+      let zone = zones.get(key);
+      if (!zone) {
+        await ownership.acquireChild(key);
+        zone = new ZoneSimulation(ctx.gameData, brokenVault.zoneId, { runtimeId: key });
+        zones.set(key, zone);
+      }
+      await travel(conn, player, 'dungeon.enter', seq, { zone, position: zone.zone.defaultSpawn });
+      const members = await ctx.db
+        .select()
+        .from(schema.dungeonMembers)
+        .where(eq(schema.dungeonMembers.instanceId, instance.id));
+      zone.parties.install(
+        instance.partyId ?? instance.id,
+        instance.ownerCharacterId,
+        members.map((m) => ({
+          id: m.characterId,
+          name: inWorld.get(m.characterId)?.name ?? 'Party member',
+        })),
+        Date.now(),
+      );
+      zone.syncParties();
+      flush();
+      await checkpoint;
+      await sendSystems(conn, seq);
+    } finally {
+      dungeonAdmission = false;
+    }
+  }
+
   async function handleGameMessage(
     conn: Connection,
     player: NonNullable<Connection['player']>,
     msg: ClientMessage,
     now: number,
   ) {
+    if (
+      player.zone.zone.instanced &&
+      Date.now() >= (instanceDeadlines.get(player.zone.runtimeId) ?? 0) &&
+      msg.t !== 'systems.inspect' &&
+      !(msg.t === 'dungeon.command' && msg.d.action === 'exit')
+    )
+      throw new DomainError(ErrorCode.CONFLICT, 'This run has expired; return to Greenvale');
     switch (msg.t) {
+      case 'systems.inspect':
+        await sendSystems(conn);
+        return;
+      case 'craft.finish':
+        await finishCraft(ctx, {
+          accountId: player.accountId,
+          characterId: player.characterId,
+          jobId: msg.d.jobId,
+        });
+        await sync.fullState(syncTarget(conn));
+        await sendSystems(conn);
+        return;
+      case 'consumable.use': {
+        const p = player.zone.getPlayer(player.characterId);
+        if (!p || p.dead || p.health >= p.maxHealth)
+          throw new DomainError(ErrorCode.CONFLICT, 'Use a remedy while alive and injured');
+        await consumeRemedy(ctx, {
+          accountId: player.accountId,
+          characterId: player.characterId,
+          ...msg.d,
+        });
+        await deliverEffects(conn);
+        await sync.fullState(syncTarget(conn));
+        await sendSystems(conn);
+        return;
+      }
+      case 'dungeon.command':
+        await dungeonCommand(conn, player, msg.d.action, msg.seq);
+        return;
       case 'world.travel':
         await travel(conn, player, msg.d.travelId, msg.seq);
         break;
       case 'party.invite':
+        if (player.zone.zone.instanced)
+          throw new DomainError(ErrorCode.CONFLICT, 'Dungeon membership is fixed for this run');
         player.zone.parties.invite(player.characterId, msg.d.characterId, now);
         player.zone.syncParties();
         return;
@@ -729,6 +1143,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         return;
       case 'party.leave':
       case 'party.disband':
+        if (player.zone.zone.instanced)
+          throw new DomainError(ErrorCode.CONFLICT, 'Exit before changing the party');
         if (player.zone.parties.view(player.characterId).partyId !== msg.d.partyId)
           throw new DomainError(ErrorCode.CONFLICT, 'Party changed; refresh and try again');
         player.zone.parties.leave(player.characterId, msg.t === 'party.disband');
@@ -761,6 +1177,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             }));
           player.zone.commitPickup(reservation.entityId, Date.now(), harvest?.readyAtMs);
           pickups.inc({ result: 'ok' });
+          if (harvest) await sendSystems(conn);
           send(
             conn,
             {
@@ -829,6 +1246,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         await sync.fullState(syncTarget(conn));
         await pushQuestLog(conn, true);
         await sendDialogue(conn, msg.d.entityId, npcId);
+        await sendSystems(conn);
         // Completion acknowledgement follows all reconciliation work. An early ACK lets a
         // fast client start its next exchange while this connection still owns the work slot.
         send(
@@ -1081,7 +1499,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         zoneId: entry.zone.zone.id,
       },
     });
-    if (last) departures.set(entry.characterId, { zoneId: entry.zone.zone.id, state: last });
+    if (last) departures.set(entry.characterId, { zoneId: entry.zone.runtimeId, state: last });
     flush();
     if (last) {
       await persistDeparture(entry.characterId).catch((err: unknown) =>
@@ -1231,6 +1649,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     durableKills.delete(kill.killId);
     flush();
     await rewardKill(kill.killId, false);
+    for (const conn of byCharacter.values())
+      if (conn.player?.zone === r.zone && r.zone.zone.instanced) await sendSystems(conn);
   }
 
   /** Applies one recorded kill's rewards (exactly once) and notifies the character if online. */
@@ -1311,7 +1731,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     try {
       for (;;) {
         const due = (
-          await dueKillEvents(ctx.db, { now: new Date(), zoneIds: deps.zoneIds, limit: 50 })
+          await dueKillEvents(ctx.db, { now: new Date(), zoneIds: [...zones.keys()], limit: 50 })
         ).filter((id) => !rewarding.has(id));
         if (due.length === 0 || crashed) return;
         for (const killId of due) await rewardKill(killId, true);
@@ -1344,7 +1764,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     for (const zone of zones.values())
       for (const [id, messages] of zone.drainOutbox()) {
         const conn = byCharacter.get(id);
-        if (conn) for (const m of messages) send(conn, m);
+        if (conn?.player?.zone === zone) for (const m of messages) send(conn, m);
       }
     if (checkpoint || !ownership.active || crashed) return;
     checkpoint = persistAndPublish()
@@ -1364,7 +1784,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     for (const zone of zones.values()) {
       for (const [id, messages] of zone.drainOutbox()) {
         const conn = byCharacter.get(id);
-        if (conn) for (const m of messages) send(conn, m);
+        if (conn?.player?.zone === zone) for (const m of messages) send(conn, m);
       }
     }
     const batch = new Map(pendingSend);
@@ -1380,9 +1800,11 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         return state ? [{ id: e.characterId, state }] : [];
       });
       for (const [id, departed] of departures)
-        if (departed.zoneId === zone.zone.id) states.push({ id, state: departed.state });
+        if (departed.zoneId === zone.runtimeId) states.push({ id, state: departed.state });
       return {
-        zoneId: zone.zone.id,
+        zoneId: zone.runtimeId,
+        catalogZoneId: zone.zone.id,
+        instanceId: zone.runtimeId.startsWith('instance:') ? zone.runtimeId.slice(9) : null,
         payload: JSON.stringify({
           contentHash,
           simulation: zone.checkpoint(),
@@ -1392,7 +1814,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             name: e.name,
             lingerUntil: e.lingerUntil,
           })),
-          pending: [...pendingRecords.values()].filter((k) => k.zoneId === zone.zone.id),
+          pending: [...pendingRecords.values()].filter((k) => k.zoneId === zone.runtimeId),
         }),
         characters: states.map(({ id, state }) => ({
           id,
@@ -1527,6 +1949,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       try {
         const now = Date.now();
         for (const id of deps.zoneIds) {
+          if (ctx.gameData.zone(id).instanced) continue;
           const restoredRespawns = await activeRespawns(ctx.db, id, new Date(now));
           zones.set(
             id,
@@ -1537,7 +1960,42 @@ export function createRealtimeServer(deps: RealtimeDeps) {
             }),
           );
         }
+        if (deps.zoneIds.includes(entrance().zoneId)) {
+          const instances = await ctx.db.select().from(schema.dungeonInstances);
+          const childImages = new Set(
+            (
+              await ctx.db
+                .select({ id: schema.zoneCheckpoints.zoneId })
+                .from(schema.zoneCheckpoints)
+                .where(sql`${schema.zoneCheckpoints.zoneId} like 'instance:%'`)
+            ).map((r) => r.id),
+          );
+          const occupied = await ctx.db
+            .select({ id: schema.characters.instanceId })
+            .from(schema.characters)
+            .where(sql`${schema.characters.instanceId} is not null`);
+          for (const instance of instances.filter(
+            (i) =>
+              i.status !== 'expired' ||
+              occupied.some((c) => c.id === i.id) ||
+              childImages.has(instanceKey(i.id)),
+          )) {
+            const key = instanceKey(instance.id);
+            instanceDeadlines.set(key, instance.expiresAt.getTime());
+            const payload = await ownership.acquireChild(key);
+            zones.set(
+              key,
+              new ZoneSimulation(ctx.gameData, brokenVault.zoneId, {
+                runtimeId: key,
+                nowMs: now,
+                restoredRespawns: await activeRespawns(ctx.db, key, new Date(now)),
+              }),
+            );
+            if (payload) recovered.set(key, payload);
+          }
+        }
         for (const [id, payload] of recovered) {
+          if (!zones.has(id)) continue;
           const saved = JSON.parse(payload) as {
             contentHash: string;
             simulation: string;
@@ -1569,6 +2027,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         await changeFeed?.start();
         sessionTimer = setInterval(() => {
           void checkSessions();
+          void sweepSystems();
           if (reconcileNeeded || Date.now() - lastReconcileAt >= 30_000) {
             lastReconcileAt = Date.now();
             void reconcile();

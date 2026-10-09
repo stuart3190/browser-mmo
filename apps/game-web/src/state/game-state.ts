@@ -8,7 +8,8 @@ import type {
 } from '@mmo/schemas';
 import { ItemStore } from '@mmo/ui';
 
-export type WindowId = 'inventory' | 'character' | 'bank' | 'quests' | 'party' | 'world';
+export type WindowId =
+  'inventory' | 'character' | 'bank' | 'quests' | 'party' | 'world' | 'professions';
 
 export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 
@@ -107,6 +108,11 @@ export class GameState {
   };
   /** Open NPC dialogue (the server's answer to npc.interact / quest actions). */
   dialogue: NpcDialogueView | null = null;
+  systems: ServerPayload<'systems.state'> = {
+    professions: [],
+    jobs: [],
+    instance: null,
+  };
   /** serverTime - Date.now() at last auth.ok, for displaying server timestamps. */
   serverOffsetMs = 0;
   revision = 0;

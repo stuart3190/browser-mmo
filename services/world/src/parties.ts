@@ -5,7 +5,13 @@ import type { ServerPayload } from '@mmo/networking';
 export const PARTY_RANGE = 40;
 export const PARTY_GRACE_MS = 120_000;
 type Member = { id: string; name: string; offlineAt: number | null };
-type Party = { id: string; leader: string; members: Member[]; lootCursor: number };
+type Party = {
+  persistent?: boolean;
+  id: string;
+  leader: string;
+  members: Member[];
+  lootCursor: number;
+};
 type Invite = { id: string; from: string; to: string; expires: number };
 export type PartyPlayer = {
   name: string;
@@ -28,6 +34,24 @@ export class Parties {
   }
   private of(id: string) {
     return this.parties.find((p) => p.members.some((m) => m.id === id));
+  }
+  /** Frozen dungeon cohort survives normal offline grace; the instance lifecycle owns expiry. */
+  install(id: string, leader: string, members: { id: string; name: string }[], now: number) {
+    const previous = this.parties.find((p) => p.id === id);
+    this.parties = this.parties.filter(
+      (p) => p.id !== id && !p.members.some((m) => members.some((n) => n.id === m.id)),
+    );
+    if (members.length > 1)
+      this.parties.push({
+        id,
+        leader,
+        members: members.map((m) => ({
+          ...m,
+          offlineAt: this.online.has(m.id) ? null : now + 24 * 60 * 60 * 1000,
+        })),
+        lootCursor: previous?.lootCursor ?? 0,
+        persistent: true,
+      });
   }
   checkpoint() {
     return { parties: this.parties, invites: this.invites };
@@ -107,7 +131,8 @@ export class Parties {
     this.invites = this.invites.filter((i) => i.expires > now && this.online.has(i.from));
     for (const p of [...this.parties])
       for (const m of [...p.members])
-        if (m.offlineAt !== null && now - m.offlineAt >= PARTY_GRACE_MS) this.leave(m.id);
+        if (!p.persistent && m.offlineAt !== null && now - m.offlineAt >= PARTY_GRACE_MS)
+          this.leave(m.id);
   }
   cohort(id: string): { partyId: string | null; members: string[] } {
     const p = this.of(id);

@@ -1,0 +1,395 @@
+{
+  "readOnly": true,
+  "instances": [
+    {
+      "id": "01a12291-fa83-777a-b62b-c775ecde2a79",
+      "dungeon_id": "dungeon.greenvale.broken_vault",
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "party_id": null,
+      "status": "expired",
+      "expires_at": "2026-10-09T23:29:14.622Z",
+      "completed_at": "2026-10-09T21:34:51.666Z",
+      "created_at": "2026-10-09T21:29:14.615Z"
+    },
+    {
+      "id": "01a12297-d83a-7fe1-99e2-97daf11509aa",
+      "dungeon_id": "dungeon.greenvale.broken_vault",
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "party_id": null,
+      "status": "expired",
+      "expires_at": "2026-10-09T23:35:39.059Z",
+      "completed_at": null,
+      "created_at": "2026-10-09T21:35:39.052Z"
+    },
+    {
+      "id": "01a1229d-222b-7a98-a5f3-e1ab1f023c8b",
+      "dungeon_id": "dungeon.greenvale.broken_vault",
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "party_id": "01a1229d-02fb-72f5-94c3-7a91013599bf",
+      "status": "expired",
+      "expires_at": "2026-10-09T23:41:25.672Z",
+      "completed_at": "2026-10-09T21:43:12.689Z",
+      "created_at": "2026-10-09T21:41:25.667Z"
+    },
+    {
+      "id": "01a122a3-d4f8-7f4a-9402-b0439b8e6046",
+      "dungeon_id": "dungeon.greenvale.broken_vault",
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "party_id": null,
+      "status": "expired",
+      "expires_at": "2026-10-09T23:48:44.661Z",
+      "completed_at": null,
+      "created_at": "2026-10-09T21:48:44.643Z"
+    },
+    {
+      "id": "01a122a4-b0fb-7a24-860f-52a86b40e9d1",
+      "dungeon_id": "dungeon.greenvale.broken_vault",
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "party_id": "01a122a4-99b2-79b8-9395-2f849de6b835",
+      "status": "expired",
+      "expires_at": "2026-10-09T23:49:40.976Z",
+      "completed_at": "2026-10-09T21:51:22.202Z",
+      "created_at": "2026-10-09T21:49:40.966Z"
+    },
+    {
+      "id": "01a122a7-e40f-7042-b77e-51a838621889",
+      "dungeon_id": "dungeon.greenvale.broken_vault",
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "party_id": null,
+      "status": "expired",
+      "expires_at": "2026-10-09T23:53:10.668Z",
+      "completed_at": null,
+      "created_at": "2026-10-09T21:53:10.664Z"
+    }
+  ],
+  "members": [
+    {
+      "instance_id": "01a12291-fa83-777a-b62b-c775ecde2a79",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "joined_at": "2026-10-09T21:29:14.717Z",
+      "rewarded_at": "2026-10-09T21:34:51.666Z"
+    },
+    {
+      "instance_id": "01a12297-d83a-7fe1-99e2-97daf11509aa",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "joined_at": "2026-10-09T21:35:39.088Z",
+      "rewarded_at": null
+    },
+    {
+      "instance_id": "01a1229d-222b-7a98-a5f3-e1ab1f023c8b",
+      "character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "joined_at": "2026-10-09T21:41:31.485Z",
+      "rewarded_at": "2026-10-09T21:43:12.689Z"
+    },
+    {
+      "instance_id": "01a1229d-222b-7a98-a5f3-e1ab1f023c8b",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "joined_at": "2026-10-09T21:41:25.848Z",
+      "rewarded_at": "2026-10-09T21:43:12.689Z"
+    },
+    {
+      "instance_id": "01a122a3-d4f8-7f4a-9402-b0439b8e6046",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "joined_at": "2026-10-09T21:48:44.709Z",
+      "rewarded_at": null
+    },
+    {
+      "instance_id": "01a122a4-b0fb-7a24-860f-52a86b40e9d1",
+      "character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "joined_at": "2026-10-09T21:49:46.196Z",
+      "rewarded_at": "2026-10-09T21:51:22.202Z"
+    },
+    {
+      "instance_id": "01a122a4-b0fb-7a24-860f-52a86b40e9d1",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "joined_at": "2026-10-09T21:49:41.091Z",
+      "rewarded_at": "2026-10-09T21:51:22.202Z"
+    },
+    {
+      "instance_id": "01a122a7-e40f-7042-b77e-51a838621889",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "joined_at": "2026-10-09T21:53:10.702Z",
+      "rewarded_at": null
+    }
+  ],
+  "kills": [
+    {
+      "kill_id": "01a12292-41a5-79c5-817b-ef70a247a020",
+      "zone_id": "instance:01a12291-fa83-777a-b62b-c775ecde2a79",
+      "spawn_point_id": "spawn.vault.guard_west",
+      "status": "rewarded",
+      "recipients": ["01a10d2e-ad38-708f-95c2-1202fa577237"],
+      "loot_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "kill_id": "01a12294-f57d-71e1-be87-de03f451220b",
+      "zone_id": "instance:01a12291-fa83-777a-b62b-c775ecde2a79",
+      "spawn_point_id": "spawn.vault.guard_east",
+      "status": "rewarded",
+      "recipients": ["01a10d2e-ad38-708f-95c2-1202fa577237"],
+      "loot_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "kill_id": "01a12297-1c0a-7203-a89a-d85952d73682",
+      "zone_id": "instance:01a12291-fa83-777a-b62b-c775ecde2a79",
+      "spawn_point_id": "spawn.vault.keeper",
+      "status": "rewarded",
+      "recipients": ["01a10d2e-ad38-708f-95c2-1202fa577237"],
+      "loot_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "kill_id": "01a1229d-a721-7805-ab97-5f70526364c3",
+      "zone_id": "instance:01a1229d-222b-7a98-a5f3-e1ab1f023c8b",
+      "spawn_point_id": "spawn.vault.guard_west",
+      "status": "rewarded",
+      "recipients": [
+        "01a10d2e-ad38-708f-95c2-1202fa577237",
+        "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+      ],
+      "loot_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "kill_id": "01a1229e-24a5-7eb0-bad1-a968d70dd11c",
+      "zone_id": "instance:01a1229d-222b-7a98-a5f3-e1ab1f023c8b",
+      "spawn_point_id": "spawn.vault.guard_east",
+      "status": "rewarded",
+      "recipients": [
+        "01a10d2e-ad38-708f-95c2-1202fa577237",
+        "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+      ],
+      "loot_character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+    },
+    {
+      "kill_id": "01a1229e-c0ba-7ddf-94bf-2f6c799f364b",
+      "zone_id": "instance:01a1229d-222b-7a98-a5f3-e1ab1f023c8b",
+      "spawn_point_id": "spawn.vault.keeper",
+      "status": "rewarded",
+      "recipients": [
+        "01a10d2e-ad38-708f-95c2-1202fa577237",
+        "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+      ],
+      "loot_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "kill_id": "01a122a5-3b21-76e3-9e1a-0b423bd5a7c1",
+      "zone_id": "instance:01a122a4-b0fb-7a24-860f-52a86b40e9d1",
+      "spawn_point_id": "spawn.vault.guard_west",
+      "status": "rewarded",
+      "recipients": [
+        "01a10d2e-ad38-708f-95c2-1202fa577237",
+        "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+      ],
+      "loot_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "kill_id": "01a122a5-aa85-7d9a-b468-4204b2e05c42",
+      "zone_id": "instance:01a122a4-b0fb-7a24-860f-52a86b40e9d1",
+      "spawn_point_id": "spawn.vault.guard_east",
+      "status": "rewarded",
+      "recipients": [
+        "01a10d2e-ad38-708f-95c2-1202fa577237",
+        "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+      ],
+      "loot_character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+    },
+    {
+      "kill_id": "01a122a6-385d-7d56-8307-372cb6c98064",
+      "zone_id": "instance:01a122a4-b0fb-7a24-860f-52a86b40e9d1",
+      "spawn_point_id": "spawn.vault.keeper",
+      "status": "rewarded",
+      "recipients": [
+        "01a10d2e-ad38-708f-95c2-1202fa577237",
+        "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+      ],
+      "loot_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    }
+  ],
+  "rewards": [
+    {
+      "id": "01a12297-1f38-7a2f-a304-c2ec8c834020",
+      "source_ref": "dungeon:01a12291-fa83-777a-b62b-c775ecde2a79:01a10d2e-ad38-708f-95c2-1202fa577237",
+      "template_id": "material.world.iron_shard",
+      "quantity": 4,
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "location_kind": "destroyed",
+      "destroyed_reason": "stack_merged",
+      "event_type": "created",
+      "history_quantity": 4,
+      "delta": "150",
+      "reason": "loot",
+      "paid_character": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "id": "01a1229e-c43e-7183-94f5-9c687913f5a1",
+      "source_ref": "dungeon:01a1229d-222b-7a98-a5f3-e1ab1f023c8b:01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "template_id": "material.world.iron_shard",
+      "quantity": 4,
+      "owner_character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "location_kind": "destroyed",
+      "destroyed_reason": "stack_merged",
+      "event_type": "created",
+      "history_quantity": 4,
+      "delta": "150",
+      "reason": "loot",
+      "paid_character": "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+    },
+    {
+      "id": "01a1229e-c4b5-79a3-a174-f559bd373be7",
+      "source_ref": "dungeon:01a1229d-222b-7a98-a5f3-e1ab1f023c8b:01a10d2e-ad38-708f-95c2-1202fa577237",
+      "template_id": "material.world.iron_shard",
+      "quantity": 4,
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "location_kind": "destroyed",
+      "destroyed_reason": "stack_merged",
+      "event_type": "created",
+      "history_quantity": 4,
+      "delta": "150",
+      "reason": "loot",
+      "paid_character": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    },
+    {
+      "id": "01a122a6-3c6a-7caa-b8a3-8f4fa948d4e9",
+      "source_ref": "dungeon:01a122a4-b0fb-7a24-860f-52a86b40e9d1:01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "template_id": "material.world.iron_shard",
+      "quantity": 4,
+      "owner_character_id": "01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "location_kind": "destroyed",
+      "destroyed_reason": "stack_merged",
+      "event_type": "created",
+      "history_quantity": 4,
+      "delta": "150",
+      "reason": "loot",
+      "paid_character": "01a10b26-5349-7759-8ef0-81113bcfe7b2"
+    },
+    {
+      "id": "01a122a6-3c89-7c12-9684-faba31973d01",
+      "source_ref": "dungeon:01a122a4-b0fb-7a24-860f-52a86b40e9d1:01a10d2e-ad38-708f-95c2-1202fa577237",
+      "template_id": "material.world.iron_shard",
+      "quantity": 4,
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "location_kind": "destroyed",
+      "destroyed_reason": "stack_merged",
+      "event_type": "created",
+      "history_quantity": 4,
+      "delta": "150",
+      "reason": "loot",
+      "paid_character": "01a10d2e-ad38-708f-95c2-1202fa577237"
+    }
+  ],
+  "mergedRewardTargets": [
+    {
+      "source_ref": "dungeon:01a12291-fa83-777a-b62b-c775ecde2a79:01a10d2e-ad38-708f-95c2-1202fa577237",
+      "details": {
+        "mergedInto": ["01a12292-4201-7691-b6bc-6f78a277572c"]
+      }
+    },
+    {
+      "source_ref": "dungeon:01a1229d-222b-7a98-a5f3-e1ab1f023c8b:01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "details": {
+        "mergedInto": ["01a1229e-2583-7204-b68e-6b97a68a59ba"]
+      }
+    },
+    {
+      "source_ref": "dungeon:01a1229d-222b-7a98-a5f3-e1ab1f023c8b:01a10d2e-ad38-708f-95c2-1202fa577237",
+      "details": {
+        "mergedInto": ["01a12292-4201-7691-b6bc-6f78a277572c"]
+      }
+    },
+    {
+      "source_ref": "dungeon:01a122a4-b0fb-7a24-860f-52a86b40e9d1:01a10b26-5349-7759-8ef0-81113bcfe7b2",
+      "details": {
+        "mergedInto": ["01a1229e-2583-7204-b68e-6b97a68a59ba"]
+      }
+    },
+    {
+      "source_ref": "dungeon:01a122a4-b0fb-7a24-860f-52a86b40e9d1:01a10d2e-ad38-708f-95c2-1202fa577237",
+      "details": {
+        "mergedInto": ["01a12292-4201-7691-b6bc-6f78a277572c"]
+      }
+    }
+  ],
+  "professions": [
+    {
+      "username": "gather_muveurw6",
+      "profession_id": "crafting",
+      "xp": 40
+    },
+    {
+      "username": "gather_muveurw6",
+      "profession_id": "herbalism",
+      "xp": 45
+    },
+    {
+      "username": "gather_muveurw6",
+      "profession_id": "woodcutting",
+      "xp": 20
+    },
+    {
+      "username": "route_muvjmzr0",
+      "profession_id": "crafting",
+      "xp": 20
+    },
+    {
+      "username": "route_muvjmzr0",
+      "profession_id": "herbalism",
+      "xp": 15
+    }
+  ],
+  "crafts": [
+    {
+      "id": "560e4286-eeee-461f-8481-ffdec6551e9c",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "offer_id": "service.greenvale.craft_remedy",
+      "ready_at": "2026-10-09T21:16:23.210Z",
+      "completed_at": "2026-10-09T21:16:40.356Z"
+    },
+    {
+      "id": "30a09ffe-31aa-4c32-a8c4-c3faef6ba669",
+      "character_id": "01a10cb4-05b7-7425-bca2-24db0f343dc0",
+      "offer_id": "service.greenvale.craft_remedy",
+      "ready_at": "2026-10-09T21:27:46.826Z",
+      "completed_at": "2026-10-09T21:28:03.249Z"
+    },
+    {
+      "id": "1b2f47a4-2f17-4ee3-a906-c47ced8ffeba",
+      "character_id": "01a10cb4-05b7-7425-bca2-24db0f343dc0",
+      "offer_id": "service.greenvale.craft_staff",
+      "ready_at": "2026-10-09T21:58:07.880Z",
+      "completed_at": "2026-10-09T21:58:11.268Z"
+    }
+  ],
+  "craftOutputs": [
+    {
+      "source_ref": "craft:1b2f47a4-2f17-4ee3-a906-c47ced8ffeba",
+      "template_id": "weapon.staff.oak_staff",
+      "quantity": 1,
+      "owner_character_id": "01a10cb4-05b7-7425-bca2-24db0f343dc0",
+      "location_kind": "container"
+    },
+    {
+      "source_ref": "craft:30a09ffe-31aa-4c32-a8c4-c3faef6ba669",
+      "template_id": "consumable.greenvale.remedy",
+      "quantity": 1,
+      "owner_character_id": "01a10cb4-05b7-7425-bca2-24db0f343dc0",
+      "location_kind": "container"
+    },
+    {
+      "source_ref": "craft:560e4286-eeee-461f-8481-ffdec6551e9c",
+      "template_id": "consumable.greenvale.remedy",
+      "quantity": 1,
+      "owner_character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "location_kind": "destroyed"
+    }
+  ],
+  "effects": [
+    {
+      "id": "3978cf68-508f-448a-abda-ac71f963d3a1",
+      "character_id": "01a10d2e-ad38-708f-95c2-1202fa577237",
+      "item_id": "01a12286-782b-7515-a180-ccf3bf213ce1",
+      "heal": 60,
+      "applied_at": "2026-10-09T21:33:27.143Z"
+    }
+  ],
+  "routes": [],
+  "privateCheckpoints": []
+}

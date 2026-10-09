@@ -128,6 +128,7 @@ export const characters = pgTable(
     level: integer('level').notNull().default(1),
     xp: bigint('xp', { mode: 'number' }).notNull().default(0),
     zoneId: text('zone_id').notNull(),
+    instanceId: uuid('instance_id'),
     posX: doublePrecision('pos_x').notNull().default(0),
     posY: doublePrecision('pos_y').notNull().default(0),
     posZ: doublePrecision('pos_z').notNull().default(0),
@@ -632,4 +633,104 @@ export const characterDiscoveries = pgTable(
     discoveredAt: timestamp('discovered_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.characterId, t.locationId] })],
+);
+
+/** XP is committed with the harvest/job output, never client supplied. */
+export const characterProfessions = pgTable(
+  'character_professions',
+  {
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    professionId: text('profession_id').notNull(),
+    xp: integer('xp').notNull().default(0),
+  },
+  (t) => [
+    primaryKey({ columns: [t.characterId, t.professionId] }),
+    check('profession_xp_ck', sql`${t.xp} >= 0`),
+  ],
+);
+export const craftJobs = pgTable(
+  'craft_jobs',
+  {
+    id: uuid('id').primaryKey(),
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    offerId: text('offer_id').notNull(),
+    readyAt: timestamp('ready_at', { withTimezone: true }).notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index('craft_jobs_character_recent_idx').on(t.characterId, t.createdAt),
+    uniqueIndex('craft_jobs_one_active_uq')
+      .on(t.characterId)
+      .where(sql`${t.completedAt} is null`),
+  ],
+);
+export const consumableUses = pgTable(
+  'consumable_uses',
+  {
+    id: uuid('id').primaryKey(),
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    itemId: uuid('item_id')
+      .notNull()
+      .references(() => itemInstances.id),
+    heal: integer('heal').notNull(),
+    appliedAt: timestamp('applied_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index('consumable_uses_pending_idx')
+      .on(t.characterId)
+      .where(sql`${t.appliedAt} is null`),
+  ],
+);
+export const consumableCooldowns = pgTable('consumable_cooldowns', {
+  characterId: uuid('character_id')
+    .primaryKey()
+    .references(() => characters.id),
+  readyAt: timestamp('ready_at', { withTimezone: true }).notNull(),
+});
+
+export const dungeonInstances = pgTable(
+  'dungeon_instances',
+  {
+    id: uuid('id').primaryKey(),
+    dungeonId: text('dungeon_id').notNull(),
+    ownerCharacterId: uuid('owner_character_id')
+      .notNull()
+      .references(() => characters.id),
+    partyId: uuid('party_id'),
+    status: text('status').notNull().default('active'),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index('dungeon_instances_live_expiry_idx')
+      .on(t.expiresAt)
+      .where(sql`${t.status} <> 'expired'`),
+    check('dungeon_instance_status_ck', sql`${t.status} in ('active','completed','expired')`),
+  ],
+);
+export const dungeonMembers = pgTable(
+  'dungeon_members',
+  {
+    instanceId: uuid('instance_id')
+      .notNull()
+      .references(() => dungeonInstances.id),
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    joinedAt: timestamp('joined_at', { withTimezone: true }),
+    rewardedAt: timestamp('rewarded_at', { withTimezone: true }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.instanceId, t.characterId] }),
+    index('dungeon_members_character_idx').on(t.characterId),
+  ],
 );

@@ -70,7 +70,7 @@ export function WorldWindow() {
                   {state.discoveries.includes(l.id) ? '✓ Discovered · ' : 'Unvisited · '}
                   {l.kind.replace('_', ' ')}
                   {gameData.raw.dungeonEntries?.find((d) => d.locationId === l.id)
-                    ? ' · shared ruin'
+                    ? ' · private dungeon'
                     : ''}
                   {l.zoneId === controls.zoneId() && pos
                     ? ` · ${Math.round(distance2D(pos, l.position))} m`
@@ -80,7 +80,9 @@ export function WorldWindow() {
                   ?.filter((d) => d.locationId === l.id)
                   .map((d) => (
                     <small key={d.id}>
-                      {d.name} · recommended level {d.recommendedLevel}. {d.description}
+                      {d.name} · recommended level {d.recommendedLevel}. Private solo or party run ·
+                      level 4 required. Clear two guardians and the Bell Keeper. Each admitted
+                      player receives personal completion supplies.
                     </small>
                   ))}
               </span>
@@ -144,7 +146,8 @@ export function WorldWindow() {
       </button>
       <p className="small">
         Greenvale offers gathering, shops, field-gear crafting and a shared Broken Vault ruin. Other
-        regions remain greybox; private dungeon instances and profession training are not built.
+        regions remain greybox. Broken Vault private runs and Greenvale field professions are
+        available.
       </p>
     </Window>
   );

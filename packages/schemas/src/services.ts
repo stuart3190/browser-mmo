@@ -21,7 +21,7 @@ export const DungeonEntrySchema = z.strictObject({
   locationId: ContentIdSchema,
   enemyIds: z.array(ContentIdSchema).min(1),
   recommendedLevel: z.number().int().min(1),
-  mode: z.literal('shared_world'),
+  mode: z.enum(['shared_world', 'private_instance']),
   description: z.string().min(1).max(500),
 });
 export type ServiceOffer = z.infer<typeof ServiceOfferSchema>;

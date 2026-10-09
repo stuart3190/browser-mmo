@@ -372,7 +372,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-05 · Codex · 24 regions, 72 actual creature placements from 10 families/72 variants; existing authoritative combat/rewards. Detailed terrain/density remain unfinished. Commit: `573a07b3f74454e7f2481a790d42ca9d4fbce3e5`.
 - [x] Shared-world Broken Vault entry and catalog encounter foundation
   - Verified 2026-10-05 · Codex · validated placed stonekin, atlas entry and personal exploration; latest Current Work.
-- [ ] Private caves/dungeon instances and remaining catalog entrances
+- [x] Private Broken Vault instance framework (2026-10-09 qualification below)
+- [ ] Remaining catalog dungeon entrances
 - [ ] Dynamic events
 
 # Quests
@@ -424,10 +425,11 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
     Implementation commit: `d014293320384b94ca09ef9287128e290e624a8d`; see latest Current Work and `world/marches-gathering.md`.
 - [x] Hardwood and iron-shard gathering using shared persistent resource nodes
   - Verified 2026-10-05 · Codex · catalog, competing claims and recovery tests; latest Current Work.
-- [x] Three immediate material-to-equipment workshop recipes
+- [x] Three material-to-equipment workshop recipes (originally immediate; now timed jobs)
   - Verified 2026-10-05 · Codex · atomic NPC exchanges, rollback/receipt/provenance tests.
-- [ ] Tools and profession progression
-- [ ] General crafting queues, ranks and consumable effects
+- [x] Tools and profession progression — verified Greenvale systems below (2026-10-09)
+- [x] Durable single-job crafting, ranks and real consumable effects — verified Greenvale systems below
+- [ ] Multiple queued craft jobs per character (current bound is one active paid job)
 
 # Social
 
@@ -1277,8 +1279,9 @@ Design, scope and unfinished slices: [Greenvale Complete](gameplay/greenvale-com
       The harness now saves credential-free failure diagnostics. Runtime gameplay remains unchanged.
       After archiving this first release, the final evidence commit receives the same deployment/
       browser checks; `/release.json` and `/tmp/greenvale-public-final/proof.json` identify its SHA.
-- [ ] Private dungeon admission, instance ownership/lifecycle/reset, reconnect and completion rewards.
-- [ ] Profession ranks, tools, timed crafting and consumable effects; repair remains unsupported without wear.
+- [x] Private dungeon admission, ownership/lifecycle/reset, reconnect and completion rewards — 2026-10-09 systems qualification below.
+- [x] Profession ranks, tools, timed crafting and consumable effects — 2026-10-09 qualification below.
+- [ ] Repair remains unsupported without authoritative wear.
 
 Verified code evidence so far: 229 unit tests; 81 domain / 65 initially-passing realtime cases plus
 10 corrected/targeted realtime cases; 8 API cases; production builds and debug-hook guard. The first
@@ -1302,3 +1305,62 @@ receives the same deployment/browser checks, with SHA-bearing output retained at
 `/tmp/greenvale-public-final/proof.json` and public `/release.json`. Next gameplay task remains
 private-party Broken Vault lifecycle/admission/recovery/reset/completion rewards; profession
 tools/ranks/timed crafting remain later.
+
+## Current Work — Greenvale private runs and professions, 2026-10-09
+
+Continues deployed baseline `eabb679` on `codex/greenvale-systems`; no next-continent work.
+This section supersedes the previous private-run/profession next-task notes above.
+Rules, architecture and repair rationale: [systems specification](gameplay/greenvale-systems.md).
+Qualification evidence: [record](gameplay/evidence/greenvale-systems/README.md).
+
+- [x] Private solo/frozen-party admission, child ownership and authoritative UUID routing;
+      level/nearby/alive/leader checks, outsiders isolated, existing durable two-zone transfer reused.
+      Focused gateway tests verify separate runtime identities, stale targets, frozen membership,
+      full exit before reset, expiry and crash/reconnect routing. Domain tests serialize overlapping cohorts.
+- [x] Two guardians and Bell Keeper, durable instance-scoped kill completion, personal supplies/copper
+      for actual joined members only; atomic reward markers, provenance and ledger. Concurrent completion
+      pays once; never-entered members receive nothing. Existing enemy XP/shared rotating loot retained.
+- [x] Reusable Herbalism/Woodcutting/Mining/Fieldcraft XP and five ranks; inventory-backed field/fine
+      backpack tools and Apprentice requirement for fine tier. Harvest XP/yield commit with depletion.
+- [x] Durable timed crafting for existing equipment recipes and new remedy; one active job, exact-once
+      costs/output/XP, reconnect/restart persistence and full-storage rollback/Recovered overflow.
+- [x] Real remedy sink: owned unlocked backpack consumption, 60 health, persistent 30-second cooldown,
+      receipt/checkpoint recovery, no resurrection. Domain concurrency and simulation checkpoint tests pass.
+- [x] Skills progress/timers/result collection and dungeon guidance; actual desktop profession loop passes
+      five assertions. Actual touch craft/relog/collection/joystick passes; overflow found and fixed,
+      portrait/landscape continuation passes four assertions with reviewed screenshots.
+- [x] Safe additive migration on restored earned data: all 25 checkpoint payloads semantically unchanged
+      except catalog hash; checkpoint versions/timestamps preserved. Original preview/public data untouched.
+- [x] Staged solo dungeon browser qualification: actual entrance movement, all three encounters,
+      fresh-auth reconnect, death/normal threshold recovery, real crafted remedy use, completion,
+      relog, exit/reset and fresh UUID with zero objectives. Read-only PostgreSQL proves three kills,
+      one four-shard completion source/history grant and one correlated 150-copper ledger payment;
+      reward/membership tombstones survive reset. Screenshots reviewed; saved run resumed after harness fixes.
+- [x] Two-player touch dungeon qualification: real invitation/admission, same private UUID, all
+      encounters, fresh-auth reconnect, completion, relog, exit/reset/new identity; 11 final assertions.
+      An earlier live completion exposed a checkpoint/payout deadlock. Sorted character-first locks
+      and first-join-only membership writes fixed it; six-payout/20-checkpoint regression passes.
+      The original completed run survived host restart with no duplicate payout; a fresh full party
+      run then passed with the fix. Final SQL: nine kills across three completed runs, five personal
+      completion grants and five correlated 150-copper payments; zero private routes/pending effects.
+- [x] Existing equipment recipe with actual 15-second timer: earned actor harvested two hardwood batches,
+      paid for an Oak Staff, relogged and collected it with +20 Fieldcraft XP; seven browser assertions.
+      The older workshop harness now collects its timed Sword result instead of assuming immediate output.
+- [x] Full release gate: `NODE_ENV=production TEST_DATABASE_URL=<isolated test DB> pnpm verify`
+      passes on 2026-10-10: 232 unit + 89 domain + 72 realtime + 8 API = 401 tests;
+      14-package typechecking plus scripts, format/lint, four builds and production debug-hook guard.
+      Legacy crash tests now await durable recovery completion instead of assuming idle queues mean
+      expired worker leases are resolved. Immediate remedy vitals and expired orphan cleanup regressions pass.
+- [ ] Clean feature commit/push, fast-forward main/deployment and public new-system smoke.
+- [ ] Durability/wear/repair. Stored durability has no authoritative combat-wear bridge or broken-gear
+      stat handling. A repair charge would be shallow and potentially race with future wear; deliberately
+      unsupported. See specification and appended architecture decision for implementation prerequisites.
+
+Known limitations: dungeon terrain is a functional greybox; parties remain zone-local outside runs and
+must reform for a subsequent party reservation. Membership is frozen for each two-hour run. Fine tools
+improve yield after Apprentice; old hand gathering remains possible. Persisted recipe IDs are immutable.
+At most 64 child simulations are admitted per entrance host; no capacity/performance claim is made.
+Emulated touch proves functional controls only. No physical-device performance qualification is claimed.
+
+Next recommended task after this release: build authoritative durable combat wear and broken-item stat
+reconciliation before enabling repair; continue Greenvale systems hardening rather than opening another continent.

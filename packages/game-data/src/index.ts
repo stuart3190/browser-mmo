@@ -1,3 +1,7 @@
+import { withDungeonContent } from './dungeons';
+export * from './dungeons';
+import { professionItems, professionOffers } from './professions';
+export * from './professions';
 import { abilities, classes, skills, specialisations } from './content/classes';
 import { combatRules } from './content/combat';
 import { currencies, experienceCurve, marketplaceRules } from './content/economy';
@@ -6,7 +10,7 @@ import { itemModifiers, itemTemplates } from './content/items';
 import { lootTables } from './content/loot';
 import { rarities } from './content/rarities';
 import { chunks, dungeons, enemies, npcs, quests, regions, zones } from './content/world';
-import { GameData } from './registry';
+import { GameData, RawGameDataSchema } from './registry';
 import { compileContentCatalog, type ContentManifest } from './content-loader';
 import stillwaterPack from './content/packs/stillwater.json';
 import completePack from './content/packs/greenvale-complete.json';
@@ -64,7 +68,14 @@ export const contentManifest: ContentManifest = {
   quests: [...quests, ...completePack.quests.map((q) => ({ contentRef: q.id }))],
 };
 
-export const rawGameData = compileContentCatalog(contentManifest, contentPacks);
+const compiledGameData = compileContentCatalog(contentManifest, contentPacks);
+export const rawGameData = withDungeonContent(
+  RawGameDataSchema.parse({
+    ...compiledGameData,
+    itemTemplates: [...compiledGameData.itemTemplates, ...professionItems],
+    serviceOffers: [...(compiledGameData.serviceOffers ?? []), ...professionOffers],
+  }),
+);
 
 let cached: GameData | undefined;
 

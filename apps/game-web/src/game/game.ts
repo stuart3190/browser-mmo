@@ -371,6 +371,7 @@ export async function startGame(args: {
     state.addLog(`Looted ${parts.join(', ') || 'nothing'}`);
   });
   // ---- NPCs and quests (server state only) ----
+  net.on('systems.state', (m) => state.update((s) => (s.systems = m.d)));
   net.on('world.discoveries', (m) => {
     state.update((s) => (s.discoveries = m.d.locationIds));
     for (const id of m.d.newlyDiscovered)
@@ -607,6 +608,9 @@ function exposeDebug(
       return [...state.world.values()].find((e) => e.kind === 'npc')?.id ?? null;
     },
     /** Quest log and open dialogue exactly as the server sent them. */
+    get systems() {
+      return state.systems;
+    },
     get quests() {
       return state.quests;
     },

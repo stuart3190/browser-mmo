@@ -45,6 +45,18 @@ export class QuestActions {
         requestId: crypto.randomUUID(),
       });
   }
+  inspectSystems(): void {
+    this.net.send('systems.inspect', {});
+  }
+  dungeon(action: 'enter' | 'exit' | 'reset'): void {
+    this.net.send('dungeon.command', { action });
+  }
+  finishCraft(jobId: string): void {
+    this.net.send('craft.finish', { jobId });
+  }
+  useItem(itemId: string): void {
+    this.net.send('consumable.use', { itemId, requestId: crypto.randomUUID() });
+  }
   closeDialogue(): void {
     this.state.update((s) => (s.dialogue = null));
   }

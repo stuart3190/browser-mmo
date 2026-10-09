@@ -141,6 +141,20 @@
       "when": 1791145385618,
       "tag": "0019_greenvale_road_clearance",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791579729946,
+      "tag": "0020_dizzy_redwing",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791581832287,
+      "tag": "0021_brave_husk",
+      "breakpoints": true
     }
   ]
 }

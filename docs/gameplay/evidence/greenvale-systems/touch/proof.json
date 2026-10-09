@@ -1,0 +1,23 @@
+{
+  "mode": "touch-resume",
+  "users": ["gather_muveurw6", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Actual touch joystick moves the player",
+      "ok": true
+    },
+    {
+      "name": "Touch skill sheet fits 390x844",
+      "ok": true
+    },
+    {
+      "name": "Touch skill sheet fits 844x390",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

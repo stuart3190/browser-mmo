@@ -25,8 +25,8 @@ it('connects a complete Marches closure to deployed progression, existing geogra
     expect(q.placeholder).toBe(false);
     previous = q.id;
   }
-  expect(gd.raw.dungeonEntries![0]!.mode).toBe('shared_world');
-  expect(gd.raw.serviceOffers!.filter((s) => s.kind === 'craft')).toHaveLength(3);
+  expect(gd.raw.dungeonEntries![0]!.mode).toBe('private_instance');
+  expect(gd.raw.serviceOffers!.filter((s) => s.kind === 'craft')).toHaveLength(4);
   expect(new Set(gd.raw.worldCatalog!.resourceNodes.map((n) => n.resourceId)).size).toBe(3);
 });
 it.each([

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { classAbilities } from '@mmo/game-data';
 import { createRoot } from 'react-dom/client';
 import type { WindowId } from '../state/game-state';
+import { ProfessionWindow, DungeonSummary } from './ProfessionUI';
 import { BankWindow } from './BankWindow';
 import { DeathOverlay, PlayerFrame, TargetFrame } from './CombatHud';
 import { CharacterWindow } from './CharacterWindow';
@@ -89,6 +90,7 @@ function GameUI() {
     <div className={touch ? 'ui-root touch' : 'ui-root'}>
       <PlayerFrame />
       <PartySummary />
+      <DungeonSummary />
       <TargetFrame />
       <Minimap />
       <QuestTracker />
@@ -112,6 +114,7 @@ function GameUI() {
         <QuestLogWindow />
         <PartyPanel />
         <WorldWindow />
+        <ProfessionWindow />
       </div>
       <DialoguePanel />
       <ItemDetails />
@@ -224,6 +227,7 @@ function ActionBar() {
       {btn('quests', 'Quests', 'J')}
       {btn('party', 'Party', 'P')}
       {btn('world', 'World', 'M')}
+      {btn('professions', 'Skills', '')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button
           className={state.target.attacking ? 'action attack active' : 'action attack'}

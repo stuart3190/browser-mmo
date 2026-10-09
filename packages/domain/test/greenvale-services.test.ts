@@ -4,6 +4,7 @@ import { schema } from '@mmo/db';
 import { uuidv7 } from '@mmo/shared';
 import {
   exchangeAtNpc,
+  finishCraft,
   adjustBalanceInTx,
   discoverLocations,
   getDiscoveries,
@@ -38,6 +39,11 @@ it('crafts a real item once under six competing requests and preserves all costs
   };
   const results = await Promise.all(Array.from({ length: 6 }, () => exchangeAtNpc(ctx, request)));
   expect(results.filter((r) => !r.duplicate)).toHaveLength(1);
+  await ctx.db
+    .update(schema.craftJobs)
+    .set({ readyAt: new Date(0) })
+    .where(eq(schema.craftJobs.id, request.requestId));
+  await finishCraft(ctx, { ...p, jobId: request.requestId });
   const inv = await getCharacterItems(ctx.db, ctx, p.accountId, p.characterId);
   expect(
     inv.containers
@@ -56,7 +62,7 @@ it('crafts a real item once under six competing requests and preserves all costs
     'CONFLICT',
   );
 });
-it('rejects wrong NPC/ownership and rolls back material costs when output space is full', async () => {
+it('rejects wrong NPC/ownership and delivers the reserved craft into Recovered when bags are full', async () => {
   const p = await makePlayer(ctx);
   const other = await makePlayer(ctx);
   const request = {
@@ -76,20 +82,28 @@ it('rejects wrong NPC/ownership and rolls back material costs when output space 
     sql`update containers set capacity=1 where owner_character_id=${p.characterId} and kind='backpack'`,
   );
   await materials(p, 'accessory.ring.copper_band', 1);
-  await expectCode(exchangeAtNpc(ctx, request), 'CONTAINER_FULL');
+  await exchangeAtNpc(ctx, request);
+  await ctx.db
+    .update(schema.craftJobs)
+    .set({ readyAt: new Date(0) })
+    .where(eq(schema.craftJobs.id, request.requestId));
+  await finishCraft(ctx, { ...p, jobId: request.requestId });
   const inv = await getCharacterItems(ctx.db, ctx, p.accountId, p.characterId);
   expect(
     inv.containers
       .find((c) => c.container.kind === 'material_pouch')!
       .items.map((i) => i.instance.quantity)
       .sort(),
-  ).toEqual([2, 4]);
+  ).toEqual([]);
   expect(
     await ctx.db
       .select()
       .from(schema.serviceReceipts)
       .where(eq(schema.serviceReceipts.characterId, p.characterId)),
-  ).toHaveLength(0);
+  ).toHaveLength(1);
+  expect(inv.containers.find((c) => c.container.kind === 'mailbox')!.items[0]!.template.id).toBe(
+    'weapon.staff.oak_staff',
+  );
 });
 it('sells one stock unit, balances ledger, then buys once; insufficient funds grant nothing', async () => {
   const p = await makePlayer(ctx);
@@ -390,6 +404,15 @@ it('two distinct craft operations cannot spend the same material stock', async (
     ),
   );
   expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+  const [job] = await ctx.db
+    .select()
+    .from(schema.craftJobs)
+    .where(eq(schema.craftJobs.characterId, p.characterId));
+  await ctx.db
+    .update(schema.craftJobs)
+    .set({ readyAt: new Date(0) })
+    .where(eq(schema.craftJobs.id, job!.id));
+  await finishCraft(ctx, { ...p, jobId: job!.id });
   const items = await getCharacterItems(ctx.db, ctx, p.accountId, p.characterId);
   expect(
     items.containers

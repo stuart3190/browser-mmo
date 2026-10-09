@@ -8,7 +8,7 @@ import { ItemTooltip } from './ItemTooltip';
  * Buttons are hints only — the server re-validates everything.
  */
 export function ItemDetails() {
-  const { state, actions } = useGame();
+  const { state, actions, quests } = useGame();
   const item = state.selectedItemId ? state.items.get(state.selectedItemId) : undefined;
   if (!item) return null;
   const loc = item.instance.location;
@@ -36,6 +36,17 @@ export function ItemDetails() {
   return (
     <aside className="details" data-testid="item-details" aria-label="Item details">
       <ItemTooltip item={item} />
+      {inBag && item.template.id === 'consumable.greenvale.remedy' && (
+        <button
+          data-testid="use-remedy"
+          disabled={
+            state.vitals?.dead || !state.vitals || state.vitals.health >= state.vitals.maxHealth
+          }
+          onClick={() => quests.useItem(item.instance.id)}
+        >
+          Drink remedy · +60 health
+        </button>
+      )}
       <div className="details-actions">
         {inMailbox && (
           <button disabled={busy} onClick={() => void actions.withdraw(item)} data-action="take">

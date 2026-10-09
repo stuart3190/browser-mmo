@@ -19,3 +19,7 @@ export * from './password-auth';
 export * from './gathering';
 
 export * from './services';
+
+export * from './professions';
+
+export * from './dungeons';

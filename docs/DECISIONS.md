@@ -1055,3 +1055,80 @@ remain unchanged. Mutation/favourites/junk systems are deliberately outside this
   extra item. Existing collection consumption remains personal. The old tables and reward IDs are
   preserved. The cave is playable shared content and a reusable entry/encounter foundation; private
   party instances and dungeon completion rewards remain explicitly unchecked.
+
+## 2026-10-09 — Private dungeon children retain the owning entrance host and reward pipeline
+
+**Decision:** Add a stable instanced catalog zone with UUID-scoped simulations, entities, checkpoints
+and deaths. Its entrance host owns child advisory locks on its existing fenced PostgreSQL session.
+A durable frozen admission cohort reserves membership; checkpointed transfers atomically persist
+routing, joined membership and both recovery images. Reconnect and restart route by persisted
+instance ID. Expiry evacuates through that transfer; empty/reset images are reclaimed while reward
+and ownership tombstones remain. Completion derives from durable instance deaths and pays personal
+joined-member supplies with the existing grant/provenance/ledger transaction. Ordinary encounter
+loot and party XP still use the existing kill outbox.
+
+**Reason:** Shared-world cave metadata cannot provide isolation, frozen admission, correct reconnect
+or exact-once completion. Reusing the exclusive host/checkpoint/outbox avoids a second simulation
+or distributed social service and keeps five-continent travel compatible.
+
+**Alternatives:** Client-selected instance IDs; replacing existing parties with a cross-host social
+service; ephemeral rooms with independent character saves; shared completion chests. These either
+lack admission/crash correctness or substantially expand this slice.
+
+**Consequences:** One entrance-host process owns each run. Membership lasts two hours and is fixed;
+ordinary parties remain zone-local, so players re-form before a subsequent group reservation.
+No cross-host instance routing, raids, loot voting or hardware capacity claim. Outdoor story cave
+spawns remain in place to preserve existing quest progression. See `gameplay/greenvale-systems.md`.
+
+## 2026-10-09 — Profession XP, reserved timed jobs and checkpointed consumable delivery
+
+**Decision:** Extend the existing character-locked gathering/exchange transactions with catalog-backed
+gathering professions and inventory-backed tool tier bonuses. Paid crafts reserve inputs into one
+persistent timed job; claiming a ready job grants output and Fieldcraft XP once. Retain the existing
+three recipe IDs and outputs, plus an herb remedy. Commit remedy consumption/history and cooldown
+with a pending effect; checkpoint health and an applied effect receipt together before acknowledging
+delivery in the domain table. Recovery can retry without applying health twice.
+
+**Reason:** Immediate grants cannot represent reconnect-safe craft time, and committing consumption
+independently of world health could lose the effect on a crash. Existing receipts, ownership locks,
+item source deduplication, Recovered overflow and checkpoints already provide suitable boundaries.
+
+**Alternatives:** Process-local timers; refundable client queues; client-owned potion health;
+independent consumption and health writes. None provides the required restart/replay guarantees.
+
+**Consequences:** One craft at a time and explicit collection; job timing uses the DB clock. Old
+hand gathering remains playable; finer tools require earned rank. Recipe identities must remain
+immutable across live jobs. XP caps and tool tiers are authored starter balance. Durability/repair
+remains unchecked: it needs a durable combat-wear bridge and broken-gear stat reconciliation before
+charging for repair. No changes to the owner’s master game direction.
+
+## 2026-10-09 — Character-before-membership locks for private completion and checkpoints
+
+**Decision:** A checkpoint's atomic SQL statement locks all referenced characters in UUID order
+before any character or first-join membership write. A CTE aggregate forces that lock barrier to
+complete before the modifying statements run. Joined membership timestamps are written only once.
+Completion locks its entire frozen character cohort in the same order before paying or updating
+member reward markers.
+
+**Reason:** A genuine two-player run exposed a deadlock between completion payout and a checkpoint
+that rewrote already-joined membership. The existing owner correctly fenced rather than publishing
+an ambiguous write. Both rewards had committed atomically and survived restart, but gameplay stopped.
+The shared lock order prevents the inversion without weakening fencing or splitting routing/images.
+
+**Alternatives:** Retrying an ambiguous checkpoint, member-before-character locks, or independent
+membership updates outside checkpoint persistence. These conflict with existing ownership/economy
+locks or lose the atomic admission boundary. Regression races six payouts against 20 checkpoints,
+checks two grants/ledger payments, unchanged joined timestamps and an unfenced owner.
+
+## 2026-10-10 — Drain removed child writes and recover expired orphan checkpoints
+
+**Decision:** Remove a reclaimed child from future checkpoint batches, then await the current
+captured write before deleting its image and releasing its lock. On startup, also restore expired
+instances with retained images so the normal fenced outbox/recovery sweep can safely reclaim them.
+
+**Reason:** Final read-only qualification found an expired reset image resurrected by a captured
+checkpoint committing after deletion. Restoring retained images preserves possible pending deaths;
+silently deleting them during startup could discard an unfinished outbox.
+
+**Verification:** Gateway regression models a late image after reset and proves restart reclamation;
+the earned preview's orphan was reclaimed by the real host with no manual deletion.

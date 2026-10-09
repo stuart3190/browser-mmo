@@ -1,0 +1,37 @@
+{
+  "mode": "professions",
+  "users": ["gather_muveurw6", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Inventory-backed field tool improves real herb yield",
+      "ok": true,
+      "detail": 3
+    },
+    {
+      "name": "Craft reserves a durable timed job",
+      "ok": true,
+      "detail": {
+        "id": "30a09ffe-31aa-4c32-a8c4-c3faef6ba669",
+        "offerId": "service.greenvale.craft_remedy",
+        "readyAtMs": 1791581266826,
+        "completed": false
+      }
+    },
+    {
+      "name": "Timed craft survives relog and yields a real remedy",
+      "ok": true
+    },
+    {
+      "name": "Craft completion awards profession XP",
+      "ok": true
+    },
+    {
+      "name": "Actual touch joystick moves the player",
+      "ok": true
+    },
+    {
+      "name": "Touch skill sheet fits 390x844",
+      "ok": false
+    }
+  ]
+}

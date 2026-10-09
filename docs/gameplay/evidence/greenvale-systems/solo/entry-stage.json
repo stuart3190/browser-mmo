@@ -1,0 +1,28 @@
+{
+  "mode": "solo",
+  "users": ["route_muvjmzr0", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Entered a private owned run",
+      "ok": true,
+      "detail": {
+        "id": "01a12291-fa83-777a-b62b-c775ecde2a79",
+        "status": "active",
+        "expiresAtMs": 1791588554622,
+        "kills": 0,
+        "required": 3,
+        "inside": true,
+        "owner": true
+      }
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a12291-fa83-777a-b62b-c775ecde2a79:e:1"
+    },
+    {
+      "name": "Reconnect returns to the same live instance",
+      "ok": true
+    }
+  ]
+}

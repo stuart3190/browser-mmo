@@ -263,6 +263,9 @@ describe('durable kill rewards across crashes', { timeout: 60_000 }, () => {
     await crash(b1.server);
 
     const b2 = await boot();
+    // A crashed worker can still hold its durable lease briefly; idle queues do not mean
+    // lease-backed recovery has finished. Await the persisted outcome, then assert exact counts.
+    await until(async () => (await killEventsOf(p.characterId))[0]?.status === 'rewarded');
     await b2.server.rewardsIdle();
     expect(await killEventsOf(p.characterId)).toMatchObject([{ status: 'rewarded' }]);
     const rewards = await rewardsOf(p.characterId);
@@ -335,6 +338,10 @@ describe('durable kill rewards across crashes', { timeout: 60_000 }, () => {
 
     const b2 = await boot();
     await expect(boot()).rejects.toThrow('already owned');
+    await b2.server.sweepKills();
+    await b2.server.rewardsIdle();
+    // Replayed checkpoint records may finish after the startup sweep; wait for durable completion.
+    await until(async () => (await rewardsOf(p.characterId)).length === 1);
     await b2.server.sweepKills();
     await b2.server.rewardsIdle();
     expect(await rewardsOf(p.characterId)).toHaveLength(1);

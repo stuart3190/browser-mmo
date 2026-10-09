@@ -11,6 +11,7 @@ import {
 import { adjustBalanceInTx, getBalances } from './currency';
 import { itemViews } from './mappers';
 import { inTransaction } from './tx';
+import { startCraftInTx } from './professions';
 
 /** Caller is the owning realtime host and has validated NPC/life/range. No HTTP shortcut. */
 export async function exchangeAtNpc(
@@ -76,7 +77,9 @@ export async function exchangeAtNpc(
         reason: 'vendor',
         correlationId,
       });
-    if (offer.output)
+    if (offer.kind === 'craft')
+      await startCraftInTx(tx, character.id, offer.id, input.requestId, ctx);
+    if (offer.output && offer.kind !== 'craft')
       changed.push(
         ...(
           await grantItemInTx(tx, ctx, {
@@ -84,7 +87,7 @@ export async function exchangeAtNpc(
             characterId: character.id,
             templateId: offer.output.itemTemplateId,
             quantity: offer.output.quantity,
-            method: offer.kind === 'craft' ? 'crafted' : 'vendor_purchase',
+            method: 'vendor_purchase',
             sourceRef: `service:${character.id}:${input.requestId}`,
             actor: input,
           })

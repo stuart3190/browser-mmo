@@ -4,14 +4,22 @@ import { WebSocket } from 'ws';
 import { sql, eq } from 'drizzle-orm';
 import { createDb, schema } from '@mmo/db';
 import { createDomainContext, createCharacter, DevAuthProvider, SessionService } from '@mmo/domain';
-import { DEMO_ZONE_ID, getGameData } from '@mmo/game-data';
+import { DEMO_ZONE_ID, getGameData, GameData } from '@mmo/game-data';
 import { encodeClientMessage, parseServerMessage } from '@mmo/networking';
 import type { ServerMessage } from '@mmo/networking';
 import { createLogger, Metrics } from '@mmo/server-kit';
 import { uuidv7 } from '@mmo/shared';
 import { createRealtimeServer } from '../src/server';
 const handle = createDb({ url: process.env.TEST_DATABASE_URL!, max: 8 });
-const ctx = createDomainContext({ db: handle.db, gameData: getGameData() });
+const base = getGameData();
+// Compare persisted health without legitimate regeneration racing the crash-boundary observation.
+const ctx = createDomainContext({
+  db: handle.db,
+  gameData: GameData.load({
+    ...base.raw,
+    combatRules: { ...base.raw.combatRules, regenFractionPerSecond: 0 },
+  }),
+});
 const sessions = new SessionService(1);
 const running: ReturnType<typeof createRealtimeServer>[] = [];
 function server() {

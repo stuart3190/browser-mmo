@@ -144,7 +144,21 @@ export const PartyRespondMsg = clientMsg(
 export const PartyLeaveMsg = clientMsg('party.leave', z.object({ partyId: UuidSchema }));
 export const PartyDisbandMsg = clientMsg('party.disband', z.object({ partyId: UuidSchema }));
 
+export const DungeonCommandMsg = clientMsg(
+  'dungeon.command',
+  z.object({ action: z.enum(['enter', 'exit', 'reset']) }),
+);
+export const CraftFinishMsg = clientMsg('craft.finish', z.object({ jobId: UuidSchema }));
+export const ConsumableUseMsg = clientMsg(
+  'consumable.use',
+  z.object({ itemId: UuidSchema, requestId: UuidSchema }),
+);
+export const SystemsInspectMsg = clientMsg('systems.inspect', z.object({}));
 export const ClientMessageSchema = z.discriminatedUnion('t', [
+  DungeonCommandMsg,
+  CraftFinishMsg,
+  ConsumableUseMsg,
+  SystemsInspectMsg,
   PartyInviteMsg,
   PartyRespondMsg,
   PartyLeaveMsg,
@@ -492,7 +506,33 @@ export const WorldDiscoveriesMsg = serverMsg(
   'world.discoveries',
   z.object({ locationIds: z.array(ContentIdSchema), newlyDiscovered: z.array(ContentIdSchema) }),
 );
+export const SystemsStateMsg = serverMsg(
+  'systems.state',
+  z.object({
+    professions: z.array(z.object({ id: z.string(), xp: z.number().int().nonnegative() })),
+    jobs: z.array(
+      z.object({
+        id: UuidSchema,
+        offerId: z.string(),
+        readyAtMs: z.number(),
+        completed: z.boolean(),
+      }),
+    ),
+    instance: z
+      .object({
+        id: UuidSchema,
+        status: z.string(),
+        expiresAtMs: z.number(),
+        kills: z.number().int(),
+        required: z.number().int(),
+        inside: z.boolean(),
+        owner: z.boolean(),
+      })
+      .nullable(),
+  }),
+);
 export const ServerMessageSchema = z.discriminatedUnion('t', [
+  SystemsStateMsg,
   AbilityStateMsg,
   NpcDialogueMsg,
   WorldDiscoveriesMsg,

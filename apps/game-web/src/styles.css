@@ -1650,3 +1650,41 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   min-height: 44px;
   max-width: 100%;
 }
+
+.window-professions {
+  width: min(540px, 94vw);
+}
+.dungeon-summary {
+  position: absolute;
+  top: 105px;
+  left: 12px;
+  pointer-events: auto;
+  font-size: 12px;
+  max-width: 260px;
+}
+.touch .dungeon-summary {
+  top: auto;
+  left: auto;
+  right: 12px;
+  bottom: 210px;
+  max-width: 190px;
+}
+@media (max-height: 600px) {
+  .touch .dungeon-summary {
+    bottom: 146px;
+  }
+}
+.window-professions progress {
+  width: 100%;
+}
+.window-professions .window-body {
+  min-height: 0;
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .window-professions {
+    width: 100%;
+    box-sizing: border-box;
+    max-height: 62dvh;
+    flex-shrink: 0;
+  }
+}

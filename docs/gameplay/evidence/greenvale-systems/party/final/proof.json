@@ -1,0 +1,63 @@
+{
+  "mode": "party",
+  "users": ["route_muvjmzr0", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Entered a private owned run",
+      "ok": true,
+      "detail": {
+        "id": "01a122a4-b0fb-7a24-860f-52a86b40e9d1",
+        "status": "active",
+        "expiresAtMs": 1791589780976,
+        "kills": 0,
+        "required": 3,
+        "inside": true,
+        "owner": true
+      }
+    },
+    {
+      "name": "Both party members join the same private instance",
+      "ok": true
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a122a4-b0fb-7a24-860f-52a86b40e9d1:e:1"
+    },
+    {
+      "name": "Reconnect returns to the same live instance",
+      "ok": true
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a122a4-b0fb-7a24-860f-52a86b40e9d1:e:2"
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a122a4-b0fb-7a24-860f-52a86b40e9d1:e:3"
+    },
+    {
+      "name": "All encounters authoritatively complete the run",
+      "ok": true
+    },
+    {
+      "name": "Completed private state survives relog",
+      "ok": true
+    },
+    {
+      "name": "Exit returns to the real entrance",
+      "ok": true
+    },
+    {
+      "name": "Reset creates a fresh identity with no stale objective state",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

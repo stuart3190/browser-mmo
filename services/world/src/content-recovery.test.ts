@@ -14,6 +14,14 @@ it('additive Waystone recovery preserves old entities and live player state and 
       q.id !== 'quest.greenvale.well_records' &&
       q.id !== 'quest.greenvale.keeper_outpost',
   );
+  // Reconstruct the historical quest dependency closure, including later Marches dependants.
+  let removed = true;
+  while (removed) {
+    const ids = new Set(raw.quests.map((q) => q.id));
+    const valid = raw.quests.filter((q) => q.prerequisites.every((id) => ids.has(id)));
+    removed = valid.length !== raw.quests.length;
+    raw.quests = valid;
+  }
   raw.npcs = raw.npcs.filter((n) => n.id !== 'npc.greenvale.keeper_rill');
   for (const c of raw.chunks)
     c.spawnPoints = c.spawnPoints.filter((s) => s.id !== 'spawn.greenvale.waystone_keeper');

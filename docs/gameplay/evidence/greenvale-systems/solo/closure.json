@@ -1,0 +1,49 @@
+{
+  "mode": "solo",
+  "users": ["route_muvjmzr0", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Entered a private owned run",
+      "ok": true,
+      "detail": {
+        "id": "01a12291-fa83-777a-b62b-c775ecde2a79",
+        "status": "active",
+        "expiresAtMs": 1791588554622,
+        "kills": 2,
+        "required": 3,
+        "inside": true,
+        "owner": true
+      }
+    },
+    {
+      "name": "Reconnect returns to the same live instance",
+      "ok": true
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a12291-fa83-777a-b62b-c775ecde2a79:e:3"
+    },
+    {
+      "name": "All encounters authoritatively complete the run",
+      "ok": true
+    },
+    {
+      "name": "Completed private state survives relog",
+      "ok": true
+    },
+    {
+      "name": "Exit returns to the real entrance",
+      "ok": true
+    },
+    {
+      "name": "Reset creates a fresh identity with no stale objective state",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

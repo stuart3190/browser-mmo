@@ -1,0 +1,45 @@
+{
+  "mode": "professions",
+  "users": ["gather_muveurw6", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Inventory-backed field tool improves real herb yield",
+      "ok": true,
+      "detail": 3
+    },
+    {
+      "name": "Real recipe input gathered",
+      "ok": true,
+      "detail": "material.world.hardwood"
+    },
+    {
+      "name": "Real recipe input gathered",
+      "ok": true,
+      "detail": "material.world.hardwood"
+    },
+    {
+      "name": "Craft reserves a durable timed job",
+      "ok": true,
+      "detail": {
+        "id": "1b2f47a4-2f17-4ee3-a906-c47ced8ffeba",
+        "offerId": "service.greenvale.craft_staff",
+        "readyAtMs": 1791583087880,
+        "completed": false
+      }
+    },
+    {
+      "name": "Timed craft survives relog and yields its real authored output",
+      "ok": true,
+      "detail": "weapon.staff.oak_staff"
+    },
+    {
+      "name": "Craft completion awards profession XP",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

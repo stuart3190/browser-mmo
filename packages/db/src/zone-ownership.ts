@@ -4,6 +4,8 @@ import { poolFor } from './client';
 
 export interface CheckpointWrite {
   zoneId: string;
+  catalogZoneId?: string;
+  instanceId?: string | null;
   payload: string;
   characters: {
     id: string;
@@ -63,6 +65,24 @@ export class ZoneOwnership {
       throw err;
     }
   }
+  /** Child instances are owned by the host of their entrance zone, on the same fenced session. */
+  async acquireChild(id: string): Promise<string | undefined> {
+    if (!this.active || !this.client) throw new Error('Zone ownership lost');
+    const result = await this.client.query<{ owned: boolean }>(
+      'select pg_try_advisory_lock(717723, hashtext($1)) as owned',
+      [id],
+    );
+    if (!result.rows[0]?.owned) throw new Error('Instance already owned');
+    const saved = await this.client.query<{ payload: string }>(
+      'select payload from zone_checkpoints where zone_id=$1',
+      [id],
+    );
+    return saved.rows[0]?.payload;
+  }
+  async releaseChild(id: string): Promise<void> {
+    if (!this.active || !this.client) throw new Error('Zone ownership lost');
+    await this.client.query('select pg_advisory_unlock(717723,hashtext($1))', [id]);
+  }
   private onLost = (err?: unknown) => {
     if (!this.active) return;
     this.active = false;
@@ -75,20 +95,26 @@ export class ZoneOwnership {
       // A data-modifying CTE is one atomic, WAL-flushed statement: no inter-query RTTs.
       await client.query(
         `with input as (
-        select * from jsonb_to_recordset($1::jsonb) as w("zoneId" text, payload text, characters jsonb)
+        select * from jsonb_to_recordset($1::jsonb) as w("zoneId" text, "catalogZoneId" text, "instanceId" uuid, payload text, characters jsonb)
       ), saved as (
         insert into zone_checkpoints(zone_id,version,payload,updated_at)
         select "zoneId",1,payload,now() from input
         on conflict(zone_id) do update set payload=excluded.payload,version=1,updated_at=now()
         returning zone_id
       ), states as (
-        select s.*,w."zoneId" as zone_id from input w cross join lateral jsonb_to_recordset(w.characters)
+        select s.*,coalesce(w."catalogZoneId",w."zoneId") as zone_id,w."instanceId" as instance_id from input w cross join lateral jsonb_to_recordset(w.characters)
         as s(id uuid,x double precision,y double precision,z double precision,
              rotation double precision,health integer,cooldowns jsonb)
-      ) update characters c set zone_id=s.zone_id,pos_x=s.x,pos_y=s.y,pos_z=s.z,rotation_y=s.rotation,
+      ), locked as materialized (
+        select c.id from characters c where exists(select 1 from states s where s.id=c.id)
+        order by c.id for update of c
+      ), lock_barrier as (select count(*) n from locked), joined as (
+        update dungeon_members m set joined_at=coalesce(m.joined_at,now()) from states s cross join lock_barrier b
+        where b.n>=0 and m.instance_id=s.instance_id and m.character_id=s.id and m.joined_at is null returning m.instance_id
+      ) update characters c set instance_id=s.instance_id,zone_id=s.zone_id,pos_x=s.x,pos_y=s.y,pos_z=s.z,rotation_y=s.rotation,
         current_health=s.health,ability_cooldowns=s.cooldowns,updated_at=now()
-        from states s where c.id=s.id and (c.zone_id,c.pos_x,c.pos_y,c.pos_z,c.rotation_y,c.current_health,c.ability_cooldowns)
-        is distinct from (s.zone_id,s.x,s.y,s.z,s.rotation,s.health,s.cooldowns)`,
+        from states s cross join lock_barrier b where b.n>=0 and c.id=s.id and (c.instance_id,c.zone_id,c.pos_x,c.pos_y,c.pos_z,c.rotation_y,c.current_health,c.ability_cooldowns)
+        is distinct from (s.instance_id,s.zone_id,s.x,s.y,s.z,s.rotation,s.health,s.cooldowns)`,
         [JSON.stringify(writes)],
       );
       if (!this.active) throw new Error('Ownership lost during commit');

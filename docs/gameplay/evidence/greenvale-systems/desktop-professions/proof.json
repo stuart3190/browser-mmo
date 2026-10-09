@@ -1,0 +1,34 @@
+{
+  "mode": "professions",
+  "users": ["route_muvjmzr0", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Inventory-backed field tool improves real herb yield",
+      "ok": true,
+      "detail": 3
+    },
+    {
+      "name": "Craft reserves a durable timed job",
+      "ok": true,
+      "detail": {
+        "id": "560e4286-eeee-461f-8481-ffdec6551e9c",
+        "offerId": "service.greenvale.craft_remedy",
+        "readyAtMs": 1791580583210,
+        "completed": false
+      }
+    },
+    {
+      "name": "Timed craft survives relog and yields a real remedy",
+      "ok": true
+    },
+    {
+      "name": "Craft completion awards profession XP",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

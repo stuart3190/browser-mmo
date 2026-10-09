@@ -473,6 +473,20 @@ function check(name, ok, detail) {
         ).length,
     );
     await click(p.locator('[data-service="service.greenvale.craft_sword"]'));
+    await close();
+    await click(p.locator('[data-open=professions]'));
+    await p.waitForFunction(() =>
+      window.__mmo.systems.jobs.some(
+        (j) => j.offerId === 'service.greenvale.craft_sword' && !j.completed,
+      ),
+    );
+    const job = await p.evaluate(() =>
+      window.__mmo.systems.jobs.find(
+        (j) => j.offerId === 'service.greenvale.craft_sword' && !j.completed,
+      ),
+    );
+    await p.waitForTimeout(Math.max(0, job.readyAtMs - Date.now()) + 500);
+    await click(p.locator(`[data-craft-finish="${job.id}"]`));
     await p.waitForFunction(
       (n) =>
         window.__mmo.items.filter(
