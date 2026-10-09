@@ -1,0 +1,53 @@
+{
+  "readOnly": true,
+  "checkedAt": "2026-10-09T22:46:04.724Z",
+  "charactersPreserved": 2,
+  "itemsPreserved": 39,
+  "completedQuestsPreserved": 4,
+  "newJobs": [
+    {
+      "id": "42d2ca25-0c1d-4867-845b-f9846f9eb16c",
+      "character_id": "01a10948-9d21-7115-a4db-517123d2d32f",
+      "offer_id": "service.greenvale.craft_remedy",
+      "ready_at": "2026-10-09T22:36:34.919Z",
+      "completed_at": "2026-10-09T22:36:59.567Z"
+    },
+    {
+      "id": "7036272a-8b88-42de-9805-81a0fdf3bea7",
+      "character_id": "01a10948-9d21-7115-a4db-517123d2d32f",
+      "offer_id": "service.greenvale.craft_remedy",
+      "ready_at": "2026-10-09T22:44:49.936Z",
+      "completed_at": "2026-10-09T22:45:14.254Z"
+    }
+  ],
+  "professions": [
+    {
+      "character_id": "01a10948-9d21-7115-a4db-517123d2d32f",
+      "profession_id": "crafting",
+      "xp": 40
+    },
+    {
+      "character_id": "01a10948-9d21-7115-a4db-517123d2d32f",
+      "profession_id": "herbalism",
+      "xp": 20
+    }
+  ],
+  "craftOutputs": [
+    {
+      "source_ref": "craft:42d2ca25-0c1d-4867-845b-f9846f9eb16c",
+      "template_id": "consumable.greenvale.remedy",
+      "quantity": 2,
+      "location_kind": "container",
+      "created_quantity": 1
+    },
+    {
+      "source_ref": "craft:7036272a-8b88-42de-9805-81a0fdf3bea7",
+      "template_id": "consumable.greenvale.remedy",
+      "quantity": 1,
+      "location_kind": "destroyed",
+      "created_quantity": 1
+    }
+  ],
+  "completedCraftSourcesExactOnce": true,
+  "liveRemedyQuantity": 2
+}

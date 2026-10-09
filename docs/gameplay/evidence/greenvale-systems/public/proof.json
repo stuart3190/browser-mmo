@@ -1,0 +1,75 @@
+{
+  "url": "https://brokenodyssey.com",
+  "release": {
+    "commit": "a416fc9855a2523f9af7037b8eab9cfb32133280",
+    "environment": "development-preview"
+  },
+  "checks": [
+    {
+      "name": "Public deployed SHA",
+      "ok": true,
+      "detail": "a416fc9855a2523f9af7037b8eab9cfb32133280"
+    },
+    {
+      "name": "Production debug hook absent",
+      "ok": true
+    },
+    {
+      "name": "Four authoritative professions available",
+      "ok": true
+    },
+    {
+      "name": "Public harvest earns profession XP",
+      "ok": true
+    },
+    {
+      "name": "Public timed craft reserved",
+      "ok": true,
+      "detail": {
+        "id": "7036272a-8b88-42de-9805-81a0fdf3bea7",
+        "offerId": "service.greenvale.craft_remedy",
+        "readyAtMs": 1791585889936,
+        "completed": false
+      }
+    },
+    {
+      "name": "Public timed craft survives password relog and completes",
+      "ok": true
+    },
+    {
+      "name": "Public craft pays Fieldcraft XP once",
+      "ok": true
+    },
+    {
+      "name": "Real crafted remedy in authoritative inventory",
+      "ok": true
+    },
+    {
+      "name": "Public touch Skills window fits",
+      "ok": true
+    },
+    {
+      "name": "Public private-dungeon guidance available",
+      "ok": true
+    },
+    {
+      "name": "Craft result persists across another password relog",
+      "ok": true
+    },
+    {
+      "name": "No protocol/browser errors",
+      "ok": true,
+      "detail": {
+        "errors": [],
+        "protocolErrors": []
+      }
+    },
+    {
+      "name": "Public realtime ready",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "protocolErrors": [],
+  "hostedZones": 25
+}

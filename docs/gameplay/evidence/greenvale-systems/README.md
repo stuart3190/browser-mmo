@@ -60,4 +60,23 @@ transient rate-limit toast that per-page transport logs had missed. Skills datab
 removed because auth/gameplay already push authoritative state; only countdowns tick locally.
 The public harness now aggregates protocol errors across every relog. UI tests (10), complete
 typechecking, touched-file lint/format and all builds pass after that UI-only correction;
-backend source remains the fully tested implementation. Public release qualification remains pending.
+backend source remains the fully tested implementation. `public/` records 13 passing TLS/password smoke checks at
+`a416fc9855a2523f9af7037b8eab9cfb32133280`: earned harvest XP, a real timed remedy job,
+collection and +20 Fieldcraft across password relogs, authoritative inventory, touch Skills bounds,
+dungeon guidance, absent debug hook, zero browser/protocol errors across every relog and 25-zone
+readiness. API readiness also passes. Screenshots were inspected; the corrected sheet has no toast.
+Read-only SQL preserves both original characters, all 39 original item identities and four completed
+quests. Each of two completed jobs has one creation-history quantity of one; merged inventory holds
+two remedies. Current stack quantities can grow through normal merging, so creation history proves
+the original output quantity. No public dungeon combat qualification is claimed for the level-one
+reserved account; full solo/party combat evidence is from the earned isolated preview.
+
+Feature and correction were pushed, main fast-forwarded and deployed with
+`bash scripts/deploy-broken-odyssey.sh` (database backup, additive migration, content sync, readiness).
+Final documentation/evidence commit receives the same deployment and public checks. Its exact SHA
+and complete 13-check browser proof remain at `/tmp/systems-public-final/proof.json` and public
+`/release.json`, avoiding a self-referential commit ID inside committed evidence. Public command:
+`PLAYWRIGHT_PATH=/opt/aria-browser/node_modules/playwright EXPECTED_DEPLOY_SHA=<release SHA>
+node scripts/e2e/greenvale-systems-public.cjs /tmp/systems-public-final`.
+
+Repair is deliberately unchecked; see `../../greenvale-systems.md` for the missing wear/repair boundary.

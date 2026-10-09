@@ -28,5 +28,9 @@
     "productionBuilds": 4,
     "productionDebugHookAbsent": true,
     "runtimeBackendChanged": false
-  }
+  },
+  "uiFollowupCommit": "a416fc9855a2523f9af7037b8eab9cfb32133280",
+  "publicChecks": 13,
+  "publicProtocolErrors": 0,
+  "publicHostedZones": 25
 }

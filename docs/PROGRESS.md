@@ -1351,7 +1351,18 @@ Qualification evidence: [record](gameplay/evidence/greenvale-systems/README.md).
       14-package typechecking plus scripts, format/lint, four builds and production debug-hook guard.
       Legacy crash tests now await durable recovery completion instead of assuming idle queues mean
       expired worker leases are resolved. Immediate remedy vitals and expired orphan cleanup regressions pass.
-- [ ] Clean feature commit/push, fast-forward main/deployment and public new-system smoke.
+- [x] Feature commits pushed and main fast-forwarded; standard backed-up additive deployment succeeds.
+      Public TLS/password smoke passes 13 assertions at `a416fc9855a2523f9af7037b8eab9cfb32133280`:
+      earned harvesting XP, five-second remedy job, collection/+20 Fieldcraft across two relogs,
+      real inventory, portrait Skills/dungeon guidance, no debug hook, zero protocol/browser errors
+      across all relogs, matching release SHA and 25-zone readiness. API readiness also passes.
+      Public SQL preserves two characters, 39 original item identities and four completed quests;
+      each of two completed jobs has exactly one one-item creation history, with two remedies live.
+      Screenshot review caught polling overlap in the first public smoke. Skills now uses pushed
+      state/local countdowns; strengthened cross-relog error logging and repeated smoke pass.
+      Full solo/party combat was qualified in the isolated earned preview, not on the level-one
+      public reserved account. Final evidence commit is redeployed and checked again; SHA-bearing
+      final smoke/proof is retained at `/tmp/systems-public-final/proof.json` and public `/release.json`.
 - [ ] Durability/wear/repair. Stored durability has no authoritative combat-wear bridge or broken-gear
       stat handling. A repair charge would be shallow and potentially race with future wear; deliberately
       unsupported. See specification and appended architecture decision for implementation prerequisites.
@@ -1364,3 +1375,7 @@ Emulated touch proves functional controls only. No physical-device performance q
 
 Next recommended task after this release: build authoritative durable combat wear and broken-item stat
 reconciliation before enabling repair; continue Greenvale systems hardening rather than opening another continent.
+
+Greenvale systems implementation: **cb98b4b4b28fea4318e47897ac63d2bef0516daa**.
+Public-qualified UI correction: **a416fc9855a2523f9af7037b8eab9cfb32133280**.
+Both are on pushed main. Release evidence: [qualification record](gameplay/evidence/greenvale-systems/README.md).

@@ -1,0 +1,44 @@
+{
+  "/release.json": {
+    "commit": "a416fc9855a2523f9af7037b8eab9cfb32133280",
+    "environment": "development-preview"
+  },
+  "/api/health/ready": {
+    "status": "ok",
+    "checks": {
+      "database": "ok"
+    }
+  },
+  "/realtime/health/ready": {
+    "status": "ok",
+    "zones": [
+      "zone.greenvale.meadows",
+      "zone.aurelian.greenvale_marches",
+      "zone.aurelian.amber_coast",
+      "zone.aurelian.elderwood",
+      "zone.aurelian.crownspine",
+      "zone.frostmere.brinebreak",
+      "zone.frostmere.whitepine",
+      "zone.frostmere.rimefen",
+      "zone.frostmere.glasspeak",
+      "zone.cinderwake.ashstrand",
+      "zone.cinderwake.embersteppe",
+      "zone.cinderwake.redroot",
+      "zone.cinderwake.blackglass",
+      "zone.duneshara.oasis_reach",
+      "zone.duneshara.windcut",
+      "zone.duneshara.sunsea",
+      "zone.duneshara.saltmarch",
+      "zone.duneshara.broken_steps",
+      "zone.duneshara.high_saffron",
+      "zone.veilreach.mistwood",
+      "zone.veilreach.moonfen",
+      "zone.veilreach.silver_heath",
+      "zone.veilreach.crystal_vale",
+      "zone.veilreach.forgotten_march",
+      "zone.veilreach.veiled_spires"
+    ],
+    "players": 0,
+    "changeFeed": "ok"
+  }
+}
