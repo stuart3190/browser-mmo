@@ -8,13 +8,12 @@ export function ProfessionWindow() {
   const open = state.open.has('professions');
   useEffect(() => {
     if (!open) return;
-    quests.inspectSystems();
-    const timer = setInterval(() => {
-      setNow(Date.now());
-      quests.inspectSystems();
-    }, 2000);
+    // Auth and gameplay commands push authoritative state. Only countdowns need a local tick;
+    // database polling can overlap a mutation and produce a rate-limit toast.
+    setNow(Date.now());
+    const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, [open, quests]);
+  }, [open]);
   return (
     <Window id="professions" title="Field Skills & Broken Vault">
       {professions.map((p) => {

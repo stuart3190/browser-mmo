@@ -16,5 +16,17 @@
   "productionBuilds": 4,
   "productionDebugHookAbsent": true,
   "logPath": "/tmp/systems-verify10.log",
-  "logSha256": "9b6a4c73db7c2fc5a1b00e4a507b76ec3b4bc5c15b0ec5155871314410ab3f72"
+  "logSha256": "9b6a4c73db7c2fc5a1b00e4a507b76ec3b4bc5c15b0ec5155871314410ab3f72",
+  "fullGateCommit": "cb98b4b4b28fea4318e47897ac63d2bef0516daa",
+  "uiFollowup": {
+    "change": "Replace Skills database polling with push-driven state and local countdown; aggregate public protocol errors across relogs",
+    "uiTests": 10,
+    "typecheckPackages": 14,
+    "scriptsTypecheck": true,
+    "lint": true,
+    "format": true,
+    "productionBuilds": 4,
+    "productionDebugHookAbsent": true,
+    "runtimeBackendChanged": false
+  }
 }

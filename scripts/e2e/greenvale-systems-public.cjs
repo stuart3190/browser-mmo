@@ -29,7 +29,9 @@ function check(name, ok, detail) {
     deviceScaleFactor: 0.5,
   });
   const p = await c.newPage(),
-    errors = [];
+    errors = [],
+    protocolErrors = [];
+  await c.exposeBinding('recordProtocolError', (_source, frame) => protocolErrors.push(frame));
   p.on('pageerror', (e) => errors.push(e.message));
   p.setDefaultTimeout(90000);
   await c.addInitScript(() => {
@@ -42,6 +44,7 @@ function check(name, ok, detail) {
         super(...a);
         this.addEventListener('message', (e) => {
           const m = JSON.parse(e.data);
+          if (m.t === 'error') window.recordProtocolError(m);
           if (
             [
               'auth.ok',
@@ -240,18 +243,16 @@ function check(name, ok, detail) {
       'Craft result persists across another password relog',
       (await systems()).jobs.some((j) => j.id === job.id && j.completed),
     );
-    check(
-      'No protocol/browser errors',
-      errors.length === 0 &&
-        (await p.evaluate(() => !window.proofFrames.some((m) => m.t === 'error'))),
+    check('No protocol/browser errors', errors.length === 0 && protocolErrors.length === 0, {
       errors,
-    );
+      protocolErrors,
+    });
     const readiness = await (await p.request.get(URL + '/realtime/health/ready')).json();
     check('Public realtime ready', readiness.status === 'ok' && readiness.zones.length === 25);
     fs.writeFileSync(
       OUT + '/proof.json',
       JSON.stringify(
-        { url: URL, release, checks, errors, hostedZones: readiness.zones.length },
+        { url: URL, release, checks, errors, protocolErrors, hostedZones: readiness.zones.length },
         null,
         2,
       ),
@@ -275,7 +276,10 @@ function check(name, ok, detail) {
       );
     } catch {}
     await browser.close();
-    fs.writeFileSync(OUT + '/checks.json', JSON.stringify({ checks, errors }, null, 2));
+    fs.writeFileSync(
+      OUT + '/checks.json',
+      JSON.stringify({ checks, errors, protocolErrors }, null, 2),
+    );
   }
 })().catch((e) => {
   console.error(String(e.stack || e.message).replaceAll(password, '[redacted]'));

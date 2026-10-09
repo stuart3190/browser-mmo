@@ -52,3 +52,12 @@ Modes: `professions`, `solo`, `party`, `touch-resume` (layout continuation), `ap
 Full verification uses a separate `mmo_systems_test` PostgreSQL database, not the browser preview.
 Public smoke uses only the reserved password account and observes production transport; it never
 uses a production debug hook. Credentials are neither committed nor included in the evidence.
+
+Full release gate at `cb98b4b4b28fea4318e47897ac63d2bef0516daa` passes 401 tests,
+14-package plus script typechecking, lint/format, four builds and the production debug-hook guard.
+An initial public smoke proved harvesting and timed craft/relogs, but screenshot review exposed a
+transient rate-limit toast that per-page transport logs had missed. Skills database polling was
+removed because auth/gameplay already push authoritative state; only countdowns tick locally.
+The public harness now aggregates protocol errors across every relog. UI tests (10), complete
+typechecking, touched-file lint/format and all builds pass after that UI-only correction;
+backend source remains the fully tested implementation. Public release qualification remains pending.
