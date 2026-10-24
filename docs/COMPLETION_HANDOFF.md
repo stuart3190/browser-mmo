@@ -7,8 +7,8 @@ Do not declare shippability from feature existence or unit tests alone.
 ## Source and operational boundaries
 
 - Editable repository `/root/browser-mmo`, branch `codex/shippable-completion`, origin
-  `git@github.com:stuart3190/browser-mmo.git`. Main5b19b52 integrates guilds35ee149, checkpoint encoding, database lifecycle, startup recovery
-  fb8bc5e and release preparation84a3465. Rendering candidate a973ae5 remains isolated.
+  `git@github.com:stuart3190/browser-mmo.git`. Main 5b19b52 integrates guilds 35ee149, checkpoint encoding, database lifecycle, startup recovery
+  fb8bc5e and release preparation 84a3465. Rendering candidate a973ae5 remains isolated.
 - Immutable live `/srv/brokenodyssey/current` points to release `2c47b27a38f0bc74f3a7192f713775c3a9361729`.
   NEVER edit releases. Production API4461/realtime4462/web4460/PostgreSQL55440. No production
   mutations/deployments in this completion effort. Unsafe public deployment needs explicit permission.
@@ -46,37 +46,37 @@ Earlier driver/network failures are retained, not hidden. Evidence and reviewed 
 
 ## Current verification and branches
 
-- Hosted CI40098308166 for35ee149 PASSED. CI40100303234 for84a3465 is running. Earlier failed
-  evidence JSON formatting was correctedf4ceb55. Main5b19b52 archive commit is not yet pushed.
-- Integrated35ee149 OanPjT passes format/lint/types,236unit,117domain,75RT,12HTTP tests, four builds,
-  debug guard, assets/content and20-table populated upgrade/restore. Aggregate FAILED at blank
+- Hosted CI 40098308166 for 35ee149 PASSED. CI 40100303234 for 84a3465 is running. Earlier failed
+  evidence JSON formatting was corrected f4ceb55. Main 5b19b52 archive commit is not yet pushed.
+- Integrated 35ee149 OanPjT passes format/lint/types,236 unit,117 domain,75 realtime,12 HTTP tests, four builds,
+  debug guard, assets/content and 20-table populated upgrade/restore. Aggregate FAILED at blank
   first trade login. Archive `docs/hardening/evidence/integrated-guilds-2026-10-24`. No network
   diagnostic existed for that failure; do not claim a specific cause.
-- Guilds are integrated: migration0024, consent, roles, durable chat, notices/transfer/disband,
-  stale-guild binding, responsive UI. Final15 browser assertions passedoHpLwU. Guild vault unfinished.
-- Checkpoint encoding preserves exact v2 bytes; full backend proof plus staged51 browser checks.
-  Three simultaneous SwiftShader chat actors use DPR0.5 (CSS sizes/privacy checks unchanged).
+- Guilds are integrated: migration 0024, consent, roles, durable chat, notices/transfer/disband,
+  stale-guild binding, responsive UI. Final 15 browser assertions passed oHpLwU. Guild vault unfinished.
+- Checkpoint encoding preserves exact v2 bytes; full backend proof plus staged 51 browser checks.
+  Three simultaneous SwiftShader chat actors use DPR 0.5 (CSS sizes/privacy checks unchanged).
 - Database lifecycle handles failed idle pool clients, preserves ownership fencing and coalesces
   shutdown drains; real DB replacement/ownership tests and full build checks passed.
 - Startup recovery fb8bc5e: static HTML fallback, caught module errors, engine import after character
-  choice. Six injected network-failure browser assertions passed1BU62M. Login stays functional before
+  choice. Six injected network-failure browser assertions passed 1BU62M. Login stays functional before
   the game module; reload returns the existing character. Explicit production build passes all-chunk
   debug guard. Engine-only codeSplitting group prevents preload helper pulling engine into login.
   Production enter helper now asserts no early engine request; actual production check still pending.
-- Preparation mode7b61de5/merge84a3465: `deploy-broken-odyssey.sh --candidate --prepare-only` builds
+- Preparation mode 7b61de5 / merge 84a3465: `deploy-broken-odyssey.sh --candidate --prepare-only` builds
   and validates but exits before any live configuration/service/credential/DB/current mutation.
   Private functional fixtures pass fresh preparation, immutable reuse and invalid flags. No real
   candidate artifact prepared yet; no deployment authorized/performed.
 - Active rendering source `/tmp/bo-static-world-batching`, branch `codex/static-world-batching`,
-  candidatea973ae5 includes all main runtime changes through84a3465. Static geometry batching per
-  chunk/material reduces532→165 meshes with identical32,976vertices/96,942indices/materials/textures.
-  All11 frontend tests, fullformat/types/lint and four production builds/debug guard now pass.
+  candidate a973ae5 includes all main runtime changes through 84a3465. Static geometry batching per
+  chunk/material reduces 532→165 meshes with identical 32,976 vertices / 96,942 indices / materials / textures.
+  All 11 frontend tests, full format/types/lint and four production builds/debug guard now pass.
   No FPS claim. Initial browser driver picked first replicated NPC off-screen; nearest-NPC/ray-hit
   read-only diagnostics correct that, preserving failed runs. ZwXpKt also failed blank beforelogin.
 - ACTIVE detached `/tmp/bo-final-render-candidate.sh`: code checks completed, now eight browser
   suites in order rendering,startup,trading,marketplace,social,friends,onboarding,guilds (78 assertions).
   Logs `/tmp/bo-final-render-browser.log`, exit `.exit`. If green, automatically runs unprofiled
-  five-player120s production --load; logs `/tmp/bo-final-render-load.log`, exit `.exit`.
+  five-player 120s production --load; logs `/tmp/bo-final-render-load.log`, exit `.exit`.
   No other builds/tests/browsers during measured load. Do not edit running candidate runtime.
 - Other worktrees performance/recovery/presentation/guilds/release-preparation are merged into main;
   retain until final integration. Main runtime and earned actors remain stopped/intact.
@@ -86,25 +86,25 @@ Earlier driver/network failures are retained, not hidden. Evidence and reviewed 
 Public password/TLS/WSS load includes real movement/combat/normal respawn, inventory/market,
 friend messages/read receipts. Operator gear/spawn fixtures before admission are isolated load
 setup, not earned-gameplay proof. Guild branch adds guild consent/message/history traffic and
-restores declared strict19.5Hz simulation, RTTp95<250ms, HTTPp95<500ms gates. Not yet measured.
+restores declared strict19.5 Hz simulation, RTT p95<250ms, HTTP p95<500ms gates. Not yet measured.
 
-Latest quiet profiled five-player120s run717Yig: 19.005Hz, RTTp95473ms, HTTPp95217ms, zero unexpected
-protocol/HTTP errors/disconnects, all5alive, four respawns/eight kills,195economy writes, five sales,
-65DM/60read receipts. FAIL. Prior quiet GYaFFV18.80Hz/181ms also FAIL. No safe capacity established.
+Latest quiet profiled five-player 120s run 717Yig: 19.005Hz, RTT p95473ms, HTTP p95217ms, zero unexpected
+protocol/HTTP errors/disconnects, all 5 alive, four respawns/eight kills, 195 economy writes, five sales,
+65 DM / 60 read receipts. FAIL. Prior quiet GYaFFV 18.80 Hz / 181ms also FAIL. No safe capacity established.
 Unused local servers stopped; no browsers/builds/tests during measurement. Profile mostly idle;
-host82–88%idle last samples, no CPU/RAM saturation. Prior docs cover scheduler/timer and durable
+host 82–88% idle last samples, no CPU/RAM saturation. Prior docs cover scheduler/timer and durable
 checkpoint I/O tails. Do not weaken WAL/fencing/publication or raise admission to make graphs pass.
 Evidence `docs/hardening/evidence/capacity-2026-10-24` and checkpoint encoding archive.
 
 ## Next actions
 
 1. Finish a973ae5 browser qualification, inspect screenshots, fix real issues and preserve failures.
-   Its queued production workload must prove deferred engine login,28friends/guild UI checks and
-   strict guild/commerce/combat load. If five players fail, do not raise admission or test20.
+   Its queued production workload must prove deferred engine login,28 friends/guild UI checks and
+   strict guild/commerce/combat load. If five players fail, do not raise admission or test 20.
 2. Archive results, commit evidence on rendering branch and merge into main preserving append-only
    PROGRESS/DECISIONS and main's newer archive/handoff. Push and confirm final hosted CI.
 3. Prepare final committed candidate with --candidate --prepare-only, verify release manifest and
-   unchanged live2c47b27/current/PIDs/readiness. Never invoke publishing mode without authorization.
+   unchanged live 2c47b27/current/PIDs/readiness. Never invoke publishing mode without authorization.
 4. Capacity, physical-phone performance and off-host recovery remain unqualified. No purchase,
    public deployment, reset, durability weakening or architecture rewrite to bypass these limits.
    Authoritative wear/repair and broader world art remain long-term incomplete; core requested
