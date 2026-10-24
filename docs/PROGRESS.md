@@ -2152,3 +2152,16 @@ rhythm. This corrects stale documentation; it does not claim new systems or ship
 - Independent fresh Warrior has completed all Meadows/Marches main quests and two Marches side
   quests. Remaining side quests, professions, solo/party Vault and Mage journey continue in the
   isolated source checkout. Do not claim the full integrated run has passed yet.
+
+### Main-route ferries verified; earned continuity in progress — 2026-10-25
+
+- Three-watch aftermath and camera controls committed/pushed as `4225ba6`.
+- [x] Independent fresh Warrior story stage: 52 checks pass, all main/side quests plus workshop,
+      vendor, shop, banker, discovery and relogin. Professions stage: 5 checks pass, real tool/gathering
+      yield and paid remedy crafting/output/XP. Evidence: earned-journeys-2026-10-25. Solo Vault,
+      Mage and mixed-class stages remain active; full orchestrator not claimed complete.
+- [x] Replace the main-route ferry boxes with moored skiffs, open hulls/benches, plank landings,
+      ropes and regional colours. Pure presentation; existing nodes, travel and collision unchanged.
+      33 frontend tests, types/lint/build pass. Eleven desktop/touch checks pass through actual
+      Pinewatch/Willow Quay/Tidewatch crossings and return, preserving equipment/story. Screenshots
+      reviewed; evidence: ferry-landings-2026-10-25. Production unchanged.

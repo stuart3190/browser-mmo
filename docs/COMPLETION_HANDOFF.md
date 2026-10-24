@@ -9,39 +9,48 @@ releases. Release safety validation is a separate later phase; do not claim ship
 ## Source and current work
 
 Editable `/root/browser-mmo`, branch `codex/shippable-completion`, origin
-`git@github.com:stuart3190/browser-mmo.git`. Latest pushed **06cf356** (documentation reconciliation).
+`git@github.com:stuart3190/browser-mmo.git`. Latest pushed **4225ba6** (Three-watch aftermath and recoverable controls).
 Production initially observed at immutable 2c47b27; untouched. No subagents authorized.
 
-**Uncommitted, gameplay verified:** Three-watch aftermath. Forest pack rev3 adds once-only
+**Committed/pushed 4225ba6, gameplay verified:** Three-watch aftermath. Forest pack rev3 adds once-only
 Tamsin→Maren conclusion, bound both-class Watchkeeper's Compass and two optional 24h patrols.
 Existing authoritative quest/reward/cooldown mechanisms, no schema migration. Exact repeat
-availability shown in NPC dialogue/journal.141 content/33 frontend tests, types/lint/build/content
-validation pass.43 actual both-class continuation checks pass plus 9 earlier Warrior checks before
-a corrected driver-only crab-warning timeout.11 final desktop/portrait dialogue review checks pass.
+availability shown in NPC dialogue/journal. 141 content/33 frontend tests, types/lint/build/content
+validation pass. 43 actual both-class continuation checks pass plus 9 earlier Warrior checks before
+a corrected driver-only crab-warning timeout. 11 final desktop/portrait dialogue review checks pass.
 Sticky 44px NPC header and existing PNG browser icon linked. Evidence under
 `docs/gameplay/evidence/three-watch-aftermath-2026-10-25/`. Screenshots reviewed. Actors originally
 began as level-five focused fixtures; coast/forest/epilogue/patrol progress subsequently earned.
 Never describe them as fresh level-one-to-six.
 
-**Uncommitted, controls verified:** Twenty fresh desktop/portrait camera checks pass. Existing
+**Committed/pushed 4225ba6, controls verified:** Twenty fresh desktop/portrait camera checks pass. Existing
 mouse drag/wheel and touch drag/pinch are preserved. New Reset camera view restores the starting
 angle/distance without moving the character. Pinch driver failures traced to Playwright's one-touch
 capability; corrected to five supported contacts before boot. Experimental zoom/CSS changes and
 private input diagnostics removed. Evidence: camera-controls-2026-10-25, screenshots reviewed.
 Types/lint/build pass. Controller 1147857 ended; `/tmp/bo-camera-multitouch.log` and iaQjr4/camera-multitouch.
 
-**Uncommitted, built client verified:** Nineteen actual desktop/portrait UI checks pass, with no
+**Committed/pushed 4225ba6, built client verified:** Nineteen actual desktop/portrait UI checks pass, with no
 page exceptions or failed assets, using built files and no development hook. Saved chapter/patrol
 states, exact timers, handbook, regional chart, camera reset and relogin. Evidence under
 three-watch-aftermath-2026-10-25/built-client. Controller 1150309 ended; `/tmp/bo-built-game.log`.
 All main-checkout browsers stopped. This is local functional gameplay verification, no deployment.
 
-**Prepared, unverified continuity tooling:** coast.cjs explicit COAST__*USER bypasses fixture
+**Prepared, unverified continuity tooling:** coast.cjs explicit COAST___USER bypasses fixture
 writes, preserves weapons, requires earned Marches closure/level 5 and walks back through actual
-gate. forest.cjs accepts explicit FOREST*__USER and validates class/earned weapon. Optional
+gate. forest.cjs accepts explicit FOREST___USER and validates class/earned weapon. Optional
 EARNED_CHAPTERS=1 stages Tidewatch, Elderwood and Three Watches after the systems journey.
 Keep these separate from verified gameplay until used. coast.cjs does not yet resume partially
 completed chapters; fix from actual failures if necessary. No player grants/teleports allowed.
+
+## Current visual milestone — verified, commit pending
+
+Ferries replace generic brown boat boxes with pointed open skiffs, planking, benches, oars, flags,
+ropes and regional colour. Existing chunk lifecycle, authority, collision and travel nodes preserved.
+33 frontend tests, repository types/lint/build and eleven actual desktop/touch crossing checks pass.
+Both earned actors return to Pinewatch with equipment/story intact. Screenshots reviewed. Evidence:
+ferry-landings-2026-10-25. Main controller 1155320 stopped; `/tmp/bo-ferries-checks-browser.log`.
+No main-checkout browser remains active. No content hash or fixture cache change needed.
 
 ## Independent full earned journey — ACTIVE
 
@@ -49,9 +58,9 @@ Detached test checkout `/tmp/bo-earned-gameplay-20261025`, **3f1e538**, owns its
 dependencies. Controller **PID1097045**, `/tmp/bo-integrated-earned-browser.log`.
 Fixture `/tmp/brokenodyssey-qualification.ACsH5X`; state `earned-journeys/result.json`, current
 stage `earned-journeys/warrior-story/run.log`. Users **journeyw_mvmz9wvw** and **journeym_mvmz9wvw**.
-Warrior has completed all Meadows/Marches main and side quests; final workshop/economy checks
-in the story stage are underway.
-Remaining sides, Warrior professions/solo Vault, Mage story/professions/staff/solo Vault and mixed
+Warrior story 52 checks and professions 5 checks PASS, archived in earned-journeys-2026-10-25.
+Current stage warrior-solo-vault/run.log; ordinary walk from camp to entrance underway.
+Remaining Warrior solo Vault, Mage story/professions/staff/solo Vault and mixed
 class touch-party Vault are scheduled. This checkout's runtime must stay unchanged during run.
 No grants, direct player writes or teleports; ordinary controls and genuine earned progression.
 
@@ -120,7 +129,7 @@ source. Current runners are named above. Preserve separate output dirs on every 
 
 ## Next actions
 
-1. Commit/push verified aftermath and camera controls with final evidence. Leave unverified
-   continuity tooling clearly identified.
+1. Commit/push verified ferry art and crossing proof. Aftermath/controls already pushed 4225ba6.
+   Leave unverified continuity tooling clearly identified.
 2. Continue independent fresh story/systems run and earned chapter continuation; fix actual gameplay
    findings. Old external release gates are not gameplay blockers and must not trigger more work.

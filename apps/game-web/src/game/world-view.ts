@@ -1,3 +1,4 @@
+import { ferryScenery } from './ferry-scenery';
 import { forestScenery } from './forest-scenery';
 import { coastalScenery } from './coastal-scenery';
 import { Color3 } from '@babylonjs/core/Maths/math.color';
@@ -471,15 +472,9 @@ export class WorldView {
           basin.material = this.material('#537b8b');
           basin.isPickable = false;
           disposables.push(basin);
-          const boat = MeshBuilder.CreateBox(
-            `boat_${l.id}`,
-            { width: 5, height: 1.5, depth: 11 },
-            this.scene,
+          disposables.push(
+            ...ferryScenery(this.scene, l.id, l.position, l.zoneId, (hex) => this.material(hex)),
           );
-          boat.position.set(l.position.x + 7, 0.9, l.position.z - 12);
-          boat.material = this.material('#876545');
-          boat.isPickable = false;
-          disposables.push(boat);
         }
       }
       const zone = this.gameData.zone(chunk.zoneId),

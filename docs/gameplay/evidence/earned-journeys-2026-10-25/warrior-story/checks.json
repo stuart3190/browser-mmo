@@ -1,0 +1,259 @@
+{
+  "ok": true,
+  "user": "journeyw_mvmz9wvw",
+  "classId": "class.warrior",
+  "checks": [
+    {
+      "name": "Fresh arrival and actual starter pickup/equipment",
+      "ok": true
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.grey_wolf"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.grey_wolf"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.grey_wolf"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.grey_wolf"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.grey_wolf"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.wolves_at_the_edge"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "armor.leather.trapper_cap"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.cloak.wayfarer_cloak"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.old_waystone"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.brackenmaw"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.hollow_trail"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.trinket.keepers_token"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.hollow_lantern"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.root_wound"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.ring.copper_band"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.cloak.rootward_mantle"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.siltbound_warden"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.stillwater"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.ring.stillwater_seal"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.well_records"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.necklace.springward_pendant"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.greenvale.last_door_sentinel"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.keeper_outpost"
+    },
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "accessory.cloak.oathkeepers_mantle"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_call"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_supply"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.outlaw.3"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.outlaw.3"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_boundary"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.stonekin.5"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.stonekin.5"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_vault"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_home"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_timber"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_ore"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_river"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.wildlife.1"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.wildlife.1"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_remedy"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.boar.2"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.boar.2"
+    },
+    {
+      "name": "Persistent main arc completion",
+      "ok": true,
+      "detail": "quest.greenvale.marches_patrol"
+    },
+    {
+      "name": "Specific carried gear sold through NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Real workshop equipment",
+      "ok": true
+    },
+    {
+      "name": "Vendor sell/buy via actual NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Exact purchased instance can be sold once",
+      "ok": true
+    },
+    {
+      "name": "Local banker opens existing real vault",
+      "ok": true
+    },
+    {
+      "name": "Persistent discovered atlas labels",
+      "ok": true
+    },
+    {
+      "name": "Closure survives relog",
+      "ok": true
+    },
+    {
+      "name": "Crafted equipment survives relog",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

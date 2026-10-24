@@ -1,0 +1,747 @@
+GO 8 -14
+PASS Fresh arrival and actual starter pickup/equipment
+NPC approach npc.greenvale.elder_maren {
+  position: { x: 7.619571334521355, z: -13.377971335093555 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.636208173428829, z: 5.212408172999675 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.wolves_at_the_edge accept
+GO 4.5217873177314605 63.07651522549583
+GO 3.41 59.32
+GO 3.41 59.32
+GO 3.41 59.32
+GO 3.41 59.32
+GO 3.41 59.32
+GO 3.41 59.32
+GO 3.41 59.32
+GO 3.41 59.32
+GO 3.41 59.32
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -8.562924000048637 71.28965599999428
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+GO -5.46 69.69
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -27.71 104.7
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+GO -27.11 102.52
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO 15.92 72.37
+GO -7 73
+GO -3.43 72.29
+GO -3.43 72.29
+GO -3.43 72.29
+GO -3.43 72.29
+GO -3.43 72.29
+GO -3.43 72.29
+GO -3.43 72.29
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+GO -3.42 72.5
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -3.525525865156378, z: 72.59351939169355 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.645997680376292, z: 6.6882475753292265 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.wolves_at_the_edge turn-in
+PASS Persistent main arc completion quest.greenvale.wolves_at_the_edge
+PASS Earned equipment equipped through inventory armor.leather.trapper_cap
+PASS Earned equipment equipped through inventory accessory.cloak.wayfarer_cloak
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -5.645997680376292, z: 6.6882475753292265 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.645997680376292, z: 6.6882475753292265 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.old_waystone accept
+NPC approach npc.greenvale.keeper_rill {
+  position: { x: -5.645997680376292, z: 6.6882475753292265 },
+  connected: true
+}
+GO -8 -90
+NPC interact npc.greenvale.keeper_rill {
+  position: { x: -7.657009366070834, z: -90.1869641063598 },
+  prompt: 'Press E to talk to Keeper Rill',
+  connected: true
+}
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -7.657009366070834, z: -90.1869641063598 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -6.03589635891564, z: 5.246008377843956 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.old_waystone turn-in
+PASS Persistent main arc completion quest.greenvale.old_waystone
+NPC approach npc.greenvale.keeper_rill {
+  position: { x: -6.03589635891564, z: 5.246008377843956 },
+  connected: true
+}
+GO -8 -90
+NPC interact npc.greenvale.keeper_rill {
+  position: { x: -7.913264863471685, z: -89.6278882691427 },
+  prompt: 'Press E to talk to Keeper Rill',
+  connected: true
+}
+quest.greenvale.hollow_trail accept
+GO -56.70319999957084 -92.09593600022316
+GO -52.01 -91.34
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+GO -52.2423040163039 -91.35504728429672
+PASS Real catalog enemy defeated enemy.greenvale.brackenmaw
+NPC approach npc.greenvale.keeper_rill {
+  position: { x: -52.832139883687155, z: -91.5735632883568 },
+  connected: true
+}
+GO -8 -90
+NPC interact npc.greenvale.keeper_rill {
+  position: { x: -7.823303434118662, z: -90.38392683978968 },
+  prompt: 'Press E to talk to Keeper Rill',
+  connected: true
+}
+quest.greenvale.hollow_trail turn-in
+PASS Persistent main arc completion quest.greenvale.hollow_trail
+PASS Earned equipment equipped through inventory accessory.trinket.keepers_token
+NPC approach npc.greenvale.keeper_rill {
+  position: { x: -7.823303434118662, z: -90.38392683978968 },
+  connected: true
+}
+GO -8 -90
+NPC interact npc.greenvale.keeper_rill {
+  position: { x: -7.823303434118662, z: -90.38392683978968 },
+  prompt: 'Press E to talk to Keeper Rill',
+  connected: true
+}
+quest.greenvale.root_wound accept
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+PASS Real catalog enemy defeated enemy.greenvale.hollow_lantern
+NPC approach npc.greenvale.keeper_rill {
+  position: { x: -92.53256530494305, z: -81.86746496724857 },
+  connected: true
+}
+GO -8 -90
+NPC interact npc.greenvale.keeper_rill {
+  position: { x: -7.97234590003732, z: -89.36248437401402 },
+  prompt: 'Press E to talk to Keeper Rill',
+  connected: true
+}
+quest.greenvale.root_wound turn-in
+PASS Persistent main arc completion quest.greenvale.root_wound
+PASS Earned equipment equipped through inventory accessory.ring.copper_band
+PASS Earned equipment equipped through inventory accessory.cloak.rootward_mantle
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -7.97234590003732, z: -89.36248437401402 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.980001833264951, z: 5.365259691900073 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.stillwater accept
+NPC approach npc.greenvale.surveyor_tess {
+  position: { x: -5.980001833264951, z: 5.365259691900073 },
+  connected: true
+}
+GO 63 38
+NPC interact npc.greenvale.surveyor_tess {
+  position: { x: 62.317108322214835, z: 37.895169847093754 },
+  prompt: 'Press E to talk to Surveyor Tess',
+  connected: true
+}
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+DODGE {"center":{"x":74.16664504187344,"y":0,"z":26.94503312729211},"range":2.5,"to":{"x":77.3486255572129,"z":30.127013642631574}}
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+DODGE {"center":{"x":76.4390033939957,"y":0,"z":29.217391479414346},"range":2.5,"to":{"x":79.62098390933517,"z":32.39937199475381}}
+GO 75 27
+GO 75 27
+DODGE {"center":{"x":75.36222118780711,"y":0,"z":27.520809272796626},"range":2.5,"to":{"x":78.54420170314657,"z":30.70278978813609}}
+GO 75 27
+PASS Real catalog enemy defeated enemy.greenvale.siltbound_warden
+NPC approach npc.greenvale.elder_maren {
+  position: { x: 74.47550928369341, z: 27.233497368539883 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.645601490659173, z: 6.614386592041704 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.stillwater turn-in
+PASS Persistent main arc completion quest.greenvale.stillwater
+PASS Earned equipment equipped through inventory accessory.ring.stillwater_seal
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -5.645601490659173, z: 6.614386592041704 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.645601490659173, z: 6.614386592041704 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.well_records accept
+GO 8 12
+GO 8 110
+NPC approach npc.greenvale.elder_maren {
+  position: { x: 7.568077941083596, z: 110.46363492319497 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.456828968372609, z: 6.041328013166658 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.well_records turn-in
+PASS Persistent main arc completion quest.greenvale.well_records
+PASS Earned equipment equipped through inventory accessory.necklace.springward_pendant
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -5.456828968372609, z: 6.041328013166658 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.456828968372609, z: 6.041328013166658 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.keeper_outpost accept
+GO 24 110
+GO 33 118
+DODGE {"center":{"x":32.63342938156726,"y":0,"z":117.61106413971918},"range":6.75,"to":{"x":28.791931056524376,"z":109.74942368630917}}
+GO 32.63342938156726 117.61106413971918
+DODGE {"center":{"x":32.63342938156726,"y":0,"z":117.61106413971918},"range":6.75,"to":{"x":29.943020866239547,"z":109.28494847749997}}
+GO 32.63342938156726 117.61106413971918
+DODGE {"center":{"x":32.63342938156726,"y":0,"z":117.61106413971918},"range":6.75,"to":{"x":33.116476710718125,"z":108.87440772677719}}
+GO 32.64 116.86170400006294
+DODGE {"center":{"x":32.64158406870993,"y":0,"z":116.18768758842889},"range":6.75,"to":{"x":37.85760439853712,"z":109.16233123313776}}
+GO 33.453539015077 115.26228210243833
+PASS Real catalog enemy defeated enemy.greenvale.last_door_sentinel
+NPC approach npc.greenvale.elder_maren {
+  position: { x: 34.07929606939514, z: 115.50401314192085 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.772252169391911, z: 6.908611271626316 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.keeper_outpost turn-in
+PASS Persistent main arc completion quest.greenvale.keeper_outpost
+PASS Earned equipment equipped through inventory accessory.cloak.oathkeepers_mantle
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -5.772252169391911, z: 6.908611271626316 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.772252169391911, z: 6.908611271626316 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.marches_call accept
+NPC approach npc.world.greenvale_marches.innkeeper {
+  position: { x: -5.772252169391911, z: 6.908611271626316 },
+  connected: true
+}
+GO 0 116
+GO 248 412
+NPC interact npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.49349583248224, z: 412.035904165945 },
+  prompt: 'Press E to talk to Roadkeeper Ada',
+  connected: true
+}
+NPC approach npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.49349583248224, z: 412.035904165945 },
+  connected: true
+}
+GO 248 412
+NPC interact npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.49349583248224, z: 412.035904165945 },
+  prompt: 'Press E to talk to Roadkeeper Ada',
+  connected: true
+}
+quest.greenvale.marches_call turn-in
+PASS Persistent main arc completion quest.greenvale.marches_call
+NPC approach npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.49349583248224, z: 412.035904165945 },
+  connected: true
+}
+GO 248 412
+NPC interact npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.49349583248224, z: 412.035904165945 },
+  prompt: 'Press E to talk to Roadkeeper Ada',
+  connected: true
+}
+quest.greenvale.marches_supply accept
+GO 290 400
+GO 335 455
+NPC approach npc.world.greenvale_marches.camp_scout {
+  position: { x: 334.48422432912764, z: 454.9173654271724 },
+  connected: true
+}
+GO 1408 900
+NPC interact npc.world.greenvale_marches.camp_scout {
+  position: { x: 1408.1782878724352, z: 899.9467942085698 },
+  prompt: 'Press E to talk to Hollow Scout Ren',
+  connected: true
+}
+NPC approach npc.world.greenvale_marches.innkeeper {
+  position: { x: 1408.1782878724352, z: 899.9467942085698 },
+  connected: true
+}
+GO 248 412
+NPC interact npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.68425756195398, z: 412.4394581893157 },
+  prompt: 'Press E to talk to Roadkeeper Ada',
+  connected: true
+}
+quest.greenvale.marches_supply turn-in
+PASS Persistent main arc completion quest.greenvale.marches_supply
+NPC approach npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.68425756195398, z: 412.4394581893157 },
+  connected: true
+}
+GO 248 412
+NPC interact npc.world.greenvale_marches.innkeeper {
+  position: { x: 248.68425756195398, z: 412.4394581893157 },
+  prompt: 'Press E to talk to Roadkeeper Ada',
+  connected: true
+}
+quest.greenvale.marches_boundary accept
+GO 600 820
+GO 600 850
+GO 598.16 847.23
+GO 598.16 847.23
+GO 598.16 847.23
+GO 598.16 847.23
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.outlaw.3
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+GO 601.52 849.06
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.outlaw.3
+NPC approach npc.world.greenvale_marches.vault_scout {
+  position: { x: 600.7254659524899, z: 849.1082665814356 },
+  connected: true
+}
+GO 1440 1020
+NPC interact npc.world.greenvale_marches.vault_scout {
+  position: { x: 1439.2763771680923, z: 1020.0367778057885 },
+  prompt: 'Press E to talk to Vault Watcher Iven',
+  connected: true
+}
+NPC approach npc.world.greenvale_marches.vault_scout {
+  position: { x: 1439.2763771680923, z: 1020.0367778057885 },
+  connected: true
+}
+GO 1440 1020
+NPC interact npc.world.greenvale_marches.vault_scout {
+  position: { x: 1439.2763771680923, z: 1020.0367778057885 },
+  prompt: 'Press E to talk to Vault Watcher Iven',
+  connected: true
+}
+quest.greenvale.marches_boundary turn-in
+PASS Persistent main arc completion quest.greenvale.marches_boundary
+NPC approach npc.world.greenvale_marches.vault_scout {
+  position: { x: 1439.2763771680923, z: 1020.0367778057885 },
+  connected: true
+}
+GO 1440 1020
+NPC interact npc.world.greenvale_marches.vault_scout {
+  position: { x: 1439.2763771680923, z: 1020.0367778057885 },
+  prompt: 'Press E to talk to Vault Watcher Iven',
+  connected: true
+}
+quest.greenvale.marches_vault accept
+GO 1520 1040
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+GO 1518 1040.22
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.stonekin.5
+GO 1570.68 1077.82
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+GO 1569.59 1078.53
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.stonekin.5
+GO 1580 1100
+NPC approach npc.world.greenvale_marches.vault_scout {
+  position: { x: 1580.0740206122246, z: 1099.313421249926 },
+  connected: true
+}
+GO 1440 1020
+NPC interact npc.world.greenvale_marches.vault_scout {
+  position: { x: 1441.160601226684, z: 1021.3930018658124 },
+  prompt: 'Press E to talk to Vault Watcher Iven',
+  connected: true
+}
+quest.greenvale.marches_vault turn-in
+PASS Persistent main arc completion quest.greenvale.marches_vault
+NPC approach npc.world.greenvale_marches.vault_scout {
+  position: { x: 1441.160601226684, z: 1021.3930018658124 },
+  connected: true
+}
+GO 1440 1020
+NPC interact npc.world.greenvale_marches.vault_scout {
+  position: { x: 1441.160601226684, z: 1021.3930018658124 },
+  prompt: 'Press E to talk to Vault Watcher Iven',
+  connected: true
+}
+quest.greenvale.marches_home accept
+NPC approach npc.world.greenvale_marches.innkeeper {
+  position: { x: 1441.160601226684, z: 1021.3930018658124 },
+  connected: true
+}
+GO 248 412
+NPC interact npc.world.greenvale_marches.innkeeper {
+  position: { x: 247.97025226745072, z: 412.55373519049 },
+  prompt: 'Press E to talk to Roadkeeper Ada',
+  connected: true
+}
+NPC approach npc.greenvale.elder_maren {
+  position: { x: 247.97025226745072, z: 412.55373519049 },
+  connected: true
+}
+GO 256 376
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.701260556160115, z: 6.796939446987038 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+NPC approach npc.greenvale.elder_maren {
+  position: { x: -5.701260556160115, z: 6.796939446987038 },
+  connected: true
+}
+GO -6 6
+NPC interact npc.greenvale.elder_maren {
+  position: { x: -5.701260556160115, z: 6.796939446987038 },
+  prompt: 'Press E to talk to Elder Maren',
+  connected: true
+}
+quest.greenvale.marches_home turn-in
+PASS Persistent main arc completion quest.greenvale.marches_home
+NPC approach npc.world.greenvale_marches.timber_keeper {
+  position: { x: -5.701260556160115, z: 6.796939446987038 },
+  connected: true
+}
+GO 0 116
+GO 328 455
+NPC interact npc.world.greenvale_marches.timber_keeper {
+  position: { x: 327.6121172705604, z: 455.0695172682718 },
+  prompt: 'Press E to talk to Woodkeeper Senn',
+  connected: true
+}
+quest.greenvale.marches_timber accept
+GO 335 455
+NPC approach npc.world.greenvale_marches.timber_keeper {
+  position: { x: 335.4559172702745, z: 455.0695172682718 },
+  connected: true
+}
+GO 328 455
+NPC interact npc.world.greenvale_marches.timber_keeper {
+  position: { x: 328.5337172707035, z: 455.0695172682718 },
+  prompt: 'Press E to talk to Woodkeeper Senn',
+  connected: true
+}
+quest.greenvale.marches_timber turn-in
+PASS Persistent main arc completion quest.greenvale.marches_timber
+NPC approach npc.world.greenvale_marches.quarry_keeper {
+  position: { x: 328.5337172707035, z: 455.0695172682718 },
+  connected: true
+}
+GO 503 660
+NPC interact npc.world.greenvale_marches.quarry_keeper {
+  position: { x: 502.39184356682, z: 659.5456435608172 },
+  prompt: 'Press E to talk to Quarryhand Orla',
+  connected: true
+}
+quest.greenvale.marches_ore accept
+NPC approach npc.world.greenvale_marches.quarry_keeper {
+  position: { x: 502.39184356682, z: 659.5456435608172 },
+  connected: true
+}
+GO 503 660
+NPC interact npc.world.greenvale_marches.quarry_keeper {
+  position: { x: 502.39184356682, z: 659.5456435608172 },
+  prompt: 'Press E to talk to Quarryhand Orla',
+  connected: true
+}
+quest.greenvale.marches_ore turn-in
+PASS Persistent main arc completion quest.greenvale.marches_ore
+NPC approach npc.world.greenvale_marches.scout {
+  position: { x: 502.39184356682, z: 659.5456435608172 },
+  connected: true
+}
+GO 270 418
+NPC interact npc.world.greenvale_marches.scout {
+  position: { x: 270.27822867352626, z: 418.3708286658006 },
+  prompt: 'Press E to talk to Scout Pell',
+  connected: true
+}
+quest.greenvale.marches_river accept
+GO 420 760
+GO 256 96
+NPC approach npc.world.greenvale_marches.scout {
+  position: { x: 255.9405034551769, z: 96.09270345546695 },
+  connected: true
+}
+GO 270 418
+NPC interact npc.world.greenvale_marches.scout {
+  position: { x: 269.493619130685, z: 417.29821913298036 },
+  prompt: 'Press E to talk to Scout Pell',
+  connected: true
+}
+quest.greenvale.marches_river turn-in
+PASS Persistent main arc completion quest.greenvale.marches_river
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 269.493619130685, z: 417.29821913298036 },
+  connected: true
+}
+GO 264 412
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.3272649593409, z: 412.7318649616363 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+quest.greenvale.marches_remedy accept
+GO 390.3 449.73
+GO 388.25 448.27
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.wildlife.1
+GO 397.3055878656175 451.23581132807607
+GO 396.84 449.32
+GO 396.84 449.32
+GO 396.84 449.32
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.wildlife.1
+GO 290 400
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 290.5743737697678, z: 400.46857376862914 },
+  connected: true
+}
+GO 264 412
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.41634419526827, z: 411.62120334255604 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+quest.greenvale.marches_remedy turn-in
+PASS Persistent main arc completion quest.greenvale.marches_remedy
+NPC approach npc.world.greenvale_marches.guard {
+  position: { x: 264.41634419526827, z: 411.62120334255604 },
+  connected: true
+}
+GO 248 403
+NPC interact npc.world.greenvale_marches.guard {
+  position: { x: 248.71207550355746, z: 403.5033346514175 },
+  prompt: 'Press E to talk to Roadwarden Bram',
+  connected: true
+}
+quest.greenvale.marches_patrol accept
+GO 470 580
+GO 470 610
+GO 470.53394233759354 606.7829165370944
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.boar.2
+GO 472.26 609.5
+GO 472.26 609.5
+GO 472.26 609.5
+GO 472.26 609.5
+GO 472.26 609.5
+GO 472.26 609.5
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.boar.2
+NPC approach npc.world.greenvale_marches.guard {
+  position: { x: 471.95324022744956, z: 609.8618932286124 },
+  connected: true
+}
+GO 248 403
+NPC interact npc.world.greenvale_marches.guard {
+  position: { x: 248.64090627427376, z: 403.7515592697098 },
+  prompt: 'Press E to talk to Roadwarden Bram',
+  connected: true
+}
+quest.greenvale.marches_patrol turn-in
+PASS Persistent main arc completion quest.greenvale.marches_patrol
+NPC approach npc.world.greenvale_marches.merchant {
+  position: { x: 248.64090627427376, z: 403.7515592697098 },
+  connected: true
+}
+GO 264 403
+NPC interact npc.world.greenvale_marches.merchant {
+  position: { x: 263.0523327238286, z: 402.75793282058413 },
+  prompt: 'Press E to talk to Provisioner Vale',
+  connected: true
+}
+PASS Specific carried gear sold through NPC UI
+GO 335 455
+GO 510 660
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 509.26822720361184, z: 659.6124273019423 },
+  connected: true
+}
+GO 264 412
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.1829952547936, z: 412.17879535326136 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+PASS Real workshop equipment
+NPC approach npc.world.greenvale_marches.merchant {
+  position: { x: 264.1829952547936, z: 412.17879535326136 },
+  connected: true
+}
+GO 264 403
+NPC interact npc.world.greenvale_marches.merchant {
+  position: { x: 264.1829952547936, z: 403.609595352975 },
+  prompt: 'Press E to talk to Provisioner Vale',
+  connected: true
+}
+PASS Vendor sell/buy via actual NPC UI
+PASS Exact purchased instance can be sold once
+NPC approach npc.world.greenvale_marches.banker {
+  position: { x: 264.1829952547936, z: 403.609595352975 },
+  connected: true
+}
+GO 270 390
+NPC interact npc.world.greenvale_marches.banker {
+  position: { x: 269.9563807011174, z: 390.81920990593596 },
+  prompt: 'Press E to talk to Greenvale Marches Vault Steward',
+  connected: true
+}
+PASS Local banker opens existing real vault
+PASS Persistent discovered atlas labels
+PASS Closure survives relog
+PASS Crafted equipment survives relog
+PASS No browser exceptions []

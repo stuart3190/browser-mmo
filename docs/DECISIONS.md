@@ -1631,3 +1631,10 @@ verification. NPC headers stay visible inside long conversations, preserving the
 and service architecture. Twenty fresh camera checks and eleven earned dialogue review checks pass; see 2026-10-25 evidence.
 Multi-touch tests explicitly advertise five supported contacts before game boot; hasTouch alone
 advertises only one. Existing camera behavior is preserved.
+
+### 2026-10-25 — Moored ferry presentation
+
+Replace only the generic client boat box with a separate skiff/landing scenery builder, disposed
+through the existing chunk lifecycle. Keep authored travel nodes, shared colliders and shallow-water
+movement unchanged. Region colours, visible benches/oars and ropes make the existing ferry route
+readable; no boat control or boarding system is implied. Actual both-class crossings verified.

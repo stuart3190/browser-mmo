@@ -1,0 +1,121 @@
+[
+  {
+    "v": 1,
+    "t": "auth.ok",
+    "ack": 1,
+    "d": {
+      "connectionId": "01a1704e-b45b-7702-95c0-31cdd02d720c",
+      "entityId": "e:67",
+      "character": {
+        "id": "01a1700e-bf2d-7295-9cc1-993ceabfff27",
+        "accountId": "01a1700e-be09-78ea-82a3-a6a07cda6dd6",
+        "name": "journeywmvmzjwvw",
+        "classId": "class.warrior",
+        "specialisationId": null,
+        "level": 5,
+        "xp": 517,
+        "zoneId": "zone.aurelian.greenvale_marches",
+        "position": {
+          "x": 264.5331191474089,
+          "y": 0,
+          "z": 412.5393932361505
+        },
+        "createdAt": "2026-10-24T22:36:17.067Z"
+      },
+      "zoneId": "zone.aurelian.greenvale_marches",
+      "tickHz": 20,
+      "serverTime": 1792885568826
+    }
+  },
+  {
+    "v": 1,
+    "t": "systems.state",
+    "d": {
+      "remedyReadyAtMs": 0,
+      "professions": [
+        {
+          "id": "herbalism",
+          "xp": 45
+        },
+        {
+          "id": "woodcutting",
+          "xp": 40
+        },
+        {
+          "id": "mining",
+          "xp": 10
+        },
+        {
+          "id": "crafting",
+          "xp": 20
+        }
+      ],
+      "jobs": [
+        {
+          "id": "50022c19-b4ce-4cbd-84ab-52bf72db0bc0",
+          "offerId": "service.greenvale.craft_remedy",
+          "readyAtMs": 1792885559482,
+          "completed": false
+        },
+        {
+          "id": "b5b4549e-7183-49ed-9b89-803e0961654e",
+          "offerId": "service.greenvale.craft_sword",
+          "readyAtMs": 1792885475686,
+          "completed": true
+        }
+      ],
+      "instance": null
+    }
+  },
+  {
+    "v": 1,
+    "t": "party.update",
+    "d": {
+      "partyId": null,
+      "leaderCharacterId": null,
+      "members": [],
+      "invitation": null,
+      "pendingInvite": false
+    }
+  },
+  {
+    "v": 1,
+    "t": "systems.state",
+    "d": {
+      "remedyReadyAtMs": 0,
+      "professions": [
+        {
+          "id": "herbalism",
+          "xp": 45
+        },
+        {
+          "id": "woodcutting",
+          "xp": 40
+        },
+        {
+          "id": "mining",
+          "xp": 10
+        },
+        {
+          "id": "crafting",
+          "xp": 40
+        }
+      ],
+      "jobs": [
+        {
+          "id": "50022c19-b4ce-4cbd-84ab-52bf72db0bc0",
+          "offerId": "service.greenvale.craft_remedy",
+          "readyAtMs": 1792885559482,
+          "completed": true
+        },
+        {
+          "id": "b5b4549e-7183-49ed-9b89-803e0961654e",
+          "offerId": "service.greenvale.craft_sword",
+          "readyAtMs": 1792885475686,
+          "completed": true
+        }
+      ],
+      "instance": null
+    }
+  }
+]

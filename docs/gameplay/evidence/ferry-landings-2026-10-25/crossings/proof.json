@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Warrior retains its earned three-watch completion",
+      "ok": true
+    },
+    {
+      "name": "Warrior uses the actual Pinewatch crossing",
+      "ok": true
+    },
+    {
+      "name": "Warrior uses the actual Willow-Quay crossing",
+      "ok": true
+    },
+    {
+      "name": "Warrior uses the actual Tidewatch crossing",
+      "ok": true
+    },
+    {
+      "name": "Warrior returns to Pinewatch with equipment and completed story intact",
+      "ok": true
+    },
+    {
+      "name": "Mage retains its earned three-watch completion",
+      "ok": true
+    },
+    {
+      "name": "Mage uses the actual Pinewatch crossing",
+      "ok": true
+    },
+    {
+      "name": "Mage uses the actual Willow-Quay crossing",
+      "ok": true
+    },
+    {
+      "name": "Mage uses the actual Tidewatch crossing",
+      "ok": true
+    },
+    {
+      "name": "Mage returns to Pinewatch with equipment and completed story intact",
+      "ok": true
+    },
+    {
+      "name": "No ferry gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "scope": "Existing earned actors. Actual shore walking and four ordinary passages per class; no grants, teleports or player-row edits."
+}
