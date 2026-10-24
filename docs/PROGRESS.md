@@ -1517,3 +1517,13 @@ Next: complete both class journeys, dungeon/profession/group proof, fix observed
 Prepared in an isolated worktree while earned story journeys continued on the original local
 stack. No production changes. Continue earned class/dungeon proof and release operations; this
 checkpoint does not claim full-game readiness or finished world art.
+
+### Onboarding and ability presentation — 2026-10-24
+
+- [x] Broken Odyssey login branding, readable labeled character/class fields, live-class combat
+      descriptions, duplicate-submit guard/pending feedback, scrollable44-pixel phone controls.
+- [x] Distinct live ability silhouettes preserve existing server unlock/cooldown/input semantics.
+- [x] Seven actual browser assertions, reviewed phone/landscape/class HUD screenshots; full types,
+      lint, four builds and production debug-hook guard.
+      [Evidence](gameplay/evidence/onboarding-2026-10-24/README.md).
+- [ ] Integrated production password profile and complete earned journeys remain next checks.

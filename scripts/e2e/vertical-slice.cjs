@@ -17,6 +17,8 @@ const previewRouted = new WeakSet();
 async function walk(page, x, z, range = 1.6, timeout = 90000) {
   const until = Date.now() + timeout;
   let held = [];
+  let previous = null,
+    stalledSince = Date.now();
   try {
     while (Date.now() < until) {
       const s = await page.evaluate(() => ({
@@ -25,6 +27,12 @@ async function walk(page, x, z, range = 1.6, timeout = 90000) {
         dead: window.__mmo.vitals.dead,
       }));
       if (s.dead) throw new Error('Died while travelling');
+      if (!previous || Math.hypot(s.p.x - previous.x, s.p.z - previous.z) > 0.05) {
+        previous = s.p;
+        stalledSince = Date.now();
+      } else if (Date.now() - stalledSince > 1800) {
+        throw new Error(`Walk deadline ${x},${z} (blocked route)`);
+      }
       const dx = x - s.p.x,
         dz = z - s.p.z;
       if (Math.hypot(dx, dz) <= range) return;
@@ -43,8 +51,7 @@ async function walk(page, x, z, range = 1.6, timeout = 90000) {
     for (const k of held) await page.keyboard.up(k);
   }
 }
-async function enter(page, username, create, classId = 'class.warrior') {
-  await page.bringToFront();
+async function configurePreview(page) {
   // Optional isolated UI worktree: serve its assets at the already-authorized local test origin.
   // HTTP game actions and realtime authority still use the normal test services.
   if (process.env.ASSET_PREVIEW_URL && !previewRouted.has(page)) {
@@ -63,6 +70,10 @@ async function enter(page, username, create, classId = 'class.warrior') {
     });
     previewRouted.add(page);
   }
+}
+async function enter(page, username, create, classId = 'class.warrior') {
+  await page.bringToFront();
+  await configurePreview(page);
   await page.goto(WEB);
   await page.fill('[name=username]', username);
   await page.click('#login-form button');
@@ -267,7 +278,7 @@ async function main() {
     fs.writeFileSync(`${OUT}/checks.json`, JSON.stringify(checks, null, 2));
   }
 }
-module.exports = { walk, enter };
+module.exports = { walk, enter, configurePreview };
 if (require.main === module)
   main().catch((e) => {
     console.error(e);

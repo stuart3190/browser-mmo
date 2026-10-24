@@ -12,8 +12,8 @@ export function showLogin(
   panel.className = 'login';
   panel.innerHTML = `
     <div class="eyebrow">A world worth wandering</div>
-    <h2 class="game-title">Greenvale</h2>
-    <p class="login-intro">Beyond the village lights, the Northwood stirs. Take up your weapon. Find your way.</p>
+    <h1 class="game-title">Broken Odyssey</h1>
+    <p class="login-intro">Your journey begins in Greenvale. Beyond the village lights, the Northwood stirs. Find your way together.</p>
     <form id="login-form">
       <label>Username <input name="username" autocomplete="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9_]+" /></label>
       <label id="password-label" hidden>Password <input name="password" type="password" autocomplete="current-password" maxlength="128" /></label>
@@ -22,13 +22,23 @@ export function showLogin(
     <div id="chars" hidden>
       <div id="char-list"></div>
       <form id="create-form">
-        <input name="name" placeholder="New character name" required minlength="3" maxlength="20" />
-        <select name="classId">${classes.map((c) => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
+        <label>Character name <input name="name" placeholder="Name your adventurer" required minlength="3" maxlength="20" autocomplete="off" /></label>
+        <label for="class-choice">Class</label><select id="class-choice" name="classId" aria-describedby="class-hint">${classes.map((c) => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
+        <p id="class-hint" class="class-hint"></p>
         <button type="submit">Begin your adventure</button>
       </form>
     </div>
     <p id="login-error" class="error"></p>`;
   root.appendChild(panel);
+  const classSelect = panel.querySelector<HTMLSelectElement>('[name=classId]')!;
+  const describeClass = () => {
+    panel.querySelector<HTMLElement>('#class-hint')!.textContent =
+      classSelect.value === 'class.mage'
+        ? 'Ranged fire spells. Keep your distance and move out of enemy warnings. Flame Burst unlocks at level 2.'
+        : 'Close-range weapon strikes and sturdy defenses. Battle Strike unlocks at level 2.';
+  };
+  classSelect.addEventListener('change', describeClass);
+  describeClass();
   const err = panel.querySelector<HTMLElement>('#login-error')!;
   let provider = '';
   void api
@@ -51,6 +61,8 @@ export function showLogin(
 
   return new Promise((resolve) => {
     let token = '';
+    let loginBusy = false;
+    let creating = false;
     const choose = (c: PlayerCharacter) => {
       panel.remove();
       resolve({ token, character: c });
@@ -66,6 +78,11 @@ export function showLogin(
     };
     panel.querySelector<HTMLFormElement>('#login-form')!.onsubmit = async (e) => {
       e.preventDefault();
+      if (loginBusy) return;
+      loginBusy = true;
+      const button = panel.querySelector<HTMLButtonElement>('#login-form button')!;
+      button.disabled = true;
+      button.textContent = 'Signing in…';
       err.textContent = '';
       try {
         const username = new FormData(e.target as HTMLFormElement).get('username') as string;
@@ -81,10 +98,19 @@ export function showLogin(
         panel.querySelector<HTMLElement>('#chars')!.hidden = false;
       } catch (ex) {
         err.textContent = (ex as Error).message;
+      } finally {
+        loginBusy = false;
+        button.disabled = false;
+        button.textContent = 'Log in';
       }
     };
     panel.querySelector<HTMLFormElement>('#create-form')!.onsubmit = async (e) => {
       e.preventDefault();
+      if (creating) return;
+      creating = true;
+      const button = panel.querySelector<HTMLButtonElement>('#create-form button')!;
+      button.disabled = true;
+      button.textContent = 'Entering Greenvale…';
       err.textContent = '';
       try {
         const fd = new FormData(e.target as HTMLFormElement);
@@ -95,6 +121,10 @@ export function showLogin(
         choose(character);
       } catch (ex) {
         err.textContent = (ex as Error).message;
+      } finally {
+        creating = false;
+        button.disabled = false;
+        button.textContent = 'Begin your adventure';
       }
     };
   });

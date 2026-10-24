@@ -1,0 +1,33 @@
+{
+  "checks": [
+    {
+      "name": "Login uses the game title",
+      "ok": true
+    },
+    {
+      "name": "Warrior selection explains close-range combat",
+      "ok": true
+    },
+    {
+      "name": "Mage selection explains ranged attacks and warnings",
+      "ok": true
+    },
+    {
+      "name": "Landscape character creation stays reachable by scrolling",
+      "ok": true
+    },
+    {
+      "name": "Fresh Mage has distinct fire spell icons and a locked level-two ability",
+      "ok": true
+    },
+    {
+      "name": "Fresh Warrior has distinct attack and strike icons",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

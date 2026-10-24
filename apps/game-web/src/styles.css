@@ -2122,3 +2122,37 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   filter: drop-shadow(0 2px 2px #0006);
   pointer-events: none;
 }
+
+.ability-glyph {
+  width: 30px;
+  height: 30px;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 1px 2px #0008);
+  pointer-events: none;
+}
+
+.login {
+  box-sizing: border-box;
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+.login .game-title {
+  font-size: clamp(32px, 7vw, 44px);
+  line-height: 1.1;
+  letter-spacing: 0.025em;
+}
+.login input,
+.login select,
+.login button {
+  color: var(--text);
+  min-height: 44px;
+}
+.class-hint {
+  min-height: 3em;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 10px 0 16px;
+}
