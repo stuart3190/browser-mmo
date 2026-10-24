@@ -10,6 +10,8 @@ const logger = createLogger({ service: 'realtime', level: env.LOG_LEVEL });
 const handle = createDb({
   url: env.DATABASE_URL,
   max: env.DATABASE_POOL_MAX,
+  onPoolError: (error) =>
+    logger.error({ message: error.message }, 'idle database connection failed'),
   applicationName: 'mmo-realtime',
 });
 const ctx = createDomainContext({ db: handle.db, gameData: getGameData() });
@@ -38,7 +40,10 @@ logger.info(
   'realtime listening on /ws',
 );
 
+let shuttingDown = false;
 async function shutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
   logger.info({ signal }, 'shutting down');
   await server.stop();
   await handle.close();

@@ -1657,3 +1657,16 @@ DB confirms all three original runs completed and all four participating member 
 [Archived reports, failure evidence and reviewed screenshots](gameplay/evidence/earned-classes-2026-10-24/README.md).
 Both actors remain intact; no earned journey is currently running. Live release remains 2c47b27
 and both production readiness endpoints pass. No deployment performed.
+
+### Database connection lifecycle — 2026-10-24
+
+- [x] Handle and report failed idle pool connections without an unhandled process exception;
+      preserve active query errors and ownership-session fencing. Coalesce pool closes and repeated
+      service shutdown signals. Two real database lifecycle tests plus five ownership/crash tests
+      pass on disposable bo_recovery_test.
+- [ ] Full type/lint/build checks and combined regression remain before integration.
+
+Connection lifecycle verification: all 14 packages and scripts typecheck; repository lint and four
+production builds/debug-hook exclusion pass. Seven targeted real-database tests include idle-client
+replacement, coalesced close and existing five ownership/crash fencing cases. Combined-source
+regression remains required after integration; no production service or database was changed.

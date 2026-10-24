@@ -27,7 +27,13 @@ export interface DbHandle {
 // schema validation and currency maxBalance.
 pg.types.setTypeParser(20, (v) => Number(v));
 
-export function createDb(opts: { url: string; max?: number; applicationName?: string }): DbHandle {
+export function createDb(opts: {
+  url: string;
+  max?: number;
+  applicationName?: string;
+  /** Idle clients are evicted by pg; report their failures without crashing unrelated requests. */
+  onPoolError?: (error: Error) => void;
+}): DbHandle {
   const pool = new pg.Pool({
     connectionString: opts.url,
     max: opts.max ?? 10,
@@ -36,7 +42,15 @@ export function createDb(opts: { url: string; max?: number; applicationName?: st
     lock_timeout: 3_000,
     application_name: opts.applicationName ?? 'mmo',
   });
+  pool.on(
+    'error',
+    opts.onPoolError ??
+      ((error: Error) => {
+        console.error('Idle database connection failed:', error.message);
+      }),
+  );
   const db = drizzle(pool, { schema });
   pools.set(db, pool);
-  return { db, pool, close: () => pool.end() };
+  let closing: Promise<void> | undefined;
+  return { db, pool, close: () => (closing ??= pool.end()) };
 }

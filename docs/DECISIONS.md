@@ -1236,3 +1236,27 @@ social service. Contact polling supplies unread badges; active conversation poll
 The UI retains up to 500 messages, supports older-page navigation and pauses latest polling while
 reviewing history. Additive migration 0023 leaves existing gameplay tables untouched. Parties remain
 zone-local and guilds remain separate unfinished work. No public deployment is included.
+
+## 2026-10-24 — Recover failed idle database clients without masking ownership loss
+
+**Decision**
+Handle pg Pool's idle-client error event, log the error message through each service logger, and
+let pg evict the failed client. Subsequent queries can establish fresh connections. Keep pinned
+ownership-session fencing unchanged. Coalesce repeated database close calls and ignore duplicate
+service shutdown signals once draining starts.
+
+**Reason**
+Qualification teardown exposed an unhandled idle Pool error, which could also terminate an API
+process during an ordinary database connection interruption. Group shutdown also delivered SIGTERM
+twice through the development watcher. These are connection lifecycle issues, independent of
+transaction retry and exclusive zone ownership.
+
+**Alternatives considered**
+Crashing the entire process for an idle client failure, swallowing all database errors, or retrying
+arbitrary interrupted transactions. Only the pool idle event is handled; active query errors still
+propagate and ownership loss still fences the host.
+
+**Consequences**
+A real PostgreSQL test terminates only its own idle backend, observes one report and a fresh usable
+connection. Repeated close requests share one drain. Existing ownership-loss/crash tests remain
+mandatory; successful idle reconnect does not authorize continued simulation after ownership loss.
