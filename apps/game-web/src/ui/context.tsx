@@ -1,4 +1,5 @@
 import { createContext, useContext, useSyncExternalStore } from 'react';
+import type { ClientPayload } from '@mmo/networking';
 import type { GameData } from '@mmo/game-data';
 import type { GameState } from '../state/game-state';
 import type { CombatActions } from '../state/combat-actions';
@@ -23,6 +24,7 @@ export interface Controls {
 
 export interface UiDeps {
   api: ApiClient;
+  chat: (message: ClientPayload<'chat.send'>) => number;
   party: {
     invite: (id: string) => void;
     respond: (id: string, accept: boolean) => void;

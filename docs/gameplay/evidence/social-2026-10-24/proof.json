@@ -1,0 +1,58 @@
+{
+  "checks": [
+    {
+      "name": "Warrior invites the touch Mage through ordinary Party UI",
+      "ok": true
+    },
+    {
+      "name": "Typing movement and combat keys in the composer does not move the player",
+      "ok": true
+    },
+    {
+      "name": "Unread party message appears as literal text in touch chat",
+      "ok": true
+    },
+    {
+      "name": "Bystander receives zone chat but neither private party message",
+      "ok": true
+    },
+    {
+      "name": "Nearby chat reaches players in range",
+      "ok": true
+    },
+    {
+      "name": "Portrait chat stays in view with readable menu targets",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 140,
+        "width": 390,
+        "height": 634
+      }
+    },
+    {
+      "name": "Landscape keeps the composer inside its panel",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 28,
+        "width": 844,
+        "height": 292
+      }
+    },
+    {
+      "name": "Leaving the party removes private-channel eligibility",
+      "ok": true
+    },
+    {
+      "name": "Escape closes chat without affecting the world",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

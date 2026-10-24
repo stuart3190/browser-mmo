@@ -192,7 +192,7 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Reconnect
   - Verified 2026-10-03 · Claude Opus 5.5 · `RealtimeClient` auto-reconnect with backoff, no retry on close codes ≥ 4000 (realtime tests: simulated drop, session replaced); Inventory E2E: socket drop and full realtime server kill/restart recovered without page reload · 418b1fd
 - [x] Chat protocol
-  - Verified 2026-10-03 · Claude Opus 5.5 · chat.send/chat.message for say/zone (test). No guild/party/whisper channels yet · 0f0a413
+  - Verified 2026-10-03 · Claude Opus 5.5 · chat.send/chat.message for say/zone (test). Original say/zone support; party added and verified 2026-10-24. Guild/whisper unfinished · 0f0a413
 
 # Characters / Classes
 
@@ -331,11 +331,12 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 # Trading
 
-- [ ] Player trade
-  - Model only (Trade schema, trade_escrow location).
-- [ ] Trade validation
-- [ ] Atomic exchange
-- [ ] Exploit protection
+- [x] Player trade
+  - Verified 2026-10-24 · Codex · revisioned review/lock/confirm UI, item/copper exchange, fresh-login persistence · 5b546e9
+- [x] Trade validation
+- [x] Atomic exchange
+- [x] Exploit protection
+  - Ten domain cases, HTTP authorization, two real browsers; duplicate confirmation, offer substitution, ownership, binding, capacity and wallet rollback. [Evidence](gameplay/evidence/trading-2026-10-24/README.md).
 
 # Marketplace
 
@@ -445,7 +446,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
     Commit: `2f3aaeab5169d628c750bcf00a1b101e46364a84`.
 - [ ] Guilds
 - [ ] Direct messages
-- [ ] Group chat
+- [x] Group chat
+  - Verified 2026-10-24 · Codex · server membership/range and rate-limit tests; three-player browser privacy and touch composer. [Evidence](gameplay/evidence/social-2026-10-24/README.md).
 - [ ] Guild chat
   - Social schemas are placeholders only.
 
@@ -1405,19 +1407,33 @@ See [living handoff](COMPLETION_HANDOFF.md) for exact paths and resumption instr
 - [x] Migration 0022 applied on an isolated database populated under the deployed 0021 schema:
       account, character, item, item history, wallet and ledger rows remain deeply equal; new trade
       table starts empty. No checkpoint/content migration or production data mutation needed.
-- [ ] Final full verification for direct trading is in progress. First new-feature aggregate
-      stopped on a test helper's overly broad `unknown` HTTP payload type; narrowed to a record.
-      Gameplay tests already passed, and the corrected complete aggregate is running.
-- [ ] Reusable isolated qualification runner is under test. It creates its own PostgreSQL cluster
-      and databases, starts only loopback services, saves evidence and stops only its own processes.
-      Its first browser suite is direct trading; broader game-journey coverage remains to be added.
+- [x] Full direct-trading aggregate passed: formatting/lint/types, 232 unit tests, 72 realtime,
+      9 API and 99 domain integration tests, four production builds and debug-hook exclusion.
+      Assets and content validation also pass. Commit `5b546e9` is pushed to the feature branch.
+- [x] Reusable isolated runner passes its first suite: own PostgreSQL cluster and databases,
+      loopback services, nine browser assertions, evidence saved and own processes stopped.
+      `--skip-checks` smoke mode was exercised; broader journey suites remain to be added.
 
 Browser review found and fixed desktop ability buttons intercepting the trade Lock button and
 mobile sheet header/height overflow. Locked offers now collapse the editor to expose both reviewed
 offers alongside confirmation controls. Final browser run has zero page exceptions; emulated
 390×844 and 844×390 touch checks are functional evidence, not physical-device performance claims.
 
-Next: finish this verification/commit, then implement usable chat and party communication, persistent
+Next: implement usable chat and party communication, persistent
 social features and player-facing marketplace access. Continue across those milestones; no claim
 that the complete game is shippable yet. Historical durability/repair and outer-region greybox limits
 still apply. Hosted CI, physical devices, capacity and off-host backup operation remain unverified.
+
+### Chat checkpoint — 2026-10-24
+
+- [x] Usable Nearby/Zone/Party composer, literal text rendering, 100-message client history, unread
+      badge, Enter/Escape controls and scrollable readable mobile menu bar.
+- [x] Server-owned sender/party routing, non-member rejection and per-account reconnect-resistant
+      message limiting. Protocol 8, world simulation 10, gateway party 2 tests pass.
+- [x] Three-player browser suite passes ten checks, zero exceptions; desktop and both phone
+      orientations visually reviewed. Formatting/lint/types and production builds pass.
+- [ ] Persistent friends/DM/guilds remain separate work. No claim of full social completion.
+
+Next implementation: marketplace browse, exact rolled-item inspection, selling fees, purchase,
+cancellation and own-listing history. Audit found account-wide listing admission is not serialized
+between alts; fix and prove it concurrently while preserving existing item/ledger architecture.

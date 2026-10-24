@@ -65,7 +65,7 @@ export const ChatChannelSchema = z.object({
 });
 export type ChatChannel = z.infer<typeof ChatChannelSchema>;
 
-export const ChatMessageTextSchema = z.string().min(1).max(500);
+export const ChatMessageTextSchema = z.string().trim().min(1).max(500);
 
 export const DirectMessageSchema = z.object({
   id: UuidSchema,

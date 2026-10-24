@@ -87,6 +87,7 @@ export async function startGame(args: {
   };
   mountGameUi(args.ui, {
     api: args.api,
+    chat: (message) => net.send('chat.send', message),
     state,
     actions,
     combat,
@@ -420,7 +421,7 @@ export async function startGame(args: {
     }),
   );
   net.on('presence.update', (m) => state.addLog(`${m.d.name} ${m.d.event} the zone`));
-  net.on('chat.message', (m) => state.addLog(`[${m.d.channel}] ${m.d.from.name}: ${m.d.text}`));
+  net.on('chat.message', (m) => state.addChat(m.d));
   const updateWeapon = () =>
     player?.actor.setArmed(
       state.items

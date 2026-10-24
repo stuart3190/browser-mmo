@@ -1163,3 +1163,15 @@ identity and provenance; no split/automatic merge occurs during trade. Trade sta
 while its window is open; ownership/wallet updates use the existing realtime feed. History is bounded
 to 20 recent trades per UI query, not deleted. Rate/admission/session controls reuse the authenticated
 HTTP host. No production deployment or data reset is part of this implementation.
+
+## 2026-10-24 — Player chat uses existing zone and party authority
+
+The existing `chat.send`/`chat.message` path now admits Nearby (40 m), Zone and Party. The
+simulation derives sender identity and party recipients from current server state; a client
+cannot choose a party ID or impersonate another player. Non-members fail closed. Parties remain
+zone-local outside reserved dungeon runs, so this does not introduce cross-zone party semantics.
+A bounded per-account gateway token bucket (four burst, one message per two seconds) is separate
+from movement admission and survives socket reconnects within the host. Chat is transient, with
+100 recent messages retained in the browser and an unread badge; it is not durable direct messaging.
+Text is trimmed/length-bounded and rendered as text. Persistent friends/DM/guilds remain separate
+unfinished work. The menu bar scrolls on narrow screens to retain readable 44-pixel tap targets.

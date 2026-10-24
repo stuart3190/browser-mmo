@@ -16,12 +16,14 @@ import { PartyPanel, PartySummary } from './PartyUI';
 import { FirstSteps } from './FirstSteps';
 import { AbilityBar } from './AbilityBar';
 import { WorldWindow } from './WorldWindow';
+import { ChatWindow } from './ChatWindow';
 import { TradeWindow } from './TradeWindow';
 import { Minimap } from './Minimap';
 import { DialoguePanel, QuestLogWindow, QuestTracker } from './QuestUI';
 import { TouchControls, useTouchControls } from './TouchControls';
 
 const SHORTCUTS: Record<string, WindowId> = {
+  Enter: 'chat',
   KeyM: 'world',
   KeyP: 'party',
   KeyT: 'trade',
@@ -105,7 +107,10 @@ function GameUI() {
         <summary>Controls</summary>
         <p>WASD to move · drag the view to orbit · scroll to zoom.</p>
         <p>Click a creature or press Tab to target. F toggles attack; 1–3 use abilities.</p>
-        <p>E to talk or pick up · B for Bag · C for gear · J for quests · Escape to close.</p>
+        <p>
+          Enter for chat · E to talk or pick up · B for Bag · C for gear · J for quests · Escape to
+          close.
+        </p>
         <p>On touch: left stick to move, drag the world to look, tap a target and use Attack.</p>
       </details>
       <Toasts />
@@ -118,6 +123,7 @@ function GameUI() {
         <WorldWindow />
         <ProfessionWindow />
         <TradeWindow />
+        <ChatWindow />
       </div>
       <DialoguePanel />
       <ItemDetails />
@@ -232,6 +238,7 @@ function ActionBar() {
       {btn('world', 'World', 'M')}
       {btn('professions', 'Skills', '')}
       {btn('trade', 'Trade', 'T')}
+      {btn('chat', state.unreadChat ? `Chat (${state.unreadChat})` : 'Chat', '↵')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button
           className={state.target.attacking ? 'action attack active' : 'action attack'}

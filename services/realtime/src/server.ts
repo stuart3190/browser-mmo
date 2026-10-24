@@ -271,6 +271,8 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   });
 
   const upgrades = new RateLimit(20, 2);
+  // Per account, surviving reconnects within this host; separate from movement traffic.
+  const chatLimits = new RateLimit(4, 0.5);
   const wss = new WebSocketServer({
     noServer: true,
     maxPayload: MAX_CLIENT_FRAME_BYTES,
@@ -1320,6 +1322,11 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         return;
       }
       case 'chat.send':
+        if (!chatLimits.take(player.accountId, now))
+          throw new DomainError(
+            ErrorCode.RATE_LIMITED,
+            'Chat is busy. Wait a moment before sending again.',
+          );
         player.zone.chat(player.characterId, msg.d.channel, msg.d.text, now);
         return;
       case 'target.set':

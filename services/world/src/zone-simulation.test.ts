@@ -22,6 +22,40 @@ function sim() {
 }
 
 describe('ZoneSimulation', () => {
+  it('routes nearby, zone and party chat without exposing private messages to bystanders', () => {
+    const s = sim(),
+      a = player('Aria'),
+      b = player('Bram'),
+      c = player('Cara');
+    s.addPlayer(a, { x: 0, y: 0, z: 0 }, 0, 0);
+    s.addPlayer(b, { x: 1, y: 0, z: 0 }, 0, 0);
+    s.addPlayer(c, { x: 60, y: 0, z: 0 }, 0, 0);
+    s.drainOutbox();
+    expect(() => s.chat(a.characterId, 'party', 'secret', 1)).toThrow(/Join a party/);
+    s.chat(a.characterId, 'say', 'hello', 2);
+    expect([...s.drainOutbox().keys()].sort()).toEqual([a.characterId, b.characterId].sort());
+    s.chat(a.characterId, 'zone', 'hello all', 3);
+    expect(s.drainOutbox().size).toBe(3);
+    s.parties.invite(a.characterId, b.characterId, 4);
+    s.parties.respond(b.characterId, s.parties.view(b.characterId).invitation!.id, true, 5);
+    s.chat(a.characterId, 'party', 'secret', 6);
+    const out = s.drainOutbox();
+    expect([...out.keys()].sort()).toEqual([a.characterId, b.characterId].sort());
+    expect(out.get(b.characterId)).toEqual([
+      {
+        t: 'chat.message',
+        d: {
+          channel: 'party',
+          from: { characterId: a.characterId, name: 'Aria' },
+          text: 'secret',
+          sentAt: 6,
+        },
+      },
+    ]);
+    s.parties.leave(b.characterId);
+    expect(() => s.chat(b.characterId, 'party', 'after leaving', 7)).toThrow(/Join a party/);
+  });
+
   it('spawns NPCs and pickups from chunk data and sends a snapshot on join', () => {
     const s = sim();
     const a = player('Aria');

@@ -76,7 +76,7 @@ export const PickupRequestMsg = clientMsg(
 
 export const ChatSendMsg = clientMsg(
   'chat.send',
-  z.object({ channel: z.enum(['say', 'zone']), text: ChatMessageTextSchema }),
+  z.object({ channel: z.enum(['say', 'zone', 'party']), text: ChatMessageTextSchema }).strict(),
 );
 
 export const PingMsg = clientMsg('ping', z.object({ clientTime: z.number() }));

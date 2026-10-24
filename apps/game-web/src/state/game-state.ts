@@ -9,7 +9,15 @@ import type {
 import { ItemStore } from '@mmo/ui';
 
 export type WindowId =
-  'inventory' | 'character' | 'bank' | 'quests' | 'party' | 'world' | 'professions' | 'trade';
+  | 'inventory'
+  | 'character'
+  | 'bank'
+  | 'quests'
+  | 'party'
+  | 'world'
+  | 'professions'
+  | 'trade'
+  | 'chat';
 
 export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 
@@ -66,6 +74,8 @@ export class GameState {
   zoneName = '';
   prompt: string | null = null;
   log: LogLine[] = [];
+  chatMessages: (ServerPayload<'chat.message'> & { id: number })[] = [];
+  unreadChat = 0;
   toasts: Toast[] = [];
   open = new Set<WindowId>();
   selectedItemId: string | null = null;
@@ -151,6 +161,12 @@ export class GameState {
     this.emit();
   }
 
+  addChat(message: ServerPayload<'chat.message'>): void {
+    this.chatMessages = [...this.chatMessages.slice(-99), { ...message, id: this.nextId++ }];
+    if (!this.open.has('chat')) this.unreadChat = Math.min(99, this.unreadChat + 1);
+    this.emit();
+  }
+
   addLog(text: string, kind: LogLine['kind'] = 'info'): void {
     this.log = [...this.log.slice(-29), { id: this.nextId++, at: Date.now(), text, kind }];
     this.emit();
@@ -175,8 +191,10 @@ export class GameState {
   toggle(w: WindowId, force?: boolean): void {
     const on = force ?? !this.open.has(w);
     const next = new Set(this.open);
-    if (on) next.add(w);
-    else next.delete(w);
+    if (on) {
+      next.add(w);
+      if (w === 'chat') this.unreadChat = 0;
+    } else next.delete(w);
     this.open = next;
     this.emit();
   }

@@ -147,3 +147,49 @@ it('party protocol authenticates roles, rejects replays and recovers membership 
   ca.ws.close();
   cb.ws.close();
 }, 30_000);
+
+it('delivers private party chat only to members and limits chat per account across reconnects', async () => {
+  const host = await boot();
+  const a = await player(),
+    b = await player(),
+    outsider = await player();
+  const ca = await join(host.url, a),
+    cb = await join(host.url, b),
+    cc = await join(host.url, outsider);
+  ca.send('party.invite', { characterId: b.characterId });
+  const invitation = (await cb.waitFor('party.update', (m) => !!m.d.invitation)).d.invitation!;
+  cb.send('party.respond', { invitationId: invitation.id, accept: true });
+  const party = (await ca.waitFor('party.update', (m) => m.d.members.length === 2)).d.partyId!;
+  ca.send('chat.send', { channel: 'party', text: '  private hello  ' });
+  expect((await cb.waitFor('chat.message')).d).toMatchObject({
+    channel: 'party',
+    text: 'private hello',
+    from: { characterId: a.characterId },
+  });
+  ca.send('chat.send', { channel: 'zone', text: 'public marker' });
+  await cc.waitFor('chat.message', (m) => m.d.text === 'public marker');
+  expect(cc.all('chat.message').some((m) => m.d.channel === 'party')).toBe(false);
+  expect(
+    await cc.error(cc.send('chat.send', { channel: 'party', text: 'forged membership' })),
+  ).toBe('CONFLICT');
+  const attempts = Array.from({ length: 6 }, (_, i) =>
+    ca.send('chat.send', { channel: 'zone', text: `burst ${i}` }),
+  );
+  expect(await ca.error(attempts.at(-1)!)).toBe('RATE_LIMITED');
+  ca.ws.close();
+  await cb.waitFor('party.update', (m) =>
+    m.d.members.some((x) => x.characterId === a.characterId && !x.online),
+  );
+  const rejoined = await join(host.url, a);
+  expect(
+    await rejoined.error(rejoined.send('chat.send', { channel: 'zone', text: 'reconnect bypass' })),
+  ).toBe('RATE_LIMITED');
+  // Chat pressure must not prevent ordinary party/game actions.
+  cb.messages = [];
+  cb.send('party.leave', { partyId: party });
+  await cb.waitFor('party.update', (m) => m.d.partyId === null && m.d.invitation === null);
+  expect(
+    await cb.error(cb.send('chat.send', { channel: 'party', text: 'no longer a member' })),
+  ).toBe('CONFLICT');
+  for (const c of [rejoined, cb, cc]) c.ws.close();
+}, 20_000);

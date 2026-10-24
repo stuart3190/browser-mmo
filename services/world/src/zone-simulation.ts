@@ -1066,15 +1066,23 @@ export class ZoneSimulation {
   // Chat (zone-local channels only for now)
   // -------------------------------------------------------------------------
 
-  chat(characterId: string, channel: 'say' | 'zone', text: string, nowMs: number): void {
+  chat(characterId: string, channel: 'say' | 'zone' | 'party', text: string, nowMs: number): void {
     const p = this.players.get(characterId);
     if (!p) return;
+    const party = channel === 'party' ? this.parties.view(characterId) : null;
+    if (party && !party.partyId)
+      throw new DomainError(ErrorCode.CONFLICT, 'Join a party before using party chat');
+    const members = new Set(party?.members.map((m) => m.characterId));
     const msg: OutMessage = {
       t: 'chat.message',
       d: { channel, from: { characterId, name: p.name }, text, sentAt: nowMs },
     };
     for (const other of this.players.values()) {
-      if (channel === 'zone' || distance2D(other.position, p.position) <= 40)
+      if (
+        channel === 'party'
+          ? members.has(other.characterId)
+          : channel === 'zone' || distance2D(other.position, p.position) <= 40
+      )
         this.push(other.characterId, msg);
     }
   }

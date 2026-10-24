@@ -44,6 +44,23 @@ describe('client message parsing', () => {
     ).toBe(false);
   });
 
+  it('accepts trimmed party chat but rejects empty text and forged routing fields', () => {
+    expect(
+      parseClientMessage(
+        encodeClientMessage('chat.send', 1, { channel: 'party', text: '  hello  ' }),
+      ),
+    ).toMatchObject({ ok: true, message: { d: { channel: 'party', text: 'hello' } } });
+    for (const d of [
+      { channel: 'say', text: '   ' },
+      { channel: 'zone', text: 'x'.repeat(501) },
+      { channel: 'party', text: 'hello', partyId: uuidv7() },
+      { channel: 'say', text: 'hello', from: { name: 'Someone else' } },
+    ])
+      expect(parseClientMessage(JSON.stringify({ v: 1, t: 'chat.send', seq: 2, d })).ok).toBe(
+        false,
+      );
+  });
+
   it('rejects unsupported protocol versions with a specific code', () => {
     const res = parseClientMessage(
       JSON.stringify({ v: 99, t: 'ping', seq: 1, d: { clientTime: 1 } }),
