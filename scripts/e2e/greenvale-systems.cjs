@@ -214,6 +214,24 @@ function check(name, ok, detail) {
       throw Error('Could not select the intended live encounter through Tab targeting');
     if (!(await p.evaluate(() => window.__mmo.target.attacking))) await p.keyboard.press('KeyF');
   }
+  async function useReadyAbilities(p) {
+    await p.bringToFront();
+    for (const ability of await p.evaluate(() =>
+      window.__mmo.abilities.list
+        .filter((a) => a.abilityId !== 'ability.common.attack')
+        .map((a) => a.abilityId),
+    )) {
+      const btn = p.locator(`[data-testid="ability-${ability}"]`);
+      if (!(await btn.isEnabled()) || (await btn.getAttribute('data-ready')) !== 'true') continue;
+      if (TOUCH) await btn.tap({ timeout: 5000 });
+      else {
+        // Use the visible action-bar shortcut, as a desktop player would during combat.
+        const key = (await btn.locator('kbd').textContent()).trim();
+        if (!/^[1-9]$/.test(key)) throw Error('Missing ability shortcut');
+        await p.keyboard.press(`Digit${key}`);
+      }
+    }
+  }
   async function fight(p, ref, partner) {
     for (const actor of partner ? [p, partner] : [p]) {
       await actor.bringToFront();
@@ -226,13 +244,9 @@ function check(name, ok, detail) {
       );
     }
     const alive = await p.evaluate(
-        (ref) => window.__mmo.enemies.filter((e) => !e.dead && e.refId === ref),
-        ref,
-      ),
-      pos = await p.evaluate(() => window.__mmo.position);
-    alive.sort((a, b) => {
-      return 0;
-    });
+      (ref) => window.__mmo.enemies.filter((e) => !e.dead && e.refId === ref),
+      ref,
+    );
     const enemy = alive[0];
     if (!enemy) throw Error('No enemy ' + ref);
     await startAttack(p, enemy);
@@ -258,28 +272,12 @@ function check(name, ok, detail) {
         await remedy(p);
         used = true;
       }
-      for (const ability of await p.evaluate(() =>
-        window.__mmo.abilities.list
-          .filter((a) => a.abilityId !== 'ability.common.attack')
-          .map((a) => a.abilityId),
-      )) {
-        const btn = p.locator(`[data-testid="ability-${ability}"]`);
-        if ((await btn.isEnabled()) && (await btn.getAttribute('data-ready')) === 'true')
-          await btn[TOUCH ? 'tap' : 'click']({ timeout: 1500 });
-      }
+      await useReadyAbilities(p);
       await leaveGroundWarning(p, state.cue, gd.collisionWorld(await zone(p)));
       if (partner) {
         await partner.bringToFront();
         await leaveGroundWarning(partner, state.cue, gd.collisionWorld(await zone(partner)));
-        for (const ability of await partner.evaluate(() =>
-          window.__mmo.abilities.list
-            .filter((a) => a.abilityId !== 'ability.common.attack')
-            .map((a) => a.abilityId),
-        )) {
-          const btn = partner.locator(`[data-testid="ability-${ability}"]`);
-          if ((await btn.isEnabled()) && (await btn.getAttribute('data-ready')) === 'true')
-            await btn[TOUCH ? 'tap' : 'click']({ timeout: 1500 });
-        }
+        await useReadyAbilities(partner);
       }
       await p.waitForTimeout(250);
     }

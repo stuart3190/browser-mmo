@@ -1,0 +1,49 @@
+{
+  "error": "locator.click: Timeout 1500ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"ability-ability.mage.firebolt\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button class=\"ability\" data-ready=\"true\" data-testid=\"ability-ability.mage.firebolt\" title=\"Firebolt \u2014 Hurl a bolt of fire at a distant enemy. Scales with Intellect and Spell Power.\" aria-label=\"Firebolt \u2014 Hurl a bolt of fire at a distant enemy. Scales with Intellect and Spell Power.\">\u2026</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n",
+  "checks": [
+    {
+      "name": "Earned equipment equipped through inventory",
+      "ok": true,
+      "detail": "weapon.staff.oak_staff"
+    },
+    {
+      "name": "Entered a private owned run",
+      "ok": true,
+      "detail": {
+        "id": "01a16de4-813b-741c-af96-3193a40c1723",
+        "status": "active",
+        "expiresAtMs": 1792852254264,
+        "kills": 0,
+        "required": 3,
+        "inside": true,
+        "owner": true
+      }
+    },
+    {
+      "name": "Crafted remedy restores actual health",
+      "ok": true
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a16de4-813b-741c-af96-3193a40c1723:e:1"
+    },
+    {
+      "name": "Reconnect returns to the same live instance",
+      "ok": true
+    },
+    {
+      "name": "Death recovers at the private threshold without resetting cleared objectives",
+      "ok": true
+    }
+  ],
+  "instance": {
+    "id": "01a16de4-813b-741c-af96-3193a40c1723",
+    "status": "active",
+    "expiresAtMs": 1792852254264,
+    "kills": 1,
+    "required": 3,
+    "inside": true,
+    "owner": true
+  }
+}

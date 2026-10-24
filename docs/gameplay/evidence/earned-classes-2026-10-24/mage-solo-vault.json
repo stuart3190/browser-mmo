@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "mode": "solo",
+  "users": [
+    "finishmage_mvm9ku7m"
+  ],
+  "checks": [
+    {
+      "name": "Entered a private owned run",
+      "ok": true,
+      "detail": {
+        "id": "01a16de4-813b-741c-af96-3193a40c1723",
+        "status": "active",
+        "expiresAtMs": 1792852254264,
+        "kills": 1,
+        "required": 3,
+        "inside": true,
+        "owner": true
+      }
+    },
+    {
+      "name": "Reconnect returns to the same live instance",
+      "ok": true
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a16de4-813b-741c-af96-3193a40c1723:e:2"
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a16de4-813b-741c-af96-3193a40c1723:e:3"
+    },
+    {
+      "name": "All encounters authoritatively complete the run",
+      "ok": true
+    },
+    {
+      "name": "Completed private state survives relog",
+      "ok": true
+    },
+    {
+      "name": "Exit returns to the real entrance",
+      "ok": true
+    },
+    {
+      "name": "Reset creates a fresh identity with no stale objective state",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

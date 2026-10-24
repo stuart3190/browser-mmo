@@ -1,0 +1,24 @@
+ENTERED finishmage_mvm9ku7m zone.greenvale.broken_vault
+AT VAULT
+PASS Entered a private owned run {
+  id: '01a16de4-813b-741c-af96-3193a40c1723',
+  status: 'active',
+  expiresAtMs: 1792852254264,
+  kills: 1,
+  required: 3,
+  inside: true,
+  owner: true
+}
+PASS Reconnect returns to the same live instance 
+PASS Actual private encounter defeated instance:01a16de4-813b-741c-af96-3193a40c1723:e:2
+DODGE {"center":{"x":95.81504169031334,"y":0,"z":32.405172185872765},"range":5,"to":{"x":102.81504169031334,"z":32.405172185872765}}
+DODGE {"center":{"x":102.92564169081399,"y":0,"z":32.405172185872765},"range":5,"to":{"x":107.87538915911982,"z":37.354919654178595}}
+DODGE {"center":{"x":107.45763047299714,"y":0,"z":36.93716096805589},"range":5,"to":{"x":112.40737794130297,"z":41.88690843636172}}
+DODGE {"center":{"x":111.82924743690373,"y":0,"z":41.308777931962446},"range":5,"to":{"x":116.77899490520956,"z":46.258525400268276}}
+DODGE {"center":{"x":116.13637626266953,"y":0,"z":45.61590675772824},"range":5,"to":{"x":121.08612373097536,"z":50.56565422603407}}
+PASS Actual private encounter defeated instance:01a16de4-813b-741c-af96-3193a40c1723:e:3
+PASS All encounters authoritatively complete the run 
+PASS Completed private state survives relog 
+PASS Exit returns to the real entrance 
+PASS Reset creates a fresh identity with no stale objective state 
+PASS No browser exceptions []

@@ -35,3 +35,23 @@ state were retained; no grants or instance reset bypassed a failed encounter. Ra
 completion/death screenshots are archived. The report's second `users` entry is an unused legacy
 helper default; only the Warrior logged in for this solo run. The driver now reports only actual
 actors. Mage professions/staff/solo and mixed-class party remain in progress.
+
+Mage professions and staff: five assertions each pass using earned materials, paid job timers,
+relogin/collection and durable Fieldcraft gains. `mage-professions` and `mage-staff` reports/logs.
+First Mage solo attempt defeated guardian one, reconnected to the same UUID and passed intentional
+death/recovery; it then stopped on a 1.5-second browser click timeout for visible Firebolt while
+alive. Failure summary/screenshot retained. Desktop driver now uses the action bar's visible digit
+shortcut; touch still uses real taps with a bounded five-second wait. Continuation reuses the same
+UUID `01a16de4-813b-741c-af96-3193a40c1723`; earlier death proof is separate and not repeated.
+
+Mage continuation and mixed-class touch party both PASS. The Mage completed guardian two and
+Bell Keeper with visible warning dodges, completion/relogin, exit/reset/new clean instance. Prior
+first-guardian and death/recovery proof is retained separately. Party UUID
+`01a16de9-5e7a-7897-a43f-6abf27c017db` admitted both earned actors together, defeated all three
+encounters, reconnected, persisted completion and reset only after both exited. Phone UI uses real
+taps; screenshots reviewed. No grants, teleports, injected kills or progression were used.
+Read-only independent DB evidence confirms completed timestamps and joined/rewarded markers for
+all three original runs and both party members. Their expired statuses result from the verified
+explicit resets, with completion tombstones retained. Reports/logs: `mage-solo-vault`,
+`mixed-class-party-vault`, `dungeon-members-db.json`. Fresh uninterrupted orchestrator run and
+physical-device performance are not claimed.

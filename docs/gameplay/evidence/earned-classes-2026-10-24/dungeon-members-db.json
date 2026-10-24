@@ -1,0 +1,34 @@
+[
+    {
+        "id": "01a16dcf-f42f-7376-8e59-170e92baf8f0",
+        "member": "finishwarmvmjazse",
+        "status": "expired",
+        "joinedAt": "2026-10-24T14:08:27.552321+02:00",
+        "rewardedAt": "2026-10-24T14:18:47.29+02:00",
+        "completedAt": "2026-10-24T14:18:47.29+02:00"
+    },
+    {
+        "id": "01a16de4-813b-741c-af96-3193a40c1723",
+        "member": "finishmagemvmjkuhm",
+        "status": "expired",
+        "joinedAt": "2026-10-24T14:30:54.28252+02:00",
+        "rewardedAt": "2026-10-24T14:34:39.069+02:00",
+        "completedAt": "2026-10-24T14:34:39.069+02:00"
+    },
+    {
+        "id": "01a16de9-5e7a-7897-a43f-6abf27c017db",
+        "member": "finishwarmvmjazse",
+        "status": "expired",
+        "joinedAt": "2026-10-24T14:36:13.071902+02:00",
+        "rewardedAt": "2026-10-24T14:37:37.035+02:00",
+        "completedAt": "2026-10-24T14:37:37.035+02:00"
+    },
+    {
+        "id": "01a16de9-5e7a-7897-a43f-6abf27c017db",
+        "member": "finishmagemvmjkuhm",
+        "status": "expired",
+        "joinedAt": "2026-10-24T14:36:18.361485+02:00",
+        "rewardedAt": "2026-10-24T14:37:37.035+02:00",
+        "completedAt": "2026-10-24T14:37:37.035+02:00"
+    }
+]

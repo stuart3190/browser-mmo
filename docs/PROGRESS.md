@@ -1648,3 +1648,12 @@ Hosted CI 40092678899 passes the pushed c0a47f1 checkpoint. Merged types/lint pa
       succeeded. Added sanitized request-failure diagnostics; no authentication bypass or retry masking.
 - [ ] Capacity remains unqualified. Profiling/optimization is isolated in a separate source worktree
       while earned actors continue. No production changes or admission-limit increase.
+
+Earned gameplay completion checkpoint: Mage solo continuation and mixed Warrior/Mage touch party
+both passed all remaining Vault encounters, reconnect, completion/relogin, exit/reset/new identity.
+The Mage's first attempt timed out on a 1.5-second click while alive; desktop combat now uses visible
+action-bar digit shortcuts. Its first guardian and death/recovery proofs remain separate. Read-only
+DB confirms all three original runs completed and all four participating member records rewarded.
+[Archived reports, failure evidence and reviewed screenshots](gameplay/evidence/earned-classes-2026-10-24/README.md).
+Both actors remain intact; no earned journey is currently running. Live release remains 2c47b27
+and both production readiness endpoints pass. No deployment performed.

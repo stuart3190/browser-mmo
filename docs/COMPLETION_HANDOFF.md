@@ -146,3 +146,17 @@ Capacity optimizer worktree `/tmp/bo-checkpoint-performance`, branch codex/check
 is experimenting with schema-specific version-2 checkpoint encoding, preserving original JSON.
 It must pass compatibility tests, world/realtime recovery tests and fresh load before integration.
 Do not mutate main runtime while earned runs are active. No deployment authorized/performed.
+
+### Earned journeys finished
+
+`/tmp/bo-earned-mage-vault-recovery/result.json` is ok:true for Mage solo continuation and mixed
+party. Earlier story/professions/Warrior solo evidence remains separate and archived. The original
+Mage click-timeout attempt is also archived. All current gameplay controllers have exited; main
+runtime can now be updated intentionally. Both actors remain available, no resets/grants.
+Performance branch 843919d at `/tmp/bo-checkpoint-performance`: complete checks/build/restore pass;
+51-browser qualifier still running in 05XEXU, currently market. Await it before a quiet optimized
+production load test. New guild implementation is uncommitted in `/tmp/bo-persistent-guilds`,
+branch codex/persistent-guilds. Migration0024, domain/routes/UI exist; seven domain tests pass,
+eighth stale-guild test and HTTP test running. Types found two UI wiring mistakes being corrected.
+No guild work is verified complete or integrated yet. Main latest pushed0804641; newer evidence
+and desktop shortcut driver await commit. Keep worktrees and local test databases distinct.

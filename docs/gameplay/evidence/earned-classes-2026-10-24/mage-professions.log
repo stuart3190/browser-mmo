@@ -1,0 +1,11 @@
+ENTERED finishmage_mvm9ku7m zone.aurelian.greenvale_marches
+PASS Inventory-backed field tool improves real herb yield 3
+PASS Craft reserves its authored timer {
+  id: '1e23f554-27fc-42c6-b57c-75ac81757ec4',
+  offerId: 'service.greenvale.craft_remedy',
+  readyAtMs: 1792844465784,
+  completed: false
+}
+PASS Timed craft survives relog and yields its real authored output consumable.greenvale.remedy
+PASS Craft completion awards profession XP 
+PASS No browser exceptions []

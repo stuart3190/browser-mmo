@@ -1,0 +1,24 @@
+ENTERED finishwar_mvm9azse zone.aurelian.greenvale_marches
+AT VAULT
+PASS Entered a private owned run {
+  id: '01a16de9-5e7a-7897-a43f-6abf27c017db',
+  status: 'active',
+  expiresAtMs: 1792852573047,
+  kills: 0,
+  required: 3,
+  inside: true,
+  owner: true
+}
+PASS Both party members join the same private instance 
+PASS Actual private encounter defeated instance:01a16de9-5e7a-7897-a43f-6abf27c017db:e:1
+PASS Reconnect returns to the same live instance 
+PASS Actual private encounter defeated instance:01a16de9-5e7a-7897-a43f-6abf27c017db:e:2
+DODGE {"center":{"x":100.33947417900083,"y":0,"z":31.99363603922221},"range":5,"to":{"x":105.28922164730666,"z":36.94338350752804}}
+DODGE {"center":{"x":100.33947417900083,"y":0,"z":31.99363603922221},"range":5,"to":{"x":93.38453973484785,"z":32.78665992129285}}
+DODGE {"center":{"x":105.06694930291104,"y":0,"z":36.317311163060864},"range":5,"to":{"x":110.01669677121687,"z":41.267058631366694}}
+PASS Actual private encounter defeated instance:01a16de9-5e7a-7897-a43f-6abf27c017db:e:3
+PASS All encounters authoritatively complete the run 
+PASS Completed private state survives relog 
+PASS Exit returns to the real entrance 
+PASS Reset creates a fresh identity with no stale objective state 
+PASS No browser exceptions []

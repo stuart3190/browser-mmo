@@ -39,3 +39,12 @@ Host observation after the run showed significant I/O wait; the cause is not yet
 
 `QUAL_CPU_PROFILE=1` enables a private realtime CPU profile in the disposable production directory
 for diagnosis. Profiling is not itself performance qualification. Admission remains unchanged.
+
+Fourth run, profiled 60 seconds: EY27et. Integrated built-production password/TLS browser smoke
+passes all 13 checks. Capacity fails: 17.13 Hz, RTT p95 1158 ms, HTTP p95 530 ms; zero unexpected
+protocol/HTTP errors/disconnects; 95 economy writes, five sales, 30 messages/reads, all actors alive.
+This is diagnostic under concurrent earned-browser and local test activity, not quiet-host proof.
+CPU profile's final 62 seconds shows checkpoint serialization 5.74 seconds plus its replacer 0.62;
+profile retained privately. Schema encoder optimization is being tested separately.
+Prior Pxgwmo smoke failed a phone fetch while desktop succeeded; repeated smoke passed without
+an authentication change or retry. Credentials/certificates and raw profiles are not archived.

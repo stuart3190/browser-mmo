@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "mode": "professions",
+  "users": [
+    "finishmage_mvm9ku7m",
+    "route_muuzc28m"
+  ],
+  "checks": [
+    {
+      "name": "Inventory-backed field tool improves real herb yield",
+      "ok": true,
+      "detail": 3
+    },
+    {
+      "name": "Craft reserves its authored timer",
+      "ok": true,
+      "detail": {
+        "id": "1e23f554-27fc-42c6-b57c-75ac81757ec4",
+        "offerId": "service.greenvale.craft_remedy",
+        "readyAtMs": 1792844465784,
+        "completed": false
+      }
+    },
+    {
+      "name": "Timed craft survives relog and yields its real authored output",
+      "ok": true,
+      "detail": "consumable.greenvale.remedy"
+    },
+    {
+      "name": "Craft completion awards profession XP",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}
