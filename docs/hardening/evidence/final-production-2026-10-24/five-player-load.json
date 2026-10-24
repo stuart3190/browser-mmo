@@ -1,0 +1,71 @@
+{
+  "ok": false,
+  "at": "2026-10-24T14:13:16.618Z",
+  "players": 5,
+  "intendedSeconds": 120,
+  "transport": "TLS, production password auth",
+  "errors": {},
+  "expectedRejections": {},
+  "httpErrors": {},
+  "disconnects": 0,
+  "corrections": 9,
+  "bytesIn": 2959587,
+  "bytesOut": 744763,
+  "damage": 762,
+  "playerHits": 73,
+  "respawnsRequested": 5,
+  "kills": 51,
+  "vitals": 498,
+  "economyWrites": 194,
+  "sales": 5,
+  "socialReads": 388,
+  "messagesSent": 64,
+  "readReceipts": 60,
+  "guildMessagesSent": 64,
+  "guildHistoryReads": 194,
+  "gates": {
+    "minimumSimulationHz": 19.5,
+    "maximumRttP95Ms": 250,
+    "maximumHttpP95Ms": 500
+  },
+  "skippedHttpCycles": 1,
+  "productionGates": {
+    "onlyPassword": true,
+    "devLogin404": true,
+    "privateMetricsHidden": true,
+    "guildConsent": true,
+    "logoutDisconnectAndBearerRejection": true
+  },
+  "measuredAt": "2026-10-24T14:13:40.298Z",
+  "elapsedSeconds": 120.013533707,
+  "livePlayersAtEnd": 5,
+  "simulationHz": 19.122843308680444,
+  "skippedSlots": 105,
+  "cpuCores": 0.29586285732314016,
+  "rssBytes": 183590912,
+  "rttMs": {
+    "p50": 41,
+    "p95": 162,
+    "p99": 204,
+    "samples": 195
+  },
+  "httpMs": {
+    "p95": 231.81275800000003,
+    "samples": 1168
+  },
+  "dbProbeMs": {
+    "p95": 16.56552200000442,
+    "p99": 44.002908000024036
+  },
+  "sampledTickP95Ms": 42.8,
+  "sampledCheckpointP95Ms": 99.74761200003559,
+  "sampledQueuePeak": 7485,
+  "sampledSocketPeak": 0,
+  "db": {
+    "rewarded": 8,
+    "rewards": 8,
+    "sales": 5,
+    "history": 238
+  },
+  "revocationCloseCode": 4000
+}

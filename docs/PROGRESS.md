@@ -1771,3 +1771,18 @@ trade11,market8,chat10,friends12,onboarding10,guilds15). Fullformat/types/lint,1
 production builds/all-chunk debug guard and release-preparation fixtures also pass. Backend unchanged
 from35ee149's204 integration checks and20-table restore. Password/TLS/deferred-engine profile and
 unprofiled guild load are now running separately. [Evidence](hardening/evidence/final-browser-2026-10-24/README.md).
+
+### Final candidate release gates — 2026-10-24
+
+- [x] Combined78-assertion browser run and28-assertion built-production password/TLS profile pass.
+      Production entry proves deferred engine loading and absent development hook.
+- [x] Final quiet five-player workload completes combat, respawn, inventory, market, direct/guild
+      messaging and revocation checks without unexpected protocol/HTTP errors or disconnects.
+- [ ] **Capacity gate FAILED:**19.123Hz versus required19.5Hz. RTT p95162ms and HTTP p95231.8ms pass.
+      No admission increase. [Raw report and evidence](hardening/evidence/final-production-2026-10-24/README.md).
+- [ ] Physical-phone performance and off-host recovery remain unqualified. Owner asked for an
+      existing staging host/SSH target and off-host backup destination; no purchases authorized.
+- [ ] Prepare immutable final candidate without publishing, verify unchanged live release/readiness.
+
+The core requested Warrior/Mage earned paths and social/economy features are verified. This remains
+an unqualified release candidate, not a genuinely shippable game claim; external release gates are open.

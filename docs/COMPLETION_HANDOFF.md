@@ -44,68 +44,58 @@ All controllers exited. These are staged resumes, NOT a single uninterrupted orc
 Earlier driver/network failures are retained, not hidden. Evidence and reviewed screenshots:
 `docs/gameplay/evidence/earned-classes-2026-10-24`. Actor data remains intact.
 
-## Current verification and branches
+## Final integrated candidate
 
-- Hosted CI 40098308166 for 35ee149 PASSED. CI 40100303234 for 84a3465 is running. Earlier failed
-  evidence JSON formatting was corrected f4ceb55. Main 5b19b52 archive commit is not yet pushed.
-- Integrated 35ee149 OanPjT passes format/lint/types,236 unit,117 domain,75 realtime,12 HTTP tests, four builds,
-  debug guard, assets/content and 20-table populated upgrade/restore. Aggregate FAILED at blank
-  first trade login. Archive `docs/hardening/evidence/integrated-guilds-2026-10-24`. No network
-  diagnostic existed for that failure; do not claim a specific cause.
-- Guilds are integrated: migration 0024, consent, roles, durable chat, notices/transfer/disband,
-  stale-guild binding, responsive UI. Final 15 browser assertions passed oHpLwU. Guild vault unfinished.
-- Checkpoint encoding preserves exact v2 bytes; full backend proof plus staged 51 browser checks.
-  Three simultaneous SwiftShader chat actors use DPR 0.5 (CSS sizes/privacy checks unchanged).
-- Database lifecycle handles failed idle pool clients, preserves ownership fencing and coalesces
-  shutdown drains; real DB replacement/ownership tests and full build checks passed.
-- Startup recovery fb8bc5e: static HTML fallback, caught module errors, engine import after character
-  choice. Six injected network-failure browser assertions passed 1BU62M. Login stays functional before
-  the game module; reload returns the existing character. Explicit production build passes all-chunk
-  debug guard. Engine-only codeSplitting group prevents preload helper pulling engine into login.
-  Production enter helper now asserts no early engine request; actual production check still pending.
-- Preparation mode 7b61de5 / merge 84a3465: `deploy-broken-odyssey.sh --candidate --prepare-only` builds
-  and validates but exits before any live configuration/service/credential/DB/current mutation.
-  Private functional fixtures pass fresh preparation, immutable reuse and invalid flags. No real
-  candidate artifact prepared yet; no deployment authorized/performed.
-- Active rendering source `/tmp/bo-static-world-batching`, branch `codex/static-world-batching`,
-  candidate a973ae5 includes all main runtime changes through 84a3465. Static geometry batching per
-  chunk/material reduces 532→165 meshes with identical 32,976 vertices / 96,942 indices / materials / textures.
-  All 11 frontend tests, full format/types/lint and four production builds/debug guard now pass.
-  No FPS claim. Initial browser driver picked first replicated NPC off-screen; nearest-NPC/ray-hit
-  read-only diagnostics correct that, preserving failed runs. ZwXpKt also failed blank beforelogin.
-- ACTIVE detached `/tmp/bo-final-render-candidate.sh`: code checks completed, now eight browser
-  suites in order rendering,startup,trading,marketplace,social,friends,onboarding,guilds (78 assertions).
-  Logs `/tmp/bo-final-render-browser.log`, exit `.exit`. If green, automatically runs unprofiled
-  five-player 120s production --load; logs `/tmp/bo-final-render-load.log`, exit `.exit`.
-  No other builds/tests/browsers during measured load. Do not edit running candidate runtime.
-- Other worktrees performance/recovery/presentation/guilds/release-preparation are merged into main;
-  retain until final integration. Main runtime and earned actors remain stopped/intact.
+Main69c9483 integrates every implementation branch, including renderinga973ae5. Later changes are
+proof/checklist documentation only. Hosted CI40100303234 for84a3465 passed; final runtime CI40101349993
+for69c9483 is still pending at this checkpoint. No other coding branch needs integration.
 
-## Capacity remains a release blocker
+-35ee149 backend proof OanPjT:236unit,117domain,75RT,12HTTP, fullformat/lint/types/four builds,
+assets/content and20-table populated upgrade/restore pass. First browser entry failed blank;
+retained evidence in `docs/hardening/evidence/integrated-guilds-2026-10-24`.
 
-Public password/TLS/WSS load includes real movement/combat/normal respawn, inventory/market,
-friend messages/read receipts. Operator gear/spawn fixtures before admission are isolated load
-setup, not earned-gameplay proof. Guild branch adds guild consent/message/history traffic and
-restores declared strict19.5 Hz simulation, RTT p95<250ms, HTTP p95<500ms gates. Not yet measured.
+- Rendering adds one frontend geometry test (237 total unit tests). Fullformat/types/lint,11 frontend
+  tests/four builds/all-chunk debug guard and release-preparation fixture pass.
+- **All78 browser assertions pass together in vag71f**: rendering6,startup6,trade11,market8,chat10,
+  friends12,onboarding10,guilds15. Archive `docs/hardening/evidence/final-browser-2026-10-24`.
+- **All28 built-production TLS/password browser assertions pass in qWvlw8**:13friends+15guilds.
+  Login does not request the3D engine early; debug/dev authentication/private-route checks pass.
+  Archive `docs/hardening/evidence/final-production-2026-10-24`.
+- Final unprofiled five-player load FAILED cadence (see below). All controllers have exited.
+- Static batching reduces532→165 meshes preserving all32,976vertices/96,942indices; screenshots,
+  actual NPC pick/touch controls and cleanup verified. No physical-device FPS claim.
+- Startup explicitly recovers failed entry/application/game imports; no hidden retries. All lazy
+  chunks are checked for development hooks. Initial off-screen NPC driver and blank-page failures
+  remain preserved; nearest visible NPC/ray diagnostics are read-only and absent in release.
+- `deploy-broken-odyssey.sh --candidate --prepare-only` builds/validates an immutable candidate,
+  exits before any live mutation. Functional fixture proves fresh/reused build, no credential read,
+  no service/current mutation and invalid-flag refusal. Real preparation is the next authorized step.
+- Old isolated worktrees remain for evidence: static-world-batching,guilds,performance,recovery,
+  presentation,release-preparation. Their implemented changes are all merged. Do not edit releases.
 
-Latest quiet profiled five-player 120s run 717Yig: 19.005Hz, RTT p95473ms, HTTP p95217ms, zero unexpected
-protocol/HTTP errors/disconnects, all 5 alive, four respawns/eight kills, 195 economy writes, five sales,
-65 DM / 60 read receipts. FAIL. Prior quiet GYaFFV 18.80 Hz / 181ms also FAIL. No safe capacity established.
-Unused local servers stopped; no browsers/builds/tests during measurement. Profile mostly idle;
-host 82–88% idle last samples, no CPU/RAM saturation. Prior docs cover scheduler/timer and durable
-checkpoint I/O tails. Do not weaken WAL/fencing/publication or raise admission to make graphs pass.
-Evidence `docs/hardening/evidence/capacity-2026-10-24` and checkpoint encoding archive.
+## Remaining release blocker and next actions
 
-## Next actions
+Latest quiet **unprofiled** five-player120s qWvlw8:19.123Hz (FAIL ≥19.5Hz), RTT p95162ms and HTTP p95
+231.8ms (both PASS). Zero unexpected protocol/HTTP errors/disconnects, all5alive, five respawns,
+eight durable kills,194inventory writes/five sales,64DM/60read receipts,64guild messages/194history
+reads. CPU0.296cores,RSS183.6MB. No other browser/build/test ran during measurement. Raw report
+`/tmp/brokenodyssey-qualification.qWvlw8/production/load.json` remains `ok:false`.
 
-1. Finish a973ae5 browser qualification, inspect screenshots, fix real issues and preserve failures.
-   Its queued production workload must prove deferred engine login,28 friends/guild UI checks and
-   strict guild/commerce/combat load. If five players fail, do not raise admission or test 20.
-2. Archive results, commit evidence on rendering branch and merge into main preserving append-only
-   PROGRESS/DECISIONS and main's newer archive/handoff. Push and confirm final hosted CI.
-3. Prepare final committed candidate with --candidate --prepare-only, verify release manifest and
-   unchanged live 2c47b27/current/PIDs/readiness. Never invoke publishing mode without authorization.
-4. Capacity, physical-phone performance and off-host recovery remain unqualified. No purchase,
-   public deployment, reset, durability weakening or architecture rewrite to bypass these limits.
-   Authoritative wear/repair and broader world art remain long-term incomplete; core requested
-   Warrior/Mage earned gameplay paths are genuinely verified. Maintain honest current release gates.
+Earlier quiet runs also fail cadence. Prior timer-only kernel scheduling and durable WAL-tail
+measurements are documented; no justification for fake catch-up ticks, disabled WAL, rewritten
+authority, increased admission or another identical empty rerun. No safe player capacity established.
+
+Owner was asked asynchronously for an existing staging host/SSH target and off-host backup destination.
+No answer yet. Physical-phone testing is also pending. This is the first explicit waiting checkpoint;
+keep the external-blocker audit honest. Goal is ACTIVE, not complete. Avoid unrelated feature work or
+empty loops while waiting; finish the concrete release artifact/verification/documentation first.
+
+1. Prepare final committed candidate with --candidate --prepare-only AFTER all load jobs exit.
+   Verify manifest and unchanged live2c47b27/current, PIDs and API/RT readiness. Never publish without
+   authorization; no new purchase or production reset.
+2. Verify CI40101349993, archive preparation evidence, push final documentation and update this handoff.
+3. If the owner supplies existing staging/backup access, run capacity/recovery qualification there,
+   retaining the strict19.5Hz/<250msRTT/<500msHTTP gates. Do not raise public admission prematurely.
+4. Wear/repair, guild vault, extra classes/specialisations and broader world art remain long-term
+   incomplete. The requested core earned Warrior/Mage gameplay paths are verified; release remains
+   blocked on measured capacity and external validation, not declared shippable.

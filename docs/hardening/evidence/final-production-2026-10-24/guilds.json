@@ -1,0 +1,84 @@
+{
+  "checks": [
+    {
+      "name": "A real character founds a guild with the selected name and tag",
+      "ok": true
+    },
+    {
+      "name": "Invitation requires consent before guild chat becomes available",
+      "ok": true
+    },
+    {
+      "name": "Guild chat reaches an accepted member as literal text",
+      "ok": true
+    },
+    {
+      "name": "New guild messages follow the end of the conversation",
+      "ok": true
+    },
+    {
+      "name": "Incoming guild chat preserves a reader’s scrollback position",
+      "ok": true
+    },
+    {
+      "name": "Portrait guild sheet stays within the viewport",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 140,
+        "width": 390,
+        "height": 634
+      }
+    },
+    {
+      "name": "Membership and both messages survive a fresh login",
+      "ok": true
+    },
+    {
+      "name": "Landscape guild sheet stays within the viewport",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 28,
+        "width": 844,
+        "height": 292
+      }
+    },
+    {
+      "name": "Landscape keeps the guild composer visible below scrollable history",
+      "ok": true,
+      "detail": {
+        "x": 701.125,
+        "y": 265,
+        "width": 131.875,
+        "height": 44
+      }
+    },
+    {
+      "name": "Ordinary members are not offered officer controls",
+      "ok": true
+    },
+    {
+      "name": "Leader promotion enables officer notice editing for the other player",
+      "ok": true
+    },
+    {
+      "name": "Confirmed leadership transfer gives the new leader membership controls",
+      "ok": true
+    },
+    {
+      "name": "Leaving clears private chat and requires a new invitation",
+      "ok": true
+    },
+    {
+      "name": "Explicit disband survives relog and releases membership",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}
