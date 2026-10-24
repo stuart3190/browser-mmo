@@ -111,6 +111,7 @@ export function TargetFrame() {
       <StatusTags entityId={t.id} />
       {t.attackCue && !t.dead && (
         <div className="attack-warning" role="status">
+          {t.attackCue.name && <strong>{t.attackCue.name}: </strong>}
           {t.attackCue.cleave
             ? 'Sweeping strike — flank or move behind your foe!'
             : t.attackCue.groundPosition

@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "fixture": "Read-only lookup of earned Tidewatch actors. Existing earned level-six actors; normal purchases, walking, combat and respawns only. No item, quest, position or checkpoint writes.",
+  "checks": [
+    {
+      "name": "Mage retains earned chapter gear",
+      "ok": true
+    },
+    {
+      "name": "Mage starts in Elderwood",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Rootbound Cantor",
+      "ok": true,
+      "detail": {
+        "dodge": 5
+      }
+    },
+    {
+      "name": "Mage reads both named attacks",
+      "ok": true,
+      "detail": [
+        "Roots Reach",
+        "Bough Sweep"
+      ]
+    },
+    {
+      "name": "Mage escapes both shapes without damage",
+      "ok": true,
+      "detail": [
+        "Roots Reach",
+        "Bough Sweep"
+      ]
+    },
+    {
+      "name": "Mage returns alive with earned gear after relogin",
+      "ok": true
+    },
+    {
+      "name": "No encounter gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

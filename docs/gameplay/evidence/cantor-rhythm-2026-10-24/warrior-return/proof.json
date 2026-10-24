@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "fixture": "Read-only lookup of earned Tidewatch actors. Existing earned level-six actors; normal purchases, walking, combat and respawns only. No item, quest, position or checkpoint writes.",
+  "checks": [
+    {
+      "name": "Warrior retains earned chapter gear",
+      "ok": true
+    },
+    {
+      "name": "Warrior starts in Elderwood",
+      "ok": true
+    },
+    {
+      "name": "Warrior returns alive with earned gear after relogin",
+      "ok": true
+    },
+    {
+      "name": "No encounter gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

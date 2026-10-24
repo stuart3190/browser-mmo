@@ -165,6 +165,8 @@ interface EnemyState {
   taggedBy: string | null;
   tagCohort?: ReturnType<Parties['cohort']>;
   nextAttackAtMs: number;
+  /** Missing on older checkpoints: begin with the first authored step. */
+  attackStep?: number;
   diedAtMs: number;
   corpseRemoved: boolean;
   killId: string | null;
@@ -1676,28 +1678,42 @@ export class ZoneSimulation {
     this.sendVitals(p, nowMs);
   }
 
-  /** Enemy gives up: walk home, then reset to full health ("evade"). */
+  /** Current authored step; base combat rules apply to all steps. */
+  private enemyAttack(enemy: EnemyState) {
+    const base = enemy.def.combat;
+    const step = base.attackPattern?.[(enemy.attackStep ?? 0) % base.attackPattern.length];
+    // Explicit undefined removes the base geometry; a sweep must never inherit a ground circle.
+    return step
+      ? {
+          ...base,
+          ...step,
+          groundStrikeRadius: step.groundStrikeRadius,
+          cleaveArcDegrees: step.cleaveArcDegrees,
+        }
+      : { ...base, name: undefined };
+  }
+
   private cue(enemy: EnemyState, endsAtMs: number | null): void {
     const entity = this.entities.get(enemy.entityId);
     if (!entity) return;
+    const attack = this.enemyAttack(enemy);
     entity.attackCue =
       endsAtMs === null
         ? null
         : {
             endsAtMs,
-            range:
-              enemy.def.combat.groundStrikeRadius ??
-              enemy.def.combat.attackRange + this.rules.rangeTolerance,
-            ...(enemy.def.combat.cleaveArcDegrees
+            ...(attack.name ? { name: attack.name } : {}),
+            range: attack.groundStrikeRadius ?? attack.attackRange + this.rules.rangeTolerance,
+            ...(attack.cleaveArcDegrees
               ? {
                   groundPosition: { ...entity.position },
                   cleave: {
                     heading: entity.rotationY,
-                    arc: (enemy.def.combat.cleaveArcDegrees * Math.PI) / 180,
+                    arc: (attack.cleaveArcDegrees * Math.PI) / 180,
                   },
                 }
               : {}),
-            ...(enemy.def.combat.groundStrikeRadius && enemy.targetCharacterId
+            ...(attack.groundStrikeRadius && enemy.targetCharacterId
               ? { groundPosition: { ...this.players.get(enemy.targetCharacterId)!.position } }
               : {}),
           };
@@ -1797,13 +1813,14 @@ export class ZoneSimulation {
     enemy.taggedBy = null;
     delete enemy.tagCohort;
     enemy.health = enemy.maxHealth;
+    if (enemy.def.combat.attackPattern) enemy.attackStep = 0;
     enemy.nextWanderAtMs = nowMs + 3000 + this.rng.next() * 5000;
     this.syncEntityHealth(enemy.entityId, enemy.health, enemy.maxHealth, false);
   }
 
   private stepEnemies(nowMs: number, dtMs: number): void {
     for (const enemy of this.enemies.values()) {
-      const c = enemy.def.combat;
+      const c = this.enemyAttack(enemy);
       const entity = this.entities.get(enemy.entityId);
       if (enemy.mode === 'dead') {
         if (!enemy.corpseRemoved && nowMs - enemy.diedAtMs >= c.corpseMs) {
@@ -1899,6 +1916,8 @@ export class ZoneSimulation {
       if (cue) {
         this.cue(enemy, null);
         enemy.nextAttackAtMs = nowMs + c.attackSpeedMs;
+        if (c.attackPattern)
+          enemy.attackStep = ((enemy.attackStep ?? 0) + 1) % c.attackPattern.length;
         if (!cue.groundPosition && !canHit) continue;
       }
       if (!canHit && !cue?.groundPosition) {

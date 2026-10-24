@@ -77,9 +77,16 @@ completed story history; 9 desktop +10 touch browser checks and final screenshot
 Evidence: `gameplay/evidence/adventure-journal-2026-10-24/`. Portrait sizing and a temporary status
 clock regression fixed; failures preserved. Passage-guidance commit `358e314` is pushed.
 
-ACTIVE next gameplay milestone: varied, readable Rootbound Cantor encounter. Existing forest boss
-uses only a fixed ground circle; add authored attack sequencing through the current authoritative
-cue/damage pipeline, preserve checkpoint recovery, and verify actual dodging with both classes.
+Completed: named Cantor Roots Reach/Bough Sweep pattern. 91 world,8 schema,133 content,28 frontend
+checks plus types/lint/build/content validation pass. Both earned characters win and escape both
+shapes without damage; staged Warrior relogin and complete Mage run pass. Evidence:
+`gameplay/evidence/cantor-rhythm-2026-10-24/`. First relogin driver failure retained; corrected to
+normal login. Screenshots reviewed. Test controllers stopped. `/tmp/bo-cantor-pattern.py` and
+`/tmp/bo-cantor-driver.py` are integrated/obsolete: DO NOT rerun.
+ACTIVE next: inspectable quest rewards sharing outfitter stat/requirement previews. Prepared draft
+under `/tmp/bo-reward-preview/` NOT applied: integrate.py + reward-preview.cjs; verify both viewports.
+Private iaQjr4 simulation images were archived/reconstructed for changed content only after no
+pending rewards. Every earned character/item/quest row remains. Never apply this to production.
 Equipment milestone is verified (see latest entry above). All armour test controllers have stopped.
 Most atlas regions remain incomplete. No production, capacity or infrastructure work.
 

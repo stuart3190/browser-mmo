@@ -1,0 +1,22 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 41 item templates.
+PASS Warrior retains earned chapter gear
+PASS Warrior starts in Elderwood
+PASS Warrior returns alive with earned gear after relogin
+PASS No encounter gameplay exceptions
+PASS Mage retains earned chapter gear
+PASS Mage starts in Elderwood
+PASS Mage defeats Rootbound Cantor
+PASS Mage reads both named attacks
+PASS Mage escapes both shapes without damage
+PASS Mage returns alive with earned gear after relogin
+PASS No encounter gameplay exceptions

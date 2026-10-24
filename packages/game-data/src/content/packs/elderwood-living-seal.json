@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "pack.elderwood.living_seal",
-  "revision": 1,
+  "revision": 2,
   "quests": [
     {
       "id": "quest.elderwood.third_watch",
@@ -73,7 +73,7 @@
     {
       "id": "quest.elderwood.living_seal",
       "name": "A Song Left Unfinished",
-      "description": "Continue south-east beyond the archive to read the Heartwood Oath. Quiet the Rootbound Cantor without breaking the ancient roots. Its wide blue circle stays where it was placed; leave it before the roots erupt. Bosses resist Frost Nova. Return to Tamsin.",
+      "description": "Continue south-east beyond the archive to read the Heartwood Oath. Quiet the Rootbound Cantor without breaking the ancient roots. Its song alternates: leave the blue Roots Reach circle, then flank or move behind the amber Bough Sweep. Strike between warnings. Bosses resist Frost Nova. Return to Tamsin.",
       "giverNpcId": "npc.elderwood.tamsin",
       "turnInNpcId": "npc.elderwood.tamsin",
       "minLevel": 5,
@@ -96,8 +96,8 @@
         }
       ],
       "dialogue": {
-        "offer": "Read the Heartwood Oath beyond the archive, then quiet the Cantor. Its roots strike where the blue circle was laid, not where you move next. Step out, return, and strike between songs. Iron Guard can soften a mistake; frost cannot hold this guardian. Leave the oldest roots whole.",
-        "inProgress": "Continue south-east beyond the archive to read the Heartwood Oath. Quiet the Rootbound Cantor without breaking the ancient roots. Its wide blue circle stays where it was placed; leave it before the roots erupt. Bosses resist Frost Nova. Return to Tamsin.",
+        "offer": "Read the Heartwood Oath beyond the archive, then quiet the Cantor. Listen to its two-part song. Roots Reach marks your old position in blue: step clear. Bough Sweep follows with an amber fan: flank or move behind it. Return and strike between songs. Iron Guard can soften a mistake; frost cannot hold this guardian. Leave the oldest roots whole.",
+        "inProgress": "Continue south-east beyond the archive to read the Heartwood Oath. Quiet the Rootbound Cantor without breaking the ancient roots. Its song alternates: leave the blue Roots Reach circle, then flank or move behind the amber Bough Sweep. Strike between warnings. Bosses resist Frost Nova. Return to Tamsin.",
         "readyToTurnIn": "‘Let the dream outlast the dreamers.’ You have heard the words in stone, tide and living wood. The Cantor has fallen quiet and the roots are settling. Take this Heartwood Knot. Three watches remember one another again. The dream is still safe—for now.",
         "completed": "The living seal holds. Pinewatch will remember your part in its keeping."
       },
@@ -327,7 +327,21 @@
           "armor": 26,
           "corpseMs": 10000,
           "windupMs": 2200,
-          "groundStrikeRadius": 4.5
+          "groundStrikeRadius": 4.5,
+          "attackPattern": [
+            {
+              "name": "Roots Reach",
+              "windupMs": 2200,
+              "attackRange": 14,
+              "groundStrikeRadius": 4.5
+            },
+            {
+              "name": "Bough Sweep",
+              "windupMs": 2000,
+              "attackRange": 7,
+              "cleaveArcDegrees": 150
+            }
+          ]
         }
       },
       "lootRewardId": "loot.elderwood.rootbound_cantor",

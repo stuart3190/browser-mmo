@@ -1,0 +1,39 @@
+{
+  "ok": false,
+  "error": "locator.click: Timeout 45000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#char-list button').first()\u001b[22m\n\n    at <anonymous> (/root/browser-mmo/scripts/e2e/cantor.cjs:320:55)",
+  "checks": [
+    {
+      "name": "Warrior retains earned chapter gear",
+      "ok": true
+    },
+    {
+      "name": "Warrior starts in Elderwood",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Rootbound Cantor",
+      "ok": true,
+      "detail": {
+        "dodge": 5
+      }
+    },
+    {
+      "name": "Warrior reads both named attacks",
+      "ok": true,
+      "detail": [
+        "Roots Reach",
+        "Bough Sweep"
+      ]
+    },
+    {
+      "name": "Warrior escapes both shapes without damage",
+      "ok": true,
+      "detail": [
+        "Roots Reach",
+        "Bough Sweep"
+      ]
+    }
+  ],
+  "errors": [],
+  "state": {}
+}

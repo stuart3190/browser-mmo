@@ -10,6 +10,20 @@ export const DamageRangeSchema = z
   .object({ min: z.number().int().nonnegative(), max: z.number().int().nonnegative() })
   .refine((r) => r.min <= r.max, 'min must be <= max');
 
+/** Named, telegraphed steps in a repeating encounter rhythm. Geometry never inherits from another step. */
+export const EnemyAttackStepSchema = z
+  .object({
+    name: z.string().min(1).max(48),
+    windupMs: z.number().int().min(500).max(5000),
+    attackRange: z.number().positive(),
+    groundStrikeRadius: z.number().positive().max(10).optional(),
+    cleaveArcDegrees: z.number().positive().max(180).optional(),
+  })
+  .refine(
+    (s) => !(s.groundStrikeRadius && s.cleaveArcDegrees),
+    'An attack step cannot combine a ground strike and cleave',
+  );
+
 /** Per-enemy combat block. Enemies without one are not simulated as combatants. */
 export const EnemyCombatSchema = z
   .object({
@@ -19,6 +33,7 @@ export const EnemyCombatSchema = z
     groundStrikeRadius: z.number().positive().max(10).optional(),
     /** Fixed enemy-centred sector; heading freezes when the warning starts. */
     cleaveArcDegrees: z.number().positive().max(180).optional(),
+    attackPattern: z.array(EnemyAttackStepSchema).min(2).max(4).optional(),
     damage: DamageRangeSchema,
     attackSpeedMs: z.number().int().positive(),
     /** Metres between centres at which the enemy can hit. */

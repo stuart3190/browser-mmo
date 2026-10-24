@@ -855,7 +855,7 @@ systems added; external follow-ups remain separate from development and merge ga
 2. **Change feed is not durable.** Reconnection and failed queries now request full reconciliation, including simulation gear; a 30 s reconciliation sweep covers otherwise missed notifications. Delivery is eventually consistent, not instantaneous. Needs a direct DB connection (not PgBouncer transaction mode).
 3. **Reconnect = full snapshot.** No session resume/replay buffer; an expired session cannot reconnect (client shows "Disconnected"; reload to log in). The game client keeps the token in memory only.
 4. **Bank opens anywhere.** No banker NPC/proximity rule yet (server would need the player's position from the realtime service).
-5. **No drag-and-drop, split-stack or loadout UI.** Sorting/name/rarity filtering is now implemented; mutations use the details sheet. Icons are text placeholders.
+5. **No drag-and-drop, split-stack or loadout UI.** Sorting/name/rarity filtering is now implemented; mutations use the details sheet. Vector silhouettes distinguish the current item categories.
 6. **Client bundle remains substantial.** Current measured main chunk 456.56 kB raw / 140.32 kB gzip; Babylon 1,952.23 kB raw / 461.57 kB gzip. See the sustained browser evidence; no hardware-phone performance pass is claimed.
 7. **One-handed weapons always equip to the main hand.** Off-hand one-handers are possible via the API but not from the UI; dual-wield rules are undesigned.
 8. **Expired listings with a full bag** stay in escrow until the seller has space (the mailbox exists now but the marketplace does not use it yet). The expiry sweep runs in every API process (safe, wasteful with replicas).
@@ -868,26 +868,27 @@ systems added; external follow-ups remain separate from development and merge ga
 15. **Navigation limits.** 2D/static collision only, no terrain height or actor collision. Atlas regions now use bounded local nav windows for short-leash enemies; long-leash encounters/dense populations need targeted extension, not a whole-continent grid.
 16. **`kill_events` grows forever.** Needs a retention/archive job for rewarded rows older than the longest respawn window.
 17. **Durable feedback includes database latency.** Death/reward feedback waits for checkpoint/kill writes; failed ownership/checkpoint writes fence the gateway and require recovery. First-hit tags now freeze eligible party credit under the documented shared-hunt rules.
-18. **Combat balance is placeholder.** Formulas and numbers are first-pass and have had no design or balance review; armour comes only from gear today.
+18. **Broader combat balance remains provisional.** Both classes have earned solo story/dungeon victories, tactical abilities and level-five paths, with actual encounter evidence below. This does not establish balance across the remaining catalog or long-term progression. Armour comes from gear.
 19. **Lingering characters stay attackable for 10 s after disconnect** (intended anti-combat-logging behaviour; may need tuning). This also means a DB-side teleport of a character is ignored while it lingers.
 20. **World E2E depends on a globally installed Playwright** (`/opt/node22/...`, override with `PLAYWRIGHT_PATH`) and on dev-only debug hooks (`window.__mmo`, incl. `lookAt` used to aim the camera before the multi-touch tap). It is not part of `pnpm verify`.
 21. **Minimap:** in-map landmark text is replaced by route lines/markers and the nearest landmark caption to avoid overlapping names.
-22. **Quest scope remains bounded.** Seventeen playable definitions and one retained placeholder: original seven-story sequence, five Marches continuation quests, four side quests and one daily contract. Party-eligible kills share credit; talk, collection and exploration remain personal. No abandonment, escorts or branching engine. Compass directions are bearings, not obstacle-avoiding paths. Selling/vaulting pelts still lowers collection progress.
+22. **Quest scope remains bounded.** Twenty-three playable definitions and one retained placeholder: original seven-story sequence, five Marches continuation quests, four side quests, one daily contract, three Tidewatch and three Elderwood quests. Party-eligible kills share credit; talk, collection and exploration remain personal. No abandonment, escorts or branching engine. Compass directions are bearings, not obstacle-avoiding paths. Selling/vaulting pelts still lowers collection progress.
 23. **A full Recovered loot box blocks quest turn-in** (atomic failure, nothing lost) and the error does not explain how to fix it.
 24. **Dens respawn only with no player within 18 m**, so a player camping one den waits; the quest needs travelling between dens (intended anti-camping, may need tuning for the first quest's pacing).
 25. **Quest E2E uses scaffolding** (DB "travel" between village and dens after the linger window; phone run credits kills via inserted kill events) and dev-only `window.__mmo` hooks; not part of `pnpm verify`.
 26. **Dialogue panel does not close automatically when walking away** (the server re-validates range on every action).
-27. **Abilities are first pass.** Instant, single-target, hostile only; no casts, AoE, heals, buffs/debuffs, resources or talents; numbers unbalanced (a Mage out-damages a Warrior at range). Validation rejects unsupported features in data.
+27. **Class breadth remains limited.** Warrior and Mage have verified attacks, Iron Guard/Frost Nova and four level-five paths. Frost Nova affects nearby enemies; guard/root durations and cooldowns are server-owned. Resource economies, cast-time spells, healer classes and further talents remain incomplete. Broader balance remains provisional.
 28. **Ranger and Cleric characters created before this milestone** (dev data only) still load but their bars show placeholder abilities that the server refuses.
 29. **Scripted hunting in the quest/ability E2Es is timing-sensitive** when dens were just cleared (respawn needs no player within 18 m); one quest E2E run timed out and passed on re-run.
 
 ## Next Recommended Task
 
-**Finish the reusable private-party Broken Vault instance slice.**
-Build admission, instance identity/ownership, lifecycle/reset, reconnect and completion reward rules
-on the validated shared-world entrance/encounter foundation. Preserve the playable Greenvale route,
-existing party/authority/persistence and world catalogs. Do not expand to another continent or mass
-produce quests. Profession tools/ranks and timed crafting remain a separate later milestone.
+**Continue the authored gameplay quality pass.**
+The private-party Vault, earned coastal/forest progression, tactical abilities, paths, repairs,
+equipment appearance and adventure journal are implemented and verified in the latest entries below.
+Current work: varied Cantor attacks with readable warnings and both-class encounter proof. Then
+prioritize item readability and quest reward decisions, remaining shallow player-facing content and
+actual fresh-character journeys. No performance, capacity, deployment or infrastructure work.
 See [Greenvale Complete](gameplay/greenvale-complete.md).
 
 ## Mobile display follow-up — 2026-10-05
@@ -2032,3 +2033,14 @@ Ranked player-facing gaps from the current client and content:
 - [x] Screenshot review, truthful class/proficiency shop preview, opaque equipment panels and folded
       cloaks. Three visual follow-up browser checks pass. Evidence: `gameplay/evidence/equipment-appearance-2026-10-24/`.
 - [ ] Next: varied, readable Rootbound Cantor attack sequence with real both-class encounter proof.
+
+### Cantor encounter rhythm — verified 2026-10-24
+
+- [x] Named repeating Roots Reach/Bough Sweep pattern using existing authoritative fixed geometry,
+      persistence and damage; updated quest advice. Recovery, bystanders and evade reset verified.
+- [x] Both earned level-six actors defeat the boss and escape both shapes without damage. Warrior
+      relogin driver fixed in a staged continuation; Mage seven-check run passes. Screenshots reviewed.
+- 91 world,8 schema,133 content,28 frontend tests, repository types/lint/build/content validation pass.
+  Evidence: `gameplay/evidence/cantor-rhythm-2026-10-24/`. Production unchanged.
+- [ ] Next: inspectable quest rewards, sharing outfitter requirements/stat previews; desktop/touch proof.
+- Equipment milestone `09893fc` committed and pushed. Production unchanged.

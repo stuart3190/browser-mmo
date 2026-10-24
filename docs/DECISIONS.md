@@ -1562,3 +1562,13 @@ The shop uses the existing equip-rule function to explain class and level eligib
 purchase, without preventing legitimate purchases for trading. It no longer implies that an item
 with no explicit class allowlist bypasses equipment proficiency. Inventory/character sheets use
 opaque surfaces so world labels and HUD text do not bleed through the item controls.
+
+## 2026-10-24 — Authored encounter rhythm in the existing combat simulation
+
+Named optional attackPattern steps override wind-up/range/geometry only; base damage, cooldown,
+aggro, tags, loot and XP remain existing rules. Geometry is explicit per step, so a sweep cannot
+inherit a ground circle. The step advances once when the committed strike resolves (including a
+dodge), persists in the enemy recovery image, defaults to zero for old images and resets on evade.
+The existing replicated cue freezes shape/heading/centre and carries the attack name for the HUD.
+Cantor alternates Roots Reach and Bough Sweep; quests explain their different counterplay. Existing
+enemies without patterns retain their behavior. This is gameplay authoring, not a replacement AI.
