@@ -14,6 +14,7 @@ import { ItemDetails } from './ItemDetails';
 import { ItemTooltip } from './ItemTooltip';
 import { PartyPanel, PartySummary } from './PartyUI';
 import { FirstSteps } from './FirstSteps';
+import { QuickRemedy } from './QuickRemedy';
 import { AbilityBar } from './AbilityBar';
 import { WorldWindow } from './WorldWindow';
 import { GuildWindow } from './GuildWindow';
@@ -50,7 +51,7 @@ export function mountGameUi(root: HTMLElement, deps: UiDeps): void {
 }
 
 function GameUI() {
-  const { state, combat, gameData, controls } = useGame();
+  const { state, combat, gameData, controls, quests } = useGame();
   const touch = useTouchControls();
   const partyOpen = state.open.has('party');
   useEffect(() => {
@@ -79,6 +80,10 @@ function GameUI() {
         });
         return;
       }
+      if (e.code === 'KeyH') {
+        quests.useRemedy();
+        return;
+      }
       if (e.code === 'KeyF') {
         combat.toggleAttack();
         return;
@@ -94,7 +99,7 @@ function GameUI() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [state, combat, gameData]);
+  }, [state, combat, gameData, quests]);
 
   return (
     <div className={touch ? 'ui-root touch' : 'ui-root'}>
@@ -112,7 +117,10 @@ function GameUI() {
       <details className="controls-help panel">
         <summary>Controls</summary>
         <p>WASD to move · drag the view to orbit · scroll to zoom.</p>
-        <p>Click a creature or press Tab to target. F toggles attack; 1–4 use abilities.</p>
+        <p>
+          Click a creature or press Tab to target. F toggles attack; 1–4 use abilities; H drinks a
+          carried remedy.
+        </p>
         <p>
           Enter for chat · E to talk or pick up · B for Bag · C for gear · J for quests · Escape to
           close.
@@ -139,6 +147,7 @@ function GameUI() {
       <HoverTooltip />
       {!touch && <AbilityBar />}
       {touch && <TouchControls />}
+      <QuickRemedy />
       <ActionBar />
     </div>
   );

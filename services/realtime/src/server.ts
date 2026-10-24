@@ -1127,7 +1127,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         });
         await deliverEffects(conn);
         await sync.fullState(syncTarget(conn));
-        await sendSystems(conn);
+        await sendSystems(conn, msg.seq);
         return;
       }
       case 'dungeon.command':

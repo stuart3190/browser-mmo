@@ -12,22 +12,22 @@
 @mmo/api:build: cache miss, executing 0ececa67305a2ba9
 @mmo/admin:build: cache miss, executing de531604886f600e
 @mmo/game-web:build: cache miss, executing 814599428efc3afe
-@mmo/admin:build: 
+@mmo/admin:build:
 @mmo/admin:build: > @mmo/admin@0.0.0 build /root/browser-mmo/apps/admin
 @mmo/admin:build: > vite build
-@mmo/admin:build: 
-@mmo/game-web:build: 
+@mmo/admin:build:
+@mmo/game-web:build:
 @mmo/game-web:build: > @mmo/game-web@0.0.0 build /root/browser-mmo/apps/game-web
 @mmo/game-web:build: > vite build
-@mmo/game-web:build: 
-@mmo/realtime:build: 
+@mmo/game-web:build:
+@mmo/realtime:build:
 @mmo/realtime:build: > @mmo/realtime@0.0.0 build /root/browser-mmo/services/realtime
 @mmo/realtime:build: > tsup
-@mmo/realtime:build: 
-@mmo/api:build: 
+@mmo/realtime:build:
+@mmo/api:build:
 @mmo/api:build: > @mmo/api@0.0.0 build /root/browser-mmo/services/api
 @mmo/api:build: > tsup
-@mmo/api:build: 
+@mmo/api:build:
 @mmo/admin:build: vite v8.3.2 building client environment for production...
 @mmo/admin:build: transforming...
 @mmo/admin:build: ✓ 170 modules transformed.
@@ -50,9 +50,9 @@
 @mmo/realtime:build: CLI Cleaning output folder
 @mmo/admin:build: dist/index.html                  0.80 kB │ gzip:   0.49 kB
 @mmo/admin:build: dist/assets/index-DM5iuG57.js  771.19 kB │ gzip: 157.36 kB │ map: 2,549.37 kB
-@mmo/admin:build: 
+@mmo/admin:build:
 @mmo/realtime:build: ESM Build start
-@mmo/admin:build: [plugin builtin:vite-reporter] 
+@mmo/admin:build: [plugin builtin:vite-reporter]
 @mmo/admin:build: (!) Some chunks are larger than 500 kB after minification. Consider:
 @mmo/admin:build: - Using dynamic import() to code-split the application
 @mmo/admin:build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
@@ -105,11 +105,11 @@
 @mmo/game-web:build: dist/assets/game-9vRL-mJc.js                         378.01 kB │ gzip: 118.82 kB │ map: 1,564.22 kB
 @mmo/game-web:build: dist/assets/api-BQQTXW9P.js                          550.16 kB │ gzip:  88.88 kB │ map: 1,494.60 kB
 @mmo/game-web:build: dist/assets/babylon-DbzD--J_.js                    1,950.99 kB │ gzip: 460.99 kB │ map: 7,971.63 kB
-@mmo/game-web:build: 
+@mmo/game-web:build:
 @mmo/game-web:build: ✓ built in 3.88s
 
  Tasks:    4 successful, 4 total
 Cached:    0 cached, 4 total
-  Time:    5.715s 
+  Time:    5.715s
 
 Production bundle: development debug hook absent

@@ -1443,3 +1443,16 @@ already-cast effects are preserved; swapping cannot refresh them. No migration o
 
 Free mentor retraining encourages experimentation while the two playable classes and encounters
 continue to grow. It avoids locking new players into an irreversible choice or charging for learning.
+
+## 2026-10-24 — Combat remedy shortcut and authoritative readiness
+
+Expose the existing durable remedy cooldown in systems.state, which already synchronizes on join
+and consumption. A successful consumable request is acknowledged only after its durable healing,
+inventory and readiness reconciliation. The existing consumeRemedy authority/effect outbox remains
+unchanged. No new healing formula, migration or client-granted resource is introduced.
+
+A shared client presentation rule selects only unlocked backpack remedies and blocks use during
+cooldown, death, full health, reconnect or a pending request. H and a dedicated touch button invoke
+the same exact-item consumption action as the bag. Quantity, health and ready time update only from
+server messages; reconnect clears pending input and waits for fresh readiness. The countdown uses
+the server clock offset. Hide irrelevant opening-village instructions outside the starter zone.

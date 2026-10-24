@@ -125,6 +125,9 @@ it('consumable replay/concurrency decrements one exact stack and stores one dura
     .from(schema.itemInstances)
     .where(eq(schema.itemInstances.id, req.itemId));
   expect(item!.quantity).toBe(2);
+  const cooldown = (await professionState(ctx, p.characterId)).remedyReadyAtMs;
+  expect(cooldown).toBeGreaterThan(Date.now());
+  expect((await professionState(ctx, p.characterId)).remedyReadyAtMs).toBe(cooldown);
   expect(
     await ctx.db
       .select()

@@ -65,7 +65,12 @@ export async function professionState(ctx: DomainContext, characterId: string) {
     .where(eq(schema.craftJobs.characterId, characterId))
     .orderBy(sql`${schema.craftJobs.createdAt} desc`)
     .limit(10);
+  const [cooldown] = await ctx.db
+    .select()
+    .from(schema.consumableCooldowns)
+    .where(eq(schema.consumableCooldowns.characterId, characterId));
   return {
+    remedyReadyAtMs: cooldown?.readyAt.getTime() ?? 0,
     professions: professions.map((p) => ({
       id: p.id,
       xp: progress.find((r) => r.professionId === p.id)?.xp ?? 0,

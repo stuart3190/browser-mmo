@@ -332,3 +332,39 @@ it('reset drains child checkpoint writes and restart reclaims an expired orphan 
   expect(row!.instanceId).toBeNull();
   expect(row!.zoneId).toBe(march);
 });
+
+it('remedy acknowledgement follows actual healing and reports the same persisted cooldown after reconnect', async () => {
+  const p = await player(march, { x: 264, z: 403 }, 10);
+  const grant = await inTransaction(ctx, (tx) =>
+    grantItemInTx(tx, ctx, {
+      accountId: p.accountId,
+      characterId: p.id,
+      templateId: 'consumable.greenvale.remedy',
+      quantity: 3,
+      method: 'system',
+      actor: { accountId: p.accountId, characterId: p.id },
+    }),
+  );
+  const h = await boot(),
+    c = await join(h.url, p);
+  expect((await c.wait('systems.state')).d.remedyReadyAtMs).toBe(0);
+  const ack = c.send('consumable.use', { itemId: grant.created.id, requestId: uuidv7() });
+  const state = await c.wait('systems.state', (m) => m.ack === ack);
+  expect(state.d.remedyReadyAtMs).toBeGreaterThan(Date.now());
+  expect(h.server.zones.get(march)!.getPlayer(p.id)!.health).toBe(70);
+  c.ws.close();
+  await sleep(250);
+  const again = await join(h.url, p);
+  expect((await again.wait('systems.state')).d.remedyReadyAtMs).toBe(state.d.remedyReadyAtMs);
+  const repeat = again.send('consumable.use', { itemId: grant.created.id, requestId: uuidv7() });
+  await again.wait('error', (m) => m.ack === repeat);
+  expect(
+    (
+      await handle.db
+        .select()
+        .from(schema.itemInstances)
+        .where(eq(schema.itemInstances.id, grant.created.id))
+    )[0]!.quantity,
+  ).toBe(2);
+  again.ws.close();
+});

@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five character at coastal merchant. Remedies bought normally; injuries from real crabs; no item/health grants or fake actions.",
+  "checks": [
+    {
+      "name": "Three remedies bought through the merchant UI",
+      "ok": true
+    },
+    {
+      "name": "Full health prevents accidental drinking",
+      "ok": true
+    },
+    {
+      "name": "Full-health shortcut preserves the stack",
+      "ok": true
+    },
+    {
+      "name": "H heals during real combat and consumes exactly one remedy",
+      "ok": true
+    },
+    {
+      "name": "Server cooldown is shown immediately",
+      "ok": true
+    },
+    {
+      "name": "Repeated shortcut cannot consume during cooldown",
+      "ok": true
+    },
+    {
+      "name": "Relogin preserves the exact server cooldown and remaining stack",
+      "ok": true
+    },
+    {
+      "name": "Remedy remains unobstructed at 390x844",
+      "ok": true
+    },
+    {
+      "name": "Remedy remains unobstructed at 844x480",
+      "ok": true
+    },
+    {
+      "name": "Touch control heals in combat without opening a bag",
+      "ok": true
+    },
+    {
+      "name": "No remedy gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

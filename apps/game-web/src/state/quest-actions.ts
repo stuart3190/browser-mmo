@@ -1,3 +1,4 @@
+import { remedyStatus } from './remedy-state';
 import type { RealtimeClient } from '@mmo/networking';
 import type { GameState } from './game-state';
 
@@ -74,8 +75,24 @@ export class QuestActions {
   finishCraft(jobId: string): void {
     this.net.send('craft.finish', { jobId });
   }
+  useRemedy(): void {
+    const s = remedyStatus(this.state);
+    if (s.reason || !s.item) {
+      this.state.toast(s.reason ?? 'No carried remedy');
+      return;
+    }
+    this.useItem(s.item.instance.id);
+  }
   useItem(itemId: string): void {
-    this.net.send('consumable.use', { itemId, requestId: crypto.randomUUID() });
+    const s = remedyStatus(this.state, Date.now(), itemId);
+    if (s.reason) {
+      this.state.toast(s.reason);
+      return;
+    }
+    const seq = this.net.send('consumable.use', { itemId, requestId: crypto.randomUUID() });
+    this.state.update((state) => {
+      state.remedyPendingSeq = seq;
+    });
   }
   closeDialogue(): void {
     this.state.update((s) => (s.dialogue = null));

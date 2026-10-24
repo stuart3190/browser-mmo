@@ -1,3 +1,4 @@
+import { useRemedyStatus } from './QuickRemedy';
 import { canPlaceInContainerKind } from '@mmo/game-data';
 import { itemRequirements } from '@mmo/ui';
 import { useGame } from './context';
@@ -11,6 +12,7 @@ import { ItemTooltip } from './ItemTooltip';
 export function ItemDetails() {
   const { state, actions, quests, gameData } = useGame();
   const item = state.selectedItemId ? state.items.get(state.selectedItemId) : undefined;
+  const remedy = useRemedyStatus(item?.instance.id);
   if (!item) return null;
   const loc = item.instance.location;
   const busy = state.pending.has(item.instance.id);
@@ -44,12 +46,13 @@ export function ItemDetails() {
       {inBag && item.template.id === 'consumable.greenvale.remedy' && (
         <button
           data-testid="use-remedy"
-          disabled={
-            state.vitals?.dead || !state.vitals || state.vitals.health >= state.vitals.maxHealth
-          }
+          disabled={remedy.reason !== null}
+          title={remedy.reason ?? 'Restore up to 60 health'}
           onClick={() => quests.useItem(item.instance.id)}
         >
-          Drink remedy · +60 health
+          {remedy.remainingMs > 0
+            ? `Remedy ready in ${Math.ceil(remedy.remainingMs / 1000)}s`
+            : 'Drink remedy · +60 health (H)'}
         </button>
       )}
       <div className="details-actions">

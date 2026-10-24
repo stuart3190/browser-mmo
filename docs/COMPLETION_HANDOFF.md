@@ -28,12 +28,18 @@ passes all choices, tactical effects, offensive cooldowns, victories and relogin
 repository types/lint/build pass. All prepared drafts are integrated; `/tmp/integrate-specs.py` is
 obsolete and MUST NOT be rerun. Coast milestone `8959ce7` is pushed.
 
-Active next gameplay milestone: quick carried-remedy use, because players currently must open the
-bag in combat and cannot see the persistent 30-second cooldown. Reuse the existing authoritative
-consumeRemedy/effect delivery. Add cooldown to existing systems.state, a pending request guard,
-H shortcut and a touch control without covering the playfield. Verify actual healing, counts,
-cooldown rejection/relogin, locked/vault exclusions and layout. No gameplay injection or new
-consumption authority; keep fixture evidence explicit. Continue visual/control refinement afterward.
+Completed: H/touch quick remedy with server-owned readiness/count/healing, pending input guard,
+bag readiness and relogin. Evidence: `gameplay/evidence/quick-remedy-2026-10-24/`; eleven real browser
+checks pass (merchant purchase, real crab injuries, keyboard/touch healing, counts, cooldown,
+relogin and portrait/landscape hit targets). 15 frontend, eight domain, six realtime checks plus
+types/lint/build pass. Specialisations commit `45df411` is pushed.
+
+Active next gameplay gap: class and equipment appearance. Local heroes share one rig and all
+held weapons look like a small blade; remote equipment is absent. Build server-replicated appearance
+from existing character/gear profiles, snapshots and updates; distinct warrior/mage silhouettes,
+sword/staff shapes, class-path accents, multiplayer/equip/relogin screenshot proof. Preserve all
+combat rules and existing renderer architecture. Deduplicate repeated feedback toasts as seen in
+quick-remedy screenshots. No performance/capacity/infrastructure work or production change.
 
 Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.

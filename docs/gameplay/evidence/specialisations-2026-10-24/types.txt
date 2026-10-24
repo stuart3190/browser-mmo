@@ -9,77 +9,76 @@
    • Remote caching disabled
 
 @mmo/config:typecheck: cache hit, replaying logs 0276cfd302aac304
-@mmo/config:typecheck: 
+@mmo/config:typecheck:
 @mmo/config:typecheck: > @mmo/config@0.0.0 typecheck /root/browser-mmo/packages/config
 @mmo/config:typecheck: > tsc -p tsconfig.json
-@mmo/config:typecheck: 
+@mmo/config:typecheck:
 @mmo/shared:typecheck: cache hit, replaying logs 0a0895bde0a898b3
-@mmo/shared:typecheck: 
+@mmo/shared:typecheck:
 @mmo/shared:typecheck: > @mmo/shared@0.0.0 typecheck /root/browser-mmo/packages/shared
 @mmo/shared:typecheck: > tsc -p tsconfig.json
-@mmo/shared:typecheck: 
+@mmo/shared:typecheck:
 @mmo/server-kit:typecheck: cache hit, replaying logs f1a1d3e4c325801e
 @mmo/schemas:typecheck: cache hit, replaying logs 9ad5ff7ca8ad3ef3
-@mmo/schemas:typecheck: 
+@mmo/schemas:typecheck:
 @mmo/schemas:typecheck: > @mmo/schemas@0.0.0 typecheck /root/browser-mmo/packages/schemas
 @mmo/schemas:typecheck: > tsc -p tsconfig.json
-@mmo/schemas:typecheck: 
-@mmo/server-kit:typecheck: 
+@mmo/schemas:typecheck:
+@mmo/server-kit:typecheck:
 @mmo/server-kit:typecheck: > @mmo/server-kit@0.0.0 typecheck /root/browser-mmo/packages/server-kit
 @mmo/server-kit:typecheck: > tsc -p tsconfig.json
-@mmo/server-kit:typecheck: 
+@mmo/server-kit:typecheck:
 @mmo/game-data:typecheck: cache miss, executing 2e40aa849f73c1fe
 @mmo/networking:typecheck: cache hit, replaying logs 5c1cd0fd210e44c8
-@mmo/networking:typecheck: 
+@mmo/networking:typecheck:
 @mmo/networking:typecheck: > @mmo/networking@0.0.0 typecheck /root/browser-mmo/packages/networking
 @mmo/networking:typecheck: > tsc -p tsconfig.json
-@mmo/networking:typecheck: 
-@mmo/game-data:typecheck: 
+@mmo/networking:typecheck:
+@mmo/game-data:typecheck:
 @mmo/game-data:typecheck: > @mmo/game-data@0.0.0 typecheck /root/browser-mmo/packages/game-data
 @mmo/game-data:typecheck: > tsc -p tsconfig.json
-@mmo/game-data:typecheck: 
+@mmo/game-data:typecheck:
 @mmo/world:typecheck: cache miss, executing 3e294ccbf54b20a9
 @mmo/db:typecheck: cache miss, executing 34ca373c5b37da68
 @mmo/ui:typecheck: cache miss, executing f3399d0c794e64f1
-@mmo/db:typecheck: 
+@mmo/db:typecheck:
 @mmo/db:typecheck: > @mmo/db@0.0.0 typecheck /root/browser-mmo/packages/db
 @mmo/db:typecheck: > tsc -p tsconfig.json
-@mmo/db:typecheck: 
-@mmo/ui:typecheck: 
+@mmo/db:typecheck:
+@mmo/ui:typecheck:
 @mmo/ui:typecheck: > @mmo/ui@0.0.0 typecheck /root/browser-mmo/packages/ui
 @mmo/ui:typecheck: > tsc -p tsconfig.json
-@mmo/ui:typecheck: 
-@mmo/world:typecheck: 
+@mmo/ui:typecheck:
+@mmo/world:typecheck:
 @mmo/world:typecheck: > @mmo/world@0.0.0 typecheck /root/browser-mmo/services/world
 @mmo/world:typecheck: > tsc -p tsconfig.json
-@mmo/world:typecheck: 
+@mmo/world:typecheck:
 @mmo/game-web:typecheck: cache miss, executing bf63ffe89e443447
 @mmo/admin:typecheck: cache miss, executing 5dc58b83567db9c7
-@mmo/admin:typecheck: 
+@mmo/admin:typecheck:
 @mmo/admin:typecheck: > @mmo/admin@0.0.0 typecheck /root/browser-mmo/apps/admin
 @mmo/admin:typecheck: > tsc -p tsconfig.json
-@mmo/admin:typecheck: 
-@mmo/game-web:typecheck: 
+@mmo/admin:typecheck:
+@mmo/game-web:typecheck:
 @mmo/game-web:typecheck: > @mmo/game-web@0.0.0 typecheck /root/browser-mmo/apps/game-web
 @mmo/game-web:typecheck: > tsc -p tsconfig.json
-@mmo/game-web:typecheck: 
+@mmo/game-web:typecheck:
 @mmo/domain:typecheck: cache miss, executing b81ebddf4233883c
-@mmo/domain:typecheck: 
+@mmo/domain:typecheck:
 @mmo/domain:typecheck: > @mmo/domain@0.0.0 typecheck /root/browser-mmo/packages/domain
 @mmo/domain:typecheck: > tsc -p tsconfig.json
-@mmo/domain:typecheck: 
+@mmo/domain:typecheck:
 @mmo/realtime:typecheck: cache miss, executing e3fdfc517dece033
 @mmo/api:typecheck: cache miss, executing a7e37e6a8d280fbc
-@mmo/realtime:typecheck: 
+@mmo/realtime:typecheck:
 @mmo/realtime:typecheck: > @mmo/realtime@0.0.0 typecheck /root/browser-mmo/services/realtime
 @mmo/realtime:typecheck: > tsc -p tsconfig.json
-@mmo/realtime:typecheck: 
-@mmo/api:typecheck: 
+@mmo/realtime:typecheck:
+@mmo/api:typecheck:
 @mmo/api:typecheck: > @mmo/api@0.0.0 typecheck /root/browser-mmo/services/api
 @mmo/api:typecheck: > tsc -p tsconfig.json
-@mmo/api:typecheck: 
+@mmo/api:typecheck:
 
  Tasks:    14 successful, 14 total
 Cached:    5 cached, 14 total
-  Time:    48.61s 
-
+  Time:    48.61s

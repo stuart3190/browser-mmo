@@ -123,6 +123,7 @@ export class GameState {
   };
   /** Open NPC dialogue (the server's answer to npc.interact / quest actions). */
   dialogue: NpcDialogueView | null = null;
+  remedyPendingSeq: number | null = null;
   systems: ServerPayload<'systems.state'> = {
     professions: [],
     jobs: [],

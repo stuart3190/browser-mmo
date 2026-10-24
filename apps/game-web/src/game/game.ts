@@ -165,6 +165,10 @@ export async function startGame(args: {
   net.onStatus((status, info) => {
     state.update((s) => {
       s.connection = status;
+      if (status !== 'open') {
+        s.remedyPendingSeq = null;
+        s.systems = { ...s.systems, remedyReadyAtMs: undefined };
+      }
       s.reconnects = net.reconnects;
     });
     if (status === 'reconnecting')
@@ -173,6 +177,10 @@ export async function startGame(args: {
       state.addLog(`Disconnected: ${info.reason || info.code}`, 'error');
   });
   net.on('error', (m) => {
+    if (m.ack === state.remedyPendingSeq)
+      state.update((s) => {
+        s.remedyPendingSeq = null;
+      });
     state.addLog(`${m.d.code}: ${m.d.message}`, 'error');
     if (m.ack !== undefined) state.toast(m.d.message, 'error');
   });
@@ -394,7 +402,15 @@ export async function startGame(args: {
     state.addLog(`Looted ${parts.join(', ') || 'nothing'}`);
   });
   // ---- NPCs and quests (server state only) ----
-  net.on('systems.state', (m) => state.update((s) => (s.systems = m.d)));
+  net.on('systems.state', (m) =>
+    state.update((s) => {
+      s.systems = m.d;
+      if (m.ack === s.remedyPendingSeq) {
+        s.remedyPendingSeq = null;
+        s.toast('Remedy used');
+      }
+    }),
+  );
   net.on('world.discoveries', (m) => {
     state.update((s) => (s.discoveries = m.d.locationIds));
     for (const id of m.d.newlyDiscovered)

@@ -3,7 +3,7 @@ import { useGame } from './context';
 
 /** Opening route uses existing real pickups, equipment and quest state. No fake progress. */
 export function FirstSteps() {
-  const { state, gameData } = useGame();
+  const { state, gameData, controls } = useGame();
   const [dismissed, setDismissed] = useState(false);
   const quest = state.quests.find((q) => q.questId === 'quest.greenvale.wolves_at_the_edge');
   const weapon = state.items
@@ -13,6 +13,8 @@ export function FirstSteps() {
   if (dismissed || state.quests.some((q) => q.state === 'active' || q.state === 'ready_to_turn_in'))
     return null;
   const completed = quest?.state === 'completed';
+  if (!completed && controls.zoneId() && controls.zoneId() !== 'zone.greenvale.meadows')
+    return null;
   const story = state.quests.filter((q) => {
     const def = gameData.quest(q.questId);
     return (

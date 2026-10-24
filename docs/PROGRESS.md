@@ -1912,3 +1912,18 @@ Ranked player-facing gaps from the current client and content:
 - [ ] Next gameplay gap: healing requires opening the bag mid-fight and exposes no cooldown timer.
       Add a carried-remedy shortcut with server-confirmed readiness, desktop/touch controls and
       actual injury/use/cooldown/relogin checks. Continue gameplay only; production remains unchanged.
+
+### Quick combat remedy — verified 2026-10-24
+
+- [x] H/touch use without opening a bag; carried quantity, persistent cooldown, pending-input guard,
+      consistent bag button and readiness after reconnect. No optimistic healing/consumption.
+- [x] Real purchased remedies, crab injuries, desktop and touch healing, stack counts, cooldown,
+      relogin and unobstructed portrait/landscape controls. Eleven browser checks pass; screenshots
+      inspected. Level-five coastal-merchant fixture, no item/health grants or fake actions.
+- 15 frontend, eight domain and six realtime tests pass; repository/final affected types, lint and
+  production build pass. Evidence: `gameplay/evidence/quick-remedy-2026-10-24/`.
+- [ ] Next: character/class and held-equipment visuals. Players currently share one humanoid rig and
+      every equipped weapon appears as a short blade locally; remote equipment is not represented.
+      Add server-replicated appearance using existing profiles/snapshots, distinct warrior/mage
+      silhouettes, real sword/staff visuals and multiplayer/equip/relogin screenshot proof. Also
+      deduplicate repeated feedback toasts. Continue gameplay; no production or capacity work.

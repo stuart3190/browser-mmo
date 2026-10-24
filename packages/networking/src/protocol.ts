@@ -524,6 +524,7 @@ export const WorldDiscoveriesMsg = serverMsg(
 export const SystemsStateMsg = serverMsg(
   'systems.state',
   z.object({
+    remedyReadyAtMs: z.number().nonnegative().optional(),
     professions: z.array(z.object({ id: z.string(), xp: z.number().int().nonnegative() })),
     jobs: z.array(
       z.object({
