@@ -1630,3 +1630,12 @@ same private UUID, the first guardian was defeated and reconnect retained it. Re
 full run completion and mixed-class proof are still in progress. The failed attempt and its
 NO_TARGET counts are archived in earned-class evidence; no combat balance change was made.
 Hosted CI 40092678899 passes the pushed c0a47f1 checkpoint. Merged types/lint pass locally.
+
+### Checkpoint encoding optimization — 2026-10-24
+
+- [x] Exact version-2 JSON preserved using schema-specific collection encoding; two compatibility
+      tests cover all authored zones and combat/party/cooldown/effect recovery. All 68 world tests,
+      full types and lint pass. Relative benchmark: 463 ms legacy versus 169 ms schema encoder for
+      100 complete 26-zone snapshots, identical bytes. No durability/publication change.
+- [ ] Full isolated qualification running in `/tmp/brokenodyssey-qualification.05XEXU`; improved
+      capacity is not yet established. Main earned run stays on existing runtime until completion.
