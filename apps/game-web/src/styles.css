@@ -1688,3 +1688,114 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     flex-shrink: 0;
   }
 }
+
+.window-trade {
+  width: min(640px, calc(100vw - 24px));
+}
+.trade-create,
+.trade-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+}
+.trade-create label,
+.trade-draft > label {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+.trade-offers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+.trade-offer,
+.trade-draft {
+  border: 1px solid #66583c;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 0;
+}
+.trade-offer h3 {
+  margin: 0;
+}
+.trade-offer summary {
+  padding: 10px 0;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.trade-items {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+.trade-items label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.trade-items input {
+  width: 20px;
+  min-height: 20px;
+}
+.trade-editor button,
+.trade-create button,
+.trade-create input,
+.trade-draft input[type='number'] {
+  min-height: 44px;
+}
+@media (max-width: 520px) {
+  .trade-offers {
+    grid-template-columns: 1fr;
+  }
+  .trade-buttons > button {
+    flex: 1 1 100px;
+  }
+}
+
+/* Trading is a review task: combat buttons must not intercept its confirmation controls. */
+.ui-root:has(.window-trade) > .ability-bar,
+.ui-root:has(.window-trade) .first-steps {
+  display: none;
+}
+.window-trade {
+  background: #172620;
+  box-sizing: border-box;
+}
+.window-trade .window-header {
+  flex-shrink: 0;
+}
+.window-trade .window-body {
+  min-height: 0;
+}
+.window-trade input:not([type='checkbox']),
+.window-trade select {
+  background: #0e1b16;
+  color: #eee9dc;
+  border: 1px solid #746649;
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 720px), (pointer: coarse) {
+  .ui-root:has(.window-trade) .windows {
+    top: 120px;
+    bottom: 70px;
+    max-height: none;
+    overflow: hidden;
+  }
+  .window-trade {
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+  }
+}
+@media (pointer: coarse) and (max-height: 500px) {
+  .ui-root:has(.window-trade) .windows {
+    top: 8px;
+  }
+}

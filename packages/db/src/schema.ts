@@ -7,6 +7,7 @@
  * See docs/architecture/database.md for the design rationale, especially the item location model.
  */
 import { sql } from 'drizzle-orm';
+import type { TradeSide } from '@mmo/schemas';
 import {
   bigint,
   boolean,
@@ -732,5 +733,35 @@ export const dungeonMembers = pgTable(
   (t) => [
     primaryKey({ columns: [t.instanceId, t.characterId] }),
     index('dungeon_members_character_idx').on(t.characterId),
+  ],
+);
+
+/** Revisioned proposals; assets remain owned until both players confirm an atomic exchange. */
+export const directTrades = pgTable(
+  'direct_trades',
+  {
+    id: uuid('id').primaryKey(),
+    initiatorId: uuid('initiator_id')
+      .notNull()
+      .references(() => characters.id),
+    counterpartyId: uuid('counterparty_id')
+      .notNull()
+      .references(() => characters.id),
+    status: text('status').notNull().default('open'),
+    revision: integer('revision').notNull().default(0),
+    sides: jsonb('sides').$type<[TradeSide, TradeSide]>().notNull(),
+    createdAt: createdAt(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+  },
+  (t) => [
+    check('direct_trades_distinct_ck', sql`${t.initiatorId} <> ${t.counterpartyId}`),
+    check(
+      'direct_trades_status_ck',
+      sql`${t.status} IN ('open','locked','completed','cancelled','expired')`,
+    ),
+    check('direct_trades_revision_ck', sql`${t.revision} >= 0`),
+    index('direct_trades_initiator_idx').on(t.initiatorId, t.createdAt),
+    index('direct_trades_counterparty_idx').on(t.counterpartyId, t.createdAt),
   ],
 );

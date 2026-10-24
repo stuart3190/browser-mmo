@@ -86,6 +86,7 @@ export async function startGame(args: {
     if (enemy) combat.target(enemy.id);
   };
   mountGameUi(args.ui, {
+    api: args.api,
     state,
     actions,
     combat,

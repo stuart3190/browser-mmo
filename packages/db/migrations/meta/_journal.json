@@ -155,6 +155,13 @@
       "when": 1791581832287,
       "tag": "0021_brave_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792833131164,
+      "tag": "0022_direct_trading",
+      "breakpoints": true
     }
   ]
 }

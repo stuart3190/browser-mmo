@@ -15,3 +15,4 @@ export * from './content-pack';
 export * from './world-catalog';
 
 export * from './services';
+export * from './trading';

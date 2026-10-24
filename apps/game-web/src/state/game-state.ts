@@ -9,7 +9,7 @@ import type {
 import { ItemStore } from '@mmo/ui';
 
 export type WindowId =
-  'inventory' | 'character' | 'bank' | 'quests' | 'party' | 'world' | 'professions';
+  'inventory' | 'character' | 'bank' | 'quests' | 'party' | 'world' | 'professions' | 'trade';
 
 export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 

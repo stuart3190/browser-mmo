@@ -12,6 +12,7 @@ import { adminRoutes } from './routes/admin';
 import { authRoutes } from './routes/auth';
 import { characterRoutes } from './routes/characters';
 import { marketplaceRoutes } from './routes/marketplace';
+import { tradingRoutes } from './routes/trading';
 
 export interface AppDeps {
   ctx: DomainContext;
@@ -162,6 +163,7 @@ export async function buildApp(deps: AppDeps) {
   await app.register(authRoutes(deps), { prefix: '/v1' });
   await app.register(characterRoutes(deps), { prefix: '/v1' });
   await app.register(marketplaceRoutes(deps), { prefix: '/v1' });
+  await app.register(tradingRoutes(deps), { prefix: '/v1' });
   await app.register(adminRoutes(deps), { prefix: '/v1/admin' });
   return app;
 }

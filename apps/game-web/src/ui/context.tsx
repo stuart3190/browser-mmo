@@ -5,6 +5,7 @@ import type { CombatActions } from '../state/combat-actions';
 import type { ItemActions } from '../state/item-actions';
 import type { QuestActions } from '../state/quest-actions';
 import type { AnalogInput } from '../game/analog-input';
+import type { ApiClient } from '../api';
 
 export interface Controls {
   /** Joystick output, read by the player controller every frame. */
@@ -21,6 +22,7 @@ export interface Controls {
 }
 
 export interface UiDeps {
+  api: ApiClient;
   party: {
     invite: (id: string) => void;
     respond: (id: string, accept: boolean) => void;

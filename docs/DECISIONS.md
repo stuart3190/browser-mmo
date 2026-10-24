@@ -1132,3 +1132,34 @@ silently deleting them during startup could discard an unfinished outbox.
 
 **Verification:** Gateway regression models a late image after reset and proves restart reclamation;
 the earned preview's orphan was reclaimed by the real host with no manual deletion.
+
+## 2026-10-24 — Revisioned direct trade with atomic final settlement
+
+**Decision:** Add durable five-minute trade proposals between two characters on different accounts.
+One active proposal per character is serialized by sorted character locks. Each side offers up to
+12 whole bag/material stacks and copper. The server snapshots the exact item instances/versions;
+both players lock and confirm the same revision. Editing increments the revision and clears both
+locks and confirmations. Proposals and consent persist across reconnect; cancellation/expiry never
+strand assets because negotiation does not escrow anything. The final transaction locks both
+characters, revalidates item ownership/versions/binding/locks, bag capacity and both wallets, then
+transfers items and net currency with provenance, ledger and audit entries. Temporary escrow exists
+only inside that transaction to permit full-bag swaps. Concurrent/replayed completion returns the
+same terminal trade, without paying again.
+
+**Reason:** Direct trade was an unimplemented schema despite a working persistent item/economy
+architecture. Revision-bound consent prevents offer substitution. Existing single-location rows,
+transactions and change-feed reconciliation provide transfer authority without another inventory
+system or a crash-prone negotiation escrow/refund lifecycle.
+
+**Alternatives:** Reserve assets throughout negotiation (requires durable cancellation/expiry return
+capacity); immediately exchange on one player's acceptance (insufficient consent); client-maintained
+offers (unsafe); a separate trade service (unnecessary). Reuse of marketplace listings would impose
+sale fees and cannot represent reciprocal items and gifts.
+
+**Consequences:** Trading is accessible remotely by exact character name, like the existing remote
+bank/marketplace APIs; it has no proximity claim. Offers are not reservations: spending/moving/merging
+items before settlement can require updating and re-reviewing the offer. Whole stacks retain instance
+identity and provenance; no split/automatic merge occurs during trade. Trade state is refreshed only
+while its window is open; ownership/wallet updates use the existing realtime feed. History is bounded
+to 20 recent trades per UI query, not deleted. Rate/admission/session controls reuse the authenticated
+HTTP host. No production deployment or data reset is part of this implementation.

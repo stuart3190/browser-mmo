@@ -6,6 +6,7 @@ export * from './containers';
 export * from './items';
 export * from './currency';
 export * from './marketplace';
+export * from './trading';
 export * from './characters';
 export * from './auth';
 export * from './admin';

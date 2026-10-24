@@ -1,5 +1,9 @@
 # Progress
 
+Latest completion work: [living handoff](COMPLETION_HANDOFF.md). Source recovered from deployed
+`2c47b27` on 2026-10-24; implementation continues on `codex/shippable-completion`. Historical
+sections below retain their original evidence; current status is in the latest dated section.
+
 Authoritative checklist of what genuinely exists and works in this repository.
 
 Rules (see `AGENTS.md`):
@@ -1379,3 +1383,41 @@ reconciliation before enabling repair; continue Greenvale systems hardening rath
 Greenvale systems implementation: **cb98b4b4b28fea4318e47897ac63d2bef0516daa**.
 Public-qualified UI correction: **a416fc9855a2523f9af7037b8eab9cfb32133280**.
 Both are on pushed main. Release evidence: [qualification record](gameplay/evidence/greenvale-systems/README.md).
+
+## Current work — end-to-end completion, 2026-10-24
+
+Editable source recovered by fetching origin/main: deployed `2c47b27` is also the latest remote
+main and includes all remote feature branches. Work branch: `codex/shippable-completion`.
+The live release, production database and service start times remain unchanged. Tests use a new
+loopback-only PostgreSQL cluster on 55441, entirely separate from production 55440.
+See [living handoff](COMPLETION_HANDOFF.md) for exact paths and resumption instructions.
+
+- [x] Source recovery and isolated development/test environment; checkpoint commit `776b202`.
+- [x] Fix verified test-fixture name collisions; commit `2969503`. Bijective random UUID-derived
+      names replace lossy timestamp substitution and per-worker counters. The previously failing
+      Waystone case passes. Initial full baseline stopped at this collision (88/89 domain tests),
+      after formatting/lint/types and unit tests passed; it is not recorded as a full baseline pass.
+- [x] Direct trade domain/API and desktop/touch flow implemented and focused verification passed:
+      ten real-PostgreSQL domain cases, authenticated HTTP acceptance/security case, and nine browser
+      assertions using a freshly picked-up sword. Atomic duplicate-confirmation, marketplace race,
+      revision substitution, capacity, insufficient funds/cap rollback, foreign/bound/locked items,
+      expiry/cancellation and persistence covered. Fresh login keeps the same item identity.
+- [x] Migration 0022 applied on an isolated database populated under the deployed 0021 schema:
+      account, character, item, item history, wallet and ledger rows remain deeply equal; new trade
+      table starts empty. No checkpoint/content migration or production data mutation needed.
+- [ ] Final full verification for direct trading is in progress. First new-feature aggregate
+      stopped on a test helper's overly broad `unknown` HTTP payload type; narrowed to a record.
+      Gameplay tests already passed, and the corrected complete aggregate is running.
+- [ ] Reusable isolated qualification runner is under test. It creates its own PostgreSQL cluster
+      and databases, starts only loopback services, saves evidence and stops only its own processes.
+      Its first browser suite is direct trading; broader game-journey coverage remains to be added.
+
+Browser review found and fixed desktop ability buttons intercepting the trade Lock button and
+mobile sheet header/height overflow. Locked offers now collapse the editor to expose both reviewed
+offers alongside confirmation controls. Final browser run has zero page exceptions; emulated
+390×844 and 844×390 touch checks are functional evidence, not physical-device performance claims.
+
+Next: finish this verification/commit, then implement usable chat and party communication, persistent
+social features and player-facing marketplace access. Continue across those milestones; no claim
+that the complete game is shippable yet. Historical durability/repair and outer-region greybox limits
+still apply. Hosted CI, physical devices, capacity and off-host backup operation remain unverified.

@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "source": "deployed migrations through 0021",
+  "target": "0022_direct_trading",
+  "preserved": [
+    {
+      "table": "accounts",
+      "rows": 1
+    },
+    {
+      "table": "characters",
+      "rows": 1
+    },
+    {
+      "table": "item_instances",
+      "rows": 1
+    },
+    {
+      "table": "item_history",
+      "rows": 1
+    },
+    {
+      "table": "currency_balances",
+      "rows": 1
+    },
+    {
+      "table": "currency_ledger",
+      "rows": 1
+    }
+  ],
+  "newTrades": 0
+}

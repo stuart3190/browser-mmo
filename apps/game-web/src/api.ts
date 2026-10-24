@@ -5,6 +5,8 @@ import type {
   MoveItemRequest,
   PlayerCharacter,
   SessionResponse,
+  DirectTrade,
+  TradeAction,
 } from '@mmo/schemas';
 import { config } from './config';
 
@@ -79,5 +81,21 @@ export class ApiClient {
   }
   characterItems(characterId: string) {
     return this.request<{ items: CharacterItems }>('GET', `/v1/characters/${characterId}/items`);
+  }
+  trades(characterId: string) {
+    return this.request<{ trades: DirectTrade[] }>('GET', `/v1/characters/${characterId}/trades`);
+  }
+  createTrade(characterId: string, targetName: string, requestId: string) {
+    return this.request<{ trade: DirectTrade }>('POST', `/v1/characters/${characterId}/trades`, {
+      targetName,
+      requestId,
+    });
+  }
+  tradeAction(characterId: string, tradeId: string, action: TradeAction) {
+    return this.request<{ trade: DirectTrade }>(
+      'POST',
+      `/v1/characters/${characterId}/trades/${tradeId}`,
+      action,
+    );
   }
 }

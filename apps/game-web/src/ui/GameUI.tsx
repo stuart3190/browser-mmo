@@ -16,6 +16,7 @@ import { PartyPanel, PartySummary } from './PartyUI';
 import { FirstSteps } from './FirstSteps';
 import { AbilityBar } from './AbilityBar';
 import { WorldWindow } from './WorldWindow';
+import { TradeWindow } from './TradeWindow';
 import { Minimap } from './Minimap';
 import { DialoguePanel, QuestLogWindow, QuestTracker } from './QuestUI';
 import { TouchControls, useTouchControls } from './TouchControls';
@@ -23,6 +24,7 @@ import { TouchControls, useTouchControls } from './TouchControls';
 const SHORTCUTS: Record<string, WindowId> = {
   KeyM: 'world',
   KeyP: 'party',
+  KeyT: 'trade',
   KeyB: 'inventory',
   KeyI: 'inventory',
   KeyC: 'character',
@@ -115,6 +117,7 @@ function GameUI() {
         <PartyPanel />
         <WorldWindow />
         <ProfessionWindow />
+        <TradeWindow />
       </div>
       <DialoguePanel />
       <ItemDetails />
@@ -228,6 +231,7 @@ function ActionBar() {
       {btn('party', 'Party', 'P')}
       {btn('world', 'World', 'M')}
       {btn('professions', 'Skills', '')}
+      {btn('trade', 'Trade', 'T')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button
           className={state.target.attacking ? 'action attack active' : 'action attack'}
