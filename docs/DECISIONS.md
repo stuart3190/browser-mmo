@@ -1333,3 +1333,21 @@ asset lifecycle machinery than needed for the existing procedural static shapes.
 Props remain non-pickable and cannot be individually animated; dynamic/pickable entities stay on
 existing paths. Geometry/transform tests, repeated world disposal and browser visual/input checks
 are required before integration. World content, authoritative collisions and server code are unchanged.
+
+## 2026-10-24 — Recoverable startup and delayed engine loading
+
+**Decision**
+Render a static loading/reload panel before JavaScript. Use a minimal bootstrap that catches
+application imports; load the3D game after login and character choice. Catch failures with an explicit
+reload action. Keep the engine's build group from absorbing the shared preload helper, so login
+actually avoids downloading the engine. Scan all release JavaScript chunks for development hooks.
+
+**Reason**
+Qualification encountered blank initial pages. The old eager import graph could prevent login from
+rendering when any game module failed. Explicit recovery is useful independently of the intermittent
+network cause; do not hide failed tests with automatic retry or claim the environment fixed.
+
+**Consequences**
+Saved characters remain server-owned; reload reauthenticates and chooses the existing character.
+Test failed entry/application/game imports and production engine deferral, in addition to ordinary
+login, mobile entry and absence of development hooks. No authentication or persistence change.

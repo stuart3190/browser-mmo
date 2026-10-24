@@ -38,6 +38,9 @@ const characterName = (name) =>
     b = await phone.newPage();
   for (const p of [a, b]) {
     p.on('pageerror', (e) => errors.push(e.message));
+    p.on('requestfailed', (r) =>
+      errors.push(`Request ${new URL(r.url()).pathname}: ${r.failure()?.errorText}`),
+    );
     p.setDefaultTimeout(30000);
   }
   const suffix = Date.now().toString(36),
@@ -171,6 +174,7 @@ const characterName = (name) =>
     check('No browser exceptions', errors.length === 0, errors);
   } catch (e) {
     fs.writeFileSync(`${OUT}/failure.txt`, e.stack || String(e));
+    fs.writeFileSync(`${OUT}/errors.json`, JSON.stringify(errors, null, 2));
     for (const [p, name] of [
       [a, 'desktop'],
       [b, 'phone'],

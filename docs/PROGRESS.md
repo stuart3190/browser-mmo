@@ -1732,3 +1732,23 @@ and ray-hit diagnostics correct that driver assumption; no gameplay target rules
 run ZwXpKt stopped before login on a blank page. Preserve failures and qualify with startup recovery
 integrated. Full types/lint/build and11 frontend tests pass for batching before these debug additions;
 latest frontend types pass. Final browser proof and production build remain required.
+
+### Startup recovery — 2026-10-24
+
+- [x] Static loading/reload fallback, caught application/game import failures, and engine loading
+      after character choice. Six injected-failure browser assertions pass in1BU62M; existing
+      character recovers through reload. Types/lint/ten frontend tests pass; production build passes
+      the strengthened all-chunk debug guard. [Evidence](gameplay/evidence/startup-recovery-2026-10-24/README.md).
+- [x] Integrated35ee149 hosted CI40098308166 passes. Local OanPjT passes236unit,117domain,75realtime,
+      12HTTP, full checks/four builds/content/assets and20-table populated upgrade/restore.
+- [ ] OanPjT browser stage failed before first login on a blank page; cause not established.
+      Retained failure, added sanitized network diagnostics. Combined browsers, production delayed
+      engine assertion and unprofiled guild load remain required on the final candidate.
+
+### Release preparation — 2026-10-24 (isolated branch)
+
+- [x] Add `--prepare-only` to the existing deployment command. Private fixture execution verifies
+      fresh build, immutable reuse and invalid-flag refusal without reading runtime credentials,
+      changing `current`, installing configuration or stopping services. Bash syntax check passes.
+- [ ] Prepare the final committed candidate on this host after qualification, verify its manifest
+      and unchanged live release/readiness. Preparation is not a public deployment or capacity pass.

@@ -88,11 +88,11 @@ for endpoint in "$VITE_API_URL/health/ready" "http://127.0.0.1:$REALTIME_PORT/he
   done
   $ready || { echo "Local endpoint failed to become ready: $endpoint" >&2; exit 1; }
 done
-qualification_suites=${QUAL_BROWSER_SUITES:-trading,marketplace,social,friends,onboarding,guilds,rendering}
+qualification_suites=${QUAL_BROWSER_SUITES:-trading,marketplace,social,friends,onboarding,guilds,rendering,startup}
 if $guilds_only; then qualification_suites=guilds; fi
 read -r -a selected_suites <<< "${qualification_suites//,/ }"
 for suite in "${selected_suites[@]}"; do
-  case "$suite" in trading|marketplace|social|friends|onboarding|guilds|rendering) ;; *) echo "Unknown browser suite: $suite" >&2; exit 2 ;; esac
+  case "$suite" in trading|marketplace|social|friends|onboarding|guilds|rendering|startup) ;; *) echo "Unknown browser suite: $suite" >&2; exit 2 ;; esac
   node "scripts/e2e/$suite.cjs" "$qualification_dir/$suite" > "$qualification_dir/$suite.log" 2>&1
 done
 QUAL_RESULT_PATH="$qualification_dir/result.json" QUAL_FULL_CHECKS="$checks" QUAL_RUN_SUITES="$qualification_suites" node --input-type=module - <<'JS'
