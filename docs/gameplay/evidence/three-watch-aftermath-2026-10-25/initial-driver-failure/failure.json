@@ -1,0 +1,61 @@
+{
+  "ok": false,
+  "error": "page.waitForFunction: Timeout 45000ms exceeded.\n    at fight (/root/browser-mmo/scripts/e2e/aftermath.cjs:198:20)\n    at async <anonymous> (/root/browser-mmo/scripts/e2e/aftermath.cjs:444:13)",
+  "checks": [
+    {
+      "name": "Warrior continues the actual completed living-seal story",
+      "ok": true
+    },
+    {
+      "name": "Warrior retains the correct earned class",
+      "ok": true
+    },
+    {
+      "name": "Warrior regional patrols stay locked before returning the oath",
+      "ok": true
+    },
+    {
+      "name": "Warrior brings the oath home through the real ferry and gate",
+      "ok": true
+    },
+    {
+      "name": "Warrior can inspect its usable compass before turn-in",
+      "ok": true
+    },
+    {
+      "name": "Warrior earns one permanent compass and opens both regional patrols",
+      "ok": true
+    },
+    {
+      "name": "Warrior compass increases actual maximum health",
+      "ok": true
+    },
+    {
+      "name": "Warrior conclusion and single equipped compass survive relogin",
+      "ok": true
+    },
+    {
+      "name": "Warrior coast patrol starts with zero hunt credit",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "state": {
+    "position": {
+      "x": 315.53902986881826,
+      "z": 163.95042986653027
+    },
+    "progress": {
+      "level": 6,
+      "xp": 1349,
+      "xpToNext": 7032
+    },
+    "vitals": {
+      "health": 80,
+      "maxHealth": 274,
+      "dead": false,
+      "inCombat": true,
+      "respawnAvailableAt": null
+    }
+  }
+}

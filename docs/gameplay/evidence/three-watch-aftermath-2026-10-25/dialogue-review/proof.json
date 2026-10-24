@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "fixture": "Read-only earned actor lookup. NPC and journal interaction only; no player writes outside normal UI.",
+  "checks": [
+    {
+      "name": "Warrior reviews completed earned epilogue and patrols",
+      "ok": true
+    },
+    {
+      "name": "Warrior keeps the NPC close control visible after scrolling",
+      "ok": true
+    },
+    {
+      "name": "Warrior closes the scrolled conversation normally",
+      "ok": true
+    },
+    {
+      "name": "Warrior browser icon points to a real game asset",
+      "ok": true
+    },
+    {
+      "name": "Warrior journal preserves the repeat timer",
+      "ok": true
+    },
+    {
+      "name": "Mage reviews completed earned epilogue and patrols",
+      "ok": true
+    },
+    {
+      "name": "Mage keeps the NPC close control visible after scrolling",
+      "ok": true
+    },
+    {
+      "name": "Mage closes the scrolled conversation normally",
+      "ok": true
+    },
+    {
+      "name": "Mage browser icon points to a real game asset",
+      "ok": true
+    },
+    {
+      "name": "Mage journal preserves the repeat timer",
+      "ok": true
+    },
+    {
+      "name": "No earned aftermath review exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

@@ -2904,3 +2904,25 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   flex-shrink: 0;
   background: #172620;
 }
+.quest-repeat {
+  border-left: 2px solid #c3ab69;
+  padding-left: 8px;
+  color: #d5c59c;
+}
+.quest-repeat time {
+  color: #b9c1ad;
+}
+
+/* NPC names and dismissal remain reachable through long quest/service conversations. */
+.dialogue-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 4px 0;
+  background: #172620;
+  border-bottom: 1px solid #66775c;
+}
+.dialogue-header .icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}

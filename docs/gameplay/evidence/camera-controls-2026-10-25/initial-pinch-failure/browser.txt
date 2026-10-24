@@ -1,0 +1,38 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 42 item templates.
+PASS Warrior reviews completed earned epilogue and patrols
+PASS Warrior keeps the NPC close control visible after scrolling
+PASS Warrior closes the scrolled conversation normally
+PASS Warrior browser icon points to a real game asset
+PASS Warrior journal preserves the repeat timer
+PASS Mage reviews completed earned epilogue and patrols
+PASS Mage keeps the NPC close control visible after scrolling
+PASS Mage closes the scrolled conversation normally
+PASS Mage browser icon points to a real game asset
+PASS Mage journal preserves the repeat timer
+PASS No earned aftermath review exceptions
+PASS desktop camera gesture starts on unobscured world
+PASS desktop mouse drag rotates the camera
+PASS desktop wheel zooms into the world
+PASS desktop zoom respects maximum distance
+PASS desktop zoom respects minimum distance
+PASS desktop viewing controls do not move character
+PASS desktop reset camera has a touch-sized control
+PASS desktop reset restores stable starting view
+PASS desktop camera reset leaves character in place
+PASS touch camera gesture starts on unobscured world
+PASS touch drag rotates the camera
+page.waitForFunction: Timeout 45000ms exceeded.
+    at /root/browser-mmo/scripts/e2e/camera.cjs:92:20 {
+  log: [],
+  name: 'TimeoutError'
+}

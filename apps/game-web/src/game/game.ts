@@ -113,6 +113,7 @@ export async function startGame(args: {
       travel: (travelId) => net.send('world.travel', { travelId }),
       interact,
       targetNearest,
+      resetCamera: () => player?.resetCamera(),
       zoneId: () => zoneId,
       position: () =>
         player
@@ -721,6 +722,11 @@ function exposeDebug(
     get position() {
       const p = player();
       return p ? { x: p.position.x, z: p.position.z } : null;
+    },
+    /** Read-only camera state for functional input verification. */
+    get cameraView() {
+      const c = player()?.camera;
+      return c ? { alpha: c.alpha, beta: c.beta, radius: c.radius } : null;
     },
     /** Orbit camera yaw (changes when the view is dragged). */
     get cameraAlpha() {

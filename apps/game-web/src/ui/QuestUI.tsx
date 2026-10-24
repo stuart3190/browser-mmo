@@ -1,4 +1,5 @@
 import { availableQuestOffers, questGiverPlace } from '../state/quest-offers';
+import { QuestRepeatStatus } from './QuestRepeatStatus';
 import { EquipmentPreview } from './EquipmentPreview';
 import { ItemGlyph } from './ItemGlyph';
 import { ServiceOffer } from './ServiceOffer';
@@ -215,6 +216,7 @@ export function DialoguePanel() {
             data-state={quest.state}
           >
             <h3>{quest.name}</h3>
+            <QuestRepeatStatus quest={quest} />
             <p className="dialogue-line">“{line}”</p>
             {action === 'accept' && <p className="small muted">{quest.description}</p>}
             {(quest.state === 'active' || quest.state === 'ready_to_turn_in') && (
@@ -369,6 +371,7 @@ export function QuestLogWindow() {
             data-state={q.state}
           >
             <h3>{q.name}</h3>
+            <QuestRepeatStatus quest={q} />
             {q.state === 'available' && (
               <>
                 <p className="small" data-testid="quest-offer-place">

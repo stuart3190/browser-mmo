@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "error": "page.waitForFunction: Timeout 45000ms exceeded.\n    at /root/browser-mmo/scripts/e2e/camera.cjs:99:20",
+  "checks": [
+    {
+      "name": "touch camera gesture starts on unobscured world",
+      "ok": true
+    },
+    {
+      "name": "touch drag rotates the camera",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

@@ -6,7 +6,19 @@ export function ItemGlyph({ template }: { template: ItemTemplate }) {
   const type = equipment?.equipmentTypeId;
   const id = template.id;
   let shape;
-  if (type === 'sword' || type === 'dagger')
+  if (id === 'accessory.trinket.watchkeepers_compass')
+    shape = (
+      <>
+        <circle cx="32" cy="34" r="23" fill="#263e3c" stroke="#ddbf70" strokeWidth="4" />
+        <circle cx="32" cy="34" r="17" stroke="#a79965" strokeWidth="1" />
+        <path d="M32 13v5m21 16h-5M32 55v-5M11 34h5" stroke="#f3dda1" strokeWidth="2" />
+        <path d="m32 16 5 18-5 18-5-18Z" fill="#e5cb84" />
+        <path d="m17 43 15-14 15 14-15-4Z" fill="#8bc9bf" />
+        <circle cx="32" cy="34" r="3" fill="#fff0bc" />
+        <path d="M27 10V6h10v4" stroke="#ddbf70" strokeWidth="3" />
+      </>
+    );
+  else if (type === 'sword' || type === 'dagger')
     shape = (
       <>
         <path d="M18 40 41 6 44 21 25 44Z" fill="#c7d9dd" />

@@ -1,0 +1,80 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 42 item templates.
+
+> @mmo/game-web@0.0.0 build /root/browser-mmo/apps/game-web
+> vite build
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 873 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                        1.26 kB │ gzip:   0.62 kB
+dist/assets/index-DiGaZl7-.css                        40.28 kB │ gzip:   8.98 kB
+dist/assets/dds.pure-BhmDCYzh.js                       0.06 kB │ gzip:   0.07 kB
+dist/assets/webAudioBus-BIfaPpWW.js                    0.06 kB │ gzip:   0.08 kB
+dist/assets/webgpuEngine-s2MYLm5d.js                   0.06 kB │ gzip:   0.08 kB
+dist/assets/mesh.vertexData.functions-C27tWypl.js      0.07 kB │ gzip:   0.08 kB
+dist/assets/color.fragment-Ct_DbAtA.js                 0.07 kB │ gzip:   0.08 kB
+dist/assets/webAudioMainBus-Bn1xTIeV.js                0.07 kB │ gzip:   0.08 kB
+dist/assets/color.vertex-Cw0Iy2Ac.js                   0.07 kB │ gzip:   0.08 kB
+dist/assets/ddsTextureLoader-Dbr-DvEm.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/envTextureLoader-59S8V8Pp.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/exrTextureLoader-CFLq4ak_.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/hdrTextureLoader-BTBNj1pG.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/iesTextureLoader-DI9Ll-gY.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/ktxTextureLoader-BOgtrYSK.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/tgaTextureLoader-CH1fZR2A.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/default.fragment-CBJUuPGL.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/basisTextureLoader-BQO8Vy1S.js             0.07 kB │ gzip:   0.09 kB
+dist/assets/default.vertex-D-9sr3Yo.js                 0.07 kB │ gzip:   0.09 kB
+dist/assets/color.fragment-YqFq5PsD.js                 0.07 kB │ gzip:   0.09 kB
+dist/assets/webAudioSoundSource-CTEyrq6-.js            0.07 kB │ gzip:   0.09 kB
+dist/assets/color.vertex-sWFMFJTt.js                   0.07 kB │ gzip:   0.09 kB
+dist/assets/rgbdDecode.fragment-B9DoljsS.js            0.07 kB │ gzip:   0.09 kB
+dist/assets/default.fragment-BxYN2br_.js               0.07 kB │ gzip:   0.09 kB
+dist/assets/default.vertex-CZL4A553.js                 0.07 kB │ gzip:   0.09 kB
+dist/assets/postprocess.vertex-D6Bzc5Eh.js             0.07 kB │ gzip:   0.09 kB
+dist/assets/webAudioStreamingSound-DMXzzy3I.js         0.07 kB │ gzip:   0.09 kB
+dist/assets/clearQuad.fragment-CuE8cha4.js             0.08 kB │ gzip:   0.09 kB
+dist/assets/clearQuad.vertex-fXL2Nhb-.js               0.08 kB │ gzip:   0.09 kB
+dist/assets/rgbdDecode.fragment-C39aeHZY.js            0.08 kB │ gzip:   0.09 kB
+dist/assets/postprocess.vertex-5dKjAA2M.js             0.08 kB │ gzip:   0.09 kB
+dist/assets/webAudioStaticSound-DRdY7yij.js            0.11 kB │ gzip:   0.10 kB
+dist/assets/preload-helper-DjzSQ1t3.js                 1.38 kB │ gzip:   0.75 kB
+dist/assets/index-Cuq2_uMP.js                          1.50 kB │ gzip:   0.79 kB │ map:     1.55 kB
+dist/assets/main-Dtkbpj0t.js                           5.93 kB │ gzip:   2.39 kB │ map:    14.76 kB
+dist/assets/game-CnGW5qZb.js                         410.19 kB │ gzip: 129.31 kB │ map: 1,661.90 kB
+dist/assets/api-OXcWahFx.js                          574.44 kB │ gzip:  94.69 kB │ map: 1,547.88 kB
+dist/assets/babylon-DbzD--J_.js                    1,950.99 kB │ gzip: 460.99 kB │ map: 7,971.63 kB
+
+✓ built in 5.21s
+Production bundle: development debug hook absent
+PASS Warrior-desktop loads actual built scripts without a development hook
+PASS Warrior-desktop retains quest.greenvale.three_watches
+PASS Warrior-desktop retains quest.amber_coast.daily_watch
+PASS Warrior-desktop retains quest.elderwood.daily_watch
+PASS Warrior-desktop built journal displays patrol availability
+PASS Warrior-desktop built class reference contains four abilities
+PASS Warrior-desktop built regional chart locates its character
+PASS Warrior-desktop built camera reset returns to the world
+PASS Warrior-desktop built client rejoins after reload
+PASS Mage-touch loads actual built scripts without a development hook
+PASS Mage-touch retains quest.greenvale.three_watches
+PASS Mage-touch retains quest.amber_coast.daily_watch
+PASS Mage-touch retains quest.elderwood.daily_watch
+PASS Mage-touch built journal displays patrol availability
+PASS Mage-touch built class reference contains four abilities
+PASS Mage-touch built regional chart locates its character
+PASS Mage-touch built camera reset returns to the world
+PASS Mage-touch built client rejoins after reload
+PASS No built-client exceptions or failed assets

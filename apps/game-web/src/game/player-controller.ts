@@ -72,6 +72,16 @@ export class PlayerController {
     canvas.focus();
   }
 
+  /** Restore a useful north-facing view without changing character state. */
+  resetCamera(): void {
+    this.camera.inertialAlphaOffset = 0;
+    this.camera.inertialBetaOffset = 0;
+    this.camera.inertialRadiusOffset = 0;
+    this.camera.alpha = -Math.PI / 2;
+    this.camera.beta = Math.PI / 3;
+    this.camera.radius = 21;
+  }
+
   private bounds?: { minX: number; minZ: number; maxX: number; maxZ: number };
   changeZone(
     collision: CollisionWorld,

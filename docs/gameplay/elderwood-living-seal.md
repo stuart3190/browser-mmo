@@ -25,6 +25,26 @@ creatures. This is an authored landing chapter; it does not finish the whole Eld
 or the other atlas greyboxes. Forest attacks reuse the fixed-position ground strike and its
 recovery logic. Normal spitters prepare players for the Cantor's alternating circle/sweep rhythm.
 
+## Bringing the watches home
+
+After A Song Left Unfinished, accept **The Three Watches** from Tamsin. Return by the actual
+Pinewatch ferry, Willow Quay and Enclave Gate to Elder Maren in the Meadows. The once-only
+conclusion awards 500 XP, 180 copper and a bound **Watchkeeper's Compass**. Both classes can equip
+this level-five trinket: its base stats are +4 stamina, +5 armour, +2 strength and +2 intellect,
+with ordinary rarity rolls. It occupies a trinket slot alongside the earlier necklace/ring rewards.
+
+The conclusion unlocks two optional short return visits:
+
+| Patrol                         | Work                                                   | Reward                                   |
+| ------------------------------ | ------------------------------------------------------ | ---------------------------------------- |
+| Daily Tidewatch Patrol, Iona   | Survey Storm-Line Gauge and defeat two Glassback Crabs | 350 XP, 100 copper, one Greenvale Remedy |
+| Daily Pinewatch Patrol, Tamsin | Survey Listening Roots and defeat two Briar Spitters   | 400 XP, 110 copper, one Greenvale Remedy |
+
+Each patrol requires fresh accepted objectives. Its next acceptance is 24 hours after its own
+completion, not at calendar midnight. NPC dialogue and the completed quest journal show the
+next local date/time and remaining wait. This display never authorises a quest; the server checks
+acceptance. The patrols are optional follow-up work, not a new chapter or a daily login requirement.
+
 ## Functional verification recipe
 
 `COAST_COMMISSIONS=1 QUAL_BROWSER_SUITES=coast,forest bash scripts/qualify-local.sh --skip-checks`

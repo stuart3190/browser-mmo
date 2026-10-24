@@ -1,0 +1,51 @@
+{
+  "ok": false,
+  "error": "page.waitForFunction: Timeout 45000ms exceeded.\n    at /root/browser-mmo/scripts/e2e/camera.cjs:122:20",
+  "checks": [
+    {
+      "name": "desktop camera gesture starts on unobscured world",
+      "ok": true
+    },
+    {
+      "name": "desktop mouse drag rotates the camera",
+      "ok": true
+    },
+    {
+      "name": "desktop wheel zooms into the world",
+      "ok": true
+    },
+    {
+      "name": "desktop zoom respects maximum distance",
+      "ok": true
+    },
+    {
+      "name": "desktop zoom respects minimum distance",
+      "ok": true
+    },
+    {
+      "name": "desktop viewing controls do not move character",
+      "ok": true
+    },
+    {
+      "name": "desktop reset camera has a touch-sized control",
+      "ok": true
+    },
+    {
+      "name": "desktop reset restores stable starting view",
+      "ok": true
+    },
+    {
+      "name": "desktop camera reset leaves character in place",
+      "ok": true
+    },
+    {
+      "name": "touch camera gesture starts on unobscured world",
+      "ok": true
+    },
+    {
+      "name": "touch drag rotates the camera",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

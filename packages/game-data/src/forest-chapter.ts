@@ -34,6 +34,11 @@ export const livingSeal = {
     },
   ],
 };
+export const watchAftermath = {
+  epilogueId: 'quest.greenvale.three_watches',
+  patrolIds: ['quest.amber_coast.daily_watch', 'quest.elderwood.daily_watch'],
+  compassId: 'accessory.trinket.watchkeepers_compass',
+};
 export const forestChapterPack = authored;
 /** Extend authored progression at the existing boat landing, preserving all atlas links and data. */
 export function withForestChapter(source: ParsedGameData): ParsedGameData {
@@ -158,6 +163,28 @@ export function withForestChapter(source: ParsedGameData): ParsedGameData {
           stamina: { min: 8, max: 8 },
           armor: { min: 10, max: 10 },
           spirit: { min: 4, max: 4 },
+        },
+      },
+    }),
+  );
+  const token = raw.itemTemplates.find((i) => i.id === 'accessory.trinket.keepers_token')!;
+  raw.itemTemplates.push(
+    ItemTemplateSchema.parse({
+      ...token,
+      id: watchAftermath.compassId,
+      name: "Watchkeeper's Compass",
+      description:
+        'A brass compass whose three needles remember stone, tide and root. Maren entrusted it to you after the three watches answered one another again.',
+      requiredLevel: 5,
+      itemLevel: 12,
+      iconId: 'icons/items/watchkeepers_compass',
+      equipment: {
+        ...token.equipment,
+        baseStats: {
+          stamina: { min: 4, max: 4 },
+          armor: { min: 5, max: 5 },
+          strength: { min: 2, max: 2 },
+          intellect: { min: 2, max: 2 },
         },
       },
     }),

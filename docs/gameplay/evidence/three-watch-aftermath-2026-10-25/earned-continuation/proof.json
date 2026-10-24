@@ -1,0 +1,204 @@
+{
+  "ok": true,
+  "fixture": "Existing earned coastal/forest actors. All new acceptance, return travel, equipment, surveys, victories, turn-ins and relogins use ordinary UI; no player grants or teleports.",
+  "checks": [
+    {
+      "name": "Warrior recovers normally at a safe camp before continuing",
+      "ok": true
+    },
+    {
+      "name": "Warrior continues the actual completed living-seal story",
+      "ok": true
+    },
+    {
+      "name": "Warrior retains the correct earned class",
+      "ok": true
+    },
+    {
+      "name": "Warrior earns one permanent compass and opens both regional patrols",
+      "ok": true
+    },
+    {
+      "name": "Warrior conclusion and single equipped compass survive relogin",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Warrior defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Warrior coast patrol awards earned XP and one remedy",
+      "ok": true
+    },
+    {
+      "name": "Warrior coast patrol cannot be accepted again immediately",
+      "ok": true
+    },
+    {
+      "name": "Warrior coast display uses actual completion plus 24 hours",
+      "ok": true
+    },
+    {
+      "name": "Warrior forest patrol starts with zero hunt credit",
+      "ok": true
+    },
+    {
+      "name": "Warrior Briar Spitter warning stays clear of notices",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 1
+      }
+    },
+    {
+      "name": "Warrior Briar Spitter warning stays clear of notices",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 1
+      }
+    },
+    {
+      "name": "Warrior forest patrol awards earned XP and one remedy",
+      "ok": true
+    },
+    {
+      "name": "Warrior forest patrol cannot be accepted again immediately",
+      "ok": true
+    },
+    {
+      "name": "Warrior forest display uses actual completion plus 24 hours",
+      "ok": true
+    },
+    {
+      "name": "Warrior both paid patrols retain their completion after login",
+      "ok": true
+    },
+    {
+      "name": "Warrior journal retains patrol availability information",
+      "ok": true
+    },
+    {
+      "name": "Mage continues the actual completed living-seal story",
+      "ok": true
+    },
+    {
+      "name": "Mage retains the correct earned class",
+      "ok": true
+    },
+    {
+      "name": "Mage regional patrols stay locked before returning the oath",
+      "ok": true
+    },
+    {
+      "name": "Mage brings the oath home through the real ferry and gate",
+      "ok": true
+    },
+    {
+      "name": "Mage can inspect its usable compass before turn-in",
+      "ok": true
+    },
+    {
+      "name": "Mage earns one permanent compass and opens both regional patrols",
+      "ok": true
+    },
+    {
+      "name": "Mage compass increases actual maximum health",
+      "ok": true
+    },
+    {
+      "name": "Mage conclusion and single equipped compass survive relogin",
+      "ok": true
+    },
+    {
+      "name": "Mage coast patrol starts with zero hunt credit",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage coast patrol awards earned XP and one remedy",
+      "ok": true
+    },
+    {
+      "name": "Mage coast patrol cannot be accepted again immediately",
+      "ok": true
+    },
+    {
+      "name": "Mage coast display uses actual completion plus 24 hours",
+      "ok": true
+    },
+    {
+      "name": "Mage forest patrol starts with zero hunt credit",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage forest patrol awards earned XP and one remedy",
+      "ok": true
+    },
+    {
+      "name": "Mage forest patrol cannot be accepted again immediately",
+      "ok": true
+    },
+    {
+      "name": "Mage forest display uses actual completion plus 24 hours",
+      "ok": true
+    },
+    {
+      "name": "Mage both paid patrols retain their completion after login",
+      "ok": true
+    },
+    {
+      "name": "Mage journal retains patrol availability information",
+      "ok": true
+    },
+    {
+      "name": "No three-watch journey exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

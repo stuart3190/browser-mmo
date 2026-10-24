@@ -1,0 +1,44 @@
+
+> @mmo/game-data@0.0.0 test /root/browser-mmo/packages/game-data
+> vitest run
+
+
+ RUN  v5.0.3 /root/browser-mmo/packages/game-data
+
+ ❯ src/world-catalog.test.ts (27 tests | 1 failed) 1330ms
+   × ships diverse reusable catalogs and focused Greenvale population while preserving other regions 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/world-catalog.test.ts > ships diverse reusable catalogs and focused Greenvale population while preserving other regions
+AssertionError: expected 27 to be 24 // Object.is equality
+
+- Expected
++ Received
+
+- 24
++ 27
+
+ ❯ src/world-catalog.test.ts:45:26
+     43|   expect(world.populations).toHaveLength(249);
+     44|   expect(world.resources).toHaveLength(10);
+     45|   expect(gd.quests.size).toBe(getStarterGameData().quests.size + 16);
+       |                          ^
+     46|   expect(gd.raw.chunks.length).toBeLessThan(700);
+     47|   for (const r of world.regions) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 21 passed (22)
+      Tests  1 failed | 140 passed (141)
+   Start at  00:55:35
+   Duration  11.38s (transform 56%, import 38%, tests 5%)
+
+  Transform  transforming modules took 58.83s · 56% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+/root/browser-mmo/packages/game-data:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @mmo/game-data@0.0.0 test: `vitest run`
+Exit status 1

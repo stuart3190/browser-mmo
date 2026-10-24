@@ -1610,3 +1610,24 @@ and effectiveAbility definitions as the combat bar and uses the server's unlock 
 reach, recovery, target rules and tactical effects; it never submits a combat action. Path changes
 therefore update both the bar and reference together. Keep this information out of the permanent
 HUD and preserve current hotkeys. No combat, progression or specialisation rules change.
+
+## 2026-10-25 — Conclude the three-watch arc and reuse regional patrol rules
+
+The existing forest content pack now includes a return to Maren after the Living Seal. Its compass
+reward is an ordinary bound trinket usable by both live classes; existing rewards and characters
+remain intact. Completion opens short coastal/forest patrols using the existing explore/kill
+objectives, party credit, transactional rewards and explicit 24-hour cooldown after completion.
+No new quest state, clock mutation, calendar reset or persistence model is introduced.
+Dialogue/journal show next availability from the stored completion timestamp plus authored cooldown,
+using server clock offset for the countdown. This is display only; the server still decides whether
+fresh acceptance is allowed. The first-time story and current three regional chapters remain intact.
+
+### 2026-10-25 — Recoverable orbit camera and readable NPC conversations
+
+Settings exposes a local camera reset to the existing starting angle and distance, clearing orbit
+inertia. It never sends a movement intent or changes character state. Existing mouse drag/wheel
+and touch drag/pinch remain the controls; read-only development observations support actual input
+verification. NPC headers stay visible inside long conversations, preserving the existing dialogue
+and service architecture. Twenty fresh camera checks and eleven earned dialogue review checks pass; see 2026-10-25 evidence.
+Multi-touch tests explicitly advertise five supported contacts before game boot; hasTouch alone
+advertises only one. Existing camera behavior is preserved.

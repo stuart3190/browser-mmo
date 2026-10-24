@@ -1,0 +1,127 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 42 item templates.
+PASS touch camera gesture starts on unobscured world
+PASS touch drag rotates the camera
+PINCH STEP 1 {
+  alpha: -1.7943374228707778,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 2 {
+  alpha: -1.7846549421888285,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 3 {
+  alpha: -1.775960937889922,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 4 {
+  alpha: -1.7644039479345421,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 5 {
+  alpha: -1.7641402245634898,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 6 {
+  alpha: -1.7426932785429,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 7 {
+  alpha: -1.7377092928388926,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 8 {
+  alpha: -1.7219582277588608,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 9 {
+  alpha: -1.706476064565886,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 10 {
+  alpha: -1.7063666555062844,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 11 {
+  alpha: -1.6925318543763836,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH STEP 12 {
+  alpha: -1.6783133554018201,
+  beta: 0.9997929925579776,
+  radius: 21,
+  pointerIds: [ 4, undefined ],
+  natural: true,
+  pinch: true,
+  both: true
+}
+PINCH {"before":21,"after":{"alpha":-1.6636474545784643,"beta":0.9997929925579776,"radius":21,"pointerIds":[null,null],"natural":true,"pinch":true,"both":true},"scale":1,"events":[{"type":"pointerdown","id":4,"x":165,"y":380,"kind":"touch","button":0},{"type":"pointerdown","id":5,"x":225,"y":380,"kind":"touch","button":0},{"type":"pointermove","id":5,"x":230,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":160,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":235,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":155,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":240,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":150,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":245,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":145,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":250,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":140,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":255,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":135,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":260,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":130,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":265,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":125,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":270,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":120,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":275,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":115,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":280,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":110,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":5,"x":285,"y":380,"kind":"touch","button":-1},{"type":"pointermove","id":4,"x":105,"y":380,"kind":"touch","button":-1},{"type":"pointerup","id":4,"x":105,"y":380,"kind":"touch","button":0},{"type":"pointerup","id":5,"x":285,"y":380,"kind":"touch","button":0}]}
+page.waitForFunction: Timeout 45000ms exceeded.
+    at /root/browser-mmo/scripts/e2e/camera.cjs:123:20 {
+  log: [],
+  name: 'TimeoutError'
+}

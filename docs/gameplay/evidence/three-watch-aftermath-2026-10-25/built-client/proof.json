@@ -1,0 +1,84 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Warrior-desktop loads actual built scripts without a development hook",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop retains quest.greenvale.three_watches",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop retains quest.amber_coast.daily_watch",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop retains quest.elderwood.daily_watch",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop built journal displays patrol availability",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop built class reference contains four abilities",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop built regional chart locates its character",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop built camera reset returns to the world",
+      "ok": true
+    },
+    {
+      "name": "Warrior-desktop built client rejoins after reload",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch loads actual built scripts without a development hook",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch retains quest.greenvale.three_watches",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch retains quest.amber_coast.daily_watch",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch retains quest.elderwood.daily_watch",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch built journal displays patrol availability",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch built class reference contains four abilities",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch built regional chart locates its character",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch built camera reset returns to the world",
+      "ok": true
+    },
+    {
+      "name": "Mage-touch built client rejoins after reload",
+      "ok": true
+    },
+    {
+      "name": "No built-client exceptions or failed assets",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "scope": "Built game assets against private loopback test services; existing earned actors, UI only; no deployment or release-readiness claim"
+}

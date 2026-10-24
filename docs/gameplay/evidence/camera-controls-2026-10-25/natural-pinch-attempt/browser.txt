@@ -1,0 +1,232 @@
+
+> browser-mmo@ typecheck /root/browser-mmo
+> turbo run typecheck && tsc -p scripts/tsconfig.json
+
+
+   • turbo 2.11.7
+   • Packages in scope: @mmo/admin, @mmo/api, @mmo/config, @mmo/db, @mmo/domain, @mmo/game-data, @mmo/game-web, @mmo/networking, @mmo/realtime, @mmo/schemas, @mmo/server-kit, @mmo/shared, @mmo/ui, @mmo/world
+   • Running typecheck in 14 packages
+   • Remote caching disabled
+
+@mmo/shared:typecheck: cache hit, replaying logs 0a0895bde0a898b3
+@mmo/shared:typecheck:
+@mmo/shared:typecheck: > @mmo/shared@0.0.0 typecheck /root/browser-mmo/packages/shared
+@mmo/shared:typecheck: > tsc -p tsconfig.json
+@mmo/shared:typecheck:
+@mmo/config:typecheck: cache hit, replaying logs 0276cfd302aac304
+@mmo/config:typecheck:
+@mmo/config:typecheck: > @mmo/config@0.0.0 typecheck /root/browser-mmo/packages/config
+@mmo/config:typecheck: > tsc -p tsconfig.json
+@mmo/config:typecheck:
+@mmo/schemas:typecheck: cache hit, replaying logs bf86a2df6b0bd326
+@mmo/schemas:typecheck:
+@mmo/schemas:typecheck: > @mmo/schemas@0.0.0 typecheck /root/browser-mmo/packages/schemas
+@mmo/schemas:typecheck: > tsc -p tsconfig.json
+@mmo/schemas:typecheck:
+@mmo/server-kit:typecheck: cache hit, replaying logs f1a1d3e4c325801e
+@mmo/server-kit:typecheck:
+@mmo/server-kit:typecheck: > @mmo/server-kit@0.0.0 typecheck /root/browser-mmo/packages/server-kit
+@mmo/server-kit:typecheck: > tsc -p tsconfig.json
+@mmo/server-kit:typecheck:
+@mmo/game-data:typecheck: cache hit, replaying logs 01a46ed2690c67c5
+@mmo/game-data:typecheck:
+@mmo/game-data:typecheck: > @mmo/game-data@0.0.0 typecheck /root/browser-mmo/packages/game-data
+@mmo/game-data:typecheck: > tsc -p tsconfig.json
+@mmo/game-data:typecheck:
+@mmo/networking:typecheck: cache hit, replaying logs 675390412d7abdf7
+@mmo/networking:typecheck:
+@mmo/networking:typecheck: > @mmo/networking@0.0.0 typecheck /root/browser-mmo/packages/networking
+@mmo/networking:typecheck: > tsc -p tsconfig.json
+@mmo/networking:typecheck:
+@mmo/db:typecheck: cache hit, replaying logs 11a2826fbb09f441
+@mmo/db:typecheck:
+@mmo/db:typecheck: > @mmo/db@0.0.0 typecheck /root/browser-mmo/packages/db
+@mmo/db:typecheck: > tsc -p tsconfig.json
+@mmo/db:typecheck:
+@mmo/world:typecheck: cache hit, replaying logs f3a6a6aa40fe6d22
+@mmo/world:typecheck:
+@mmo/world:typecheck: > @mmo/world@0.0.0 typecheck /root/browser-mmo/services/world
+@mmo/world:typecheck: > tsc -p tsconfig.json
+@mmo/world:typecheck:
+@mmo/ui:typecheck: cache hit, replaying logs 546c3dca1619f6a2
+@mmo/ui:typecheck:
+@mmo/ui:typecheck: > @mmo/ui@0.0.0 typecheck /root/browser-mmo/packages/ui
+@mmo/ui:typecheck: > tsc -p tsconfig.json
+@mmo/ui:typecheck:
+@mmo/domain:typecheck: cache hit, replaying logs 14ee3d58b07c6b74
+@mmo/domain:typecheck:
+@mmo/domain:typecheck: > @mmo/domain@0.0.0 typecheck /root/browser-mmo/packages/domain
+@mmo/domain:typecheck: > tsc -p tsconfig.json
+@mmo/domain:typecheck:
+@mmo/admin:typecheck: cache hit, replaying logs 9c560b8b8b644543
+@mmo/admin:typecheck:
+@mmo/admin:typecheck: > @mmo/admin@0.0.0 typecheck /root/browser-mmo/apps/admin
+@mmo/admin:typecheck: > tsc -p tsconfig.json
+@mmo/admin:typecheck:
+@mmo/realtime:typecheck: cache hit, replaying logs 9551570740aae488
+@mmo/realtime:typecheck:
+@mmo/realtime:typecheck: > @mmo/realtime@0.0.0 typecheck /root/browser-mmo/services/realtime
+@mmo/realtime:typecheck: > tsc -p tsconfig.json
+@mmo/realtime:typecheck:
+@mmo/game-web:typecheck: cache miss, executing 67b1793d4a3f6375
+@mmo/api:typecheck: cache hit, replaying logs 514d3b3aebf5362e
+@mmo/api:typecheck:
+@mmo/api:typecheck: > @mmo/api@0.0.0 typecheck /root/browser-mmo/services/api
+@mmo/api:typecheck: > tsc -p tsconfig.json
+@mmo/api:typecheck:
+@mmo/game-web:typecheck:
+@mmo/game-web:typecheck: > @mmo/game-web@0.0.0 typecheck /root/browser-mmo/apps/game-web
+@mmo/game-web:typecheck: > tsc -p tsconfig.json
+@mmo/game-web:typecheck:
+
+ Tasks:    14 successful, 14 total
+Cached:    13 cached, 14 total
+  Time:    25.947s
+
+
+> browser-mmo@ lint /root/browser-mmo
+> eslint . --max-warnings=0
+
+
+> browser-mmo@ build /root/browser-mmo
+> turbo run build && node scripts/check-production-build.cjs
+
+
+   • turbo 2.11.7
+   • Packages in scope: @mmo/admin, @mmo/api, @mmo/config, @mmo/db, @mmo/domain, @mmo/game-data, @mmo/game-web, @mmo/networking, @mmo/realtime, @mmo/schemas, @mmo/server-kit, @mmo/shared, @mmo/ui, @mmo/world
+   • Running build in 14 packages
+   • Remote caching disabled
+
+@mmo/admin:build: cache hit, replaying logs 0ff5a67d40edba05
+@mmo/admin:build:
+@mmo/admin:build: > @mmo/admin@0.0.0 build /root/browser-mmo/apps/admin
+@mmo/admin:build: > vite build
+@mmo/admin:build:
+@mmo/admin:build: vite v8.3.2 building client environment for production...
+@mmo/admin:build: transforming...
+@mmo/admin:build: ✓ 172 modules transformed.
+@mmo/admin:build: rendering chunks...
+@mmo/admin:build: computing gzip size...
+@mmo/admin:build: dist/index.html                  0.80 kB │ gzip:   0.49 kB
+@mmo/admin:build: dist/assets/index-C6zAp9_6.js  791.91 kB │ gzip: 161.65 kB │ map: 2,593.70 kB
+@mmo/admin:build:
+@mmo/admin:build: [plugin builtin:vite-reporter]
+@mmo/admin:build: (!) Some chunks are larger than 500 kB after minification. Consider:
+@mmo/admin:build: - Using dynamic import() to code-split the application
+@mmo/admin:build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+@mmo/admin:build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+@mmo/admin:build: ✓ built in 1.13s
+@mmo/realtime:build: cache hit, replaying logs d10e0d4fce7b4dc0
+@mmo/realtime:build:
+@mmo/realtime:build: > @mmo/realtime@0.0.0 build /root/browser-mmo/services/realtime
+@mmo/realtime:build: > tsup
+@mmo/realtime:build:
+@mmo/realtime:build: CLI Building entry: src/main.ts
+@mmo/realtime:build: CLI Using tsconfig: tsconfig.json
+@mmo/realtime:build: CLI tsup v8.5.1
+@mmo/realtime:build: CLI Using tsup config: /root/browser-mmo/services/realtime/tsup.config.ts
+@mmo/realtime:build: CLI Target: node22
+@mmo/realtime:build: CLI Cleaning output folder
+@mmo/realtime:build: ESM Build start
+@mmo/realtime:build: ESM dist/main.js     1021.07 KB
+@mmo/realtime:build: ESM dist/main.js.map 1.93 MB
+@mmo/realtime:build: ESM ⚡️ Build success in 1043ms
+@mmo/api:build: cache hit, replaying logs e1d550a5763198c3
+@mmo/api:build:
+@mmo/api:build: > @mmo/api@0.0.0 build /root/browser-mmo/services/api
+@mmo/api:build: > tsup
+@mmo/api:build:
+@mmo/api:build: CLI Building entry: src/main.ts
+@mmo/api:build: CLI Using tsconfig: tsconfig.json
+@mmo/api:build: CLI tsup v8.5.1
+@mmo/api:build: CLI Using tsup config: /root/browser-mmo/services/api/tsup.config.ts
+@mmo/api:build: CLI Target: node22
+@mmo/api:build: CLI Cleaning output folder
+@mmo/api:build: ESM Build start
+@mmo/api:build: ESM dist/main.js     880.59 KB
+@mmo/api:build: ESM dist/main.js.map 1.64 MB
+@mmo/api:build: ESM ⚡️ Build success in 960ms
+@mmo/game-web:build: cache miss, executing acb1061f6c646e55
+@mmo/game-web:build:
+@mmo/game-web:build: > @mmo/game-web@0.0.0 build /root/browser-mmo/apps/game-web
+@mmo/game-web:build: > vite build
+@mmo/game-web:build:
+@mmo/game-web:build: vite v8.3.2 building client environment for production...
+@mmo/game-web:build: transforming...
+@mmo/game-web:build: ✓ 873 modules transformed.
+@mmo/game-web:build: rendering chunks...
+@mmo/game-web:build: computing gzip size...
+@mmo/game-web:build: dist/index.html                                        1.26 kB │ gzip:   0.61 kB
+@mmo/game-web:build: dist/assets/index-DJMekNuc.css                        40.30 kB │ gzip:   8.98 kB
+@mmo/game-web:build: dist/assets/dds.pure-BhmDCYzh.js                       0.06 kB │ gzip:   0.07 kB
+@mmo/game-web:build: dist/assets/webAudioBus-BIfaPpWW.js                    0.06 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/webgpuEngine-s2MYLm5d.js                   0.06 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/mesh.vertexData.functions-C27tWypl.js      0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/color.fragment-Ct_DbAtA.js                 0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/webAudioMainBus-Bn1xTIeV.js                0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/color.vertex-Cw0Iy2Ac.js                   0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/ddsTextureLoader-Dbr-DvEm.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/envTextureLoader-59S8V8Pp.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/exrTextureLoader-CFLq4ak_.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/hdrTextureLoader-BTBNj1pG.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/iesTextureLoader-DI9Ll-gY.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/ktxTextureLoader-BOgtrYSK.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/tgaTextureLoader-CH1fZR2A.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/default.fragment-CBJUuPGL.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/basisTextureLoader-BQO8Vy1S.js             0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/default.vertex-D-9sr3Yo.js                 0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/color.fragment-YqFq5PsD.js                 0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/webAudioSoundSource-CTEyrq6-.js            0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/color.vertex-sWFMFJTt.js                   0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/rgbdDecode.fragment-B9DoljsS.js            0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/default.fragment-BxYN2br_.js               0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/default.vertex-CZL4A553.js                 0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/postprocess.vertex-D6Bzc5Eh.js             0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/webAudioStreamingSound-DMXzzy3I.js         0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/clearQuad.fragment-CuE8cha4.js             0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/clearQuad.vertex-fXL2Nhb-.js               0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/rgbdDecode.fragment-C39aeHZY.js            0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/postprocess.vertex-5dKjAA2M.js             0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/webAudioStaticSound-DRdY7yij.js            0.11 kB │ gzip:   0.10 kB
+@mmo/game-web:build: dist/assets/preload-helper-DjzSQ1t3.js                 1.38 kB │ gzip:   0.75 kB
+@mmo/game-web:build: dist/assets/index-_V1K1-bO.js                          1.50 kB │ gzip:   0.79 kB │ map:     1.55 kB
+@mmo/game-web:build: dist/assets/main-BVkyv8lw.js                           5.93 kB │ gzip:   2.39 kB │ map:    14.76 kB
+@mmo/game-web:build: dist/assets/game-CEDFj4hi.js                         410.22 kB │ gzip: 129.33 kB │ map: 1,662.06 kB
+@mmo/game-web:build: dist/assets/api-BOxoHc74.js                          574.44 kB │ gzip:  94.68 kB │ map: 1,547.88 kB
+@mmo/game-web:build: dist/assets/babylon-DbzD--J_.js                    1,950.99 kB │ gzip: 460.99 kB │ map: 7,971.63 kB
+@mmo/game-web:build:
+@mmo/game-web:build: ✓ built in 6.79s
+
+ Tasks:    4 successful, 4 total
+Cached:    3 cached, 4 total
+  Time:    8.295s
+
+Production bundle: development debug hook absent
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 42 item templates.
+PASS desktop camera gesture starts on unobscured world
+PASS desktop mouse drag rotates the camera
+PASS desktop wheel zooms into the world
+PASS desktop zoom respects maximum distance
+PASS desktop zoom respects minimum distance
+PASS desktop viewing controls do not move character
+PASS desktop reset camera has a touch-sized control
+PASS desktop reset restores stable starting view
+PASS desktop camera reset leaves character in place
+PASS touch camera gesture starts on unobscured world
+PASS touch drag rotates the camera
+PINCH {"before":21,"after":{"alpha":-1.6782674007607588,"beta":0.9951394984825932,"radius":21},"scale":1,"events":[{"type":"pointerdown","id":4,"x":165,"y":380,"kind":"touch"},{"type":"pointerdown","id":5,"x":225,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":230,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":160,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":235,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":155,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":240,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":150,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":245,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":145,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":250,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":140,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":255,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":135,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":260,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":130,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":265,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":125,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":270,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":120,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":275,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":115,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":280,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":110,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":285,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":105,"y":380,"kind":"touch"},{"type":"pointerup","id":4,"x":105,"y":380,"kind":"touch"},{"type":"pointerup","id":5,"x":285,"y":380,"kind":"touch"}]}
+page.waitForFunction: Timeout 45000ms exceeded.
+    at /root/browser-mmo/scripts/e2e/camera.cjs:122:20 {
+  log: [],
+  name: 'TimeoutError'
+}

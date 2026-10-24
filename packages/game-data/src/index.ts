@@ -4,7 +4,7 @@ import { withCoastalChapter } from './coastal-chapter';
 import { chapterContentPacks as coastalPacks } from './coastal-chapter';
 import { withForestChapter, forestChapterPack } from './forest-chapter';
 export { tidewatch } from './coastal-chapter';
-export { livingSeal } from './forest-chapter';
+export { livingSeal, watchAftermath } from './forest-chapter';
 export const chapterContentPacks = [...coastalPacks, forestChapterPack];
 import { withTacticalAbilities } from './tactical';
 import { withDungeonContent } from './dungeons';

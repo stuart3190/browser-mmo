@@ -15,6 +15,8 @@ export interface Controls {
   interact: () => void;
   travel: (travelId: string) => void;
   targetNearest: () => void;
+  /** Restore the local orbit view; does not move the character. */
+  resetCamera: () => void;
   /** Zone the character is in (null before the first join). */
   zoneId: () => string | null;
   /** Local player position/heading (predicted), null before the first join. */

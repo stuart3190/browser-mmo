@@ -1,143 +1,126 @@
 # Broken Odyssey completion handoff
 
 Updated 2026-10-25 by Codex. Goal ACTIVE. Read AGENTS, MASTER_PLAN, PROGRESS and DECISIONS.
-Owner authorizes sustained autonomous gameplay implementation, functional browser tests and verified
-commits/push. GAME ONLY: zero performance optimization, benchmarks, capacity tests, infrastructure
-investigation, staging or backup planning. Never alter production or immutable releases. Release
-safety validation belongs to a separate later phase; do not claim shipping readiness.
+Owner authorizes sustained independent gameplay implementation, functional browser tests and
+verified commits/push. GAME ONLY: zero performance optimisation, benchmarking, capacity tests,
+infrastructure investigation, staging or backup planning. Never alter production or immutable
+releases. Release safety validation is a separate later phase; do not claim shipping readiness.
 
-## Source and current milestone
+## Source and current work
 
-Editable source: `/root/browser-mmo`, branch `codex/shippable-completion`, origin
-`git@github.com:stuart3190/browser-mmo.git`. Latest pushed gameplay commit `2a02a70` (regional chart); verified handbook commit follows.
-Production initially observed at immutable `2c47b27`; no production mutations in this work.
+Editable `/root/browser-mmo`, branch `codex/shippable-completion`, origin
+`git@github.com:stuart3190/browser-mmo.git`. Latest pushed **06cf356** (documentation reconciliation).
+Production initially observed at immutable 2c47b27; untouched. No subagents authorized.
 
-Class-appropriate trailwear is implemented, verified and pushed as `63b0869`: optional authored
-rewards.classItems; shared server questRewardItems for offers/atomic grant; used and unused class/
-item/stack validation. Fen supplies Mage the existing Apprentice Robe, keeps Warrior cap. Prior
-awards untouched. UI clears selected details when the last inventory/character/bank closes, keeps
-selection while another item window remains. Catalog preview text distinguishes current rewards
-from previously earned items. Authoring additions documented in docs/content-engine.md.
+**Uncommitted, gameplay verified:** Three-watch aftermath. Forest pack rev3 adds once-only
+Tamsin→Maren conclusion, bound both-class Watchkeeper's Compass and two optional 24h patrols.
+Existing authoritative quest/reward/cooldown mechanisms, no schema migration. Exact repeat
+availability shown in NPC dialogue/journal.141 content/33 frontend tests, types/lint/build/content
+validation pass.43 actual both-class continuation checks pass plus 9 earlier Warrior checks before
+a corrected driver-only crab-warning timeout.11 final desktop/portrait dialogue review checks pass.
+Sticky 44px NPC header and existing PNG browser icon linked. Evidence under
+`docs/gameplay/evidence/three-watch-aftermath-2026-10-25/`. Screenshots reviewed. Actors originally
+began as level-five focused fixtures; coast/forest/epilogue/patrol progress subsequently earned.
+Never describe them as fresh level-one-to-six.
 
-138 content,28 frontend,8 schema,13 domain tests pass; repository types, lint, production builds/
-debug guard and content validation pass. Real level-one Warrior nine-check staged journey and Mage
-seven-check fresh journey pass: starter pickup, travel, hides/herbs, turn-in, usable gear, relogin.
-Eight desktop/six touch window follow-up checks pass; screenshots reviewed. Evidence:
-`gameplay/evidence/class-trailwear-2026-10-25/`. Starter-helper and close-label driver failures retained.
-All browser/check controllers stopped. No gameplay failures outstanding in this milestone.
+**Uncommitted, controls verified:** Twenty fresh desktop/portrait camera checks pass. Existing
+mouse drag/wheel and touch drag/pinch are preserved. New Reset camera view restores the starting
+angle/distance without moving the character. Pinch driver failures traced to Playwright's one-touch
+capability; corrected to five supported contacts before boot. Experimental zoom/CSS changes and
+private input diagnostics removed. Evidence: camera-controls-2026-10-25, screenshots reviewed.
+Types/lint/build pass. Controller 1147857 ended; `/tmp/bo-camera-multitouch.log` and iaQjr4/camera-multitouch.
 
-## Recent completed gameplay
+**Uncommitted, built client verified:** Nineteen actual desktop/portrait UI checks pass, with no
+page exceptions or failed assets, using built files and no development hook. Saved chapter/patrol
+states, exact timers, handbook, regional chart, camera reset and relogin. Evidence under
+three-watch-aftermath-2026-10-25/built-client. Controller 1150309 ended; `/tmp/bo-built-game.log`.
+All main-checkout browsers stopped. This is local functional gameplay verification, no deployment.
 
-| Commit | Delivered | Evidence directory under docs/gameplay/evidence |
-| --- | --- | --- |
-| `07c4087` | Inspectable quest rewards/shared outfitter previews; opaque NPC dialogue | reward-inspection-2026-10-25 |
-| `62ef82b` | Named Cantor root/sweep rhythm, authoritative recovery and dodge geometry | cantor-rhythm-2026-10-24 |
-| `09893fc` | Equipped cap/plate/robe/cloak/buckler appearances, normal shop stock | equipment-appearance-2026-10-24 |
-| `a395cbb` | Three Elderwood quests, forest art/enemies/boss, necklace, revival and adventure journal | elderwood-living-seal-2026-10-24; adventure-journal-2026-10-24 |
-| `358e314` | Practical passage guidance | passage-guidance-2026-10-24 |
-| `6aa0342` | Optional combat/reward audio, Settings/Controls | combat-audio-2026-10-24 |
-| `660f75e` | Earned Tidewatch weapon commissions, recipe previews, effective health | tidewatch-commissions-2026-10-24 |
-| `06fa657` | Class/path/held-weapon appearance and multiplayer replication | player-appearance-2026-10-24 |
-| `b6ad7c4` | H/touch quick remedy | quick-remedy-2026-10-24 |
-| `45df411` | Four level-five specialisations and free mentor retraining | specialisations-2026-10-24 |
-| `8959ce7` | Three Tidewatch coastal quests, shore art/creatures/Bellkeeper and ring | amber-tidewatch-2026-10-24 |
-| `229bf55` | Gear wear/broken consequences and paid repair | gear-condition-2026-10-24 |
-| `3e7eaa6` | Iron Guard/Frost Nova, status VFX and touch combat HUD | tactical-abilities-2026-10-24 |
+**Prepared, unverified continuity tooling:** coast.cjs explicit COAST__*USER bypasses fixture
+writes, preserves weapons, requires earned Marches closure/level 5 and walks back through actual
+gate. forest.cjs accepts explicit FOREST*__USER and validates class/earned weapon. Optional
+EARNED_CHAPTERS=1 stages Tidewatch, Elderwood and Three Watches after the systems journey.
+Keep these separate from verified gameplay until used. coast.cjs does not yet resume partially
+completed chapters; fix from actual failures if necessary. No player grants/teleports allowed.
 
-Earlier complete Greenvale/Marches story, professions, private Broken Vault solo/party instances,
-economy/trade/marketplace, chat/friends/DM/guilds and persistence are documented in PROGRESS.
-Preserve them. Atlas regions beyond authored routes, additional classes/paths, guild vault and
-broader art remain long-term incomplete; neither these nor shipping readiness are claimed complete.
+## Independent full earned journey — ACTIVE
 
-## Next useful work
+Detached test checkout `/tmp/bo-earned-gameplay-20261025`, **3f1e538**, owns its cached installed
+dependencies. Controller **PID1097045**, `/tmp/bo-integrated-earned-browser.log`.
+Fixture `/tmp/brokenodyssey-qualification.ACsH5X`; state `earned-journeys/result.json`, current
+stage `earned-journeys/warrior-story/run.log`. Users **journeyw_mvmz9wvw** and **journeym_mvmz9wvw**.
+Warrior has completed all Meadows/Marches main and side quests; final workshop/economy checks
+in the story stage are underway.
+Remaining sides, Warrior professions/solo Vault, Mage story/professions/staff/solo Vault and mixed
+class touch-party Vault are scheduled. This checkout's runtime must stay unchanged during run.
+No grants, direct player writes or teleports; ordinary controls and genuine earned progression.
 
-1. Continue gameplay independently; the verified trailwear milestone is pushed.
-2. Verify integrated fresh Warrior/Mage story/profession/dungeon journeys against the accumulated
-   gameplay changes. `scripts/e2e/earned-journeys.cjs` already orchestrates ordinary player actions,
-   with durable stage results/resume. It currently ends at the Vault, not the new chapters. Use a
-   separate editable test checkout with its own dependencies/fixture for the long run so main
-   gameplay source can continue evolving without reloading its browser.
-3. Extend earned continuity into coast/forest without level/quest grants. Current coast.cjs creates
-   level-five/prior-story fixtures; add explicit existing-user mode and normal return to Maren from
-   the Marches. Forest.cjs already reads earned Tidewatch weapon owners. Do not mislabel separate
-   staged continuations as one uninterrupted level-one-to-six playthrough.
-4. Fix concrete player-facing findings from these journeys; prioritize quest clarity, encounter
-   pacing, meaningful rewards, responsive controls and authored exploration. Avoid repeated CI/load
-   checks or revisiting old external release gates.
+On failure retain evidence and resume appropriate stage using EARNED_FROM_STAGE and BOTH existing
+EARNED_*_USER. Do not recreate earned actors. After original run succeeds, continue its same
+fixture/users into new chapters from earned-tidewatch with EARNED_CHAPTERS=1 and newer tested source.
+Keep staged evidence; don't claim an uninterrupted run. New quest catalog hashes require handling
+only the disposable simulation cache, never deleting player state or applying test procedures live.
 
-## Test fixtures and commands
+## Recent verified and pushed gameplay
 
-- Own PG17 integration fixture port55441; private ignored `.env` points to bo_completion_dev/test.
-  Domain global setup DROPS/remigrates bo_completion_test. Verify the URL is loopback:55441 and
-  `/bo_completion_test` before running it; never point it at bo_completion_dev or an earned fixture.
-- `QUAL_BROWSER_SUITES=<explicit gameplay suites> bash scripts/qualify-local.sh --skip-checks` creates
-  a disposable loopback fixture. Never invoke its default/full/production/backup/load qualification.
-  Registered recent suites: trailwear, reward-preview, cantor, armor, journal, forest, forest-recovery,
-  coast, guidance, audio, appearance, remedy, specialisations, repair, tactical.
-- Chrome `/usr/bin/google-chrome`; Playwright `/opt/aria-browser/node_modules/playwright`.
-- Freeze runtime source during an active same-checkout browser run. Vite reload interrupts combat.
-- Long jobs: Python subprocess.Popen with start_new_session=True, DEVNULL stdin and explicit log.
-  Controllers trap cleanup of only their own service process groups/PG. Avoid global process kills.
-- Run lint then build sequentially, `NODE_ENV=production pnpm build`. Inspect screenshots, retain
-  failures honestly, `git diff --check`, normalize archived text trailing whitespace before commit.
-- Retained **4YTXAT** under `/tmp/brokenodyssey-qualification.4YTXAT`: genuine level-one trailwear
-  Warrior `trailw_mvmyhrzw`, Mage `trailm_mvmyrkcm`; both completed Fen, equipped cap/robe near Fen.
-  Proofs: trailwear-warrior-resume, trailwear-mage, trailwear-warrior-panels, trailwear-mage-panels.
-  Final runner `/tmp/bo-trailwear-final-run.sh` now resumes earned actors; logs
-  `/tmp/bo-trailwear-panels.log` and `/tmp/bo-trailwear-final-checks.log`. All stopped.
-- Retained **iaQjr4**: both coastal/forest actors level six, earned Tidewatch weapons/Tideglass Seal/
-  Heartwood Knot, at Tamsin. Initial fixtures began level five; their new chapters were earned.
-  Its old test simulation images were privately archived/reconstructed for changed content only
-  after checking no pending rewards; earned player rows preserved. Never apply that to production.
-- Retained **WbH0Ok**: ten-check outfitter regression after shared preview refactor. **3OHuI9**:
-  purchased armour actors and folded-cloak proof. Do not overwrite earned fixture rows.
+| Commit  | Delivered                                                                      | Evidence directory under docs/gameplay/evidence                |
+| ------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| fa972ab | Inspectable class/path handbook and reachable Character header                 | class-handbook-2026-10-25                                      |
+| 2a02a70 | Regional field chart, separate zone frames, touch pins and guidance            | regional-chart-2026-10-25                                      |
+| 63b0869 | Class-appropriate Fen trailwear, authoritative rewards, item-panel dismissal   | class-trailwear-2026-10-25                                     |
+| 07c4087 | Shared inspectable quest/service equipment previews, opaque NPC dialogue       | reward-inspection-2026-10-25                                   |
+| 62ef82b | Cantor Roots Reach/Bough Sweep rhythm, warning/recovery geometry               | cantor-rhythm-2026-10-24                                       |
+| 09893fc | Equipped armour/cloak/buckler visuals and normal outfitter stock               | equipment-appearance-2026-10-24                                |
+| a395cbb | Three Elderwood quests, forest art/creatures/boss/necklace/revival and journal | elderwood-living-seal-2026-10-24; adventure-journal-2026-10-24 |
+| 358e314 | Practical passage guidance                                                     | passage-guidance-2026-10-24                                    |
+| 6aa0342 | Optional combat/reward audio and settings                                      | combat-audio-2026-10-24                                        |
+| 660f75e | Earned Tidewatch weapon commissions                                            | tidewatch-commissions-2026-10-24                               |
+| 06fa657 | Class/path/weapon appearance and replication                                   | player-appearance-2026-10-24                                   |
+| b6ad7c4 | H/touch quick remedy                                                           | quick-remedy-2026-10-24                                        |
+| 45df411 | Four level-five specialisations/retraining                                     | specialisations-2026-10-24                                     |
+| 8959ce7 | Three coastal quests, shore art/Bellkeeper/ring                                | amber-tidewatch-2026-10-24                                     |
+| 229bf55 | Gear wear, broken consequences and paid repair                                 | gear-condition-2026-10-24                                      |
+| 3e7eaa6 | Iron Guard/Frost Nova/status VFX/touch HUD                                     | tactical-abilities-2026-10-24                                  |
 
-## Known verification limitation
+Earlier Greenvale/Marches story, professions, private solo/party Vault, economy/trade/marketplace,
+chat/friends/DM/guilds and persistence are documented in PROGRESS. Preserve them. Additional
+atlas regions/classes/paths, guild vault and broader art remain long-term incomplete.
 
-One dialogue visual follow-up displayed the recoverable game load-failure screen. Initial failure
-had no diagnostic; DEV-only bootstrap console error logging was added. Diagnostic rerun passed
-seven dialogue checks and later fresh trailwear journeys also passed. Cause remains unknown;
-do not claim fixed. Evidence is retained under reward-inspection-2026-10-25/dialogue-startup-failure.
-If it recurs, capture the actual startup error and fix the gameplay client; no speculative tuning.
-Physical phone/GPU and live release validation remain separate, never blockers to gameplay work.
+## Test safeguards and retained state
 
-## Temporary scripts
+- Private ignored .env points to owned PG17 port 55441 bo_completion_dev/test. Domain global setup
+  drops/remigrates ONLY bo_completion_test; verify exact loopback URL before running it.
+- `QUAL_BROWSER_SUITES=<explicit gameplay suites> bash scripts/qualify-local.sh --skip-checks`
+  creates isolated fixtures. Never default/full/production/load/backup qualification.
+- Chrome /usr/bin/google-chrome; Playwright /opt/aria-browser/node_modules/playwright.
+- Run builds before same-checkout browsers. Long jobs use subprocess.Popen(start_new_session=True)
+  and explicit logs. Own runners clean only their service groups and disposable cluster.
+- iaQjr4 retains genuine earned coastal/forest/aftermath actors. Read-only lookup by earned weapon
+  or completed epilogue; all gameplay mutations through controls. Prior local checkpoint images
+  are archived privately in pre-aftermath-test-world.json; no pending rewards when reconstructed.
+  NEVER rerun `/tmp/bo-prepare-aftermath-fixture.cjs` or delete these images. Never copy them to repo.
+- 4YTXAT retains fresh trailwear Warrior trailw_mvmyhrzw and Mage trailm_mvmyrkcm. SpSdTx map,
+  gM6Bsk handbook, WbH0Ok outfitter and 3OHuI9 armour fixtures stopped. Preserve earned records.
+- Finish evidence, normalize archived text whitespace, git diff --check, commit/push incrementally.
 
-All generators used so far are integrated and OBSOLETE; do not rerun them over corrected source:
-`/tmp/bo-reward-preview/*`, `/tmp/bo-class-rewards.py`, `/tmp/bo-trailwear-driver.py`,
-`/tmp/bo-class-reward-unused-validation.py`, `/tmp/bo-trailwear-finish.py`,
-`/tmp/bo-cantor-pattern.py`, `/tmp/bo-cantor-driver.py`, `/tmp/bo-shop-fit.py`, and older
-forest/journal/audio/spec draft generators. No pending unapplied drafts remain.
+## Known verification limitations
 
-## Current gameplay work — 2026-10-25
+Earlier DEV bootstrap occasionally failed fetching /src/main.ts during concurrent same-checkout
+build/browser activity. Cause unknown; failure and diagnostic rerun retained in reward-inspection
+and handbook evidence. Later frozen-source browser runs pass. Do not claim root cause fixed.
+Incidental404 conclusively identified as /favicon.ico; explicit icon link now browser-verified.
+Touch evidence is browser emulation, not physical-phone signoff. No shipping-readiness claim.
 
-Regional chart pushed as **2a02a70**. 31 frontend tests, repository types/lint/build; 21 fresh
-journey,21 desktop-layout,15 selection-visibility browser checks. Evidence regional-chart-2026-10-25.
-Retained fixture SpSdTx; all map controllers stopped.
+## Temporary drafts
 
-Class handbook implemented and verified, commit pending: collapsed Character reference shares
-classAbilities/effectiveAbility and server unlocks. Fifteen fresh inspection checks, twenty actual
-mentor/retraining/combat/relogin checks, seventeen final checks with sticky Character header pass.
-31 frontend tests/types/lint/build pass. Evidence class-handbook-2026-10-25, screenshots reviewed.
-All browser controllers stopped. Final CSS build /tmp/bo-handbook-final-build.log. gM6Bsk retained.
-First load failed before login with DEV diagnostic failed fetch of /src/main.ts. Diagnostic rerun
-after build passed; cause unknown. Do not claim fixed. Future browser runs capture console and
-request failures; run same-checkout builds before browsers to keep the served source stable.
-Drafts /tmp/bo-CombatHandbook.tsx,/tmp/bo-handbook.cjs,/tmp/bo-handbook-header-patch.py are obsolete.
+All source generators used so far are applied and obsolete, including bo-aftermath-finish.py,
+bo-camera-patch.py, bo-camera-finalize.py, bo-aftermath-driver.py, bo-epilogue-draft.py and all earlier handbook/map/
+trailwear/reward-preview/Cantor/forest/shop/audio/spec generators. Never rerun over corrected
+source. Current runners are named above. Preserve separate output dirs on every continuation.
 
-Independent full earned journey still ACTIVE at `/tmp/bo-earned-gameplay-20261025`, detached
-**3f1e538**, own installed dependencies. Controller PID1097045;
-`/tmp/bo-integrated-earned-browser.log`; fixture `/tmp/brokenodyssey-qualification.ACsH5X`.
-Read earned-journeys/result.json and stage run.log. Warrior journeyw_mvmz9wvw is on Marches supply;
-Mage journeym_mvmz9wvw is scheduled later. Do not mutate that checkout's runtime during its run.
-Main changes cannot reload it. Prepared coast/forest/earned-journeys script changes in main remain
-UNCOMMITTED and not browser-verified. Explicit users bypass fixture grants; EARNED_CHAPTERS=1 adds
-coast then forest. After story/systems success, resume same earned users from earned-tidewatch
-with both EARNED_*_USER values; stage separately and retain original evidence.
+## Next actions
 
-Next gameplay: return-home epilogue + short post-story Tidewatch/Pinewatch patrols. Design draft
-`/tmp/bo-epilogue-plan.txt`; `/tmp/bo-epilogue-draft.py` generates ONLY
-`/tmp/bo-elderwood-epilogue.json` from current forest pack, no repo mutation yet. Draft quest/reward
-references Watchkeeper's Compass (template NOT implemented). Need implement template, review
-balance/content, completion cooldown UI, meaningful tests and actual earned browser journeys.
-No direction/architecture replacement: use existing quests/rewards/repeat cooldown mechanisms.
+1. Commit/push verified aftermath and camera controls with final evidence. Leave unverified
+   continuity tooling clearly identified.
+2. Continue independent fresh story/systems run and earned chapter continuation; fix actual gameplay
+   findings. Old external release gates are not gameplay blockers and must not trigger more work.

@@ -1,0 +1,61 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 42 item templates.
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:60831/favicon.ico
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:60831/favicon.ico
+PASS Warrior recovers normally at a safe camp before continuing
+PASS Warrior continues the actual completed living-seal story
+PASS Warrior retains the correct earned class
+PASS Warrior earns one permanent compass and opens both regional patrols
+PASS Warrior conclusion and single equipped compass survive relogin
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:60831/favicon.ico
+PASS Warrior defeats Glassback Crab
+PASS Warrior defeats Glassback Crab
+PASS Warrior coast patrol awards earned XP and one remedy
+PASS Warrior coast patrol cannot be accepted again immediately
+PASS Warrior coast display uses actual completion plus 24 hours
+PASS Warrior forest patrol starts with zero hunt credit
+PASS Warrior Briar Spitter warning stays clear of notices
+DODGE {"center":{"x":315.434927682114,"y":0,"z":3935.9102723181622},"range":2.8,"to":{"x":318.8290402318094,"z":3939.3043848678576}}
+PASS Warrior defeats Briar Spitter
+PASS Warrior Briar Spitter warning stays clear of notices
+DODGE {"center":{"x":355.82439952522276,"y":0,"z":3901.6075650552875},"range":2.8,"to":{"x":359.2185120749182,"z":3905.001677604983}}
+PASS Warrior defeats Briar Spitter
+PASS Warrior forest patrol awards earned XP and one remedy
+PASS Warrior forest patrol cannot be accepted again immediately
+PASS Warrior forest display uses actual completion plus 24 hours
+PASS Warrior both paid patrols retain their completion after login
+PASS Warrior journal retains patrol availability information
+PASS Mage continues the actual completed living-seal story
+PASS Mage retains the correct earned class
+PASS Mage regional patrols stay locked before returning the oath
+PASS Mage brings the oath home through the real ferry and gate
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:60831/favicon.ico
+PASS Mage can inspect its usable compass before turn-in
+PASS Mage earns one permanent compass and opens both regional patrols
+PASS Mage compass increases actual maximum health
+PASS Mage conclusion and single equipped compass survive relogin
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:60831/favicon.ico
+PASS Mage coast patrol starts with zero hunt credit
+PASS Mage defeats Glassback Crab
+PASS Mage defeats Glassback Crab
+PASS Mage coast patrol awards earned XP and one remedy
+PASS Mage coast patrol cannot be accepted again immediately
+PASS Mage coast display uses actual completion plus 24 hours
+PASS Mage forest patrol starts with zero hunt credit
+PASS Mage defeats Briar Spitter
+PASS Mage defeats Briar Spitter
+PASS Mage forest patrol awards earned XP and one remedy
+PASS Mage forest patrol cannot be accepted again immediately
+PASS Mage forest display uses actual completion plus 24 hours
+PASS Mage both paid patrols retain their completion after login
+PASS Mage journal retains patrol availability information
+PASS No three-watch journey exceptions

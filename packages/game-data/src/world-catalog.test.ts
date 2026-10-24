@@ -42,7 +42,7 @@ it('ships diverse reusable catalogs and focused Greenvale population while prese
   expect(world.monsterFamilies.flatMap((f) => f.variants)).toHaveLength(74);
   expect(world.populations).toHaveLength(249);
   expect(world.resources).toHaveLength(10);
-  expect(gd.quests.size).toBe(getStarterGameData().quests.size + 16);
+  expect(gd.quests.size).toBe(getStarterGameData().quests.size + 19);
   expect(gd.raw.chunks.length).toBeLessThan(700);
   for (const r of world.regions) {
     expect(

@@ -1,0 +1,19 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 42 item templates.
+PASS touch camera gesture starts on unobscured world
+PASS touch drag rotates the camera
+PINCH {"before":21,"after":{"alpha":-1.638459146364614,"beta":1.0025389637804336,"radius":21},"scale":1,"events":[{"type":"pointerdown","id":4,"x":165,"y":380,"kind":"touch"},{"type":"pointerdown","id":5,"x":225,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":230,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":160,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":235,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":155,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":240,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":150,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":245,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":145,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":250,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":140,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":255,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":135,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":260,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":130,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":265,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":125,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":270,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":120,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":275,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":115,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":280,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":110,"y":380,"kind":"touch"},{"type":"pointermove","id":5,"x":285,"y":380,"kind":"touch"},{"type":"pointermove","id":4,"x":105,"y":380,"kind":"touch"},{"type":"pointerup","id":4,"x":105,"y":380,"kind":"touch"},{"type":"pointerup","id":5,"x":285,"y":380,"kind":"touch"}]}
+page.waitForFunction: Timeout 45000ms exceeded.
+    at /root/browser-mmo/scripts/e2e/camera.cjs:99:20 {
+  log: [],
+  name: 'TimeoutError'
+}

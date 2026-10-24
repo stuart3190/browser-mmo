@@ -114,8 +114,10 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · Browser E2E: login, character create, scene loads, no page errors · 0f0a413
 - [x] Basic world renders
   - Verified 2026-10-03 · Claude Opus 5.5 · Browser E2E screenshots: 4 chunk grounds + placeholder props · 0f0a413
-- [ ] Camera controls
-  - Orbit camera (drag rotate, wheel/pinch zoom, follows player). Touch drag-rotate verified in World E2E (yaw changes while moving); mouse drag and zoom still not exercised by any automated check.
+- [x] Camera controls
+  - Verified 2026-10-25: 20 fresh browser checks cover mouse rotation/wheel/limits, touch rotation and
+    inward/outward pinch, unchanged position, and stable Settings reset. Proper multi-touch emulation
+    required; initial one-contact driver failures retained. Evidence: camera-controls-2026-10-25.
 - [x] Character renders
   - Verified 2026-10-03 · Claude Opus 5.5 · Placeholder capsule visible in Browser E2E screenshots · 0f0a413
 - [x] Movement
@@ -2115,3 +2117,38 @@ Ranked player-facing gaps from the current client and content:
 - [ ] Next: a return-home conclusion and short post-story regional patrols, using existing quest,
       reward and 24-hour cooldown rules. Continue the independent earned story/systems journey.
 - Regional chart committed/pushed as `2a02a70`. Production untouched.
+
+### Three-watch conclusion and regional patrols — gameplay verified, 2026-10-25
+
+- [x] The Three Watches returns Tamsin's oath to Maren through existing passages and awards a bound,
+      both-class Watchkeeper's Compass. Two optional short patrols then revisit coastal/forest
+      survey sites and enemies, using the existing 24-hour repeat rules. No new persistence model.
+- [x] Dialogue/journal display the exact next availability from completion time and authored cooldown;
+      acceptance remains authoritative. New compass vector icon and regular equipment previews.
+- Initial content run: 140/141 pass; one catalog-count expectation still expected three fewer quests.
+  Updated that explicit total; complete relevant checks and actual earned playthrough remain pending.
+- Handbook committed/pushed as `fa972ab`. Isolated earned full story continues on3f1e538.
+
+Documentation reconciliation (2026-10-25): README still described guilds and gear repairs as
+unfinished and listed only three ability keys; the foundational quest guide still called talk,
+exploration and repeatable/party credit unimplemented. Corrected these against existing code and
+verified milestone evidence, added the inspectable class reference, and updated Cantor's two-part
+rhythm. This corrects stale documentation; it does not claim new systems or shipping readiness.
+
+- 141 content and 33 frontend tests pass, repository typecheck/lint/build and content validation pass.
+  Both earned coastal/forest actors completed the epilogue and two patrols through ordinary travel,
+  surveys, combat and NPC UI. 43 continuation checks pass, plus nine earlier Warrior checks before
+  a driver-only timeout (it wrongly expected a warning on ordinary crabs). Earned state preserved.
+  Exact rewards/equipment effects, no immediate repeat, completion+24h and relogin persistence pass.
+  These actors originally began at focused level-five fixtures, not fresh level-one characters.
+- [x] Eleven final desktop/portrait dialogue-header checks pass. Sticky 44px NPC dismissal remains
+      reachable after scrolling; browser icon resolves. Twenty fresh camera controls checks pass,
+      including proper multi-touch pinch and a stable local Reset camera view. Original camera behavior
+      preserved; failed pinch attempts traced to a one-contact emulated device. Types/lint/build pass.
+      Evidence: camera-controls-2026-10-25. No production changes.
+- [x] Nineteen built-client desktop/portrait checks pass against isolated gameplay services,
+      without development hooks: saved quests/timers, class reference, map, camera UI and relogin.
+      No page exceptions or failed assets. Evidence: three-watch-aftermath-2026-10-25/built-client.
+- Independent fresh Warrior has completed all Meadows/Marches main quests and two Marches side
+  quests. Remaining side quests, professions, solo/party Vault and Mage journey continue in the
+  isolated source checkout. Do not claim the full integrated run has passed yet.

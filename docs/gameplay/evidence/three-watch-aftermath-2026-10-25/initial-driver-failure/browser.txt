@@ -1,0 +1,30 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 42 item templates.
+Preserved earned character rows; retained old disposable simulation images privately for the content-update playtest.
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found)
+PASS Warrior continues the actual completed living-seal story
+PASS Warrior retains the correct earned class
+PASS Warrior regional patrols stay locked before returning the oath
+PASS Warrior brings the oath home through the real ferry and gate
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found)
+PASS Warrior can inspect its usable compass before turn-in
+PASS Warrior earns one permanent compass and opens both regional patrols
+PASS Warrior compass increases actual maximum health
+PASS Warrior conclusion and single equipped compass survive relogin
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found)
+PASS Warrior coast patrol starts with zero hunt credit
+page.waitForFunction: Timeout 45000ms exceeded.
+    at fight (/root/browser-mmo/scripts/e2e/aftermath.cjs:198:20)
+    at async <anonymous> (/root/browser-mmo/scripts/e2e/aftermath.cjs:444:13) {
+  log: [],
+  name: 'TimeoutError'
+}

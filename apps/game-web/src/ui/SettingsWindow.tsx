@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { useGame } from './context';
 import { Window } from './Window';
 export function SettingsWindow() {
-  const { audio } = useGame();
+  const { audio, controls, state } = useGame();
   const prefs = useSyncExternalStore(audio.subscribe, audio.snapshot);
   return (
     <Window id="settings" title="Settings & Controls">
@@ -49,13 +49,25 @@ export function SettingsWindow() {
         Test sound
       </button>
       <h3>Explore and fight</h3>
+      <button
+        onClick={() => {
+          controls.resetCamera();
+          state.toggle('settings', false);
+        }}
+      >
+        Reset camera view
+      </button>
+      <p className="small">
+        Returns to the starting direction and zoom without moving your character.
+      </p>
       <p>
         WASD moves. Drag the world to look; scroll to zoom. Tab cycles nearby enemies. F toggles
         attack, 1–4 use abilities and H drinks a carried remedy.
       </p>
       <p>
         On touch, move with the left stick, drag the world to look, tap an enemy and use the combat
-        buttons. Swipe the bottom menu to find more panels.
+        buttons. Pinch the world with two fingers to zoom. Swipe the bottom menu to find more
+        panels.
       </p>
       <p>
         E talks, gathers or chooses a nearby passage. Enter opens chat. Escape closes the current

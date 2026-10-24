@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "pack.elderwood.living_seal",
-  "revision": 2,
+  "revision": 3,
   "quests": [
     {
       "id": "quest.elderwood.third_watch",
@@ -103,6 +103,102 @@
       },
       "placeholder": false,
       "rewardId": "reward.elderwood.living_seal"
+    },
+    {
+      "id": "quest.greenvale.three_watches",
+      "name": "The Three Watches",
+      "description": "Bring Tamsin’s living oath home to Elder Maren. Sail from Pinewatch Landing to Willow Quay, walk north to the Greenvale Enclave Gate, then follow the village road to Maren. The three watches share one promise.",
+      "giverNpcId": "npc.elderwood.tamsin",
+      "turnInNpcId": "npc.greenvale.elder_maren",
+      "minLevel": 5,
+      "prerequisites": ["quest.elderwood.living_seal"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "home",
+          "kind": "talk",
+          "npcId": "npc.greenvale.elder_maren",
+          "label": "Bring the living oath home to Elder Maren"
+        }
+      ],
+      "dialogue": {
+        "offer": "A village ward, a drowned bell and a living root: three ways of keeping one promise. Bring Maren this living oath. Take the ferry to Willow Quay, then the Enclave Gate back to Greenvale. Tell her the watches are listening to each other again.",
+        "inProgress": "Return to Elder Maren in Greenvale by way of Willow Quay and the Enclave Gate. Follow the quest compass to each passage.",
+        "readyToTurnIn": "Rill kept the stone. Iona kept the tide. Tamsin kept the roots. You brought their stories together. This compass belonged to the last keeper who walked all three watches. Carry it on the road ahead. Iona and Tamsin can use your help keeping their paths clear.",
+        "completed": "The three watches answer one another again. Maren has entrusted you with the Watchkeeper’s Compass. The road ahead remains open."
+      },
+      "placeholder": false,
+      "rewardId": "reward.greenvale.three_watches"
+    },
+    {
+      "id": "quest.amber_coast.daily_watch",
+      "name": "Daily Tidewatch Patrol",
+      "description": "Check the Storm-Line Gauge, then clear two Glassback Crabs from the nearby path. Return for supplies. This patrol becomes available again 24 hours after completion; nearby eligible party members share hunt credit.",
+      "giverNpcId": "npc.amber_coast.iona",
+      "turnInNpcId": "npc.amber_coast.iona",
+      "minLevel": 5,
+      "prerequisites": ["quest.greenvale.three_watches"],
+      "repeatable": true,
+      "repeatCooldownMs": 86400000,
+      "objectives": [
+        {
+          "id": "inspect",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.amber_coast",
+          "areaId": "landmark.amber_coast.tide_gauge",
+          "label": "Check the Storm-Line Gauge"
+        },
+        {
+          "id": "clear",
+          "kind": "kill",
+          "enemyId": "enemy.amber_coast.glassback_crab",
+          "count": 2,
+          "label": "Clear two Glassback Crabs after accepting the patrol"
+        }
+      ],
+      "dialogue": {
+        "offer": "Check the Storm-Line Gauge, then clear two Glassback Crabs from the nearby path. Return for supplies. This patrol becomes available again 24 hours after completion; nearby eligible party members share hunt credit.",
+        "inProgress": "Follow your quest compass. Inspect the watch yourself; nearby party members can help with the hunt. Only victories after accepting this patrol count.",
+        "readyToTurnIn": "The watch is steady and the path is clear. Take these supplies for your next journey. I can offer another patrol 24 hours from now.",
+        "completed": "The watch is steady for today. Another patrol opens 24 hours after this one was completed."
+      },
+      "placeholder": false,
+      "rewardId": "reward.amber_coast.daily_watch"
+    },
+    {
+      "id": "quest.elderwood.daily_watch",
+      "name": "Daily Pinewatch Patrol",
+      "description": "Read the Listening Roots, then clear two Briar Spitters from the nearby path. Return for supplies. This patrol becomes available again 24 hours after completion; nearby eligible party members share hunt credit.",
+      "giverNpcId": "npc.elderwood.tamsin",
+      "turnInNpcId": "npc.elderwood.tamsin",
+      "minLevel": 5,
+      "prerequisites": ["quest.greenvale.three_watches"],
+      "repeatable": true,
+      "repeatCooldownMs": 86400000,
+      "objectives": [
+        {
+          "id": "inspect",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.elderwood",
+          "areaId": "landmark.elderwood.listening_roots",
+          "label": "Read the Listening Roots"
+        },
+        {
+          "id": "clear",
+          "kind": "kill",
+          "enemyId": "enemy.elderwood.briar_spitter",
+          "count": 2,
+          "label": "Clear two Briar Spitters after accepting the patrol"
+        }
+      ],
+      "dialogue": {
+        "offer": "Read the Listening Roots, then clear two Briar Spitters from the nearby path. Return for supplies. This patrol becomes available again 24 hours after completion; nearby eligible party members share hunt credit.",
+        "inProgress": "Follow your quest compass. Inspect the watch yourself; nearby party members can help with the hunt. Only victories after accepting this patrol count.",
+        "readyToTurnIn": "The watch is steady and the path is clear. Take these supplies for your next journey. I can offer another patrol 24 hours from now.",
+        "completed": "The watch is steady for today. Another patrol opens 24 hours after this one was completed."
+      },
+      "placeholder": false,
+      "rewardId": "reward.elderwood.daily_watch"
     }
   ],
   "rewards": [
@@ -195,6 +291,63 @@
           "min": 50,
           "max": 70
         }
+      }
+    },
+    {
+      "id": "reward.greenvale.three_watches",
+      "kind": "quest",
+      "value": {
+        "xp": 500,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 180
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "accessory.trinket.watchkeepers_compass",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "reward.amber_coast.daily_watch",
+      "kind": "quest",
+      "value": {
+        "xp": 350,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 100
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "consumable.greenvale.remedy",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "reward.elderwood.daily_watch",
+      "kind": "quest",
+      "value": {
+        "xp": 400,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 110
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "consumable.greenvale.remedy",
+            "quantity": 1
+          }
+        ]
       }
     }
   ],
