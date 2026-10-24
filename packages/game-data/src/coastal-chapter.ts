@@ -37,6 +37,17 @@ export function withCoastalChapter(source: ParsedGameData): ParsedGameData {
   const raw = structuredClone(source);
   const zone = raw.zones.find((z) => z.id === tidewatch.zoneId)!;
   zone.landmarks.push(...tidewatch.landmarks);
+  zone.respawnPoints.push({
+    id: 'respawn.amber_coast.tidewatch',
+    name: 'Tidewatch Camp',
+    position: { x: 272, y: 0, z: 104 },
+  });
+  zone.safeZones.push({
+    id: 'safe.amber_coast.tidewatch',
+    name: 'Tidewatch Camp',
+    center: { x: 272, y: 0, z: 104 },
+    radius: 12,
+  });
   const world = raw.worldCatalog!;
   world.locations.push(
     ...tidewatch.landmarks.map((l) =>

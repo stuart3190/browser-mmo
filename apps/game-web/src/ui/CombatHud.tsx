@@ -70,7 +70,12 @@ export function PlayerFrame() {
         <Bar value={prog.xp} max={Math.max(1, prog.xpToNext)} kind="xp" testId="player-xp" />
       )}
       <div className="muted small">
-        {state.zoneName} · {v?.inCombat ? 'Hold your ground' : 'Rest outside combat to recover'}
+        {state.zoneName} ·{' '}
+        {v?.dead
+          ? 'Return safely when ready'
+          : v?.inCombat
+            ? 'Hold your ground'
+            : 'Rest outside combat to recover'}
       </div>
     </div>
   );
@@ -136,16 +141,16 @@ export function TargetFrame() {
 /** Shown while dead. The button unlocks on the server-provided time; the server re-checks anyway. */
 export function DeathOverlay() {
   const { state, combat, controls, gameData } = useGame();
-  const [now, setNow] = useState(Date.now());
+  const [, refreshClock] = useState(0);
   const dead = state.vitals?.dead ?? false;
   useEffect(() => {
     if (!dead) return;
-    const t = setInterval(() => setNow(Date.now()), 250);
+    const t = setInterval(() => refreshClock((n) => n + 1), 250);
     return () => clearInterval(t);
   }, [dead]);
   if (!dead) return null;
   const at = state.vitals?.respawnAvailableAt ?? 0;
-  const wait = Math.max(0, Math.ceil((at - (now + state.serverOffsetMs)) / 1000));
+  const wait = Math.max(0, Math.ceil((at - (Date.now() + state.serverOffsetMs)) / 1000));
   return (
     <div
       className="panel death-overlay"

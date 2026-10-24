@@ -291,6 +291,8 @@ export class EntityViews {
                       'greybox:elemental': 'lantern',
                       'authored:crab': 'crab',
                       'authored:tidekeeper': 'tidekeeper',
+                      'authored:thornling': 'thornling',
+                      'authored:rootcantor': 'rootcantor',
                     } as const
                   )[getGameData().enemies.get(e.refId ?? '')?.modelId as 'greybox:humanoid'] ??
                   'wolf')

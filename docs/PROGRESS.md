@@ -4,6 +4,10 @@ Latest completion work: [living handoff](COMPLETION_HANDOFF.md). Source recovere
 `2c47b27` on 2026-10-24; implementation continues on `codex/shippable-completion`. Historical
 sections below retain their original evidence; current status is in the latest dated section.
 
+Current owner direction (2026-10-24): GAME ONLY. No performance, capacity, infrastructure,
+staging or backup planning; no production changes. Gameplay milestones and real browser evidence
+are appended at the end. Old release-gate work is historical and does not block gameplay.
+
 Authoritative checklist of what genuinely exists and works in this repository.
 
 Rules (see `AGENTS.md`):
@@ -1986,3 +1990,32 @@ Ranked player-facing gaps from the current client and content:
   collision pathfinding; existing server travel authorization remains intact.
 - [ ] Next: authored Elderwood/Pinewatch Landing continuation, living-seal investigation, distinct
       forest creatures with dodgeable ground strikes, meaningful earned progression and forest art.
+
+### Elderwood living seal and revival — verified 2026-10-24
+
+- [x] Three forest quests continue the coast: personal surveys, two Briar Spitters, Rootbound
+      Cantor, authored trees/glyphs/creatures, earned necklace and level-six progression.
+- [x] Both earned coastal actors complete the chapter through real movement/travel/combat/UI.
+      Warrior and Mage staged continuations pass, including necklace bonuses and relogin. Initial
+      dodge deadline, warning-timing and health-update assertion failures retained and corrected.
+- [x] Nearby Pinewatch/Tidewatch respawns; clear old target on revival, accurate first-frame
+      countdown, unobstructed combat warnings. Nine actual forest death/recovery browser checks
+      pass; coastal return also verified in simulation. No XP/items lost. Screenshots reviewed.
+- 133 content, 27 frontend, 15 focused world/combat and one domain chapter test pass, plus final
+  lint, repository/scripts types, production builds/debug guard and content validation. Evidence:
+  `gameplay/evidence/elderwood-living-seal-2026-10-24/`. Prior coastal actors began as level-five
+  fixtures; this is staged earned continuation, not a new uninterrupted level-one playthrough.
+
+### Adventure journal — verified 2026-10-24
+
+- [x] Available quests with giver/region, shared story-first suggestions, persisted guide selection,
+      completed story conclusions newest first; only server-approved offers and in-person acceptance.
+- [x] Nine desktop and ten final touch browser checks pass through real selection, acceptance,
+      boat travel, turn-in and history. Portrait sizing/opaque sheets fixed from actual screenshots.
+- Evidence: `gameplay/evidence/adventure-journal-2026-10-24/`; 27 frontend tests and final lint/types/
+  build pass. Initial portrait and temporary status-clock regression failures retained; final clear.
+- [ ] Next: visible earned armour/cloaks/shields on local and remote players. Current class outfits
+      and held weapons work; armour slots still have no matching world appearance. Improve opaque
+      character/inventory panels alongside actual equipment changes and multiplayer browser proof.
+- Most atlas regions, remaining classes/specialisations, guild vault and broader armour/art remain
+  long-term incomplete. Production remains unchanged; separate release validation is still required.

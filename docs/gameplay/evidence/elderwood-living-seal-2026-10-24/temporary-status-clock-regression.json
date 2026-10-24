@@ -1,0 +1,37 @@
+{
+  "ok": false,
+  "error": "locator.tap: Timeout 45000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-open=character]')\u001b[22m\n\n    at click (/root/browser-mmo/scripts/e2e/forest.cjs:118:50)\n    at <anonymous> (/root/browser-mmo/scripts/e2e/forest.cjs:349:15)",
+  "checks": [
+    {
+      "name": "Mage continues an earned coastal character",
+      "ok": true
+    },
+    {
+      "name": "Mage earns the living-seal chapter",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches level six from earned chapter XP",
+      "ok": true
+    }
+  ],
+  "errors": ["setNow is not defined"],
+  "state": {
+    "position": {
+      "x": 271.4442851838302,
+      "z": 3987.706063218084
+    },
+    "progress": {
+      "level": 6,
+      "xp": 563,
+      "xpToNext": 7032
+    },
+    "vitals": {
+      "health": 201,
+      "maxHealth": 201,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  }
+}

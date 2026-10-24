@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "fixture": "Read-only lookup of earned Tidewatch actors. All new chapter progress, travel, surveys, combat, purchases and rewards use actual controls; no item/quest/position writes.",
+  "checks": [
+    {
+      "name": "Mage continues an earned coastal character",
+      "ok": true
+    },
+    {
+      "name": "Mage earns the living-seal chapter",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches level six from earned chapter XP",
+      "ok": true
+    },
+    {
+      "name": "Mage earned necklace increases maximum health",
+      "ok": true
+    },
+    {
+      "name": "Mage keeps all chapter progress and one equipped reward after login",
+      "ok": true
+    },
+    {
+      "name": "No forest gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

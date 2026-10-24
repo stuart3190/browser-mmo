@@ -42,7 +42,7 @@ it('ships diverse reusable catalogs and focused Greenvale population while prese
   expect(world.monsterFamilies.flatMap((f) => f.variants)).toHaveLength(74);
   expect(world.populations).toHaveLength(249);
   expect(world.resources).toHaveLength(10);
-  expect(gd.quests.size).toBe(getStarterGameData().quests.size + 13);
+  expect(gd.quests.size).toBe(getStarterGameData().quests.size + 16);
   expect(gd.raw.chunks.length).toBeLessThan(700);
   for (const r of world.regions) {
     expect(
@@ -53,7 +53,7 @@ it('ships diverse reusable catalogs and focused Greenvale population while prese
     ).toHaveLength(
       r.zoneId === 'zone.aurelian.greenvale_marches'
         ? 19
-        : r.zoneId === 'zone.aurelian.amber_coast'
+        : ['zone.aurelian.amber_coast', 'zone.aurelian.elderwood'].includes(r.zoneId)
           ? 6
           : 3,
     );
@@ -65,7 +65,7 @@ it('ships diverse reusable catalogs and focused Greenvale population while prese
     ).toHaveLength(
       r.zoneId === 'zone.aurelian.greenvale_marches'
         ? 19
-        : r.zoneId === 'zone.aurelian.amber_coast'
+        : ['zone.aurelian.amber_coast', 'zone.aurelian.elderwood'].includes(r.zoneId)
           ? 11
           : 10,
     );

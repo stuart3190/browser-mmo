@@ -19,7 +19,7 @@ async function leaveGroundWarning(page, cue, collision) {
   );
   if (!candidates.length) throw Error('No clear player route out of the ground warning');
   console.log('DODGE', JSON.stringify({ center, range: cue.range, to: candidates[0] }));
-  await walk(page, candidates[0].x, candidates[0].z, 1, 4000);
+  await walk(page, candidates[0].x, candidates[0].z, 1.5, 6000);
   return true;
 }
 module.exports = { leaveGroundWarning };

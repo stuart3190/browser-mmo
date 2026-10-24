@@ -1,0 +1,42 @@
+{
+  "error": "Error: Portrait quest guidance has a visible touch target\n    at check (/root/browser-mmo/scripts/e2e/journal.cjs:14:18)\n    at /root/browser-mmo/scripts/e2e/journal.cjs:201:7",
+  "checks": [
+    {
+      "name": "Available quests recommend the unlocked story with giver and region",
+      "ok": true
+    },
+    {
+      "name": "Journal offers guidance without accepting quests remotely",
+      "ok": true
+    },
+    {
+      "name": "Future locked quests stay out of available list",
+      "ok": true
+    },
+    {
+      "name": "Selected offer closes the log and guides to Iona",
+      "ok": true
+    },
+    {
+      "name": "Offer selection survives relogin",
+      "ok": true
+    },
+    {
+      "name": "In-person acceptance moves the offer into the active log",
+      "ok": true
+    },
+    {
+      "name": "Completed log retains the earned story conclusion",
+      "ok": true
+    },
+    {
+      "name": "New chapter follow-up becomes the suggested available adventure",
+      "ok": true
+    },
+    {
+      "name": "Portrait quest guidance has a visible touch target",
+      "ok": false
+    }
+  ],
+  "errors": []
+}

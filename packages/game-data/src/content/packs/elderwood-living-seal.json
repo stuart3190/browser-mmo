@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 1,
+  "id": "pack.elderwood.living_seal",
+  "revision": 1,
+  "quests": [
+    {
+      "id": "quest.elderwood.third_watch",
+      "name": "The Third Watch",
+      "description": "Iona’s records name a living seal in Elderwood. Take the ferry back to Willow Quay, then choose Pinewatch Landing in World / Travel. Keeper Tamsin waits beside the landing. Follow the suggested passage in the atlas.",
+      "giverNpcId": "npc.amber_coast.iona",
+      "turnInNpcId": "npc.elderwood.tamsin",
+      "minLevel": 5,
+      "prerequisites": ["quest.amber_coast.last_bell"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "meet_tamsin",
+          "kind": "talk",
+          "npcId": "npc.elderwood.tamsin",
+          "label": "Carry the tide records to Keeper Tamsin at Pinewatch Landing"
+        }
+      ],
+      "dialogue": {
+        "offer": "Stone beneath Greenvale. A bell beneath our tide. But the third watch was grown, not built. Tamsin tends its roots in Elderwood. Take these records by way of Willow Quay to Pinewatch Landing. The forest may be answering a warning we cannot hear.",
+        "inProgress": "Iona’s records name a living seal in Elderwood. Take the ferry back to Willow Quay, then choose Pinewatch Landing in World / Travel. Keeper Tamsin waits beside the landing. Follow the suggested passage in the atlas.",
+        "readyToTurnIn": "Two watches have answered. Then the trembling is real. The roots along this path used to hold memories of rain; now they speak in the keeper’s voice. Something is forcing the living seal to wake.",
+        "completed": "Iona’s records are safe with Tamsin. The living roots remember a warning from the other two watches."
+      },
+      "placeholder": false,
+      "rewardId": "reward.elderwood.third_watch"
+    },
+    {
+      "id": "quest.elderwood.briar_memory",
+      "name": "What the Roots Remember",
+      "description": "Follow the moss path south-east from Tamsin. Read the Listening Roots and the Briar Archive, then clear two Briar Spitters. Their blue ground circles lock onto where you stood: step clear before the thorn burst. Return with both readings.",
+      "giverNpcId": "npc.elderwood.tamsin",
+      "turnInNpcId": "npc.elderwood.tamsin",
+      "minLevel": 5,
+      "prerequisites": ["quest.elderwood.third_watch"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "listening_roots",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.elderwood",
+          "areaId": "landmark.elderwood.listening_roots",
+          "label": "Read The Listening Roots"
+        },
+        {
+          "id": "briar_archive",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.elderwood",
+          "areaId": "landmark.elderwood.briar_archive",
+          "label": "Read The Briar Archive"
+        },
+        {
+          "id": "spitters",
+          "kind": "kill",
+          "enemyId": "enemy.elderwood.briar_spitter",
+          "count": 2,
+          "label": "Clear the Briar Spitters along the archive path (2)"
+        }
+      ],
+      "dialogue": {
+        "offer": "Read the Listening Roots, then the Briar Archive farther along the moss path. The briars have begun throwing their thorns at shadows. Clear two spitters, but watch the ground: each blue circle marks where the burst will land. Keep moving until it fades.",
+        "inProgress": "Follow the moss path south-east from Tamsin. Read the Listening Roots and the Briar Archive, then clear two Briar Spitters. Their blue ground circles lock onto where you stood: step clear before the thorn burst. Return with both readings.",
+        "readyToTurnIn": "The roots remember the same oath as your tide records. We were never sealing the forest away. We were sheltering the dream beneath it. The Cantor has mistaken the seal’s pain for an order to awaken it.",
+        "completed": "The archive remembers the oath. The Cantor has mistaken the seal’s pain for an order to awaken the dream beneath it."
+      },
+      "placeholder": false,
+      "rewardId": "reward.elderwood.briar_memory"
+    },
+    {
+      "id": "quest.elderwood.living_seal",
+      "name": "A Song Left Unfinished",
+      "description": "Continue south-east beyond the archive to read the Heartwood Oath. Quiet the Rootbound Cantor without breaking the ancient roots. Its wide blue circle stays where it was placed; leave it before the roots erupt. Bosses resist Frost Nova. Return to Tamsin.",
+      "giverNpcId": "npc.elderwood.tamsin",
+      "turnInNpcId": "npc.elderwood.tamsin",
+      "minLevel": 5,
+      "prerequisites": ["quest.elderwood.briar_memory"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "heartwood_oath",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.elderwood",
+          "areaId": "landmark.elderwood.heartwood_oath",
+          "label": "Read The Heartwood Oath"
+        },
+        {
+          "id": "cantor",
+          "kind": "kill",
+          "enemyId": "enemy.elderwood.rootbound_cantor",
+          "count": 1,
+          "label": "Quiet the Rootbound Cantor"
+        }
+      ],
+      "dialogue": {
+        "offer": "Read the Heartwood Oath beyond the archive, then quiet the Cantor. Its roots strike where the blue circle was laid, not where you move next. Step out, return, and strike between songs. Iron Guard can soften a mistake; frost cannot hold this guardian. Leave the oldest roots whole.",
+        "inProgress": "Continue south-east beyond the archive to read the Heartwood Oath. Quiet the Rootbound Cantor without breaking the ancient roots. Its wide blue circle stays where it was placed; leave it before the roots erupt. Bosses resist Frost Nova. Return to Tamsin.",
+        "readyToTurnIn": "‘Let the dream outlast the dreamers.’ You have heard the words in stone, tide and living wood. The Cantor has fallen quiet and the roots are settling. Take this Heartwood Knot. Three watches remember one another again. The dream is still safe—for now.",
+        "completed": "The living seal holds. Pinewatch will remember your part in its keeping."
+      },
+      "placeholder": false,
+      "rewardId": "reward.elderwood.living_seal"
+    }
+  ],
+  "rewards": [
+    {
+      "id": "reward.elderwood.third_watch",
+      "kind": "quest",
+      "value": {
+        "xp": 600,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 70
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "id": "reward.elderwood.briar_memory",
+      "kind": "quest",
+      "value": {
+        "xp": 900,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 100
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "id": "reward.elderwood.living_seal",
+      "kind": "quest",
+      "value": {
+        "xp": 1500,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 200
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "accessory.necklace.heartwood_knot",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "loot.elderwood.briar_spitter",
+      "kind": "loot",
+      "value": {
+        "rolls": 1,
+        "emptyChance": 0,
+        "entries": [
+          {
+            "itemTemplateId": "material.world.hardwood",
+            "weight": 1,
+            "minQuantity": 1,
+            "maxQuantity": 2,
+            "rarityId": null
+          }
+        ],
+        "currency": {
+          "currencyId": "gold",
+          "min": 14,
+          "max": 20
+        }
+      }
+    },
+    {
+      "id": "loot.elderwood.rootbound_cantor",
+      "kind": "loot",
+      "value": {
+        "rolls": 1,
+        "emptyChance": 0,
+        "entries": [
+          {
+            "itemTemplateId": "material.world.wild_herb",
+            "weight": 1,
+            "minQuantity": 2,
+            "maxQuantity": 3,
+            "rarityId": null
+          }
+        ],
+        "currency": {
+          "currencyId": "gold",
+          "min": 50,
+          "max": 70
+        }
+      }
+    }
+  ],
+  "npcs": [
+    {
+      "definition": {
+        "id": "npc.elderwood.tamsin",
+        "name": "Keeper Tamsin",
+        "title": "Tender of the living seal",
+        "role": "quest_giver",
+        "modelId": null,
+        "dialogue": ["Walk softly. These roots remember every footstep."]
+      },
+      "placements": [
+        {
+          "zoneId": "zone.aurelian.elderwood",
+          "spawn": {
+            "id": "spawn.elderwood.tamsin",
+            "kind": "npc",
+            "position": {
+              "x": 270,
+              "y": 0,
+              "z": 3988
+            },
+            "rotationY": 3.14,
+            "refId": "npc.elderwood.tamsin",
+            "quantity": 1,
+            "respawnMs": null,
+            "interactRadius": 4,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    }
+  ],
+  "encounters": [
+    {
+      "id": "encounter.elderwood.briar_spitter",
+      "enemy": {
+        "id": "enemy.elderwood.briar_spitter",
+        "name": "Briar Spitter",
+        "level": 6,
+        "maxHealth": 160,
+        "family": "elemental",
+        "xpReward": 120,
+        "modelId": "authored:thornling",
+        "isBoss": false,
+        "isWorldBoss": false,
+        "combat": {
+          "damage": {
+            "min": 16,
+            "max": 22
+          },
+          "attackSpeedMs": 3500,
+          "attackRange": 16,
+          "aggroRange": 12,
+          "leashRange": 26,
+          "moveSpeed": 2.7,
+          "armor": 20,
+          "corpseMs": 4000,
+          "windupMs": 1600,
+          "groundStrikeRadius": 2.8
+        }
+      },
+      "lootRewardId": "loot.elderwood.briar_spitter",
+      "placements": [
+        {
+          "zoneId": "zone.aurelian.elderwood",
+          "spawn": {
+            "id": "spawn.elderwood.briar_spitter0",
+            "kind": "enemy",
+            "position": {
+              "x": 316,
+              "y": 0,
+              "z": 3938
+            },
+            "rotationY": 3.14,
+            "refId": "enemy.elderwood.briar_spitter",
+            "quantity": 1,
+            "respawnMs": 45000,
+            "interactRadius": 3,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        },
+        {
+          "zoneId": "zone.aurelian.elderwood",
+          "spawn": {
+            "id": "spawn.elderwood.briar_spitter1",
+            "kind": "enemy",
+            "position": {
+              "x": 356,
+              "y": 0,
+              "z": 3904
+            },
+            "rotationY": 3.14,
+            "refId": "enemy.elderwood.briar_spitter",
+            "quantity": 1,
+            "respawnMs": 45000,
+            "interactRadius": 3,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "encounter.elderwood.rootbound_cantor",
+      "enemy": {
+        "id": "enemy.elderwood.rootbound_cantor",
+        "name": "Rootbound Cantor",
+        "level": 7,
+        "maxHealth": 750,
+        "family": "elemental",
+        "xpReward": 260,
+        "modelId": "authored:rootcantor",
+        "isBoss": true,
+        "isWorldBoss": false,
+        "combat": {
+          "damage": {
+            "min": 28,
+            "max": 38
+          },
+          "attackSpeedMs": 4800,
+          "attackRange": 14,
+          "aggroRange": 10,
+          "leashRange": 42,
+          "moveSpeed": 2.3,
+          "armor": 26,
+          "corpseMs": 10000,
+          "windupMs": 2200,
+          "groundStrikeRadius": 4.5
+        }
+      },
+      "lootRewardId": "loot.elderwood.rootbound_cantor",
+      "placements": [
+        {
+          "zoneId": "zone.aurelian.elderwood",
+          "spawn": {
+            "id": "spawn.elderwood.rootbound_cantor0",
+            "kind": "enemy",
+            "position": {
+              "x": 384,
+              "y": 0,
+              "z": 3860
+            },
+            "rotationY": 3.14,
+            "refId": "enemy.elderwood.rootbound_cantor",
+            "quantity": 1,
+            "respawnMs": 90000,
+            "interactRadius": 3,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    }
+  ]
+}

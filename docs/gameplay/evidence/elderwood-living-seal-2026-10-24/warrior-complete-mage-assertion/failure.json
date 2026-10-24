@@ -1,0 +1,79 @@
+{
+  "ok": false,
+  "error": "Error: Mage Briar warning stays clear of notices\n    at check (/root/browser-mmo/scripts/e2e/forest.cjs:16:18)\n    at fight (/root/browser-mmo/scripts/e2e/forest.cjs:269:15)\n    at async <anonymous> (/root/browser-mmo/scripts/e2e/forest.cjs:296:9)",
+  "checks": [
+    {
+      "name": "Warrior continues an earned coastal character",
+      "ok": true
+    },
+    {
+      "name": "Warrior reaches Pinewatch Landing by boat",
+      "ok": true
+    },
+    {
+      "name": "Warrior Cantor warning stays clear of notices",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Rootbound Cantor",
+      "ok": true,
+      "detail": {
+        "dodge": 10
+      }
+    },
+    {
+      "name": "Warrior responds to the Cantor ground warning",
+      "ok": true,
+      "detail": {
+        "dodge": 10
+      }
+    },
+    {
+      "name": "Warrior earns the living-seal chapter",
+      "ok": true
+    },
+    {
+      "name": "Warrior reaches level six from earned chapter XP",
+      "ok": true
+    },
+    {
+      "name": "Warrior earned necklace increases maximum health",
+      "ok": true
+    },
+    {
+      "name": "Warrior keeps all chapter progress and one equipped reward after login",
+      "ok": true
+    },
+    {
+      "name": "Mage continues an earned coastal character",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches Pinewatch Landing by boat",
+      "ok": true
+    },
+    {
+      "name": "Mage Briar warning stays clear of notices",
+      "ok": false
+    }
+  ],
+  "errors": [],
+  "state": {
+    "position": {
+      "x": 315.4338738757592,
+      "z": 3947.082726124021
+    },
+    "progress": {
+      "level": 5,
+      "xp": 2840,
+      "xpToNext": 5253
+    },
+    "vitals": {
+      "health": 164,
+      "maxHealth": 164,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  }
+}

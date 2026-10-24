@@ -23,7 +23,8 @@ export class ActorModel {
   constructor(
     scene: Scene,
     id: string,
-    readonly kind: 'hero' | 'wolf' | 'lantern' | 'warden' | 'crab' | 'tidekeeper',
+    readonly kind:
+      'hero' | 'wolf' | 'lantern' | 'warden' | 'crab' | 'tidekeeper' | 'thornling' | 'rootcantor',
     coat = '#426877',
   ) {
     const material = (hex: string) => {
@@ -35,7 +36,7 @@ export class ActorModel {
     };
     this.shadow = MeshBuilder.CreateDisc(
       `${id}_shadow`,
-      { radius: kind === 'wolf' ? 0.8 : 0.55, tessellation: 20 },
+      { radius: kind === 'rootcantor' ? 1.2 : kind === 'wolf' ? 0.8 : 0.55, tessellation: 20 },
       scene,
     );
     this.shadow.rotation.x = Math.PI / 2;
@@ -48,7 +49,7 @@ export class ActorModel {
     const dark = material(kind === 'wolf' ? '#394951' : '#333b41');
     const light = material(kind === 'wolf' ? '#c5c9bd' : '#d2b58a');
     this.mesh =
-      kind === 'lantern' || kind === 'crab'
+      kind === 'lantern' || kind === 'crab' || kind === 'thornling'
         ? MeshBuilder.CreateIcoSphere(id, { radius: 0.65, subdivisions: 0 }, scene)
         : MeshBuilder.CreateBox(
             id,
@@ -75,7 +76,40 @@ export class ActorModel {
       m.material = mat;
       return m;
     };
-    if (kind === 'crab') {
+    if (kind === 'thornling' || kind === 'rootcantor') {
+      main.diffuseColor = Color3.FromHexString('#655448');
+      dark.diffuseColor = Color3.FromHexString('#304a3a');
+      light.diffuseColor = Color3.FromHexString('#b5db6b');
+      light.emissiveColor = Color3.FromHexString('#35481d');
+      const boss = kind === 'rootcantor';
+      if (boss) this.mesh.scaling.set(1.7, 1.7, 1.3);
+      else this.mesh.scaling.set(1.1, 0.8, 1.1);
+      part('heart_seed', [0.3, 0.5, 0.2], [0, 0.03, 0.38], light);
+      for (const side of [-1, 1]) {
+        const branch = part('briar_branch', [0.2, 1.1, 0.25], [side * 0.6, 0.35, 0], main);
+        branch.rotation.z = -side * 0.55;
+        this.limbs.push(branch);
+        const root = part('walking_root', [0.2, 0.26, 1.0], [side * 0.45, -0.55, 0.2], dark);
+        root.rotation.y = side * 0.6;
+        this.limbs.push(root);
+        part('thorn', [0.12, 0.45, 0.12], [side * 0.95, 0.78, 0.05], light).rotation.z =
+          -side * 0.7;
+        const leaf = MeshBuilder.CreateIcoSphere(
+          `${id}_leaf_crown`,
+          { radius: boss ? 0.5 : 0.42, subdivisions: 0 },
+          scene,
+        );
+        leaf.parent = this.mesh;
+        leaf.position.set(side * 0.4, boss ? 1.15 : 0.7, -0.1);
+        leaf.scaling.set(1.3, 0.55, 1);
+        leaf.material = dark;
+        if (boss) {
+          part('antler', [0.12, 0.85, 0.14], [side * 0.34, 1.2, 0], main).rotation.z = -side * 0.3;
+          part('oath_eye', [0.08, 0.12, 0.12], [side * 0.13, 0.6, 0.25], light);
+        }
+      }
+      if (boss) part('wooden_mask', [0.5, 0.55, 0.4], [0, 0.63, 0], main);
+    } else if (kind === 'crab') {
       main.diffuseColor = Color3.FromHexString('#5aa7b4');
       main.specularColor = Color3.FromHexString('#c4e4da');
       dark.diffuseColor = Color3.FromHexString('#b57b45');

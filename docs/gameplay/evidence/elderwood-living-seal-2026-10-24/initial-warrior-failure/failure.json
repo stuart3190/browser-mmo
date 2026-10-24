@@ -1,0 +1,29 @@
+{
+  "ok": false,
+  "error": "Error: Walk deadline 389.3952085097168,3865.8009214196513\n    at walk (/root/browser-mmo/scripts/e2e/vertical-slice.cjs:49:11)\n    at async leaveGroundWarning (/root/browser-mmo/scripts/e2e/combat-inputs.cjs:22:3)\n    at async fight (/root/browser-mmo/scripts/e2e/forest.cjs:269:17)\n    at async <anonymous> (/root/browser-mmo/scripts/e2e/forest.cjs:302:9)",
+  "checks": [
+    {
+      "name": "Warrior continues an earned coastal character",
+      "ok": true
+    },
+    {
+      "name": "Warrior reaches Pinewatch Landing by boat",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 1
+      }
+    },
+    {
+      "name": "Warrior defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 3
+      }
+    }
+  ],
+  "errors": []
+}

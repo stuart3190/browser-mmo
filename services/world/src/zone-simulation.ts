@@ -950,6 +950,8 @@ export class ZoneSimulation {
     if (!canPlayerRespawn(this.rules, p.diedAtMs, nowMs))
       throw new DomainError(ErrorCode.RESPAWN_NOT_READY, 'You cannot respawn yet');
     const point = this.respawnPointFor(p);
+    p.targetId = null;
+    p.attacking = false;
     p.dead = false;
     p.health = Math.max(1, Math.round(p.maxHealth * this.rules.playerRespawnHealthFraction));
     p.position = { ...point };

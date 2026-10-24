@@ -1,3 +1,4 @@
+import { forestScenery } from './forest-scenery';
 import { coastalScenery } from './coastal-scenery';
 import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
@@ -397,6 +398,7 @@ export class WorldView {
     ground.isPickable = false;
     disposables.push(ground);
     disposables.push(...coastalScenery(this.scene, chunk, size, (hex) => this.material(hex)));
+    disposables.push(...forestScenery(this.scene, chunk, size, (hex) => this.material(hex)));
 
     const atlas = this.gameData.raw.worldCatalog;
     if (atlas?.regions.some((r) => r.zoneId === chunk.zoneId)) {
@@ -517,7 +519,11 @@ export class WorldView {
         case 'cone':
           mesh = MeshBuilder.CreateCylinder(
             prop.id,
-            { height: shape.height, diameterTop: 0, diameterBottom: shape.radius * 2 },
+            {
+              height: shape.height,
+              diameterTop: prop.modelId === 'authored:elder_tree' ? 0.7 : 0,
+              diameterBottom: prop.modelId === 'authored:elder_tree' ? 1.2 : shape.radius * 2,
+            },
             this.scene,
           );
           y = (shape.height / 2) * prop.scale;
@@ -547,7 +553,9 @@ export class WorldView {
       mesh.scaling.setAll(prop.scale);
       mesh.position = new Vector3(prop.position.x, y, prop.position.z);
       mesh.rotation.y = prop.rotationY;
-      mesh.material = this.material(PROP_COLORS[prop.kind]);
+      mesh.material = this.material(
+        prop.modelId === 'authored:elder_tree' ? '#695746' : PROP_COLORS[prop.kind],
+      );
       mesh.isPickable = false;
       // Dressing stays inside the existing collision footprint; no invisible new obstacles.
       const detail = (
@@ -579,6 +587,20 @@ export class WorldView {
           detail('beam', 0.2, 5, 0.2, sign * 3.85, 0, -3, '#443b31');
         }
         detail('door', 1.2, 2.6, 0.08, 0, -1.2, -3.03, '#403e32');
+      } else if (prop.modelId === 'authored:elder_tree') {
+        for (const [i, x] of [-1.1, 1.1, 0].entries()) {
+          const crown = MeshBuilder.CreateIcoSphere(
+            `${prop.id}_crown_${i}`,
+            { radius: 2.2, subdivisions: 1 },
+            this.scene,
+          );
+          crown.parent = mesh;
+          crown.position.set(x, 2.5 + (i === 2 ? 1 : 0), i === 2 ? -0.8 : 0.3);
+          crown.scaling.set(1, 0.6, 0.9);
+          crown.material = this.material(i === 2 ? '#75945c' : '#486d46');
+          crown.isPickable = false;
+          detail('branch', 0.3, 2, 0.3, x * 0.6, 1.4, 0, '#695746').rotation.z = -x * 0.5;
+        }
       } else if (prop.kind === 'tree') {
         detail('trunk', 0.75, 2.5, 0.75, 0, -1.75, 0, '#655441');
       } else if (prop.kind === 'fence') {

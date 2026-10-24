@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five/prior-coast fixture at harbour. Actual quest selection, movement, dialogue acceptance, two boat trips, turn-in and journal history. No new chapter progress or item grants.",
+  "checks": [
+    {
+      "name": "Available quests recommend the unlocked story with giver and region",
+      "ok": true
+    },
+    {
+      "name": "Journal offers guidance without accepting quests remotely",
+      "ok": true
+    },
+    {
+      "name": "Future locked quests stay out of available list",
+      "ok": true
+    },
+    {
+      "name": "Selected offer closes the log and guides to Iona",
+      "ok": true
+    },
+    {
+      "name": "Offer selection survives relogin",
+      "ok": true
+    },
+    {
+      "name": "In-person acceptance moves the offer into the active log",
+      "ok": true
+    },
+    {
+      "name": "Completed log retains the earned story conclusion",
+      "ok": true
+    },
+    {
+      "name": "New chapter follow-up becomes the suggested available adventure",
+      "ok": true
+    },
+    {
+      "name": "No journal gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

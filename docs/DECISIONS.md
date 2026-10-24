@@ -1513,3 +1513,33 @@ life/combat, story and ownership checks still authorize travel on the server. Cl
 quest passages are excluded from guidance; the atlas explains their locks and highlights the
 recommended available route. Guidance may prefer an extra crossing when it avoids a long walk.
 Same-zone goals remain local bearings. No teleport shortcut or world topology changes.
+
+## 2026-10-24 — Elderwood extends the existing story and encounter rules
+
+The third watch continues Iona's Tidewatch story at the existing Pinewatch boat landing, rather
+than placing a quest hub kilometres away at Elderwood's generic town. Add three authored quests,
+personal survey sites, two practice Briar Spitters and the Rootbound Cantor. Their attacks use
+the existing fixed-position ground strike; no second AI/combat or progression implementation.
+A bound necklace and normal XP/copper extend earned level-five/six progression. Tamsin offers
+existing remedy, vendor and repair services. Keep all prior quest packs and world travel links.
+
+Forest survey glyphs, broad-leaf canopies and plant creature rigs use the current procedural art
+and shared collision footprints. This finishes a landing chapter, not the whole forest region.
+For identical estimated walking distance, passage guidance prefers lower-level transit regions;
+this makes the familiar Willow Quay journey win an otherwise alphabetical high-level detour.
+Travel authorization remains unchanged.
+
+## 2026-10-24 — Adventure journal and readable revival
+
+The quest log now presents only offers already marked available by the server, with giver, region
+and a guide action. It cannot accept remotely or unlock future quests. Shared presentation sorting
+prefers the most recent story continuation, then nearby work; both the compass and journal use it.
+Completed entries retain the earned turn-in dialogue and sort newest first. Existing persisted
+quest-guidance preferences remain the only local state. Touch pages use opaque sheets and 44px
+buttons. No new quest state, persistence or reward authority.
+
+Each authored coastal/forest hub gets a nearby safe respawn so defeat does not force a kilometres-
+long return from a generic town. Server revival clears the old target and attack intent, preserving
+health rules, cooldowns, items and XP. The death countdown reads the current clock on its first
+visible render; the prior timer initialized while alive could briefly display an inflated wait.
+World damage text renders below the UI, and attack warnings take precedence over transient notices.

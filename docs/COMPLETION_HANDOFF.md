@@ -59,12 +59,30 @@ World highlights the recommended route. Eight real browser checks, 132 content a
 types/lint/build/debug guard pass; screenshots inspected. Evidence:
 `gameplay/evidence/passage-guidance-2026-10-24/`. Audio commit `6aa0342` is pushed.
 
-Next gameplay milestone: authored Elderwood chapter (NOT yet implemented). Pinewatch Landing
-outpost near256/4000, Keeper Tamsin, living-seal surveys, telegraphed Briar Spitters and Rootbound
-Cantor, level-five/six progression. Existing boats from Willow Quay arrive at256/4000. Build near
-this landing, not the generic town kilometres away. Most other atlas regions and armour-specific
-appearance remain incomplete. Use existing quest/encounter/crafting authority and procedural art;
-no production, capacity or infrastructure work.
+Completed: Elderwood living-seal chapter, nearby chapter respawns and clearer revival UI. Both
+coastal actors earned three new quests, defeated spitters/Cantor and reached level six. Staged
+resumes verify necklace bonuses and one equipped reward after relogin; driver failures retained.
+Evidence: `gameplay/evidence/elderwood-living-seal-2026-10-24/`. 133 content,27 frontend,15 focused
+world/combat and one domain test, lint/types/build/content validation pass. Nine real forest death/
+recovery checks pass including first-frame 3s countdown and cleared target. Screenshots reviewed.
+Completed: Available adventure journal, shared recommendations, persisted guide selection and
+completed story history; 9 desktop +10 touch browser checks and final screenshot review pass.
+Evidence: `gameplay/evidence/adventure-journal-2026-10-24/`. Portrait sizing and a temporary status
+clock regression fixed; failures preserved. Passage-guidance commit `358e314` is pushed.
+
+Next gameplay milestone: earned equipment appearance for existing head/chest/cloak/off-hand items,
+with server-derived identity, local/remote equip/remove and relogin. Current class outfits/weapons
+are cosmetic plus actual main hand; armour-specific art is NOT implemented yet. Candidate items:
+Trapper's Cap, Recruit Breastplate, Apprentice Robe, three earned cloaks, Oak Buckler. Preserve the
+existing appearance/snapshot/rig pipeline and stats rules. Character/inventory translucent panels
+still benefit from opaque backgrounds; verify during real equip UI. Most atlas regions remain
+incomplete. No production, capacity or infrastructure work.
+
+All `/tmp/bo-*-draft.py`, `/tmp/build-forest-driver.py`, `/tmp/bo-gameplay-polish.py` generators used
+this pass are OBSOLETE and must not be rerun. Current source contains their corrected integration.
+Retained iaQjr4 actors are now both level six with completed coastal/forest stories and earned
+Tidewatch weapons/rings/Heartwood necklaces. Preserve earned rows. Its controllers and fresh 2vuS1k
+controllers have exited; evidence only is archived. No production changes.
 
 Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.

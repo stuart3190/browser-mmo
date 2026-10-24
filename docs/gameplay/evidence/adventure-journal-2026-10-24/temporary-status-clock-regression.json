@@ -1,0 +1,5 @@
+{
+  "error": "locator.tap: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-open=quests]')\u001b[22m\n\n    at click (/root/browser-mmo/scripts/e2e/journal.cjs:97:41)\n    at open (/root/browser-mmo/scripts/e2e/journal.cjs:98:24)\n    at /root/browser-mmo/scripts/e2e/journal.cjs:100:11",
+  "checks": [],
+  "errors": ["setNow is not defined"]
+}

@@ -1,3 +1,4 @@
+import { availableQuestOffers, questGiverPlace } from '../state/quest-offers';
 import { ServiceOffer } from './ServiceOffer';
 import { SpecialisationChoices } from './SpecialisationChoices';
 import { canRepairAt, repairCost } from '@mmo/game-data';
@@ -261,13 +262,33 @@ export function QuestTracker() {
 
 /** Quest log window: active and completed quests with details, progress and rewards. */
 export function QuestLogWindow() {
-  const { state, gameData } = useGame();
-  const [tab, setTab] = useState<'active' | 'completed'>('active');
-  const list = state.quests.filter((q) =>
-    tab === 'active'
-      ? q.state === 'active' || q.state === 'ready_to_turn_in'
-      : q.state === 'completed',
+  const { state, gameData, controls } = useGame();
+  const [tab, setTab] = useState<'active' | 'available' | 'completed'>('active');
+  const zone = controls.zoneId() ?? state.character.zoneId;
+  const offers = availableQuestOffers(
+    gameData,
+    state.quests,
+    zone,
+    controls.position() ?? { x: 0, z: 0 },
   );
+  const list =
+    tab === 'available'
+      ? offers
+      : state.quests.filter((q) =>
+          tab === 'active'
+            ? q.state === 'active' || q.state === 'ready_to_turn_in'
+            : q.state === 'completed',
+        );
+  if (tab === 'completed')
+    list.sort(
+      (a, b) =>
+        (b.completedAt ? Date.parse(b.completedAt) : 0) -
+        (a.completedAt ? Date.parse(a.completedAt) : 0),
+    );
+  const guide = (id: string) => {
+    state.trackQuest(id);
+    state.toggle('quests', false);
+  };
   return (
     <Window id="quests" title="Quests">
       <Tabs
@@ -275,46 +296,86 @@ export function QuestLogWindow() {
         onChange={setTab}
         options={[
           { id: 'active', label: 'Active' },
+          { id: 'available', label: `Available (${offers.length})` },
           { id: 'completed', label: 'Completed' },
         ]}
       />
-      {list.length === 0 && (
-        <p className="muted small">
-          {tab === 'active'
-            ? 'No quests in progress. Talk to people in Greenvale.'
-            : 'Nothing completed yet.'}
+      {tab === 'available' && (
+        <p className="small muted">
+          People with work for you. Follow a guide to speak in person; continuing stories appear
+          first.
         </p>
       )}
-      {list.map((q) => (
-        <article
-          key={q.questId}
-          className="quest-entry"
-          data-quest={q.questId}
-          data-state={q.state}
-        >
-          <h3>{q.name}</h3>
-          {q.state !== 'completed' && (
-            <button
-              className="secondary"
-              onClick={() => state.trackQuest(q.questId)}
-              data-testid="quest-track"
-            >
-              Track quest
-            </button>
-          )}
-          <p className="small">{q.description}</p>
-          {q.state !== 'completed' && <Objectives quest={q} />}
-          {q.state === 'ready_to_turn_in' && (
-            <p className="ready small">{returnTo(q, (id) => gameData.npcs.get(id)?.name)}</p>
-          )}
-          {q.state === 'completed' && (
-            <p className="small muted">
-              Completed {q.completedAt ? new Date(q.completedAt).toLocaleString() : ''}
-            </p>
-          )}
-          <Rewards quest={q} />
-        </article>
-      ))}
+      {list.length === 0 && (
+        <p className="small muted">
+          {tab === 'active'
+            ? offers.length
+              ? 'No quests in progress. Choose an available adventure to find your next quest giver.'
+              : 'No quests in progress. Explore the atlas, gather supplies, or revisit a dungeon with friends.'
+            : tab === 'available'
+              ? 'No new quests are available at your current level and story progress.'
+              : 'Nothing completed yet.'}
+        </p>
+      )}
+      {tab === 'active' && list.length === 0 && offers.length > 0 && (
+        <button data-testid="quest-find-adventure" onClick={() => setTab('available')}>
+          Find an adventure
+        </button>
+      )}
+      {list.map((q, index) => {
+        const place = questGiverPlace(gameData, q.giverNpcId);
+        const giver = q.giverNpcId ? gameData.npcs.get(q.giverNpcId)?.name : undefined;
+        const conclusion = gameData.quests.get(q.questId)?.dialogue?.readyToTurnIn;
+        return (
+          <article
+            key={q.questId}
+            className="quest-entry"
+            data-quest={q.questId}
+            data-state={q.state}
+          >
+            <h3>{q.name}</h3>
+            {q.state === 'available' && (
+              <>
+                <p className="small" data-testid="quest-offer-place">
+                  {index === 0 ? 'Suggested · ' : ''}
+                  {giver ?? 'Quest giver'}
+                  {place ? ` · ${gameData.zone(place.zoneId).name}` : ''}
+                </p>
+                <button data-testid="quest-guide-offer" onClick={() => guide(q.questId)}>
+                  Guide to quest giver
+                </button>
+              </>
+            )}
+            {(q.state === 'active' || q.state === 'ready_to_turn_in') && (
+              <button
+                className="secondary"
+                data-testid="quest-track"
+                onClick={() => guide(q.questId)}
+              >
+                Track quest
+              </button>
+            )}
+            <p className="small">{q.description}</p>
+            {q.state !== 'completed' && q.state !== 'available' && <Objectives quest={q} />}
+            {q.state === 'ready_to_turn_in' && (
+              <p className="ready small">{returnTo(q, (id) => gameData.npcs.get(id)?.name)}</p>
+            )}
+            {q.state === 'completed' && (
+              <>
+                {conclusion && (
+                  <blockquote className="quest-conclusion" data-testid="quest-conclusion">
+                    {conclusion}
+                  </blockquote>
+                )}
+                <p className="small muted">
+                  Completed {q.completedAt ? new Date(q.completedAt).toLocaleString() : ''}
+                </p>
+              </>
+            )}
+            <Rewards quest={q} />
+          </article>
+        );
+      })}
     </Window>
   );
 }

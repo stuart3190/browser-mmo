@@ -1,7 +1,11 @@
 import { withSpecialisationPaths } from './specialisations';
 export * from './specialisations';
 import { withCoastalChapter } from './coastal-chapter';
-export { tidewatch, chapterContentPacks } from './coastal-chapter';
+import { chapterContentPacks as coastalPacks } from './coastal-chapter';
+import { withForestChapter, forestChapterPack } from './forest-chapter';
+export { tidewatch } from './coastal-chapter';
+export { livingSeal } from './forest-chapter';
+export const chapterContentPacks = [...coastalPacks, forestChapterPack];
 import { withTacticalAbilities } from './tactical';
 import { withDungeonContent } from './dungeons';
 export * from './dungeons';
@@ -86,7 +90,7 @@ const chapterGameData = withCoastalChapter(
   ),
 );
 
-export const rawGameData = withSpecialisationPaths(chapterGameData);
+export const rawGameData = withSpecialisationPaths(withForestChapter(chapterGameData));
 
 let cached: GameData | undefined;
 

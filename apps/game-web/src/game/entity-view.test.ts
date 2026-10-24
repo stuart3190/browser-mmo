@@ -248,3 +248,36 @@ it('renders replicated class outfits and held gear, updates existing actors and 
     engine.dispose();
   }
 });
+it.each([
+  ['enemy.elderwood.briar_spitter', 'spitter'],
+  ['enemy.elderwood.rootbound_cantor', 'cantor'],
+])('renders a distinct pickable %s and cleans its plant rig/cue on despawn', (ref, id) => {
+  const engine = new NullEngine(),
+    scene = new Scene(engine);
+  try {
+    void scene.defaultMaterial;
+    const views = new EntityViews(scene, 'local'),
+      before = { meshes: scene.meshes.length, materials: scene.materials.length };
+    views.upsert({
+      id: id!,
+      kind: 'enemy',
+      name: id!,
+      position: { x: 1, y: 0, z: 2 },
+      rotationY: 0,
+      refId: ref!,
+      characterId: null,
+      dead: false,
+      attackCue: { endsAtMs: 2000, range: 4.5, groundPosition: { x: 3, y: 0, z: 4 } },
+    });
+    expect(views.entityIdOfMesh(scene.getMeshByName(`${id}_heart_seed`)!)).toBe(id);
+    expect(scene.getMeshByName(`${id}_leaf_crown`)).toBeTruthy();
+    views.update(0.1);
+    expect(scene.getMeshByName(`bite_${id}`)!.position.x).toBe(3);
+    views.remove(id!);
+    expect(scene.meshes).toHaveLength(before.meshes);
+    expect(scene.materials).toHaveLength(before.materials);
+  } finally {
+    scene.dispose();
+    engine.dispose();
+  }
+});

@@ -210,7 +210,10 @@ function LogPanel() {
 function Toasts() {
   const { state } = useGame();
   return (
-    <div className="toasts" aria-live="polite">
+    <div
+      className={`toasts${state.targetInfo()?.attackCue && !state.targetInfo()?.dead ? ' during-warning' : ''}`}
+      aria-live="polite"
+    >
       {state.toasts.map((t) => (
         <div key={t.id} className={`toast ${t.kind}`} data-testid="toast">
           {t.text}

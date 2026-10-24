@@ -498,6 +498,8 @@ export function worldDestination(
         !!l.from && !!l.to,
     )
     .sort((a, b) => a.travel.id.localeCompare(b.travel.id));
+  const regionLevel = (location: Location) =>
+    w.regions.find((r) => r.id === location.regionId)?.levelBand.min ?? 1;
   const end = options.destinationPosition ?? destination.position;
   const queue = links
     .filter((l) => l.from.zoneId === zoneId)
@@ -505,29 +507,41 @@ export function worldDestination(
       at: l.to,
       first: l.from,
       travelId: l.travel.id,
+      risk: regionLevel(l.to),
       cost: (options.fromPosition ? distance2D(options.fromPosition, l.from.position) : 0) + 25,
     }));
-  const visited = new Map<string, number>();
+  const visited = new Map<string, { cost: number; risk: number }>();
   let best: { location: Location; destination: Location; travelId: string } | null = null;
   let bestCost = Infinity;
+  let bestRisk = Infinity;
   while (queue.length) {
-    queue.sort((a, b) => a.cost - b.cost || a.travelId.localeCompare(b.travelId));
+    queue.sort(
+      (a, b) => a.cost - b.cost || a.risk - b.risk || a.travelId.localeCompare(b.travelId),
+    );
     const current = queue.shift()!;
-    if (current.cost >= bestCost) break;
-    if (current.cost >= (visited.get(current.at.id) ?? Infinity)) continue;
-    visited.set(current.at.id, current.cost);
+    if (current.cost > bestCost) break;
+    const known = visited.get(current.at.id);
+    if (
+      known &&
+      (current.cost > known.cost || (current.cost === known.cost && current.risk >= known.risk))
+    )
+      continue;
+    visited.set(current.at.id, { cost: current.cost, risk: current.risk });
     if (current.at.zoneId === destination.zoneId) {
       const cost = current.cost + distance2D(current.at.position, end);
-      if (cost < bestCost) {
+      if (cost < bestCost || (cost === bestCost && current.risk < bestRisk)) {
         bestCost = cost;
+        bestRisk = current.risk;
         best = { location: current.first, destination, travelId: current.travelId };
       }
       continue;
     }
     for (const link of links.filter((l) => l.from.zoneId === current.at.zoneId)) {
       const cost = current.cost + distance2D(current.at.position, link.from.position) + 25;
-      if (cost < (visited.get(link.to.id) ?? Infinity))
-        queue.push({ at: link.to, first: current.first, travelId: current.travelId, cost });
+      const risk = current.risk + regionLevel(link.to),
+        known = visited.get(link.to.id);
+      if (!known || cost < known.cost || (cost === known.cost && risk < known.risk))
+        queue.push({ at: link.to, first: current.first, travelId: current.travelId, cost, risk });
     }
   }
   return best;

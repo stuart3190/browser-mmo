@@ -1,0 +1,85 @@
+{
+  "ok": false,
+  "error": "Error: Mage earned necklace increases maximum health\n    at check (/root/browser-mmo/scripts/e2e/forest.cjs:16:18)\n    at <anonymous> (/root/browser-mmo/scripts/e2e/forest.cjs:348:7)",
+  "checks": [
+    {
+      "name": "Mage continues an earned coastal character",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches Pinewatch Landing by boat",
+      "ok": true
+    },
+    {
+      "name": "Mage Briar warning stays clear of notices",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 2
+      }
+    },
+    {
+      "name": "Mage Briar warning stays clear of notices",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Briar Spitter",
+      "ok": true,
+      "detail": {
+        "dodge": 1
+      }
+    },
+    {
+      "name": "Mage Cantor warning stays clear of notices",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Rootbound Cantor",
+      "ok": true,
+      "detail": {
+        "dodge": 7
+      }
+    },
+    {
+      "name": "Mage responds to the Cantor ground warning",
+      "ok": true,
+      "detail": {
+        "dodge": 7
+      }
+    },
+    {
+      "name": "Mage earns the living-seal chapter",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches level six from earned chapter XP",
+      "ok": true
+    },
+    {
+      "name": "Mage earned necklace increases maximum health",
+      "ok": false
+    }
+  ],
+  "errors": [],
+  "state": {
+    "position": {
+      "x": 271.4442851838302,
+      "z": 3987.706063218084
+    },
+    "progress": {
+      "level": 6,
+      "xp": 563,
+      "xpToNext": 7032
+    },
+    "vitals": {
+      "health": 175,
+      "maxHealth": 201,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  }
+}

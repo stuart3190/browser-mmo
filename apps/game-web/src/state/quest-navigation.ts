@@ -1,3 +1,4 @@
+import { availableQuestOffers } from './quest-offers';
 import type { GameData } from '@mmo/game-data';
 import { worldDestination } from '@mmo/game-data';
 import type { QuestView } from '@mmo/schemas';
@@ -39,19 +40,12 @@ export function questDestination(
     viable.find((q) => q.state === 'ready_to_turn_in') ??
     viable.find((q) => q.state === 'active') ??
     // Follow the most recently completed chain before unrelated available offers.
-    viable
-      .filter((q) => q.state === 'available')
-      .sort((a, b) => {
-        const latest = (id: string) =>
-          Math.max(
-            0,
-            ...gd.quest(id).prerequisites.map((pre) => {
-              const c = quests.find((q) => q.questId === pre);
-              return c?.completedAt ? Date.parse(c.completedAt) : 0;
-            }),
-          );
-        return latest(b.questId) - latest(a.questId);
-      })[0];
+    availableQuestOffers(
+      gd,
+      viable.concat(quests.filter((q) => q.state === 'completed')),
+      zoneId,
+      me,
+    )[0];
   if (!q) return null;
   const def = gd.quest(q.questId);
   const candidates: { zoneId: string; position: { x: number; z: number } }[] = [];

@@ -1,0 +1,12 @@
+
+ RUN  v5.0.3 /root/browser-mmo/packages/domain
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  23:04:55
+   Duration  16.04s (transform 55%, import 34%, tests 11%)
+
+  Transform  transforming modules took 5.40s · 55% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns

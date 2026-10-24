@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five death/recovery fixture starts near the Cantor with no gear or health grants. Actual enemy damage/death/respawn/UI/relogin; no earned-player mutation.",
+  "checks": [
+    {
+      "name": "Actual Cantor attacks defeat the stationary test character",
+      "ok": true
+    },
+    {
+      "name": "First death countdown uses the current clock",
+      "ok": true
+    },
+    {
+      "name": "Death screen names nearby Pinewatch Landing",
+      "ok": true
+    },
+    {
+      "name": "Respawn returns beside Tamsin at full health",
+      "ok": true
+    },
+    {
+      "name": "Revival clears the old enemy target and death feedback",
+      "ok": true
+    },
+    {
+      "name": "Death preserves XP and item identities",
+      "ok": true
+    },
+    {
+      "name": "The landing provides immediate repair and remedy access",
+      "ok": true
+    },
+    {
+      "name": "Safe respawn survives relogin",
+      "ok": true
+    },
+    {
+      "name": "No forest recovery exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}
