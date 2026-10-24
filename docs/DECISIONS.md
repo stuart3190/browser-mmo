@@ -1351,3 +1351,25 @@ network cause; do not hide failed tests with automatic retry or claim the enviro
 Saved characters remain server-owned; reload reauthenticates and chooses the existing character.
 Test failed entry/application/game imports and production engine deferral, in addition to ordinary
 login, mobile entry and absence of development hooks. No authentication or persistence change.
+
+## 2026-10-24 — Reuse recovery encoding for untouched idle zones
+
+**Decision**
+Cache version-2 simulation JSON only while a zone has never admitted/restored a player or exposed
+mutable debug entities. Invalidate on stepping, restoration, resource/pickup mutations, death
+confirmation and nonempty kill draining. Compare public party/effect collections on every capture.
+Player-used zones always encode fresh, including after departure, because outbox/player references
+can outlive their connection. Static game-data definitions remain immutable runtime inputs.
+
+The realtime host may also reuse the outer payload when its simulation string is identical and it
+has no player or pending-kill records. Keep this encoding cache separate from acknowledged database
+payloads: failed commits must retry normally. Character/departure writes, WAL flush, ownership
+fencing and publish-after-commit ordering are unchanged. Weak keys release expired instances.
+
+**Reason and alternatives**
+The final five-player workload missed cadence while a new timer-only control reached19.80Hz.
+Repeated encoding of24 inactive atlas zones remained measurable avoidable work. Caching all empty
+zones would require stronger ownership of escaped mutable references. This conservative boundary
+retains the existing interfaces and sacrifices reuse after first admission for recovery correctness.
+Byte-for-byte legacy compatibility, late durable deaths/resources and real crash/fencing integration
+checks are required; benchmark improvements alone do not establish capacity.

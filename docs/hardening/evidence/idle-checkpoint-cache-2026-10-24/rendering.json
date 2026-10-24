@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Desktop loads all starter chunks",
+      "ok": true
+    },
+    {
+      "name": "NPC remains selectable through the static scenery",
+      "ok": true
+    },
+    {
+      "name": "Phone loads all starter chunks",
+      "ok": true
+    },
+    {
+      "name": "Touch joystick moves through the rendered village",
+      "ok": true,
+      "detail": {
+        "before": {
+          "x": 0,
+          "z": -8
+        },
+        "after": {
+          "x": -1.4885581843271105e-16,
+          "z": -5.569000000059604
+        }
+      }
+    },
+    {
+      "name": "Landscape retains a visible game canvas",
+      "ok": true
+    },
+    {
+      "name": "No rendering or input exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "scenes": [
+    {
+      "touch": false,
+      "counts": {
+        "loadedChunks": 16,
+        "meshes": 391,
+        "materials": 129,
+        "textures": 18,
+        "activeMeshes": 117,
+        "entities": 19
+      }
+    },
+    {
+      "touch": true,
+      "counts": {
+        "loadedChunks": 16,
+        "meshes": 379,
+        "materials": 124,
+        "textures": 18,
+        "activeMeshes": 77,
+        "entities": 18
+      }
+    }
+  ],
+  "errors": [],
+  "networkFailures": []
+}

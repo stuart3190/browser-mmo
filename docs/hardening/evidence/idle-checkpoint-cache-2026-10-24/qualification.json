@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "fullChecks": true,
+  "browserSuites": [
+    "trading",
+    "marketplace",
+    "social",
+    "friends",
+    "onboarding",
+    "guilds",
+    "rendering",
+    "startup"
+  ],
+  "productionTouched": false
+}

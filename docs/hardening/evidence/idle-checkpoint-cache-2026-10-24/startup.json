@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "An unavailable entry module retains readable HTML and a reload link",
+      "ok": true
+    },
+    {
+      "name": "Application module failure offers an explicit recovery action",
+      "ok": true
+    },
+    {
+      "name": "Login and character choice work before loading the 3D game",
+      "ok": true
+    },
+    {
+      "name": "Failed game download preserves a recovery screen",
+      "ok": true
+    },
+    {
+      "name": "Reload recovers the existing character into the world",
+      "ok": true
+    },
+    {
+      "name": "Handled startup failures do not become uncaught exceptions",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

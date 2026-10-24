@@ -1785,6 +1785,9 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   }
 
   const savedPayloads = new Map<string, string>();
+  // Serialization reuse is separate from durable acknowledgement. A failed commit must
+  // still retry against savedPayloads; expired instance objects can be garbage collected.
+  const emptyPayloads = new WeakMap<ZoneSimulation, { simulation: string; payload: string }>();
 
   async function persistAndPublish() {
     if (!ownership.active || crashed) return;
@@ -1808,21 +1811,27 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       });
       for (const [id, departed] of departures)
         if (departed.zoneId === zone.runtimeId) states.push({ id, state: departed.state });
+      const simulation = zone.checkpoint();
+      const players = entries.map((e) => ({
+        accountId: e.accountId,
+        characterId: e.characterId,
+        name: e.name,
+        lingerUntil: e.lingerUntil,
+      }));
+      const pending = [...pendingRecords.values()].filter((k) => k.zoneId === zone.runtimeId);
+      const empty = players.length === 0 && pending.length === 0;
+      const previous = empty ? emptyPayloads.get(zone) : undefined;
+      const payload =
+        previous?.simulation === simulation
+          ? previous.payload
+          : JSON.stringify({ contentHash, simulation, players, pending });
+      if (empty) emptyPayloads.set(zone, { simulation, payload });
+      else emptyPayloads.delete(zone);
       return {
         zoneId: zone.runtimeId,
         catalogZoneId: zone.zone.id,
         instanceId: zone.runtimeId.startsWith('instance:') ? zone.runtimeId.slice(9) : null,
-        payload: JSON.stringify({
-          contentHash,
-          simulation: zone.checkpoint(),
-          players: entries.map((e) => ({
-            accountId: e.accountId,
-            characterId: e.characterId,
-            name: e.name,
-            lingerUntil: e.lingerUntil,
-          })),
-          pending: [...pendingRecords.values()].filter((k) => k.zoneId === zone.runtimeId),
-        }),
+        payload,
         characters: states.map(({ id, state }) => ({
           id,
           x: state.position.x,
