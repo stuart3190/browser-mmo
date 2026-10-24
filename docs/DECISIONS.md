@@ -1591,3 +1591,14 @@ Class/item references and stack limits are validated. Fen's trailwear quest reta
 and supplies the existing Apprentice Robe to Mage. XP, costs and objectives stay the same. Old
 awarded items remain untouched; completed journal text explicitly describes the current catalog,
 not a retroactive replacement. This adds no branch engine or player reward-choice API.
+
+## 2026-10-25 — A local field chart in the existing atlas
+
+The regional chart uses authored catalog places/roads and the client's current position. It never
+reads hidden entities or submits movement/travel. Selecting a place delegates to the existing
+worldDestination guidance; travel still requires the normal server-validated departure action.
+Each simulation zone has its own coordinate frame, including the starter enclave. A region with
+multiple zones exposes a Map area selector instead of plotting unrelated coordinates together.
+The chart starts at the player (or a remote region's port), supports explicit zoom/pan/recenter,
+and groups close places to preserve touch-sized targets. The original accessible place list stays
+available. This adds exploration readability without changing content, discoveries or authority.

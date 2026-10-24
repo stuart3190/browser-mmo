@@ -1,0 +1,123 @@
+
+> @mmo/game-web@0.0.0 typecheck /root/browser-mmo/apps/game-web
+> tsc -p tsconfig.json
+
+
+> browser-mmo@ lint /root/browser-mmo
+> eslint . --max-warnings=0
+
+
+> browser-mmo@ build /root/browser-mmo
+> turbo run build && node scripts/check-production-build.cjs
+
+
+   • turbo 2.11.7
+   • Packages in scope: @mmo/admin, @mmo/api, @mmo/config, @mmo/db, @mmo/domain, @mmo/game-data, @mmo/game-web, @mmo/networking, @mmo/realtime, @mmo/schemas, @mmo/server-kit, @mmo/shared, @mmo/ui, @mmo/world
+   • Running build in 14 packages
+   • Remote caching disabled
+
+@mmo/game-web:build: cache miss, executing 0edd4b90809c8770
+@mmo/admin:build: cache hit, replaying logs 090628348797ecab
+@mmo/admin:build:
+@mmo/admin:build: > @mmo/admin@0.0.0 build /root/browser-mmo/apps/admin
+@mmo/admin:build: > vite build
+@mmo/admin:build:
+@mmo/admin:build: vite v8.3.2 building client environment for production...
+@mmo/admin:build: transforming...
+@mmo/admin:build: ✓ 172 modules transformed.
+@mmo/admin:build: rendering chunks...
+@mmo/admin:build: computing gzip size...
+@mmo/admin:build: dist/index.html                  0.80 kB │ gzip:   0.49 kB
+@mmo/admin:build: dist/assets/index-AbZGrpIG.js  786.36 kB │ gzip: 160.62 kB │ map: 2,585.18 kB
+@mmo/admin:build:
+@mmo/admin:build: ✓ built in 537ms
+@mmo/admin:build: [plugin builtin:vite-reporter]
+@mmo/admin:build: (!) Some chunks are larger than 500 kB after minification. Consider:
+@mmo/admin:build: - Using dynamic import() to code-split the application
+@mmo/admin:build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+@mmo/admin:build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+@mmo/api:build: cache hit, replaying logs 6eda181dd8ac3695
+@mmo/api:build:
+@mmo/api:build: > @mmo/api@0.0.0 build /root/browser-mmo/services/api
+@mmo/api:build: > tsup
+@mmo/api:build:
+@mmo/api:build: CLI Building entry: src/main.ts
+@mmo/api:build: CLI Using tsconfig: tsconfig.json
+@mmo/api:build: CLI tsup v8.5.1
+@mmo/api:build: CLI Using tsup config: /root/browser-mmo/services/api/tsup.config.ts
+@mmo/api:build: CLI Target: node22
+@mmo/api:build: CLI Cleaning output folder
+@mmo/api:build: ESM Build start
+@mmo/api:build: ESM dist/main.js     873.48 KB
+@mmo/api:build: ESM dist/main.js.map 1.63 MB
+@mmo/api:build: ESM ⚡️ Build success in 671ms
+@mmo/realtime:build: cache hit, replaying logs 689e2a1e9a4b5167
+@mmo/realtime:build:
+@mmo/realtime:build: > @mmo/realtime@0.0.0 build /root/browser-mmo/services/realtime
+@mmo/realtime:build: > tsup
+@mmo/realtime:build:
+@mmo/realtime:build: CLI Building entry: src/main.ts
+@mmo/realtime:build: CLI Using tsconfig: tsconfig.json
+@mmo/realtime:build: CLI tsup v8.5.1
+@mmo/realtime:build: CLI Using tsup config: /root/browser-mmo/services/realtime/tsup.config.ts
+@mmo/realtime:build: CLI Target: node22
+@mmo/realtime:build: CLI Cleaning output folder
+@mmo/realtime:build: ESM Build start
+@mmo/realtime:build: ESM dist/main.js     1013.97 KB
+@mmo/realtime:build: ESM dist/main.js.map 1.92 MB
+@mmo/realtime:build: ESM ⚡️ Build success in 751ms
+@mmo/game-web:build:
+@mmo/game-web:build: > @mmo/game-web@0.0.0 build /root/browser-mmo/apps/game-web
+@mmo/game-web:build: > vite build
+@mmo/game-web:build:
+@mmo/game-web:build: vite v8.3.2 building client environment for production...
+@mmo/game-web:build: transforming...
+@mmo/game-web:build: ✓ 870 modules transformed.
+@mmo/game-web:build: rendering chunks...
+@mmo/game-web:build: computing gzip size...
+@mmo/game-web:build: dist/index.html                                        1.19 kB │ gzip:   0.60 kB
+@mmo/game-web:build: dist/assets/index-BCCfP5ck.css                        39.07 kB │ gzip:   8.77 kB
+@mmo/game-web:build: dist/assets/dds.pure-BhmDCYzh.js                       0.06 kB │ gzip:   0.07 kB
+@mmo/game-web:build: dist/assets/webAudioBus-BIfaPpWW.js                    0.06 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/webgpuEngine-s2MYLm5d.js                   0.06 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/mesh.vertexData.functions-C27tWypl.js      0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/color.fragment-Ct_DbAtA.js                 0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/webAudioMainBus-Bn1xTIeV.js                0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/color.vertex-Cw0Iy2Ac.js                   0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/ddsTextureLoader-Dbr-DvEm.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/envTextureLoader-59S8V8Pp.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/exrTextureLoader-CFLq4ak_.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/hdrTextureLoader-BTBNj1pG.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/iesTextureLoader-DI9Ll-gY.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/ktxTextureLoader-BOgtrYSK.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/tgaTextureLoader-CH1fZR2A.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/default.fragment-CBJUuPGL.js               0.07 kB │ gzip:   0.08 kB
+@mmo/game-web:build: dist/assets/basisTextureLoader-BQO8Vy1S.js             0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/default.vertex-D-9sr3Yo.js                 0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/color.fragment-YqFq5PsD.js                 0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/webAudioSoundSource-CTEyrq6-.js            0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/color.vertex-sWFMFJTt.js                   0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/rgbdDecode.fragment-B9DoljsS.js            0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/default.fragment-BxYN2br_.js               0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/default.vertex-CZL4A553.js                 0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/postprocess.vertex-D6Bzc5Eh.js             0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/webAudioStreamingSound-DMXzzy3I.js         0.07 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/clearQuad.fragment-CuE8cha4.js             0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/clearQuad.vertex-fXL2Nhb-.js               0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/rgbdDecode.fragment-C39aeHZY.js            0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/postprocess.vertex-5dKjAA2M.js             0.08 kB │ gzip:   0.09 kB
+@mmo/game-web:build: dist/assets/webAudioStaticSound-DRdY7yij.js            0.11 kB │ gzip:   0.10 kB
+@mmo/game-web:build: dist/assets/preload-helper-DjzSQ1t3.js                 1.38 kB │ gzip:   0.75 kB
+@mmo/game-web:build: dist/assets/index-2h0SErux.js                          1.50 kB │ gzip:   0.79 kB │ map:     1.55 kB
+@mmo/game-web:build: dist/assets/main-Boe-X-LK.js                           5.93 kB │ gzip:   2.39 kB │ map:    14.76 kB
+@mmo/game-web:build: dist/assets/game-D5pLsHmp.js                         405.68 kB │ gzip: 127.99 kB │ map: 1,649.95 kB
+@mmo/game-web:build: dist/assets/api-DFliiGNQ.js                          568.90 kB │ gzip:  93.66 kB │ map: 1,539.36 kB
+@mmo/game-web:build: dist/assets/babylon-DbzD--J_.js                    1,950.99 kB │ gzip: 460.99 kB │ map: 7,971.63 kB
+@mmo/game-web:build:
+@mmo/game-web:build: ✓ built in 3.02s
+
+ Tasks:    4 successful, 4 total
+Cached:    3 cached, 4 total
+  Time:    4.699s
+
+Production bundle: development debug hook absent

@@ -1,6 +1,7 @@
 import { questDestination } from '../state/quest-navigation';
 import { useEffect, useState } from 'react';
 import { distance2D, worldDestination } from '@mmo/game-data';
+import { AtlasMap } from './AtlasMap';
 import { Window } from './Window';
 import { useGame } from './context';
 
@@ -71,6 +72,14 @@ export function WorldWindow() {
       <p className="small">
         {region?.transitionIntent} Level bands are guidance, not travel locks.
       </p>
+      {region && (
+        <AtlasMap
+          key={region.id}
+          places={world.locations.filter((l) => l.regionId === region.id)}
+          initialZone={current?.id === region.id ? zone : region.zoneId}
+          guide={guide}
+        />
+      )}
       <h3>Places and routes</h3>
       <div className="world-locations">
         {world.locations
@@ -173,7 +182,8 @@ export function WorldWindow() {
       </button>
       <p className="small">
         Greenvale offers gathering, shops, fieldcraft and private Broken Vault runs. Amber Coast
-        adds the Tidewatch story and weapon commissions. Other regions remain greybox. Bearings
+        adds the Tidewatch story and weapon commissions. Elderwood continues with the Living Seal
+        and Rootbound Cantor. Routes beyond these chapters remain sparsely populated. Bearings
         estimate walking distance between passages; follow roads around obstacles.
       </p>
     </Window>

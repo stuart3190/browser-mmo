@@ -2083,3 +2083,19 @@ Ranked player-facing gaps from the current client and content:
 - Ported the short keyboard path segments validated in Mage's trailwear journey into the full story
   driver; earlier long segments caused safe replans at fences/props. No runtime pathfinding change.
 - Trailwear commit `63b0869` pushed. Production unchanged. No performance/release qualification.
+
+### Regional field chart — verified 2026-10-25
+
+- [x] New north-up atlas chart: authored roads/places, local position, separate zone coordinate
+      spaces, zoom/pan/recenter, grouped 44px touch targets, discovered state and ordinary guidance.
+      Both-class desktop/portrait fresh-character browser passes: 21 journey checks, 21 after
+      desktop layout improvement, 15 selection-visibility checks. Screenshots reviewed.
+      Evidence: `gameplay/evidence/regional-chart-2026-10-25/`.
+- 31 frontend tests pass, including equal-axis map projection, touch grouping and edge clipping.
+  Repository typecheck/lint/build pass; final UI typecheck/lint/build also pass.
+- Integrated earned story runs independently at source `3f1e538` in
+  `/tmp/bo-earned-gameplay-20261025`; fixture `/tmp/brokenodyssey-qualification.ACsH5X`;
+  usernames `journeyw_mvmz9wvw` / `journeym_mvmz9wvw`. Controller log:
+  `/tmp/bo-integrated-earned-browser.log`. Do not edit its runtime while browser runs.
+- Prepared explicit existing-user coast/forest continuation and optional `EARNED_CHAPTERS=1`;
+  not browser-verified yet. Preserve staged evidence and never claim an uninterrupted run.

@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "authority": "fresh ordinary level-one players; UI controls and walking only",
+  "checks": [
+    {
+      "name": "desktop: starter coordinates stay in their own map area",
+      "ok": true
+    },
+    {
+      "name": "desktop: current position is visible",
+      "ok": true
+    },
+    {
+      "name": "desktop: map controls do not move the character",
+      "ok": true
+    },
+    {
+      "name": "desktop: chart fits viewport",
+      "ok": true
+    },
+    {
+      "name": "desktop: pins retain 44px touch targets",
+      "ok": true
+    },
+    {
+      "name": "desktop: selected chart reveals place name",
+      "ok": true
+    },
+    {
+      "name": "desktop: selecting a map pin brings its directions into view",
+      "ok": true
+    },
+    {
+      "name": "touch: starter coordinates stay in their own map area",
+      "ok": true
+    },
+    {
+      "name": "touch: current position is visible",
+      "ok": true
+    },
+    {
+      "name": "touch: map controls do not move the character",
+      "ok": true
+    },
+    {
+      "name": "touch: chart fits viewport",
+      "ok": true
+    },
+    {
+      "name": "touch: pins retain 44px touch targets",
+      "ok": true
+    },
+    {
+      "name": "touch: selected chart reveals place name",
+      "ok": true
+    },
+    {
+      "name": "touch: selecting a map pin brings its directions into view",
+      "ok": true
+    },
+    {
+      "name": "No map gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

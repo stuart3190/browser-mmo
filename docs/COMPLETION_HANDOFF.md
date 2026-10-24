@@ -108,3 +108,22 @@ All generators used so far are integrated and OBSOLETE; do not rerun them over c
 `/tmp/bo-class-reward-unused-validation.py`, `/tmp/bo-trailwear-finish.py`,
 `/tmp/bo-cantor-pattern.py`, `/tmp/bo-cantor-driver.py`, `/tmp/bo-shop-fit.py`, and older
 forest/journal/audio/spec draft generators. No pending unapplied drafts remain.
+
+## Active work after 3f1e538 (2026-10-25)
+
+Regional chart verified: 31 frontend tests, repository types/lint/build and final UI checks pass.
+21 ordinary level-one desktop/portrait journey checks, 21 layout follow-up and 15 selection checks
+pass; screenshots reviewed. Evidence regional-chart-2026-10-25. Map browser/check controllers stopped.
+Retained fixture SpSdTx. Main still has prepared earned-chapter continuation drivers (not yet browser
+verified). Next useful UI: touch-readable class ability handbook in Character, with current spec
+recovery/reduction from effectiveAbility. Drafts /tmp/bo-CombatHandbook.tsx and /tmp/bo-handbook.cjs
+are NOT applied yet. Integrate/test only after committing the chart.
+
+Independent full earned story/professions/Vault run at `/tmp/bo-earned-gameplay-20261025` detached
+3f1e538, own installed workspace dependencies. Controller PID1097045,
+`/tmp/bo-integrated-earned-browser.log`, fixture `/tmp/brokenodyssey-qualification.ACsH5X`.
+Read earned-journeys/result.json and per-stage run.log. Users journeyw_mvmz9wvw/journeym_mvmz9wvw;
+Warrior story currently active. Main changes cannot reload this checkout. Do not mutate runtime
+there during its run. Continue actual earned coast/forest later with new explicit-user driver
+modes; use separate output directories, retained fixture and EARNED_FROM_STAGE=earned-tidewatch,
+EARNED_CHAPTERS=1 plus both EARNED_*_USER values. Main scripts are prepared but not yet verified.

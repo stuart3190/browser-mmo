@@ -2677,3 +2677,160 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
 .reward-preview summary {
   -webkit-tap-highlight-color: rgba(232, 203, 131, 0.12);
 }
+
+/* Field chart stays in the atlas, leaving the playfield clear during travel/combat. */
+.window-world {
+  width: min(560px, 94vw);
+  background: #172620;
+}
+.atlas-chart {
+  --chart-ink: #dbc795;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #7a7351;
+  border-radius: 6px;
+  background: #18251e;
+}
+.atlas-chart label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.atlas-chart select {
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+}
+.atlas-chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin: 6px 0;
+}
+.atlas-chart-toolbar strong {
+  flex: 1;
+  color: var(--chart-ink);
+  font-size: 12px;
+  min-width: 90px;
+}
+.atlas-chart button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.atlas-chart-surface {
+  position: relative;
+  aspect-ratio: 520 / 320;
+  overflow: hidden;
+  border: 1px solid #7a7351;
+  border-radius: 4px;
+  background: radial-gradient(ellipse at 40% 40%, #34442f, #172b25);
+}
+.atlas-chart-surface svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.atlas-north,
+.atlas-scale {
+  position: absolute;
+  pointer-events: none;
+  color: var(--chart-ink);
+  font-size: 11px;
+  text-shadow: 0 1px 2px #000;
+}
+.atlas-north {
+  top: 6px;
+  right: 8px;
+}
+.atlas-scale {
+  bottom: 6px;
+  right: 8px;
+}
+.atlas-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  display: grid;
+  place-items: center;
+}
+.atlas-pin span {
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 2px;
+  border-radius: 50%;
+  background: #302c1b;
+  border: 1px solid #dbc795;
+  color: #ffedbc;
+  font-size: 12px;
+}
+.atlas-pin[aria-pressed='true'] span {
+  background: #746339;
+  border: 2px solid #fff0b9;
+}
+.atlas-pin:focus-visible {
+  outline: 2px solid #e5cd85;
+  outline-offset: -2px;
+}
+.atlas-pan {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.atlas-pan small {
+  color: #bbd8d5;
+  margin-left: auto;
+}
+.atlas-place-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #ffffff18;
+}
+.atlas-place-detail span {
+  flex: 1;
+  min-width: 0;
+}
+.atlas-place-detail small {
+  display: block;
+  color: #b9c1ad;
+}
+.atlas-place-detail button {
+  flex-shrink: 0;
+}
+.atlas-scale {
+  width: 25%;
+  border-bottom: 2px solid var(--chart-ink);
+  text-align: center;
+}
+.atlas-player {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #c2f2ff;
+  background: #22758c;
+  box-shadow: 0 0 0 3px #10242dcc;
+}
+.ui-root:has(.window-world) .minimap,
+.ui-root:has(.window-world) .first-steps {
+  visibility: hidden;
+}
+@media (min-width: 721px) and (pointer: fine) {
+  .ui-root:has(.window-world) .windows {
+    top: 12px;
+  }
+}
+.atlas-pin {
+  -webkit-tap-highlight-color: transparent;
+}
