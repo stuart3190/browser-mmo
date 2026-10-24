@@ -1791,7 +1791,7 @@ an unqualified release candidate, not a genuinely shippable game claim; external
 
 ## 2026-10-24 — Idle recovery encoding follow-up
 
-- Current work: `codex/idle-checkpoint-cache`, based on618369c. The prepared f64d084 candidate and
+- Completed encoding follow-up: `codex/idle-checkpoint-cache`, based on618369c. The prepared f64d084 candidate and
   live2c47b27 remain untouched. Previous external-wait checkpoint is superseded by this investigation.
 - A current 60 s timer-only control measured 19.7996 Hz, 11 skipped slots, interval
   p95 51.615 ms, p99 78.106 ms, maximum 207.993 ms. Hardware alone is not established as the cause of the
@@ -1801,8 +1801,8 @@ an unqualified release candidate, not a genuinely shippable game claim; external
       guard, assets/content, populated upgrade/restore and all 78 browser assertions. Evidence:
       `hardening/evidence/idle-checkpoint-cache-2026-10-24`. Capacity remains a separate pending gate.
 - No capacity claim, admission increase, public deployment, production mutation or purchase.
-- Next: byte compatibility/late durable mutation tests, full isolated qualification, then one quiet
-  production capacity run for this concrete change. Existing staging/backup target request remains open.
+- The byte compatibility, recovery, full isolated and production workload checks are complete below.
+  Existing staging/backup target request remains open.
 
 - First full run `qiceb9` stopped on an existing Hollow recovery test using unseeded attack RNG.
   A legal miss contradicted its required-damage assertion. Recovery test now uses a fixed hit roll;
@@ -1817,9 +1817,9 @@ an unqualified release candidate, not a genuinely shippable game claim; external
       p95 395 ms. HTTP p95 177.6 ms passes; no unexpected errors/disconnects. Tick p95 9.75 ms and CPU
       0.165 cores improved relative to the prior run, but checkpoint p95 was 208.65 ms. Preserve the
       failed raw report; no safe capacity or sole hardware-cause claim. No identical rerun planned.
-- Next: integrate the verified change and prepare a new immutable development-preview artifact;
-  qualify on an existing staging target and configure/test off-host recovery when the owner supplies
-  those targets. Physical-phone acceptance remains external. Never weaken durability or inflate ticks.
+- Integration and immutable preparation are complete below. Next: qualify on an existing staging
+  target and configure/test off-host recovery when the owner supplies those targets. Physical-phone
+  acceptance remains external. Never weaken durability or inflate ticks.
 
 - [x] Integrated as `9d1c769` and prepared a new immutable development-preview release at
       `/srv/brokenodyssey/releases/9d1c769a1850505779c5cd012e8a47a036e18051`. Build/debug guard/Caddy
@@ -1828,3 +1828,16 @@ an unqualified release candidate, not a genuinely shippable game claim; external
 - Current blocker: existing staging/SSH and off-host backup targets have not been supplied;
   physical-phone acceptance remains pending. Code/qualification/preparation work is checkpointed.
   Merge CI `40105454236` PASSED. Next: use supplied targets for the remaining release gates.
+
+## 2026-10-24 — External blocker audit
+
+- Previous turn: substantive progress, including verified encoding improvements and immutable preparation.
+- This third consecutive audit found no new staging/SSH or off-host backup target. The repository is
+  checkpointed, live release remains `2c47b27`, and documentation head `d2da1bf` passed hosted CI
+  `40105991245`. All local qualification controllers have terminated; no test is being restarted.
+- Goal status: **BLOCKED**, not achieved. Capacity remains failed (19.2906 Hz, RTT p95 395 ms),
+  operated off-host recovery is unverified, and physical-device acceptance is outstanding.
+- Next required input: existing staging/SSH and off-host backup targets with environment access;
+  then qualify strict capacity/headroom, operated recovery and physical iOS/Android behavior.
+  No purchase, public deployment, production mutation or admission increase is authorized by this audit.
+- Durable resume instructions and proof locations: [completion handoff](COMPLETION_HANDOFF.md).
