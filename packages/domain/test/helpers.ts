@@ -20,14 +20,15 @@ export function setupContext(): DomainContext {
   return createDomainContext({ db: handle.db, gameData: getGameData(), rng: seededRng(1234) });
 }
 
-let counter = 0;
 /** Unique, schema-valid character name (letters only). */
 function uniqueName(prefix: string): string {
-  counter++;
-  const letters = (Date.now().toString(36) + counter.toString(36)).replace(
-    /[0-9]/g,
-    (d) => 'abcdefghij'[Number(d)]!,
-  );
+  // Preserve random UUID entropy with a bijective hex-to-letter mapping. The old timestamp
+  // substitution collided (a digit and a literal letter mapped to the same character), and
+  // counters restarted in each isolated Vitest worker sharing the database.
+  const letters = uuidv7()
+    .replace(/-/g, '')
+    .slice(-16)
+    .replace(/[0-9a-f]/g, (digit) => 'abcdefghijklmnop'[Number.parseInt(digit, 16)]!);
   return (prefix + letters).slice(0, 20);
 }
 
