@@ -1,0 +1,18 @@
+{
+  "runtimeSource": "843919d",
+  "format": true,
+  "lint": true,
+  "typecheck": true,
+  "unitTests": 236,
+  "domainIntegration": 109,
+  "realtimeIntegration": 73,
+  "httpIntegration": 11,
+  "productionBuilds": 4,
+  "productionDebugHookAbsent": true,
+  "assetContentValidation": true,
+  "browserInitial": {
+    "trading": 11,
+    "marketplace": 8,
+    "social": "third entry timeout; aggregate not passed"
+  }
+}

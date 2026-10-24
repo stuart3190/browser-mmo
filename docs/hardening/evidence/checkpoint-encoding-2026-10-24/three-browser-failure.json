@@ -1,0 +1,374 @@
+{
+  "errors": [],
+  "networkFailures": [],
+  "lifecycle": [
+    [
+      {
+        "t": "ws.open",
+        "ms": 1823.800000011921
+      },
+      {
+        "ms": 1827.0999999642372
+      },
+      {
+        "t": "ws.open",
+        "ms": 5282.800000011921
+      },
+      {
+        "t": "auth.ok",
+        "ms": 5435.599999964237
+      },
+      {
+        "t": "world.discoveries",
+        "ms": 6037.300000011921
+      },
+      {
+        "t": "zone.snapshot",
+        "ms": 6053.5
+      },
+      {
+        "t": "player.vitals",
+        "ms": 6272
+      },
+      {
+        "t": "combat.state",
+        "ms": 6560.399999976158
+      },
+      {
+        "t": "ability.state",
+        "ms": 6735.199999988079
+      },
+      {
+        "t": "party.update",
+        "ms": 6750
+      },
+      {
+        "t": "world.moves",
+        "ms": 6887.800000011921
+      },
+      {
+        "t": "inventory.snapshot",
+        "ms": 6889.099999964237
+      },
+      {
+        "t": "character.stats",
+        "ms": 6903.099999964237
+      },
+      {
+        "t": "wallet.updated",
+        "ms": 6916.599999964237
+      },
+      {
+        "t": "systems.state",
+        "ms": 6931.699999988079
+      },
+      {
+        "t": "world.moves",
+        "ms": 6948.099999964237
+      },
+      {
+        "t": "quest.log",
+        "ms": 6950.399999976158
+      },
+      {
+        "t": "character.progress",
+        "ms": 6982.099999964237
+      },
+      {
+        "t": "presence.update",
+        "ms": 6995.399999976158
+      },
+      {
+        "t": "world.moves",
+        "ms": 7014.800000011921
+      },
+      {
+        "t": "world.discoveries",
+        "ms": 7015
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.099999964237
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.399999976158
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.5
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.5
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.599999964237
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.599999964237
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.699999988079
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.800000011921
+      },
+      {
+        "t": "world.moves",
+        "ms": 7028.899999976158
+      }
+    ],
+    [
+      {
+        "t": "ws.open",
+        "ms": 431.4000000357628
+      },
+      {
+        "ms": 471.4000000357628
+      },
+      {
+        "t": "ws.open",
+        "ms": 18122
+      },
+      {
+        "t": "auth.ok",
+        "ms": 18184.100000023842
+      },
+      {
+        "t": "zone.snapshot",
+        "ms": 18750.900000035763
+      },
+      {
+        "t": "player.vitals",
+        "ms": 18893
+      },
+      {
+        "t": "combat.state",
+        "ms": 18908.80000001192
+      },
+      {
+        "t": "ability.state",
+        "ms": 18929.100000023842
+      },
+      {
+        "t": "party.update",
+        "ms": 18967.900000035763
+      },
+      {
+        "t": "world.moves",
+        "ms": 19007.700000047684
+      },
+      {
+        "t": "world.discoveries",
+        "ms": 19008.900000035763
+      },
+      {
+        "t": "inventory.snapshot",
+        "ms": 19126.400000035763
+      },
+      {
+        "t": "character.stats",
+        "ms": 19221.100000023842
+      },
+      {
+        "t": "wallet.updated",
+        "ms": 19236.600000023842
+      },
+      {
+        "t": "systems.state",
+        "ms": 19262.80000001192
+      },
+      {
+        "t": "quest.log",
+        "ms": 19289.400000035763
+      },
+      {
+        "t": "character.progress",
+        "ms": 19303.400000035763
+      },
+      {
+        "t": "presence.update",
+        "ms": 19345.100000023842
+      },
+      {
+        "t": "world.moves",
+        "ms": 19367.200000047684
+      },
+      {
+        "t": "world.discoveries",
+        "ms": 19367.600000023842
+      },
+      {
+        "t": "world.moves",
+        "ms": 19390.30000001192
+      },
+      {
+        "t": "world.moves",
+        "ms": 19390.700000047684
+      },
+      {
+        "t": "world.moves",
+        "ms": 19390.900000035763
+      },
+      {
+        "t": "world.moves",
+        "ms": 19391.100000023842
+      },
+      {
+        "t": "world.moves",
+        "ms": 19391.100000023842
+      },
+      {
+        "t": "world.moves",
+        "ms": 19391.200000047684
+      },
+      {
+        "t": "world.moves",
+        "ms": 19391.200000047684
+      },
+      {
+        "t": "world.moves",
+        "ms": 19391.5
+      },
+      {
+        "t": "world.moves",
+        "ms": 19391.700000047684
+      },
+      {
+        "t": "world.moves",
+        "ms": 19391.80000001192
+      }
+    ],
+    [
+      {
+        "t": "ws.open",
+        "ms": 141.29999995231628
+      },
+      {
+        "ms": 146.29999995231628
+      },
+      {
+        "t": "ws.open",
+        "ms": 31156.69999998808
+      },
+      {
+        "t": "auth.ok",
+        "ms": 31283
+      },
+      {
+        "t": "world.discoveries",
+        "ms": 32162
+      },
+      {
+        "t": "inventory.snapshot",
+        "ms": 32215.899999976158
+      },
+      {
+        "t": "character.stats",
+        "ms": 32239.799999952316
+      },
+      {
+        "t": "wallet.updated",
+        "ms": 32263.299999952316
+      },
+      {
+        "t": "systems.state",
+        "ms": 32276
+      },
+      {
+        "t": "zone.snapshot",
+        "ms": 32296.799999952316
+      },
+      {
+        "t": "player.vitals",
+        "ms": 32408.19999998808
+      },
+      {
+        "t": "combat.state",
+        "ms": 32428.399999976158
+      },
+      {
+        "t": "ability.state",
+        "ms": 32454.69999998808
+      },
+      {
+        "t": "party.update",
+        "ms": 32497.299999952316
+      },
+      {
+        "t": "world.moves",
+        "ms": 32513.299999952316
+      },
+      {
+        "t": "quest.log",
+        "ms": 32515.399999976158
+      },
+      {
+        "t": "character.progress",
+        "ms": 32531.5
+      },
+      {
+        "t": "presence.update",
+        "ms": 32543.5
+      },
+      {
+        "t": "world.moves",
+        "ms": 32556.5
+      },
+      {
+        "t": "world.moves",
+        "ms": 32556.799999952316
+      },
+      {
+        "t": "world.moves",
+        "ms": 32557
+      },
+      {
+        "t": "world.discoveries",
+        "ms": 32557.099999964237
+      },
+      {
+        "t": "world.moves",
+        "ms": 32567.399999976158
+      },
+      {
+        "t": "world.moves",
+        "ms": 32567.69999998808
+      },
+      {
+        "t": "world.moves",
+        "ms": 32567.69999998808
+      },
+      {
+        "t": "world.moves",
+        "ms": 32567.69999998808
+      },
+      {
+        "t": "world.moves",
+        "ms": 32567.799999952316
+      },
+      {
+        "t": "world.moves",
+        "ms": 32568.099999964237
+      },
+      {
+        "t": "world.moves",
+        "ms": 32568.099999964237
+      },
+      {
+        "t": "world.moves",
+        "ms": 32568.099999964237
+      }
+    ]
+  ],
+  "pages": [
+    "chatamvmeniku\n· Warrior Level 1\n144 / 144 (100%)\n0 / 400 XP\nGreenvale Meadows · Rest outside combat to recover\n↑\nWolves at the Edge\nSpeak to Elder Maren\nNW · 15 m\nGreenvale Village\n×\nYOUR FIRST ADVENTURE\nArm yourself\n\nTake the Iron Longsword at the Old Armoury, just east of your arrival point. Approach it and choose Take (E on desktop).\n\nJournal\nControls\nParty\n×\n\nAdventure together in Greenvale. Invite and accept within 20 m. Up to five members.\n\nLiving, connected members within 40 m of a kill share XP and quest kill credit if grouped when the enemy was first hit. One loot roll (including coins) rotates between eligible members. Pelts are personal items, not copied.\n\nPlayers in view\nchatbmvmeniku\nInvite\nchatcmvmeniku\nInvite\nCharacter\nC\nBag\nB\nBank\nV\nQuests\nJ\nParty\nP\nWorld\nM\nSkills\nTrade\nT\nMarket\nO\nFriends\nN\nChat\n↵",
+    "chatbmvmeniku\n· Mage Level 1\n106 / 106 (100%)\n0 / 400 XP\n↑\nWolves at the Edge\nSpeak to Elder Maren\nNW · 15 m\nGreenvale Village\n×\nYOUR FIRST ADVENTURE\nA village needs you\n\nSpeak to Elder Maren by the village square. Follow the north road to the wolf dens when you are ready.\n\n◎\nFirebolt\nFlame Burst\nLv 2\nCharacter\nBag\nBank\nQuests\nParty\nWorld\nSkills\nTrade\nMarket\nFriends\nChat\n⛶ Fullscreen",
+    "chatcmvmeniku\n· Warrior Level 1\n144 / 144 (100%)\n0 / 400 XP\nGreenvale Meadows · Rest outside combat to recover\n↑\nWolves at the Edge\nSpeak to Elder Maren\nNW · 15 m\nGreenvale Village\n×\nYOUR FIRST ADVENTURE\nArm yourself\n\nTake the Iron Longsword at the Old Armoury, just east of your arrival point. Approach it and choose Take (E on desktop).\n\nJournal\nControls\n1\nAttack\n2\nHeavy Strike\n3\nBattle Strike\nLv 2\nCharacter\nC\nBag\nB\nBank\nV\nQuests\nJ\nParty\nP\nWorld\nM\nSkills\nTrade\nT\nMarket\nO\nFriends\nN\nChat\n↵"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "fullChecks": false,
+  "browserSuites": ["social", "friends", "onboarding"],
+  "productionTouched": false
+}

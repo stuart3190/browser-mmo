@@ -86,10 +86,15 @@ for endpoint in "$VITE_API_URL/health/ready" "http://127.0.0.1:$REALTIME_PORT/he
   done
   $ready || { echo "Local endpoint failed to become ready: $endpoint" >&2; exit 1; }
 done
-node scripts/e2e/trading.cjs "$qualification_dir/trading" > "$qualification_dir/trading.log" 2>&1
-node scripts/e2e/marketplace.cjs "$qualification_dir/marketplace" > "$qualification_dir/marketplace.log" 2>&1
-node scripts/e2e/social.cjs "$qualification_dir/social" > "$qualification_dir/social.log" 2>&1
-node scripts/e2e/friends.cjs "$qualification_dir/friends" > "$qualification_dir/friends.log" 2>&1
-node scripts/e2e/onboarding.cjs "$qualification_dir/onboarding" > "$qualification_dir/onboarding.log" 2>&1
-printf '{"ok":true,"fullChecks":%s,"browserSuites":["trading","marketplace","social","friends","onboarding"],"productionTouched":false}\n' "$checks" > "$qualification_dir/result.json"
-cat "$qualification_dir/result.json"
+qualification_suites=${QUAL_BROWSER_SUITES:-trading,marketplace,social,friends,onboarding}
+read -r -a selected_suites <<< "${qualification_suites//,/ }"
+for suite in "${selected_suites[@]}"; do
+  case "$suite" in trading|marketplace|social|friends|onboarding) ;; *) echo "Unknown browser suite: $suite" >&2; exit 2 ;; esac
+  node "scripts/e2e/$suite.cjs" "$qualification_dir/$suite" > "$qualification_dir/$suite.log" 2>&1
+done
+QUAL_RESULT_PATH="$qualification_dir/result.json" QUAL_FULL_CHECKS="$checks" QUAL_RUN_SUITES="$qualification_suites" node --input-type=module - <<'JS'
+import {writeFileSync} from 'node:fs';
+const result={ok:true,fullChecks:process.env.QUAL_FULL_CHECKS==='true',browserSuites:process.env.QUAL_RUN_SUITES.split(','),productionTouched:false};
+writeFileSync(process.env.QUAL_RESULT_PATH,JSON.stringify(result));
+console.log(JSON.stringify(result));
+JS
