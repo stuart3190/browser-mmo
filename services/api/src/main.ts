@@ -17,6 +17,8 @@ const logger = createLogger({ service: 'api', level: env.LOG_LEVEL });
 const handle = createDb({
   url: env.DATABASE_URL,
   max: env.DATABASE_POOL_MAX,
+  onPoolError: (error) =>
+    logger.error({ message: error.message }, 'idle database connection failed'),
   applicationName: 'mmo-api',
 });
 const ctx = createDomainContext({ db: handle.db, gameData: getGameData() });
@@ -61,7 +63,10 @@ const sweep = setInterval(() => {
 
 await app.listen({ host: env.API_HOST, port: env.API_PORT });
 
+let shuttingDown = false;
 async function shutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
   logger.info({ signal }, 'shutting down');
   clearInterval(sweep);
   await app.close();
