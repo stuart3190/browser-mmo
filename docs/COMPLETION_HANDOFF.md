@@ -1,120 +1,58 @@
 # Broken Odyssey completion handoff
 
-Updated 2026-10-24 by Codex. This is the concise working checkpoint; historical proof stays in
-PROGRESS.md. The owner's current instruction is sustained end-to-end completion, preserving
-working systems, production uptime, credentials and player data. Do not stop at a feature milestone.
+Updated 2026-10-24 by Codex. Owner authorizes sustained end-to-end completion. Continue across
+milestones; do not stop at feature existence or unit tests. Preserve working architecture/data/uptime.
+Read MASTER_PLAN, PROGRESS, DECISIONS and AGENTS before changes.
 
-## Source and safety boundaries
+## Source and boundaries
 
-- Editable source: `/root/browser-mmo`, branch `codex/shippable-completion`.
-- Remote: `git@github.com:stuart3190/browser-mmo.git`. Fetched main and deployed release both match
-  `2c47b27a38f0bc74f3a7192f713775c3a9361729`. The initially sparse checkout was simply stale.
-- `/srv/brokenodyssey/current` points to an immutable release. Never edit it in place.
-- Live API/realtime/web were active at discovery. Production PostgreSQL is port **55440**.
-- Disposable development/test PostgreSQL created for this work: **55441**, loopback only,
-  `/tmp/brokenodyssey-completion-pg`; databases `bo_completion_dev` and `bo_completion_test`.
-  Repository `.env` is private and ignored. Never point tests at the production cluster.
-- Local development endpoints: API **4471**, realtime **4472**, browser **5180**.
-- No production service changes, production database writes, resets or deployment performed.
-  Public deployment needs separate explicit authorization if unsafe; prepare and verify first.
+- Editable `/root/browser-mmo`, branch `codex/shippable-completion`, origin GitHub stuart3190/browser-mmo.
+- Deployed/main source recovered at `2c47b27`; `/srv/brokenodyssey/current` is immutable. Never edit it.
+- Production PostgreSQL **55440**, API4461/RT4462/web4460. No production mutation/deployment performed.
+- Own disposable PostgreSQL **55441**, `/tmp/brokenodyssey-completion-pg`, socket
+  `/tmp/brokenodyssey-completion-socket`; bo_completion_dev/test/upgrade. Ignored private .env.
+- Local API4471, realtime4472, Vite5180. Browser uses http://localhost:5180 (CORS).
+  Watcher logs `/tmp/bo-completion-{api,realtime,web}.log`; realtime session97951, API60128, web67750.
+- Own disposable Docker PG16 `bo-qualification-pg16`, loopback55442; stop only this container when done.
+- No unsafe public deployment without explicit permission; prepare verified concrete release first.
 
-## Completion checklist
+## Verified checkpoints
 
-- [x] Locate source history, compare deployed revision, recover editable checkout on feature branch.
-- [x] Read AGENTS, master plan, progress and architecture history; preserve existing implementation.
-- [x] Install locked dependencies and provision an independent disposable PostgreSQL cluster.
-- [x] Baseline aggregate stopped on a fixture name collision (88/89 domain cases); fixed in
-      `2969503`. Corrected full feature verification passed: `/tmp/bo-trade-verify-final.log`.
-- [x] Direct trading: revision-bound review/confirmation, atomic items/currency, concurrency proof,
-      usable desktop/touch UI and real two-player browser checks.
-- [ ] Social communication/friends and group usability over existing parties.
-- [x] Player-facing marketplace access over existing authoritative marketplace.
-- [ ] Combat/class/balance and persistence audit; fix verified gaps, including loot feedback.
-- [ ] Responsive presentation, controls, onboarding and screenshot-based browser review.
-- [ ] Complete playable region/quest/boss journey for both classes, with earned progression.
-- [ ] Durable wear/broken-equipment/repair if implemented as a coherent system.
-- [ ] Repeatable isolated smoke/e2e runner and operational release readiness.
-- [ ] Final full verification, browser evidence, deployment review and honest remaining limitations.
+- `776b202` source recovery; `2969503` collision-free domain fixture names.
+- `5b546e9` durable revisioned direct trading, 10 domain + HTTP + 9 real browser checks.
+- `0679fc7` Nearby/Zone/Party chat, authoritative membership/range/rate, 10 browser checks.
+- `c011828` marketplace sell/review/buy/cancel/history, account admission race fix, 8 browser checks.
+- `2c1b509` contiguous populated migration/restore fixtures. Fixed snapshot full qualification PASSED
+  in `/tmp/bo-qualification-source-2c1b509`, evidence `/tmp/brokenodyssey-qualification.cajvdL`:
+  full format/lint/types/unit/integration/build/restore/assets/content + 27 browser assertions.
+- `b6f47c5` PostgreSQL backup clients match server major. Real 16/16 and17/17 restore pass, mismatch
+  refusal verified. CI40085842883 then failed a realtime test (not backup); annotations identify
+  queued pre-sale wallet notification. Test now waits for expected transaction balance.
+- Friends/DM milestone ready to commit: additive0023, canonical consent/block model, persistent
+  sender/read/rate/idempotency authority, responsive UI, 8 domain +1 API +12 browser checks;
+  format/lint/types/build, populated0022->0023 preservation and16-table restore passed.
+  Evidence `docs/gameplay/evidence/friends-2026-10-24`. Guilds remain unfinished.
 
-## Current findings and next actions
+## Active work and immediate next tasks
 
-The game already has authoritative combat, Warrior/Mage abilities, seven Greenvale story quests,
-five Marches continuation quests, side quests/daily contract, five continent travel, private Broken
-Vault runs, parties/shared rewards, gathering/professions/timed crafting, consumables, inventory,
-equipment, vaults and a backend marketplace. Most outer regions remain sparse greyboxes. Direct
-trading and several social systems are absent. The checklist has stale dungeon/magic/next-task
-entries; reconcile them only against fresh verification, preserving the historical record.
+1. Sync focused run passed all eleven tests (`/tmp/bo-sync-ci-timing.log`); commit social milestone
+   and test timing correction with proof. Push branch, inspect CI annotations (full logs403).
+2. Run full qualifier on a new detached committed snapshot. `scripts/qualify-local.sh` creates its
+   own cluster/services, full aggregate/restore and four browser suites, cleans only its processes.
+   Use fixed snapshot while implementation continues; do not mutate it during qualification.
+3. Fresh earned Warrior journey currently running, session66155, log `/tmp/bo-earned-warrior.log`,
+   output `/tmp/bo-earned-warrior`, username `finishwar_mvm9azse`. Started with GREENVALE_CREATE=1,
+   GREENVALE_FULL=1,GREENVALE_SIDE=1, WEB_URL=http://localhost:5180 and PLAYWRIGHT_PATH.
+   First combat quest passed. Driver `scripts/e2e/greenvale-complete.cjs` walks real inputs; no grants.
+   Avoid runtime-source edits while this run is active (watchers restart). Script/docs/test edits safe.
+4. Generalize driver for earned Mage; complete main+side arc, professions, solo/party Broken Vault
+   via `greenvale-systems.cjs` using earned characters. Fix actual combat/route/UI failures. Existing
+   abilities.cjs injects level/gear and is not earned progression proof.
+5. Continue polish/onboarding/balance, coherent durability/repair if implemented, real gaps and ops.
+   Most outer regions are greyboxes; no full-game shippability claim. Physical phones, capacity,
+   off-host recovery and public deployment remain unqualified. Keep honest checklist/evidence.
 
-First implementation: durable, revisioned direct trade proposals using existing item instances,
-ownership rules, character locks, wallets, provenance and atomic transactions. Offers will not
-remove items while merely negotiating; final confirmation must revalidate the exact reviewed
-item versions, ownership, binding, funds and destination capacity. Both confirmations refer to the
-same offer revision. No client-owned outcomes and no second item/economy architecture.
-
-Trading and its isolated browser runner are committed and pushed as `5b546e9`. Full verify passed:
-format/lint/types, 232 unit tests, realtime 72, API 9, domain 99, four builds, production debug guard.
-Assets/content validation pass. Evidence is archived under `docs/gameplay/evidence/trading-2026-10-24`.
-Runner `bash scripts/qualify-local.sh --skip-checks` passed nine browser assertions on its own
-cluster and stopped its own processes. FullChecks=false for that runner pass; aggregate is separate.
-Keep the development stack (4471/4472/5180) available for next milestones.
-Chat implementation verified: protocol 8, world 10, gateway party 2 cases, ten three-player browser
-checks, format/lint/types/build. Evidence: `docs/gameplay/evidence/social-2026-10-24`.
-Marketplace implementation now verified: 20 marketplace/trade domain tests, one HTTP case,
-eight two-player browser checks, format/lint/types/build. Evidence in
-`docs/gameplay/evidence/marketplace-2026-10-24`. Current checkpoint is ready to commit.
-Restore fixture fixed and verified locally; evidence:
-`docs/hardening/evidence/restore-2026-10-24`. Frozen historical SQL fixture preserves seven tables
-through 0005 -> current, then current gameplay dump/restore deep-compares 13 tables including
-pending/completed trade, revokes sessions and refuses occupied restore. Only own random databases
-are cleaned up. Script types/lint pass. Production unchanged.
-Restore fix committed/pushed as `2c1b509`; marketplace checkpoint `c011828`; chat `0679fc7`.
-Full `scripts/qualify-local.sh` is RUNNING from detached worktree
-`/tmp/bo-qualification-source-2c1b509`, session **13269**, outer log
-`/tmp/bo-combined-qualification.log`. Offline locked dependency installation succeeded. This runs full aggregate,
-backup/restore, assets/content and trading/marketplace/social browsers. Continue friends/DM in
-main editable checkout while the detached qualification snapshot stays fixed. Record its path,
-session/log and result here; monitor hosted CI. Do not stop at this checkpoint.
-Browser skill: game-studio/game-playtest; use existing Playwright scripts and inspect screenshots.
-No hosted CI, production capacity, off-host recovery or physical-phone performance claim yet.
-
-## Live checkpoint while qualification runs
-
-- Fixed-snapshot source `/tmp/bo-qualification-source-2c1b509`, session 13269. Actual evidence
-  `/tmp/brokenodyssey-qualification.cajvdL`, own PostgreSQL port 50375. Full verify, restore,
-  asset/content validation have passed; trading 9 and marketplace 8 browser checks pass; social running.
-- Hosted CI run 40084458787 for 2c1b509 passes normal tests but still fails backup-restore. Full
-  logs denied (403); metadata/annotations readable. Investigating server 16/client 17 compatibility.
-  `/usr/lib/postgresql/16/bin` has CLIENTS ONLY. Attempted local PG16 server init therefore did
-  not start anything (unused /tmp/bo-ci-pg16 dirs). Instead Docker `bo-qualification-pg16`,
-  loopback port 55442, disposable password, image postgres:16 is being pulled/started. Log:
-  `/tmp/bo-ci-pg16-container.log`. Never touch unrelated containers or production cluster.
-- Main checkout now has UNCOMMITTED persistent friends/DM work: schemas, additive migration
-  `0023_persistent_social` + snapshot, domain social.ts (six tests pass), HTTP routes. Not yet UI/API
-  tested or committed. A TS narrowing issue was fixed by declaring `fail` as a function; rerun types.
-- 0023 applied successfully to local dev on 55441 after stopping ONLY local realtime process group 480763. New local realtime watcher session **97951** logs `/tmp/bo-completion-realtime.log`.
-  API/web original watchers remain available. Production has never been stopped or migrated.
-- Friends/DM semantics: account-level canonical friend pairs, acceptance required for persistent
-  messages; blocking removes friendship, unblock does not recreate consent. Account locks serialize
-  requests/send/block, sender IDs/names server-derived, UUID message retries idempotent, 8 per 10s
-  durable rate bound, paginated history, recipient-only read receipts. Remaining backend polish:
-  deduplicate own blocked contacts against concurrent list reads; make repeated block idempotent at
-  block-list cap; add accepted-friend cap and cross-conversation cursor tests. Need API tests and
-  real desktop/touch UI + browser proof, migration preservation and restore fixtures with social data.
-- Do not stop at these milestones. Continue earned Warrior/Mage quest/boss/dungeon journeys,
-  responsive presentation/onboarding, balancing, durable wear/repair if built coherently, and ops.
-
-Latest update: fixed snapshot `2c1b509` qualifier PASSED fully (result fullChecks=true; all 27
-browser assertions), stopped own services. Evidence archived under
-`docs/hardening/evidence/completion-qualification-2026-10-24`.
-Second CI restore failure reproduced: client17 -> server16 unsupported transaction_timeout.
-`scripts/db-backup.ts` now chooses/checks matching client major; local16 and17 round trips pass,
-explicitPG_BIN17 vs16 refused. CI pinned ubuntu24.04 + client16 install. This ops fix is ready
-for a separate commit while friends work remains uncommitted. Docker PG16 test container remains
-local port55442; stop only `bo-qualification-pg16` when done.
-Friends UI now implemented (`SocialWindow.tsx`, key N, polling unread contacts, accepted-only DM,
-pagination/read receipts/block flow). Eight domain + one API case pass. Initial browser11pass,
-final browser rerun `/tmp/bo-friends-browser-final.log`, session10976 checks journal overlap fix
-and history read update (now12checks expected). UI screenshots inspected. Need finalquality,
-0022->0023 preservation, restore social fixtures, evidence/ADR/progress and commit. Add friends
-suite to isolated runner. Next gameplay focus: earned Warrior/Mage quest/boss/dungeon journeys,
-polish/balance and remaining verified gaps, not stopping at social milestone.
+Browser workflow skill read: game-studio/game-playtest. Playwright available at
+/opt/aria-browser/node_modules/playwright, Chrome /usr/bin/google-chrome. Use screenshots and actual
+UI input; read-only dev __mmo observations are not progression writes. `pnpm exec tsx` for scripts
+importing source TS. The durable goal remains active; no token budget or stop authorization.

@@ -81,5 +81,6 @@ done
 node scripts/e2e/trading.cjs "$qualification_dir/trading" > "$qualification_dir/trading.log" 2>&1
 node scripts/e2e/marketplace.cjs "$qualification_dir/marketplace" > "$qualification_dir/marketplace.log" 2>&1
 node scripts/e2e/social.cjs "$qualification_dir/social" > "$qualification_dir/social.log" 2>&1
-printf '{"ok":true,"fullChecks":%s,"browserSuites":["trading","marketplace","social"],"productionTouched":false}\n' "$checks" > "$qualification_dir/result.json"
+node scripts/e2e/friends.cjs "$qualification_dir/friends" > "$qualification_dir/friends.log" 2>&1
+printf '{"ok":true,"fullChecks":%s,"browserSuites":["trading","marketplace","social","friends"],"productionTouched":false}\n' "$checks" > "$qualification_dir/result.json"
 cat "$qualification_dir/result.json"

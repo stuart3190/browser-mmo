@@ -2,9 +2,8 @@ import { z } from 'zod';
 import { TimestampSchema, UuidSchema } from './common';
 
 /**
- * Social placeholders. Shapes exist so API contracts for the game client and the future mobile
- * companion app can be designed together. Guilds/friends/messages remain placeholders;
- * the party core is implemented by the authoritative zone.
+ * Account-wide friends and direct messages share contracts with future companion clients.
+ * Guilds remain placeholders; the party core is implemented by the authoritative zone.
  */
 
 export const GuildRankSchema = z.object({
@@ -32,9 +31,10 @@ export const FriendshipSchema = z.object({
   /** Friendships are account-level so they survive alt characters. */
   accountId: UuidSchema,
   friendAccountId: UuidSchema,
+  friendName: z.string().min(1).max(64),
+  unread: z.number().int().nonnegative(),
   status: z.enum(['pending_outgoing', 'pending_incoming', 'accepted', 'blocked']),
   createdAt: TimestampSchema,
-  placeholder: z.literal(true),
 });
 export type Friendship = z.infer<typeof FriendshipSchema>;
 
@@ -70,10 +70,17 @@ export const ChatMessageTextSchema = z.string().trim().min(1).max(500);
 export const DirectMessageSchema = z.object({
   id: UuidSchema,
   fromAccountId: UuidSchema,
+  fromCharacterId: UuidSchema,
+  fromName: z.string().min(1).max(64),
   toAccountId: UuidSchema,
   body: ChatMessageTextSchema,
   sentAt: TimestampSchema,
   readAt: TimestampSchema.nullable(),
-  placeholder: z.literal(true),
 });
 export type DirectMessage = z.infer<typeof DirectMessageSchema>;
+
+export const FriendActionSchema = z.enum(['accept', 'remove', 'block', 'unblock']);
+export type FriendAction = z.infer<typeof FriendActionSchema>;
+export const SendDirectMessageSchema = z
+  .object({ id: UuidSchema, body: ChatMessageTextSchema })
+  .strict();

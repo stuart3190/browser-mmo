@@ -441,18 +441,18 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 # Social
 
-- [ ] Friends
+- [x] Friends — verified 2026-10-24; account-wide requests/acceptance/blocking, domain/API/browser proof below.
 - [x] Zone-local parties and shared hunts
   - Verified 2026-10-04 · Codex · world/domain/gateway regressions and two-client browser hunt:
     invitations, roles, reconnect/recovery, shared XP/quest kills, one rotating loot allocation;
     touch accept/leave/disband and reachable panel controls. See Current Work and `gameplay/parties.md`.
     Commit: `2f3aaeab5169d628c750bcf00a1b101e46364a84`.
 - [ ] Guilds
-- [ ] Direct messages
+- [x] Direct messages — verified 2026-10-24; durable consent-bound conversations and read receipts.
 - [x] Group chat
   - Verified 2026-10-24 · Codex · server membership/range and rate-limit tests; three-player browser privacy and touch composer. [Evidence](gameplay/evidence/social-2026-10-24/README.md).
 - [ ] Guild chat
-  - Social schemas are placeholders only.
+  - Guild schemas remain placeholders; friends, direct messages and party chat are implemented.
 
 # Mobile Companion App
 
@@ -1483,3 +1483,23 @@ friends/direct messages and earned gameplay qualification in the editable featur
 Persistent friends/DM implementation is currently uncommitted. Eight domain and one HTTP tests
 pass; first two-player browser run passes eleven checks. Final responsive/journal correction and
 history-read handling are being checked. Additive 0023 is applied only to disposable dev/test DBs.
+
+### Persistent friends/direct messages — 2026-10-24
+
+- [x] Account-wide requests, explicit acceptance, removal/decline/cancel, block/unblock and capacity
+      limits. Blocking removes friendship; unblock requires renewed consent.
+- [x] Server-owned sender identity, durable UUID retry semantics/rate bounds, private paginated
+      history and recipient-only read state. Responsive Friends window (N), unread badge, composer.
+- [x] Eight domain and one HTTP tests; twelve two-player browser checks; format/lint/types/build.
+      [Evidence](gameplay/evidence/friends-2026-10-24/README.md).
+- [x] Populated 0022 -> 0023 migration preserves old rows including pending trade. Restore compares
+      sixteen durable tables, including pending/accepted friends, blocks, messages and read state.
+- [ ] Full fixed-snapshot aggregate/four-browser-suite qualification pending for this checkpoint.
+- [ ] Guilds and guild chat remain unfinished.
+
+Hosted run 40085842883 passed normal checks but exposed a realtime integration-test timing race:
+its marketplace case accepted the first wallet notification, including a queued pre-sale refresh.
+The test now waits for the sale balance; all eleven focused realtime sync tests pass. Full CI logs remain
+403-restricted, but file/line/expected/actual annotations identify this failure. No hosted green claim.
+Fresh earned Warrior main/side quest journey is running without grants, teleportation or XP injection.
+Next: complete both class journeys, dungeon/profession/group proof, fix observed gaps and qualify again.

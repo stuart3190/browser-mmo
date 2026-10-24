@@ -316,7 +316,13 @@ describe('server-side item changes are pushed to connected clients', () => {
     expect(upd.d.removed.find((r) => r.id === sword.instance.id)!.version).toBe(
       sword.instance.version + 1,
     );
-    const wallet = await c.waitFor('wallet.updated', () => true, m0);
+    // A queued initial/grant reconciliation can still deliver the pre-sale balance. Wait for
+    // this transaction's observable result, not whichever wallet notification arrives first.
+    const wallet = await c.waitFor(
+      'wallet.updated',
+      (m) => m.d.balances.some((b) => b.currencyId === 'gold' && b.amount === 990),
+      m0,
+    );
     expect(wallet.d.balances.find((b) => b.currencyId === 'gold')!.amount).toBe(1000 - 10);
     c.ws.close();
   });

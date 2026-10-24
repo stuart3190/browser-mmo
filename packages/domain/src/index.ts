@@ -24,3 +24,5 @@ export * from './services';
 export * from './professions';
 
 export * from './dungeons';
+
+export * from './social';

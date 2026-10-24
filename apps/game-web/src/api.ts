@@ -9,6 +9,9 @@ import type {
   TradeAction,
   MarketplaceListing,
   CreateListingRequest,
+  Friendship,
+  FriendAction,
+  DirectMessage,
 } from '@mmo/schemas';
 import { config } from './config';
 
@@ -139,6 +142,37 @@ export class ApiClient {
       'POST',
       `/v1/marketplace/listings/${id}/buy`,
       { characterId, expectedPrice },
+    );
+  }
+  friends(characterId: string) {
+    return this.request<{ friends: Friendship[] }>('GET', `/v1/characters/${characterId}/social`);
+  }
+  requestFriend(characterId: string, name: string) {
+    return this.request<{ friend: Friendship }>('POST', `/v1/characters/${characterId}/social`, {
+      name,
+    });
+  }
+  friendAction(characterId: string, peer: string, action: FriendAction) {
+    return this.request<void>('POST', `/v1/characters/${characterId}/social/${peer}`, { action });
+  }
+  directMessages(characterId: string, peer: string, before?: string) {
+    return this.request<{ messages: DirectMessage[]; hasMore: boolean }>(
+      'GET',
+      `/v1/characters/${characterId}/social/${peer}/messages${before ? `?before=${encodeURIComponent(before)}` : ''}`,
+    );
+  }
+  sendDirectMessage(characterId: string, peer: string, id: string, body: string) {
+    return this.request<{ message: DirectMessage }>(
+      'POST',
+      `/v1/characters/${characterId}/social/${peer}/messages`,
+      { id, body },
+    );
+  }
+  readDirectMessages(characterId: string, peer: string, ids: string[]) {
+    return this.request<{ readAt: string }>(
+      'POST',
+      `/v1/characters/${characterId}/social/${peer}/messages/read`,
+      { ids },
     );
   }
 }

@@ -16,6 +16,7 @@ import { PartyPanel, PartySummary } from './PartyUI';
 import { FirstSteps } from './FirstSteps';
 import { AbilityBar } from './AbilityBar';
 import { WorldWindow } from './WorldWindow';
+import { SocialWindow } from './SocialWindow';
 import { MarketWindow } from './MarketWindow';
 import { ChatWindow } from './ChatWindow';
 import { TradeWindow } from './TradeWindow';
@@ -26,6 +27,7 @@ import { TouchControls, useTouchControls } from './TouchControls';
 const SHORTCUTS: Record<string, WindowId> = {
   Enter: 'chat',
   KeyO: 'market',
+  KeyN: 'social',
   KeyM: 'world',
   KeyP: 'party',
   KeyT: 'trade',
@@ -127,6 +129,7 @@ function GameUI() {
         <TradeWindow />
         <ChatWindow />
         <MarketWindow />
+        <SocialWindow />
       </div>
       <DialoguePanel />
       <ItemDetails />
@@ -242,6 +245,7 @@ function ActionBar() {
       {btn('professions', 'Skills', '')}
       {btn('trade', 'Trade', 'T')}
       {btn('market', 'Market', 'O')}
+      {btn('social', state.socialUnread ? `Friends (${state.socialUnread})` : 'Friends', 'N')}
       {btn('chat', state.unreadChat ? `Chat (${state.unreadChat})` : 'Chat', '↵')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button

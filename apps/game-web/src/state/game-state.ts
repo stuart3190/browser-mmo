@@ -18,7 +18,8 @@ export type WindowId =
   | 'professions'
   | 'trade'
   | 'chat'
-  | 'market';
+  | 'market'
+  | 'social';
 
 export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 
@@ -77,6 +78,7 @@ export class GameState {
   log: LogLine[] = [];
   chatMessages: (ServerPayload<'chat.message'> & { id: number })[] = [];
   unreadChat = 0;
+  socialUnread = 0;
   toasts: Toast[] = [];
   open = new Set<WindowId>();
   selectedItemId: string | null = null;

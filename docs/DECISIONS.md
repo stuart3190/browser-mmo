@@ -1216,3 +1216,23 @@ matching client on PATH or PG_BIN. CI pins Ubuntu 24.04 and installs PostgreSQL 
 its PostgreSQL 16 service. This does not change database schema, backup format, production binaries
 or running services. Existing checksum, empty-target, single-transaction and session-revocation
 protections remain in force. Both 16/16 and 17/17 round trips and mismatch refusal were exercised.
+
+## 2026-10-24 — Durable account friends and consent-bound private messaging
+
+Canonical account pairs hold pending/accepted friendships; directed block rows remain independent.
+Friend requests resolve an exact character name but do not grant messaging until the recipient
+accepts. Crossing requests do not silently accept. Blocking removes the pair; unblocking does not
+restore consent. Sorted account locks serialize request/accept/block/send and enforce limits across
+alts. Removing or blocking a banned peer is permitted; the actor must still be active.
+
+Messages persist with a client retry UUID and server-derived sender character/name and timestamps.
+A reused UUID must match its original recipient/body. The persistent 8-per-10-second sender bound
+survives process restarts. Reads and cursors are conversation-scoped; only the recipient marks
+messages read. Text renders literally. Private history is available only while friendship is accepted
+and neither side blocks the other. Blocking retains history, allowing it after renewed consent.
+
+This extends the existing authenticated HTTP/domain/DB architecture rather than adding a second
+social service. Contact polling supplies unread badges; active conversation polling is bounded.
+The UI retains up to 500 messages, supports older-page navigation and pauses latest polling while
+reviewing history. Additive migration 0023 leaves existing gameplay tables untouched. Parties remain
+zone-local and guilds remain separate unfinished work. No public deployment is included.

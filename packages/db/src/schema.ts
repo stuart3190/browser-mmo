@@ -765,3 +765,80 @@ export const directTrades = pgTable(
     index('direct_trades_counterparty_idx').on(t.counterpartyId, t.createdAt),
   ],
 );
+
+/** One canonical account pair, regardless of which character initiated the request. */
+export const friendships = pgTable(
+  'friendships',
+  {
+    lowAccountId: uuid('low_account_id')
+      .notNull()
+      .references(() => accounts.id),
+    highAccountId: uuid('high_account_id')
+      .notNull()
+      .references(() => accounts.id),
+    requesterId: uuid('requester_id')
+      .notNull()
+      .references(() => accounts.id),
+    lowName: text('low_name').notNull(),
+    highName: text('high_name').notNull(),
+    status: text('status').notNull().default('pending'),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.lowAccountId, t.highAccountId] }),
+    check('friendships_order_ck', sql`${t.lowAccountId} < ${t.highAccountId}`),
+    check(
+      'friendships_requester_ck',
+      sql`${t.requesterId} in (${t.lowAccountId},${t.highAccountId})`,
+    ),
+    check('friendships_status_ck', sql`${t.status} in ('pending','accepted')`),
+    index('friendships_high_idx').on(t.highAccountId),
+  ],
+);
+export const socialBlocks = pgTable(
+  'social_blocks',
+  {
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id),
+    blockedAccountId: uuid('blocked_account_id')
+      .notNull()
+      .references(() => accounts.id),
+    blockedName: text('blocked_name').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.accountId, t.blockedAccountId] }),
+    check('social_blocks_distinct_ck', sql`${t.accountId} <> ${t.blockedAccountId}`),
+    index('social_blocks_target_idx').on(t.blockedAccountId),
+  ],
+);
+export const directMessages = pgTable(
+  'direct_messages',
+  {
+    id: uuid('id').primaryKey(),
+    fromAccountId: uuid('from_account_id')
+      .notNull()
+      .references(() => accounts.id),
+    toAccountId: uuid('to_account_id')
+      .notNull()
+      .references(() => accounts.id),
+    fromCharacterId: uuid('from_character_id')
+      .notNull()
+      .references(() => characters.id),
+    fromName: text('from_name').notNull(),
+    body: text('body').notNull(),
+    sentAt: timestamp('sent_at', { withTimezone: true }).notNull(),
+    readAt: timestamp('read_at', { withTimezone: true }),
+  },
+  (t) => [
+    check('direct_messages_distinct_ck', sql`${t.fromAccountId} <> ${t.toAccountId}`),
+    check('direct_messages_body_ck', sql`char_length(btrim(${t.body})) between 1 and 500`),
+    index('direct_messages_conversation_idx').on(t.fromAccountId, t.toAccountId, t.sentAt, t.id),
+    index('direct_messages_sender_rate_idx').on(t.fromAccountId, t.sentAt),
+    index('direct_messages_unread_idx')
+      .on(t.toAccountId, t.fromAccountId)
+      .where(sql`${t.readAt} is null`),
+  ],
+);

@@ -22,6 +22,10 @@ import {
   processKillEvent,
   createDirectTrade,
   actOnDirectTrade,
+  requestFriend,
+  actOnFriend,
+  sendDirectMessage,
+  readDirectMessages,
 } from '../packages/domain/src/index';
 const adminUrl = process.env.TEST_DATABASE_URL;
 if (!adminUrl || adminUrl === process.env.DATABASE_URL)
@@ -60,6 +64,9 @@ const durableTables = [
   'kill_events',
   'kill_rewards',
   'direct_trades',
+  'friendships',
+  'social_blocks',
+  'direct_messages',
 ];
 const durableBefore = new Map<string, unknown>();
 let sourceCreated = false,
@@ -188,6 +195,25 @@ try {
     for (const actor of [sellerActor, buyerActor])
       await actOnDirectTrade(ctx, actor, trade.id, { action: 'confirm', revision: 2 });
     await createDirectTrade(ctx, sellerActor, buyer.name, crypto.randomUUID());
+    await requestFriend(ctx, sellerActor, buyer.name);
+    await actOnFriend(ctx, buyerActor, accountId, 'accept');
+    const message = await sendDirectMessage(
+      ctx,
+      sellerActor,
+      buyerId,
+      crypto.randomUUID(),
+      'Persistent restore conversation',
+    );
+    await readDirectMessages(ctx, buyerActor, accountId, [message.id]);
+    await sendDirectMessage(ctx, buyerActor, accountId, crypto.randomUUID(), 'An unread reply');
+    const legacy = (
+      await source.pool.query(
+        "select c.id,c.account_id,c.name from characters c join accounts a on a.id=c.account_id where a.username='legacy_restore'",
+      )
+    ).rows[0];
+    await requestFriend(ctx, { accountId: legacy.account_id, characterId: legacy.id }, c.name);
+    await actOnFriend(ctx, buyerActor, legacy.account_id, 'block');
+
     for (const table of durableTables) {
       const rows = await source.pool.query(
         `SELECT to_jsonb(t) data FROM ${table} t ORDER BY to_jsonb(t)::text`,

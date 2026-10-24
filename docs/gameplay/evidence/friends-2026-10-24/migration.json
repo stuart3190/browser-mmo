@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "from": "0022",
+  "to": "0023",
+  "pendingTradePreserved": "91d6c94e-66f8-4108-999b-d9c7cc605707",
+  "unchanged": {
+    "accounts": {
+      "count": 3,
+      "sha256": "f24253bd5c95d6c5c19db5e9eb2889e02fade6fea1e69319649e38a92f8120e6"
+    },
+    "audit_log": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "auth_identities": {
+      "count": 3,
+      "sha256": "dc14adda89744803b72acb3f270d9374db0b128d5ed256116186382bd1a7a023"
+    },
+    "character_discoveries": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "character_professions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "character_quests": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "characters": {
+      "count": 3,
+      "sha256": "5128a0b1afaa90bebb34814973ce74ee86fbbbaee257b49cb9cc0b1da33be5be"
+    },
+    "consumable_cooldowns": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "consumable_uses": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "containers": {
+      "count": 15,
+      "sha256": "4cf8953c9927a20a56af6bdedd9dbae34c7ee19e83f4e9936d10fc16f7db9dc3"
+    },
+    "craft_jobs": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "currency_balances": {
+      "count": 3,
+      "sha256": "ccdeda52f2a539f765d5031f92ea2db4953e799cb16ea1f281e0f8c57478f83a"
+    },
+    "currency_ledger": {
+      "count": 3,
+      "sha256": "2190943d4e7c2f2f873bf19bc0e5312d0a33ce8edf70af59d6dee808c0ab1fc0"
+    },
+    "direct_trades": {
+      "count": 1,
+      "sha256": "8ae45f6f7615712ef8d7f023f03f955257aa19844bef05daae8ab6aee6c44d69"
+    },
+    "dungeon_instances": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "dungeon_members": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "item_history": {
+      "count": 1,
+      "sha256": "87286cb594e79b5783b7507b6ceed4f6b1655231488a740623a362f0f7cf3ff6"
+    },
+    "item_instances": {
+      "count": 1,
+      "sha256": "9da385cc535402cc515cddfa45fe8aace7ed8b83b83ef384777461822f91ecb0"
+    },
+    "item_templates": {
+      "count": 37,
+      "sha256": "389e947f279a1b68bbe5c857eccf54a568c75307fd98e7e1166b693d0384ff9f"
+    },
+    "kill_events": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "kill_rewards": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "marketplace_listings": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "marketplace_transactions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "resource_harvests": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "service_receipts": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "sessions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "zone_checkpoints": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "newTablesEmpty": true,
+  "productionTouched": false
+}
