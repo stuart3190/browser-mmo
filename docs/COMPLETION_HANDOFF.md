@@ -62,11 +62,15 @@ checks, format/lint/types/build. Evidence: `docs/gameplay/evidence/social-2026-1
 Marketplace implementation now verified: 20 marketplace/trade domain tests, one HTTP case,
 eight two-player browser checks, format/lint/types/build. Evidence in
 `docs/gameplay/evidence/marketplace-2026-10-24`. Current checkpoint is ready to commit.
-Next urgent gap: hosted CI passes all tests but fails `scripts/backup-restore-test.ts`. Logs
-are denied (GitHub token 403); local reproduction `/tmp/bo-backup-reproduce.log` is running on 55441. Old fixture removes migration 0006 but retains later dependents. Repair the fixture and
-prove real backup/restore, then qualify a fixed commit in a detached worktree with
-`scripts/qualify-local.sh` (full checks plus trading/marketplace/social browser suites), allowing
-continued source work without mutating the qualification snapshot. Then persistent friends/DM
-and further game journey/polish. Production remains unchanged. Do not stop at this milestone.
+Restore fixture fixed and verified locally; evidence:
+`docs/hardening/evidence/restore-2026-10-24`. Frozen historical SQL fixture preserves seven tables
+through 0005 -> current, then current gameplay dump/restore deep-compares 13 tables including
+pending/completed trade, revokes sessions and refuses occupied restore. Only own random databases
+are cleaned up. Script types/lint pass. Production unchanged.
+Next: commit restore fix, push branch, and launch full `scripts/qualify-local.sh` from a detached
+worktree at that exact commit after installing dependencies there. This runs full aggregate,
+backup/restore, assets/content and trading/marketplace/social browsers. Continue friends/DM in
+main editable checkout while the detached qualification snapshot stays fixed. Record its path,
+session/log and result here; monitor hosted CI. Do not stop at this checkpoint.
 Browser skill: game-studio/game-playtest; use existing Playwright scripts and inspect screenshots.
 No hosted CI, production capacity, off-host recovery or physical-phone performance claim yet.

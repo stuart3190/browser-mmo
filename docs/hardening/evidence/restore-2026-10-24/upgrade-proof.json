@@ -1,0 +1,14 @@
+{
+  "from": "0005_ability_cooldowns",
+  "to": "0022_direct_trading",
+  "preservedTables": [
+    "accounts",
+    "characters",
+    "containers",
+    "item_instances",
+    "item_history",
+    "currency_balances",
+    "currency_ledger"
+  ],
+  "itemId": "8b150a88-95ab-4395-bed3-cf123e898306"
+}

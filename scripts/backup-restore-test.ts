@@ -1,6 +1,8 @@
 /** Repeatable non-production backup/restore exercise with real economy rows. */
 import { spawn } from 'node:child_process';
-import { mkdir, cp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { deepStrictEqual } from 'node:assert';
+import { verifyLegacyUpgrade } from './fixtures/legacy-upgrade';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { createDb, runMigrations, syncItemTemplates } from '../packages/db/src/index';
@@ -18,11 +20,13 @@ import {
   acceptQuest,
   recordKill,
   processKillEvent,
+  createDirectTrade,
+  actOnDirectTrade,
 } from '../packages/domain/src/index';
 const adminUrl = process.env.TEST_DATABASE_URL;
 if (!adminUrl || adminUrl === process.env.DATABASE_URL)
   throw new Error('Set a dedicated TEST_DATABASE_URL distinct from DATABASE_URL');
-const suffix = `${Date.now()}`;
+const suffix = `${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 const sourceName = `mmo_backup_${suffix}`;
 const targetName = `mmo_restore_${suffix}`;
 const admin = createDb({ url: adminUrl });
@@ -42,21 +46,32 @@ const run = (mode: string, dbUrl: string) =>
     p.on('error', reject);
     p.on('exit', (n) => (n === 0 ? resolve() : reject(new Error(`${mode} failed`))));
   });
+const durableTables = [
+  'accounts',
+  'characters',
+  'containers',
+  'item_instances',
+  'item_history',
+  'currency_balances',
+  'currency_ledger',
+  'character_quests',
+  'marketplace_listings',
+  'marketplace_transactions',
+  'kill_events',
+  'kill_rewards',
+  'direct_trades',
+];
+const durableBefore = new Map<string, unknown>();
+let sourceCreated = false,
+  targetCreated = false;
 try {
   await admin.pool.query(`create database "${sourceName}"`);
+  sourceCreated = true;
   await admin.pool.query(`create database "${targetName}"`);
+  targetCreated = true;
   const source = createDb({ url: urlFor(sourceName) });
   try {
-    // Upgrade a populated pre-hardening schema, not only an empty database.
-    const previous = resolve(out, 'previous-migrations');
-    await cp(MIGRATIONS_FOLDER, previous, { recursive: true });
-    const journalPath = resolve(previous, 'meta/_journal.json');
-    const journal = JSON.parse(await readFile(journalPath, 'utf8')) as {
-      entries: { tag: string }[];
-    };
-    journal.entries = journal.entries.filter((e) => e.tag !== '0006_sudden_killraven');
-    await writeFile(journalPath, JSON.stringify(journal));
-    await runMigrations(source.db, previous);
+    await verifyLegacyUpgrade(source, MIGRATIONS_FOLDER, out);
     await syncItemTemplates(source.db, getGameData());
     const ctx = createDomainContext({ db: source.db, gameData: getGameData() });
     const accountId = await provisionPasswordAccount(
@@ -145,24 +160,40 @@ try {
       listingId: listing.id,
       expectedPrice: 100,
     });
-    const before = await source.pool.query(
-      'select (select count(*) from accounts)::int accounts, (select count(*) from item_instances)::int items, (select count(*) from currency_ledger)::int ledger, (select count(*) from kill_rewards)::int rewards',
-    );
-    await runMigrations(source.db);
-    const after = await source.pool.query(
-      'select (select count(*) from accounts)::int accounts, (select count(*) from item_instances)::int items, (select count(*) from currency_ledger)::int ledger, (select count(*) from kill_rewards)::int rewards',
-    );
-    if (JSON.stringify(before.rows) !== JSON.stringify(after.rows))
-      throw new Error('Populated migration changed durable counts');
-    if (!(await source.pool.query("select to_regclass('zone_checkpoints') name")).rows[0].name)
-      throw new Error('Final migration missing');
-    console.log(
-      JSON.stringify({
-        populatedMigration: '0005 -> 0006',
-        before: before.rows[0],
-        after: after.rows[0],
-      }),
-    );
+    const tradeItem = await adminGrantItem(ctx, {
+      characterId: c.id,
+      templateId: 'weapon.sword.iron_longsword',
+      quantity: 1,
+      actor: { accountId: null, characterId: null },
+      reason: 'restore trade proof',
+    });
+    const sellerActor = { accountId, characterId: c.id },
+      buyerActor = { accountId: buyerId, characterId: buyer.id };
+    const trade = await createDirectTrade(ctx, sellerActor, buyer.name, crypto.randomUUID());
+    await actOnDirectTrade(ctx, sellerActor, trade.id, {
+      action: 'offer',
+      revision: 0,
+      offer: {
+        items: [{ id: tradeItem.instance.id, version: tradeItem.instance.version }],
+        copper: 20,
+      },
+    });
+    await actOnDirectTrade(ctx, buyerActor, trade.id, {
+      action: 'offer',
+      revision: 1,
+      offer: { items: [], copper: 70 },
+    });
+    for (const actor of [sellerActor, buyerActor])
+      await actOnDirectTrade(ctx, actor, trade.id, { action: 'lock', revision: 2 });
+    for (const actor of [sellerActor, buyerActor])
+      await actOnDirectTrade(ctx, actor, trade.id, { action: 'confirm', revision: 2 });
+    await createDirectTrade(ctx, sellerActor, buyer.name, crypto.randomUUID());
+    for (const table of durableTables) {
+      const rows = await source.pool.query(
+        `SELECT to_jsonb(t) data FROM ${table} t ORDER BY to_jsonb(t)::text`,
+      );
+      durableBefore.set(table, rows.rows);
+    }
   } finally {
     await source.close();
   }
@@ -189,6 +220,18 @@ try {
       const rows = await restored.pool.query(`select count(*)::int n from ${table}`);
       if (rows.rows[0].n < 1) throw new Error(`Restore fixture missing ${table}`);
     }
+    for (const table of durableTables) {
+      const rows = await restored.pool.query(
+        `SELECT to_jsonb(t) data FROM ${table} t ORDER BY to_jsonb(t)::text`,
+      );
+      deepStrictEqual(
+        rows.rows,
+        durableBefore.get(table),
+        `Restore changed durable rows in ${table}`,
+      );
+    }
+    const trades = await restored.pool.query('SELECT status FROM direct_trades ORDER BY status');
+    deepStrictEqual(trades.rows, [{ status: 'completed' }, { status: 'open' }]);
     const equipment = await restored.pool.query(
       "select count(*)::int n from item_instances where location_kind='equipped'",
     );
@@ -208,9 +251,24 @@ try {
     refused = true;
   }
   if (!refused) throw new Error('Occupied restore target was not refused');
+  await writeFile(
+    resolve(out, 'result.json'),
+    JSON.stringify(
+      {
+        ok: true,
+        legacyUpgrade: '0005 -> current',
+        durableTables,
+        tradeStates: ['completed', 'open'],
+        sessionsRevoked: true,
+        occupiedTargetRefused: true,
+      },
+      null,
+      2,
+    ),
+  );
   console.log(`BACKUP_RESTORE_PASS ${out}`);
 } finally {
-  await admin.pool.query(`drop database if exists "${sourceName}" with (force)`);
-  await admin.pool.query(`drop database if exists "${targetName}" with (force)`);
+  if (sourceCreated) await admin.pool.query(`drop database if exists "${sourceName}" with (force)`);
+  if (targetCreated) await admin.pool.query(`drop database if exists "${targetName}" with (force)`);
   await admin.close();
 }

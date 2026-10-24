@@ -1455,3 +1455,17 @@ integration tests, then failed the backup-restore exercise. Full job logs are un
 current GitHub token (403); the failure is being reproduced locally. The old fixture removes only
 migration 0006 while applying later migrations that reference its table. Fix the verified restore
 qualification issue before claiming release readiness. No production database will be used.
+
+### Restore qualification correction — 2026-10-24
+
+- [x] Reproduce hosted backup-test failure locally: missing `zone_checkpoints` from a noncontiguous
+      fixture journal. Repair fixture only; no applied migration edited.
+- [x] Real 0005 → 0022 populated upgrade preserves seven tables' existing field values. Current
+      dump/restore deep-compares 13 durable tables, including pending/completed trades; validates
+      ledger/escrow/constraints, revokes restored sessions, refuses an occupied target. PostgreSQL 17.
+- [x] Script typecheck/lint, runner shell syntax and final repeated restore exercise pass.
+- [ ] Hosted CI rerun and full three-browser-suite isolated qualification pending.
+
+Proof: [restore evidence](hardening/evidence/restore-2026-10-24/README.md). Production remains untouched.
+Next: launch combined verification from a detached source snapshot, then continue persistent
+friends/direct messages and earned gameplay qualification in the editable feature branch.

@@ -59,7 +59,12 @@ export TRUST_PROXY_LOOPBACK=false REALTIME_MAX_CONNECTIONS=5 REALTIME_ZONES='*'
 export WEB_URL="http://127.0.0.1:$qualification_web_port"
 export CORS_ORIGINS="$WEB_URL" REALTIME_ALLOWED_ORIGINS="$WEB_URL"
 export VITE_API_URL="http://127.0.0.1:$API_PORT" VITE_REALTIME_URL="ws://127.0.0.1:$REALTIME_PORT"
-if $checks; then NODE_ENV=production pnpm verify > "$qualification_dir/verify.log" 2>&1; fi
+if $checks; then
+  NODE_ENV=production pnpm verify > "$qualification_dir/verify.log" 2>&1
+  PATH="$PG_BIN:$PATH" BACKUP_TEST_DIR="$qualification_dir/backup" pnpm exec tsx scripts/backup-restore-test.ts > "$qualification_dir/backup.log" 2>&1
+  pnpm assets:check > "$qualification_dir/content.log" 2>&1
+  pnpm content:validate >> "$qualification_dir/content.log" 2>&1
+fi
 pnpm db:migrate > "$qualification_dir/migrate.log" 2>&1
 pnpm db:sync-content >> "$qualification_dir/migrate.log" 2>&1
 setsid pnpm --filter @mmo/api exec tsx src/main.ts > "$qualification_dir/api.log" 2>&1 & processes+=("$!")

@@ -1194,3 +1194,13 @@ A concurrent-alt test with one listing place verifies one winner and one fee. Br
 history includes every active item awaiting return and the latest 50 closed listings, including
 expired escrow hidden from public browse. Full bags still defer automatic return as designed;
 the UI exposes cancellation/reclaim and explains the required free slot.
+
+## 2026-10-24 — Freeze historical upgrade fixtures independently of current domain code
+
+The restore exercise must apply a contiguous historical migration prefix. Removing one migration
+from the middle produced a schema that never existed and broke hosted CI once later SQL depended
+on it. Its legacy 0005 fixture now uses explicit historical columns, compares existing row values
+through every subsequent migration, then runs current gameplay fixtures under the current schema.
+Restore validation deep-compares durable economy/trade rows in addition to checking row counts,
+constraints, escrow, ledger and token revocation. Database cleanup is limited to random disposable
+names successfully created by this invocation. No applied migration or production data is edited.
