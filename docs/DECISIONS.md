@@ -1204,3 +1204,15 @@ through every subsequent migration, then runs current gameplay fixtures under th
 Restore validation deep-compares durable economy/trade rows in addition to checking row counts,
 constraints, escrow, ledger and token revocation. Database cleanup is limited to random disposable
 names successfully created by this invocation. No applied migration or production data is edited.
+
+## 2026-10-24 — Match backup tools to the PostgreSQL server major version
+
+After repairing the historical fixture, CI still failed restore. An isolated PostgreSQL 16 server
+reproduced the issue with installed PostgreSQL 17 clients: the archive emits `SET transaction_timeout`,
+which PostgreSQL 16 rejects. Backup/restore now selects installed tools for the connected server major
+(`/usr/lib/postgresql/<major>/bin` on this host), supports explicit PG_BIN, checks `--version`, and
+refuses mismatched tools before invoking the dump/restore operation. Other platforms can supply a
+matching client on PATH or PG_BIN. CI pins Ubuntu 24.04 and installs PostgreSQL 16 client tools for
+its PostgreSQL 16 service. This does not change database schema, backup format, production binaries
+or running services. Existing checksum, empty-target, single-transaction and session-revocation
+protections remain in force. Both 16/16 and 17/17 round trips and mismatch refusal were exercised.

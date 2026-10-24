@@ -1469,3 +1469,17 @@ qualification issue before claiming release readiness. No production database wi
 Proof: [restore evidence](hardening/evidence/restore-2026-10-24/README.md). Production remains untouched.
 Next: launch combined verification from a detached source snapshot, then continue persistent
 friends/direct messages and earned gameplay qualification in the editable feature branch.
+
+### Fixed-snapshot qualification and PostgreSQL client compatibility — 2026-10-24
+
+- [x] `2c1b509` passes the full isolated runner: aggregate checks, backup/restore, asset/content
+      validation and all 27 trading/marketplace/chat browser assertions. Test processes stopped.
+      [Evidence](hardening/evidence/completion-qualification-2026-10-24/README.md).
+- [x] Reproduce second hosted restore failure with client 17/server 16 (`transaction_timeout`).
+      Matching tool selection/version enforcement added; round trips pass on 16 and 17 and an
+      explicit mismatched client is refused. Script types/lint pass. CI pins its OS/client major.
+- [ ] Hosted CI rerun still pending. Full game shippability is not claimed.
+
+Persistent friends/DM implementation is currently uncommitted. Eight domain and one HTTP tests
+pass; first two-player browser run passes eleven checks. Final responsive/journal correction and
+history-read handling are being checked. Additive 0023 is applied only to disposable dev/test DBs.

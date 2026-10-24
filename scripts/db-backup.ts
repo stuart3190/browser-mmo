@@ -1,9 +1,11 @@
 /** Usage: DATABASE_URL=... pnpm exec tsx scripts/db-backup.ts backup|restore FILE
  * Restore requires an EMPTY database named mmo_restore_*. No destructive drop/clean option.
  */
-import { spawn } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
+import { promisify } from 'node:util';
+import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
-import { createReadStream } from 'node:fs';
+import { createReadStream, existsSync } from 'node:fs';
 import { readFile, writeFile, chmod, open } from 'node:fs/promises';
 import { createDb } from '../packages/db/src/client';
 
@@ -21,14 +23,30 @@ const env = {
   PGDATABASE: decodeURIComponent(parsed.pathname.slice(1)),
   PGSSLMODE: parsed.searchParams.get('sslmode') ?? 'prefer',
 };
-const run = (name: string, args: string[]) =>
-  new Promise<void>((resolve, reject) => {
-    const child = spawn(name, args, { env, stdio: ['ignore', 'inherit', 'inherit'] });
+const capture = promisify(execFile);
+const run = async (name: string, args: string[]) => {
+  const version = await client.query<{ server_version_num: string }>('show server_version_num');
+  const major = Math.floor(Number(version.rows[0]!.server_version_num) / 10000);
+  const configured = process.env.PG_BIN;
+  const candidate = resolve(configured ?? `/usr/lib/postgresql/${major}/bin`, name);
+  if (configured && !existsSync(candidate))
+    throw new Error(`Missing PostgreSQL tool: ${candidate}`);
+  const executable = existsSync(candidate) ? candidate : name;
+  const result = await capture(executable, ['--version'], { env, timeout: 10000 });
+  const toolMajor = Number(/PostgreSQL\) (\d+)\./.exec(result.stdout)?.[1]);
+  if (toolMajor !== major)
+    throw new Error(
+      `PostgreSQL ${major} requires matching ${name} tools; found major ${toolMajor}. Set PG_BIN to the matching client directory.`,
+    );
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn(executable, args, { env, stdio: ['ignore', 'inherit', 'inherit'] });
     child.on('error', reject);
     child.on('exit', (code) =>
       code === 0 ? resolve() : reject(new Error(`${name} failed (${code})`)),
     );
   });
+};
+
 async function digest() {
   const hash = createHash('sha256');
   for await (const chunk of createReadStream(file!)) hash.update(chunk as Buffer);

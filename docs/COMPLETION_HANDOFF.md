@@ -67,10 +67,54 @@ Restore fixture fixed and verified locally; evidence:
 through 0005 -> current, then current gameplay dump/restore deep-compares 13 tables including
 pending/completed trade, revokes sessions and refuses occupied restore. Only own random databases
 are cleaned up. Script types/lint pass. Production unchanged.
-Next: commit restore fix, push branch, and launch full `scripts/qualify-local.sh` from a detached
-worktree at that exact commit after installing dependencies there. This runs full aggregate,
+Restore fix committed/pushed as `2c1b509`; marketplace checkpoint `c011828`; chat `0679fc7`.
+Full `scripts/qualify-local.sh` is RUNNING from detached worktree
+`/tmp/bo-qualification-source-2c1b509`, session **13269**, outer log
+`/tmp/bo-combined-qualification.log`. Offline locked dependency installation succeeded. This runs full aggregate,
 backup/restore, assets/content and trading/marketplace/social browsers. Continue friends/DM in
 main editable checkout while the detached qualification snapshot stays fixed. Record its path,
 session/log and result here; monitor hosted CI. Do not stop at this checkpoint.
 Browser skill: game-studio/game-playtest; use existing Playwright scripts and inspect screenshots.
 No hosted CI, production capacity, off-host recovery or physical-phone performance claim yet.
+
+## Live checkpoint while qualification runs
+
+- Fixed-snapshot source `/tmp/bo-qualification-source-2c1b509`, session 13269. Actual evidence
+  `/tmp/brokenodyssey-qualification.cajvdL`, own PostgreSQL port 50375. Full verify, restore,
+  asset/content validation have passed; trading 9 and marketplace 8 browser checks pass; social running.
+- Hosted CI run 40084458787 for 2c1b509 passes normal tests but still fails backup-restore. Full
+  logs denied (403); metadata/annotations readable. Investigating server 16/client 17 compatibility.
+  `/usr/lib/postgresql/16/bin` has CLIENTS ONLY. Attempted local PG16 server init therefore did
+  not start anything (unused /tmp/bo-ci-pg16 dirs). Instead Docker `bo-qualification-pg16`,
+  loopback port 55442, disposable password, image postgres:16 is being pulled/started. Log:
+  `/tmp/bo-ci-pg16-container.log`. Never touch unrelated containers or production cluster.
+- Main checkout now has UNCOMMITTED persistent friends/DM work: schemas, additive migration
+  `0023_persistent_social` + snapshot, domain social.ts (six tests pass), HTTP routes. Not yet UI/API
+  tested or committed. A TS narrowing issue was fixed by declaring `fail` as a function; rerun types.
+- 0023 applied successfully to local dev on 55441 after stopping ONLY local realtime process group 480763. New local realtime watcher session **97951** logs `/tmp/bo-completion-realtime.log`.
+  API/web original watchers remain available. Production has never been stopped or migrated.
+- Friends/DM semantics: account-level canonical friend pairs, acceptance required for persistent
+  messages; blocking removes friendship, unblock does not recreate consent. Account locks serialize
+  requests/send/block, sender IDs/names server-derived, UUID message retries idempotent, 8 per 10s
+  durable rate bound, paginated history, recipient-only read receipts. Remaining backend polish:
+  deduplicate own blocked contacts against concurrent list reads; make repeated block idempotent at
+  block-list cap; add accepted-friend cap and cross-conversation cursor tests. Need API tests and
+  real desktop/touch UI + browser proof, migration preservation and restore fixtures with social data.
+- Do not stop at these milestones. Continue earned Warrior/Mage quest/boss/dungeon journeys,
+  responsive presentation/onboarding, balancing, durable wear/repair if built coherently, and ops.
+
+Latest update: fixed snapshot `2c1b509` qualifier PASSED fully (result fullChecks=true; all 27
+browser assertions), stopped own services. Evidence archived under
+`docs/hardening/evidence/completion-qualification-2026-10-24`.
+Second CI restore failure reproduced: client17 -> server16 unsupported transaction_timeout.
+`scripts/db-backup.ts` now chooses/checks matching client major; local16 and17 round trips pass,
+explicitPG_BIN17 vs16 refused. CI pinned ubuntu24.04 + client16 install. This ops fix is ready
+for a separate commit while friends work remains uncommitted. Docker PG16 test container remains
+local port55442; stop only `bo-qualification-pg16` when done.
+Friends UI now implemented (`SocialWindow.tsx`, key N, polling unread contacts, accepted-only DM,
+pagination/read receipts/block flow). Eight domain + one API case pass. Initial browser11pass,
+final browser rerun `/tmp/bo-friends-browser-final.log`, session10976 checks journal overlap fix
+and history read update (now12checks expected). UI screenshots inspected. Need finalquality,
+0022->0023 preservation, restore social fixtures, evidence/ADR/progress and commit. Add friends
+suite to isolated runner. Next gameplay focus: earned Warrior/Mage quest/boss/dungeon journeys,
+polish/balance and remaining verified gaps, not stopping at social milestone.

@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "fullChecks": true,
+  "browserSuites": ["trading", "marketplace", "social"],
+  "productionTouched": false
+}
