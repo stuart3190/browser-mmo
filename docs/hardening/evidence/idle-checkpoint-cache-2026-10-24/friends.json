@@ -1,0 +1,66 @@
+{
+  "checks": [
+    {
+      "name": "A friend request requires acceptance before a conversation can open",
+      "ok": true
+    },
+    {
+      "name": "Accepted friend receives literal private text in the touch composer",
+      "ok": true
+    },
+    {
+      "name": "Recipient viewing the message produces a server-backed read receipt",
+      "ok": true
+    },
+    {
+      "name": "Private replies reach the other player",
+      "ok": true
+    },
+    {
+      "name": "Desktop journal remains reachable above the expanded game menu",
+      "ok": true
+    },
+    {
+      "name": "Portrait conversation and composer remain in the viewport",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 140,
+        "width": 390,
+        "height": 634
+      }
+    },
+    {
+      "name": "Friendship and both messages survive a fresh login",
+      "ok": true
+    },
+    {
+      "name": "Landscape conversation stays within the viewport",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 28,
+        "width": 844,
+        "height": 292
+      }
+    },
+    {
+      "name": "Blocking removes the conversation and rejects new friend requests",
+      "ok": true
+    },
+    {
+      "name": "Unblocking requires a new accepted request",
+      "ok": true
+    },
+    {
+      "name": "Renewed consent restores the existing durable conversation",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

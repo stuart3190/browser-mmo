@@ -1788,3 +1788,25 @@ unprofiled guild load are now running separately. [Evidence](hardening/evidence/
 
 The core requested Warrior/Mage earned paths and social/economy features are verified. This remains
 an unqualified release candidate, not a genuinely shippable game claim; external release gates are open.
+
+## 2026-10-24 — Idle recovery encoding follow-up
+
+- Current work: `codex/idle-checkpoint-cache`, based on618369c. The prepared f64d084 candidate and
+  live2c47b27 remain untouched. Previous external-wait checkpoint is superseded by this investigation.
+- A current 60 s timer-only control measured 19.7996 Hz, 11 skipped slots, interval
+  p95 51.615 ms, p99 78.106 ms, maximum 207.993 ms. Hardware alone is not established as the cause of the
+  failed19.123Hz game workload. Raw control: `/tmp/bo-current-timer-control.json`.
+- [x] Conservative idle-snapshot and empty outer-payload encoding reuse verified by full isolated
+      run `lk7ghT`: format/lint/types, 241 unit + 204 integration tests, four production builds/debug
+      guard, assets/content, populated upgrade/restore and all 78 browser assertions. Evidence:
+      `hardening/evidence/idle-checkpoint-cache-2026-10-24`. Capacity remains a separate pending gate.
+- No capacity claim, admission increase, public deployment, production mutation or purchase.
+- Next: byte compatibility/late durable mutation tests, full isolated qualification, then one quiet
+  production capacity run for this concrete change. Existing staging/backup target request remains open.
+
+- First full run `qiceb9` stopped on an existing Hollow recovery test using unseeded attack RNG.
+  A legal miss contradicted its required-damage assertion. Recovery test now uses a fixed hit roll;
+  production combat is unchanged. Failed log retained; the full rerun passed.
+
+- Quiet benchmark: same 24,941,300 bytes across 2,600 captures; legacy 277.8 ms, fresh schema
+  142.3 ms, idle cache 2.4 ms. This establishes encoding savings, not production capacity.

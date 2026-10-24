@@ -1,0 +1,10 @@
+{
+  "kind": "standalone current monotonic tick-loop; no game or DB work",
+  "seconds": 60.00125875,
+  "ticks": 1188,
+  "simulationHz": 19.7995846212143,
+  "skippedSlots": 11,
+  "intervalP95Ms": 51.614857000000484,
+  "intervalP99Ms": 78.10568299999977,
+  "maximumIntervalMs": 207.99311000000307
+}

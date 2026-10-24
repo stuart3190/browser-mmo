@@ -1,0 +1,27 @@
+{
+  "sourceBase": "618369c",
+  "branch": "codex/idle-checkpoint-cache",
+  "run": "lk7ghT",
+  "format": true,
+  "lint": true,
+  "typecheck": true,
+  "unitTests": 241,
+  "domainTests": 117,
+  "realtimeTests": 75,
+  "httpTests": 12,
+  "productionBuilds": 4,
+  "debugHookExcluded": true,
+  "assets": true,
+  "content": true,
+  "populatedUpgradeAndRestore": true,
+  "browserAssertions": 78,
+  "capacity": "pending",
+  "productionTouched": false,
+  "earlierFailure": {
+    "run": "qiceb9",
+    "test": "hollow.test.ts wind-up recovery",
+    "actualHealth": 200,
+    "assertion": "health < 200",
+    "issue": "Recovered simulation used unseeded attack RNG, allowing a legitimate miss. Test now uses a fixed hit roll; production combat unchanged."
+  }
+}

@@ -76,6 +76,15 @@ responsive inventory/onboarding are integrated. Guilds use additive migration002
   no runtime-credential read, and no live configuration/service/current mutation. Real preparation
   also passed and independently preserved live identity/readiness. Do not publish the candidate.
 
+## Active follow-up — idle checkpoint encoding
+
+The external-wait checkpoint below is superseded by useful independent work. A fresh60s timer-only
+control reached19.7996Hz (11skipped slots,p9978.106ms,max207.993ms). Hardware alone is not established
+as the cause of the workload failure. Active branch `codex/idle-checkpoint-cache` in
+`/tmp/bo-idle-checkpoint-cache`, based on618369c, conservatively reuses untouched idle simulation
+images and identical empty outer payloads. Full isolated run `lk7ghT` passed 241 unit + 204 integration tests, four builds, populated
+backup/restore, assets/content and all 78 browser assertions. Production capacity is pending. Do not edit existing release artifacts or repeat load tests without this concrete change.
+
 ## Remaining release gates — external input requested
 
 Latest quiet **unprofiled** five-player120s qWvlw8 FAILS cadence: **19.123Hz versus required19.5Hz**.
@@ -91,7 +100,7 @@ identical load without a concrete reason. This host has no established safe play
 The owner was asked asynchronously for an **existing staging host/SSH target and off-host backup
 destination**. No answer has arrived. Physical-phone performance testing is also pending. This is
 the first explicit waiting checkpoint in the external-blocker audit; goal remains ACTIVE, not
-complete or paused. Concrete authorized artifact work is now complete. Avoid empty rerun loops.
+complete or paused. This was the earlier checkpoint; active encoding work above now takes precedence. Avoid empty rerun loops.
 
 Next: use supplied existing infrastructure for strict capacity and recovery qualification, preserving
 all production data. No new purchase is authorized. If input remains unavailable across consecutive

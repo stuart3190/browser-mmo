@@ -240,6 +240,10 @@ export class ZoneSimulation {
   }
 
   readonly zone: WorldZone;
+  // Only untouched, player-free zones can reuse an image. Once player/debug references
+  // escape, keep fresh encoding for the lifetime of the simulation (including after logout).
+  private checkpointCacheAllowed = true;
+  private idleCheckpoint: { externalState: string; image: string } | undefined;
   private tickCount = 0;
   private nextEntity = 1;
   private readonly entities = new Map<string, WorldEntity>();
@@ -302,10 +306,18 @@ export class ZoneSimulation {
     // visits every primitive in every static enemy/spawn definition on each durable tick.
     // Keeping those plain objects on JSON.stringify's native path avoids that hot-loop cost.
     // checkpoint.test.ts compares this image with the original recursive encoder.
-    return JSON.stringify({
+    const parties = this.parties.checkpoint();
+    const appliedEffects = { $set: [...this.appliedEffects] };
+    // These two collections are intentionally public and can change outside this class.
+    const externalState = this.checkpointCacheAllowed
+      ? JSON.stringify({ parties, appliedEffects })
+      : '';
+    if (this.idleCheckpoint?.externalState === externalState && this.checkpointCacheAllowed)
+      return this.idleCheckpoint.image;
+    const image = JSON.stringify({
       version: 2,
-      parties: this.parties.checkpoint(),
-      appliedEffects: { $set: [...this.appliedEffects] },
+      parties,
+      appliedEffects,
       tickCount: this.tickCount,
       nextEntity: this.nextEntity,
       entities: { $map: [...this.entities] },
@@ -339,9 +351,12 @@ export class ZoneSimulation {
         ]),
       },
     });
+    if (this.checkpointCacheAllowed) this.idleCheckpoint = { externalState, image };
+    return image;
   }
 
   restoreCheckpoint(raw: string): string[] {
+    this.idleCheckpoint = undefined;
     const state = JSON.parse(raw, (_key, value: unknown) => {
       if (value && typeof value === 'object') {
         if ('$map' in value) return new Map(value.$map as [unknown, unknown][]);
@@ -378,6 +393,7 @@ export class ZoneSimulation {
     };
     restore(this.entities, state.entities);
     restore(this.players, state.players);
+    if (this.players.size > 0) this.checkpointCacheAllowed = false;
     restore(this.pickups, state.pickups);
     restore(this.npcSpawns, state.npcSpawns);
     for (const [id, spawn] of this.npcSpawns) {
@@ -462,6 +478,8 @@ export class ZoneSimulation {
   // -------------------------------------------------------------------------
 
   addPlayer(info: PlayerInfo, position: Vec3, rotationY: number, nowMs: number): string {
+    this.checkpointCacheAllowed = false;
+    this.idleCheckpoint = undefined;
     if (this.players.has(info.characterId)) throw new Error('player already in zone');
     const raw = isInsideZone(this.zone, position) ? position : { ...this.zone.defaultSpawn };
     const free = this.collision.nearestFree(raw, PLAYER_COLLISION_RADIUS);
@@ -678,6 +696,7 @@ export class ZoneSimulation {
    * start the corpse timer and occupy the respawn slot until `respawnAtMs`. Idempotent.
    */
   confirmKill(killId: string, nowMs: number): boolean {
+    this.idleCheckpoint = undefined;
     const enemy = [...this.enemies.values()].find((e) => e.killId === killId && e.mode === 'dying');
     if (!enemy) return false;
     enemy.mode = 'dead';
@@ -789,6 +808,7 @@ export class ZoneSimulation {
   /** Durable node depletion takes precedence over a possibly pre-grant recovery image. Rebuild
    * only resource entities at boot; preserve all other live/checkpoint state. */
   restoreResources(states: { nodeId: string; readyAt: Date }[], nowMs: number): void {
+    this.idleCheckpoint = undefined;
     for (const p of [...this.pickups.values()])
       if (p.spawn.kind === 'resource_node') {
         this.pickups.delete(p.entityId);
@@ -836,6 +856,7 @@ export class ZoneSimulation {
 
   /** The DB accepted the claim (or reports it was already claimed): remove the entity and schedule respawn. */
   commitPickup(entityId: string, nowMs: number, readyAtMs?: number): void {
+    this.idleCheckpoint = undefined;
     const pickup = this.pickups.get(entityId);
     if (!pickup) return;
     this.pickups.delete(entityId);
@@ -849,6 +870,7 @@ export class ZoneSimulation {
 
   /** The DB claim failed for a transient reason (e.g. bag full): make it available again. */
   releasePickup(entityId: string): void {
+    this.idleCheckpoint = undefined;
     const pickup = this.pickups.get(entityId);
     if (pickup) pickup.reservedBy = null;
   }
@@ -1077,6 +1099,7 @@ export class ZoneSimulation {
 
   /** Takes pending kill rewards (the host persists them exactly once via the DB). */
   drainKills(): KillEvent[] {
+    if (this.kills.length > 0) this.idleCheckpoint = undefined;
     return this.kills.splice(0, this.kills.length);
   }
 
@@ -1111,6 +1134,7 @@ export class ZoneSimulation {
 
   /** Advances the simulation: respawns, interest updates, batched movement broadcast. */
   step(nowMs: number): void {
+    this.idleCheckpoint = undefined;
     if (nowMs >= this.nextPartyUpdate) {
       this.parties.expire(nowMs);
       this.syncParties();
@@ -1179,6 +1203,8 @@ export class ZoneSimulation {
 
   /** Read-only view for debugging/admin. */
   listEntities(): WorldEntity[] {
+    this.checkpointCacheAllowed = false;
+    this.idleCheckpoint = undefined;
     return [...this.entities.values()];
   }
 
