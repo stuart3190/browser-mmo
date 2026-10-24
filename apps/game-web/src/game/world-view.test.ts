@@ -39,6 +39,16 @@ it('streams bounded chunks, unloads distant ground/labels, and cleans up repeate
       expect(scene.getMeshByName(`ground_${zoneId}|4,6`)).toBeNull();
       expect(scene.meshes.length).toBeLessThan(100);
     }
+    // Returning to the fully loaded starter zone must retain its paths/labels and release
+    // every material batch from the previous world, including parented building details.
+    for (let visit = 0; visit < 2; visit++) {
+      view.loadZone('zone.greenvale.meadows');
+      expect(view.loadedChunkCount).toBe(16);
+      expect(scene.meshes.length).toBeLessThan(200);
+      expect(scene.getMeshByName('greenvale_path')).not.toBeNull();
+      expect(scene.getMeshByName('sign_OLD WELL')).not.toBeNull();
+      expect(scene.meshes.some((m) => m.name.startsWith('static_'))).toBe(true);
+    }
     view.dispose();
     expect(scene.meshes).toHaveLength(0);
     expect(scene.materials).toHaveLength(1);

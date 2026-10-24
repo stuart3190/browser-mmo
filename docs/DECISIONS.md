@@ -1310,6 +1310,30 @@ account-wide durable chat limits and role checks are server-enforced. Migration0
 proof must accompany release. This does not increase realtime admission limits or claim 50-player
 capacity. Full rules are in docs/gameplay/guilds.md.
 
+## 2026-10-24 — Batch static world props within their existing chunks
+
+**Decision**
+Bake static prop hierarchies and explicit collider visuals into one mesh per shared material and
+side orientation in each loaded chunk. Keep ground, roads, labels, dynamic actors and attack cues
+separate. Preserve parent transforms until every child is baked; dispose source geometry only after
+all batches exist. Shared materials remain owned by WorldView and survive chunk unloading.
+
+**Reason**
+The starter scene used 532 meshes with many repeated materials. The same scene after batching has
+165 meshes with identical 32,976 vertices and 96,942 indices, materials, textures and 16 chunks.
+Reducing render submissions is useful for browser/mobile clients. This structural reduction is not
+physical-device FPS or server-capacity proof.
+
+**Alternatives**
+Changing terrain/collision or reducing decorative geometry would alter presentation. A global merge
+would defeat chunk unloading and coarse visibility culling. A general instancing engine adds more
+asset lifecycle machinery than needed for the existing procedural static shapes.
+
+**Consequences**
+Props remain non-pickable and cannot be individually animated; dynamic/pickable entities stay on
+existing paths. Geometry/transform tests, repeated world disposal and browser visual/input checks
+are required before integration. World content, authoritative collisions and server code are unchanged.
+
 ## 2026-10-24 — Recoverable startup and delayed engine loading
 
 **Decision**

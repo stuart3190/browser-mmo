@@ -120,6 +120,11 @@ export async function startGame(args: {
     state,
     net,
     (id) => entities?.screenPosition(id, scene) ?? null,
+    (x, y) => {
+      const rect = args.canvas.getBoundingClientRect();
+      const picked = scene.pick(x - rect.left, y - rect.top)?.pickedMesh;
+      return picked ? (entities?.entityIdOfMesh(picked) ?? null) : null;
+    },
     () => player,
     () => entities?.markers() ?? [],
     () => ({
@@ -528,6 +533,7 @@ function exposeDebug(
   state: GameState,
   net: RealtimeClient,
   screenPos: (entityId: string) => { x: number; y: number } | null,
+  pickAt: (x: number, y: number) => string | null,
   player: () => PlayerController | undefined,
   markers: () => { id: string; x: number; z: number }[],
   sceneCounts: () => {
@@ -589,6 +595,7 @@ function exposeDebug(
     },
     /** CSS-pixel screen position of an entity (for automated taps on the canvas). */
     screenPos: screenPos,
+    pickAt,
     /** Turns the orbit camera to face an entity (automation aid; camera input is tested separately). */
     lookAt(id: string) {
       const m = markers().find((x) => x.id === id);
@@ -608,6 +615,17 @@ function exposeDebug(
     /** Entity id of the first replicated NPC (Elder Maren in Greenvale). */
     get npcId() {
       return [...state.world.values()].find((e) => e.kind === 'npc')?.id ?? null;
+    },
+    /** Read-only nearest replicated NPC for input automation after walking to a location. */
+    get nearestNpcId() {
+      const p = player()?.position;
+      if (!p) return null;
+      return (
+        markers()
+          .filter((e) => state.world.get(e.id)?.kind === 'npc')
+          .sort((a, b) => Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z))[0]
+          ?.id ?? null
+      );
     },
     /** Quest log and open dialogue exactly as the server sent them. */
     get systems() {

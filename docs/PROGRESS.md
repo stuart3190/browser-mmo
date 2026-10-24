@@ -1721,6 +1721,21 @@ Chat follows new messages only at the end, preserves scrollback and keeps the la
 visible. Production load now includes consented guild membership, durable messages and history,
 and restores the documented minimum 19.5Hz gate. This workload has not yet been measured.
 
+### Static world rendering — 2026-10-24 (isolated branch)
+
+- [x] Per-chunk/material static geometry batching preserves parent transforms and material ownership.
+      Initial frontend tests pass; null-renderer comparison retains 32,976 vertices/96,942 indices
+      while reducing starter meshes from 532 to 165. This is geometry evidence, not an FPS claim.
+- [ ] Extended starter-zone cleanup test, full type/lint/build and browser visual/input qualification
+      remain before integration. Main release candidate remains unchanged during its separate checks.
+
+Static-render browser qualification remains pending. Initial runs used the first replicated NPC
+rather than the nearby NPC; projected coordinates were outside the canvas. Read-only nearest-NPC
+and ray-hit diagnostics correct that driver assumption; no gameplay target rules changed. A later
+run ZwXpKt stopped before login on a blank page. Preserve failures and qualify with startup recovery
+integrated. Full types/lint/build and11 frontend tests pass for batching before these debug additions;
+latest frontend types pass. Final browser proof and production build remain required.
+
 ### Startup recovery — 2026-10-24
 
 - [x] Static loading/reload fallback, caught application/game import failures, and engine loading
@@ -1744,3 +1759,15 @@ and restores the documented minimum 19.5Hz gate. This workload has not yet been 
 Checklist reconciliation, 2026-10-24: corrected stale magic, dungeon and guild placeholder entries
 to match verified implementation/evidence. Unticked playable specialisations because only definitions
 exist. Physical ranged weapons, support-class abilities, wear/repair and guild vault remain incomplete.
+
+Static rendering candidatea973ae5: fullformat/types/lint,11 frontend tests, four production builds
+and all-chunk debug guard pass. Six actual rendering/input assertions pass in vag71f, with reviewed
+desktop/portrait/landscape screenshots. Corrected nearest-NPC diagnostic to use rendered marker
+positions; earlier failures retained. Aggregate eight-suite and production/load checks continue.
+[Evidence](gameplay/evidence/static-rendering-2026-10-24/README.md).
+
+Final combined browser run vag71f PASSES all78 assertions on candidatea973ae5 (rendering6,startup6,
+trade11,market8,chat10,friends12,onboarding10,guilds15). Fullformat/types/lint,11 frontend tests, four
+production builds/all-chunk debug guard and release-preparation fixtures also pass. Backend unchanged
+from35ee149's204 integration checks and20-table restore. Password/TLS/deferred-engine profile and
+unprofiled guild load are now running separately. [Evidence](hardening/evidence/final-browser-2026-10-24/README.md).
