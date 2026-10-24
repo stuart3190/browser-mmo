@@ -1534,3 +1534,16 @@ respawn after dying to a stationary test strategy at the Warden; with visible-wa
 defeated the Warden without balance changes. Both retain all earned progress. The harness now uses
 class abilities, respects requirements and equips owned quest rewards; larger region routes get
 distance-proportional bounded deadlines. These journey changes are still being verified.
+
+### Built production-profile smoke — 2026-10-24
+
+- [x] Repeatable `bash scripts/qualify-local.sh --production`: own database/ports/password accounts,
+      built bundles, separate loopback TLS ingress, password-only API and WSS runtime.
+- [x] Development login404, public private-routes404, no browser development hook. Thirteen real
+      UI assertions pass, including both classes, friends/DM persistence, read state, blocking
+      and responsive controls. Script types, shell syntax and production builds pass.
+      [Evidence](hardening/evidence/production-local-2026-10-24/README.md).
+- [ ] Longer earned gameplay and final combined source qualification remain active.
+
+No public deployment or production data mutation. Inventory presentation is verified separately
+on isolated branch codex/presentation-polish, commit ba27b32, awaiting integration.

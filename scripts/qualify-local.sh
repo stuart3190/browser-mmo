@@ -2,10 +2,12 @@
 # Fully isolated local qualification. Never reads deployment env or uses an existing database.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+production=false
 case "${1:-}" in
   '') checks=true ;;
   --skip-checks) checks=false ;;
-  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks]' >&2; exit 2 ;;
+  --production) checks=false; production=true ;;
+  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks|--production]' >&2; exit 2 ;;
 esac
 PG_BIN=${PG_BIN:-/usr/lib/postgresql/17/bin}
 for tool in initdb pg_ctl createdb; do [[ -x "$PG_BIN/$tool" ]] || { echo "Missing $PG_BIN/$tool" >&2; exit 1; }; done
@@ -67,6 +69,10 @@ if $checks; then
 fi
 pnpm db:migrate > "$qualification_dir/migrate.log" 2>&1
 pnpm db:sync-content >> "$qualification_dir/migrate.log" 2>&1
+if $production; then
+  source scripts/qualification/production-ui.sh
+  exit 0
+fi
 setsid pnpm --filter @mmo/api exec tsx src/main.ts > "$qualification_dir/api.log" 2>&1 & processes+=("$!")
 setsid pnpm --filter @mmo/realtime exec tsx src/main.ts > "$qualification_dir/realtime.log" 2>&1 & processes+=("$!")
 setsid pnpm --filter @mmo/game-web exec vite --host 127.0.0.1 --port "$qualification_web_port" > "$qualification_dir/web.log" 2>&1 & processes+=("$!")
