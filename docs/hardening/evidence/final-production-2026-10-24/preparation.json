@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "candidate": "f64d084522f6f079af753f6c1dc5c57a2d3189d7",
+  "preparedRelease": "/srv/brokenodyssey/releases/f64d084522f6f079af753f6c1dc5c57a2d3189d7",
+  "manifest": {
+    "commit": "f64d084522f6f079af753f6c1dc5c57a2d3189d7",
+    "environment": "development-preview"
+  },
+  "liveReleaseUnchanged": "/srv/brokenodyssey/releases/2c47b27a38f0bc74f3a7192f713775c3a9361729",
+  "servicePidsAndStartTimesUnchanged": true,
+  "liveApiReady": "ok",
+  "liveRealtimeReady": "ok",
+  "liveHostedZones": 25,
+  "productionPublished": false,
+  "filesSha256": {
+    "apps/game-web/dist/index.html": "084a111c0493c3e3a881b80a3d71737a621f630641638d86b80015ae98c68fba",
+    "services/api/dist/main.js": "7b543da805ac2335f2cf8b687a8f70c7165dbff3753ca8defe53174ed0f98780",
+    "services/realtime/dist/main.js": "946e0b98adf7abda0fe6f9b6f20ad093f9a33751879d66bc7498ff0abd8c4390"
+  },
+  "runtimeCi": {
+    "commit": "69c9483514839b82c7a8ee939bd27a48ec6ad84c",
+    "run": 40101349993,
+    "conclusion": "success"
+  }
+}

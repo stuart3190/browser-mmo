@@ -28,3 +28,8 @@ All78 combined development-browser assertions passed separately in vag71f. Sourc
 20-table populated restore and hosted CI are recorded in adjacent archives. Physical-phone and
 external-host recovery/capacity remain unqualified. Existing staging/backup destinations were
 requested from the owner. No public deployment, production DB mutation or paid provisioning.
+
+Immutable candidate f64d084 is prepared under `/srv/brokenodyssey/releases/`. Four production builds,
+all-chunk debug guard and Caddy validation pass. Independent manifest/checksum and live PID/start-time/
+symlink/readiness checks pass; see preparation.json. Live2c47b27 was not changed or restarted.
+Hosted CI40101349993 for runtime merge69c9483 passes. Later commits only record evidence/documentation.

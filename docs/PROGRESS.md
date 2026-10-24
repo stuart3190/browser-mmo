@@ -1782,7 +1782,9 @@ unprofiled guild load are now running separately. [Evidence](hardening/evidence/
       No admission increase. [Raw report and evidence](hardening/evidence/final-production-2026-10-24/README.md).
 - [ ] Physical-phone performance and off-host recovery remain unqualified. Owner asked for an
       existing staging host/SSH target and off-host backup destination; no purchases authorized.
-- [ ] Prepare immutable final candidate without publishing, verify unchanged live release/readiness.
+- [x] Prepare immutable candidate `f64d084` without publishing. Four builds/debug guard/config validation
+      pass; manifest verified and live `2c47b27`, service PIDs/start times and API/RT readiness unchanged.
+      Final runtime hosted CI40101349993 (`69c9483`) passes. [Preparation proof](hardening/evidence/final-production-2026-10-24/preparation.json).
 
 The core requested Warrior/Mage earned paths and social/economy features are verified. This remains
 an unqualified release candidate, not a genuinely shippable game claim; external release gates are open.
