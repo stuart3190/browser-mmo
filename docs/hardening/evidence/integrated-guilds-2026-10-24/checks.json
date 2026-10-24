@@ -1,0 +1,23 @@
+{
+  "source": "35ee149ab6a2bac5bc1981b838b9be189fb9c74a",
+  "codeChecksPassed": true,
+  "format": true,
+  "lint": true,
+  "types": true,
+  "unitTests": 236,
+  "domainTests": 117,
+  "realtimeTests": 75,
+  "httpTests": 12,
+  "productionBuilds": 4,
+  "debugHookExcluded": true,
+  "assets": true,
+  "content": true,
+  "populatedUpgradeAndRestore": true,
+  "browserStage": "failed before first login form",
+  "aggregatePassed": false,
+  "hostedCi": {
+    "run": 40098308166,
+    "conclusion": "success"
+  },
+  "productionTouched": false
+}
