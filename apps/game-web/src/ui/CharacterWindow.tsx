@@ -1,3 +1,4 @@
+import { repairCost } from '@mmo/game-data';
 import { STAT_LABELS, STAT_ORDER } from '@mmo/ui';
 import { useGame } from './context';
 import { ItemSlot } from './ItemSlot';
@@ -11,6 +12,9 @@ const BOTTOM = ['main_hand', 'off_hand', 'ranged'];
 export function CharacterWindow() {
   const { state, gameData } = useGame();
   const equipped = state.items.equipped();
+  const repairQuote = repairCost(
+    [...equipped.values()].flatMap((i) => (i.instance.durability ? [i.instance.durability] : [])),
+  );
   const known = new Set([...LEFT, ...RIGHT, ...BOTTOM]);
   // Slots added to game data later still show up (appended to the right column).
   const extra = gameData.raw.equipmentSlots.map((s) => s.id).filter((id) => !known.has(id));
@@ -32,6 +36,13 @@ export function CharacterWindow() {
       id="character"
       title={`${state.character.name} — level ${state.character.level} ${cls.name}`}
     >
+      <p className="small equipment-condition" data-testid="equipment-condition">
+        {repairQuote > 0
+          ? `Equipped gear can be restored for ${repairQuote} copper. Visit Provisioner Vale or the Marches workshop.`
+          : 'Equipped gear is in full condition.'}{' '}
+        Victories wear equipped gear by one condition. Broken gear stays yours, but grants no
+        bonuses until repaired.
+      </p>
       <div className="paperdoll">
         <div className="equip-col">{LEFT.map(slot)}</div>
         <div className="equip-col">{[...RIGHT, ...extra].map(slot)}</div>

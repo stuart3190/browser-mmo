@@ -252,3 +252,74 @@ it('specific backpack sale is authoritative and replay-safe across controller re
   );
   again.ws.close();
 });
+
+it('repairs equipped gear through the real protocol and rejects distant/dead requests', async () => {
+  const h = await boot(),
+    p = await player();
+  const { grantItemInTx, inTransaction, moveItem, getCombatProfile } = await import('@mmo/domain');
+  const actor = { accountId: p.accountId, characterId: p.id };
+  const grant = await inTransaction(ctx, (tx) =>
+    grantItemInTx(tx, ctx, {
+      ...actor,
+      templateId: 'weapon.sword.iron_longsword',
+      quantity: 1,
+      method: 'system',
+      actor,
+    }),
+  );
+  await moveItem(ctx, {
+    ...actor,
+    request: {
+      itemInstanceId: grant.created.id,
+      expectedVersion: grant.created.version,
+      to: { kind: 'equipped', slotId: 'main_hand' },
+    },
+  });
+  await handle.db
+    .update(schema.itemInstances)
+    .set({ durabilityCurrent: 0 })
+    .where(eq(schema.itemInstances.id, grant.created.id));
+  const c = await join(h.url, p);
+  expect(h.server.zones.get(march)!.getPlayer(p.id)!.weapon.min).toBe(
+    gd.raw.combatRules.unarmed.damage.min,
+  );
+  const npc = (await c.wait('zone.snapshot')).d.entities.find(
+    (e) => e.refId === 'npc.world.greenvale_marches.merchant',
+  )!;
+  const request = { entityId: npc.id, requestId: uuidv7(), maxCopper: 8 };
+  const seq = c.send('npc.repair', request);
+  await c.wait('inventory.updated', (m) => m.ack === seq);
+  const repaired = (await getCharacterItems(ctx.db, ctx, p.accountId, p.id)).equipment.slots
+    .main_hand!;
+  expect(repaired.instance.durability?.current).toBe(80);
+  expect((await getCombatProfile(ctx.db, ctx, p.id)).weapon.templateId).toBe(
+    'weapon.sword.iron_longsword',
+  );
+  expect(h.server.zones.get(march)!.getPlayer(p.id)!.weapon.min).toBe(7);
+  const repeat = c.send('npc.repair', request);
+  await c.wait('inventory.updated', (m) => m.ack === repeat);
+  c.ws.close();
+  for (const [pos, health] of [
+    [{ x: 256, z: 430 }, 70],
+    [{ x: 264, z: 403 }, 0],
+  ] as const) {
+    const q = await player(march, pos, health),
+      other = await join(h.url, q);
+    const entity = (await other.wait('zone.snapshot')).d.entities.find(
+      (e) => e.refId === 'npc.world.greenvale_marches.merchant',
+    )!;
+    const ack = other.send('npc.repair', {
+      entityId: entity.id,
+      requestId: uuidv7(),
+      maxCopper: 100,
+    });
+    await other.wait('error', (m) => m.ack === ack);
+    expect(
+      await handle.db
+        .select()
+        .from(schema.serviceReceipts)
+        .where(eq(schema.serviceReceipts.characterId, q.id)),
+    ).toHaveLength(0);
+    other.ws.close();
+  }
+});

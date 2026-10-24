@@ -1,0 +1,18 @@
+{
+  "domainTests": 21,
+  "realtimeTests": 9,
+  "gameDataTests": 124,
+  "frontendTests": 12,
+  "uiTests": 10,
+  "browserChecks": 10,
+  "typecheck": "passed",
+  "lint": "passed",
+  "productionBuild": "passed; no development hooks",
+  "screenshotsReviewed": true,
+  "productionTouched": false,
+  "limitations": [
+    "Wear is victory-based, not per hit or death.",
+    "Repairs cover equipped unlocked gear, not bags or vaults.",
+    "Production deployment requires separate validation."
+  ]
+}

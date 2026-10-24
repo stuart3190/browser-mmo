@@ -1,0 +1,103 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-one character; no mutation/grants; earned sword pickup, kill, road travel and repair",
+  "checks": [
+    {
+      "name": "Freshly picked-up sword starts in full condition",
+      "ok": true,
+      "detail": {
+        "id": "01a16f69-9790-7159-8d5d-d3cca6d78472",
+        "templateId": "weapon.sword.iron_longsword",
+        "version": 1,
+        "quantity": 1,
+        "location": {
+          "kind": "equipped",
+          "characterId": "01a16f69-84ef-74ff-898d-9ba3f90aad0c",
+          "slotId": "main_hand"
+        },
+        "durability": {
+          "current": 80,
+          "max": 80
+        }
+      }
+    },
+    {
+      "name": "A real wolf victory wears the equipped sword exactly once",
+      "ok": true,
+      "detail": {
+        "id": "01a16f69-9790-7159-8d5d-d3cca6d78472",
+        "templateId": "weapon.sword.iron_longsword",
+        "version": 2,
+        "quantity": 1,
+        "location": {
+          "kind": "equipped",
+          "characterId": "01a16f69-84ef-74ff-898d-9ba3f90aad0c",
+          "slotId": "main_hand"
+        },
+        "durability": {
+          "current": 79,
+          "max": 80
+        }
+      }
+    },
+    {
+      "name": "Character panel explains repair cost",
+      "ok": true
+    },
+    {
+      "name": "Provisioner offers the correct affordable repair",
+      "ok": true
+    },
+    {
+      "name": "Earned wear persists through relogin on touch",
+      "ok": true
+    },
+    {
+      "name": "Repair is a visible touch-sized action",
+      "ok": true,
+      "detail": {
+        "x": 11,
+        "y": 146,
+        "width": 284.53125,
+        "height": 44
+      }
+    },
+    {
+      "name": "Touch repair restores the same sword and charges one copper",
+      "ok": true,
+      "detail": {
+        "after": {
+          "id": "01a16f69-9790-7159-8d5d-d3cca6d78472",
+          "templateId": "weapon.sword.iron_longsword",
+          "version": 3,
+          "quantity": 1,
+          "location": {
+            "kind": "equipped",
+            "characterId": "01a16f69-84ef-74ff-898d-9ba3f90aad0c",
+            "slotId": "main_hand"
+          },
+          "durability": {
+            "current": 80,
+            "max": 80
+          }
+        },
+        "money": 1011,
+        "paid": 1010
+      }
+    },
+    {
+      "name": "Full equipment disables further repairs",
+      "ok": true
+    },
+    {
+      "name": "Repaired condition persists through another login",
+      "ok": true
+    },
+    {
+      "name": "No gameplay browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

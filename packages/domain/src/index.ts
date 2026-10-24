@@ -28,3 +28,5 @@ export * from './dungeons';
 export * from './social';
 
 export * from './guilds';
+
+export * from './durability';

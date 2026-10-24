@@ -24,6 +24,7 @@ export async function getCharacterStats(
   const equipped = await db
     .select({
       stats: schema.itemInstances.stats,
+      durabilityCurrent: schema.itemInstances.durabilityCurrent,
       modifiers: schema.itemInstances.modifiers,
       enchantments: schema.itemInstances.enchantments,
     })
@@ -37,12 +38,14 @@ export async function getCharacterStats(
   return computeCharacterStats(
     ctx.gameData.characterClass(character.classId),
     character.level,
-    equipped.map((r) =>
-      itemTotalStats({
-        stats: r.stats as StatBlock,
-        modifiers: r.modifiers as ItemModifier[],
-        enchantments: r.enchantments as ItemEnchantment[],
-      }),
-    ),
+    equipped
+      .filter((r) => r.durabilityCurrent !== 0)
+      .map((r) =>
+        itemTotalStats({
+          stats: r.stats as StatBlock,
+          modifiers: r.modifiers as ItemModifier[],
+          enchantments: r.enchantments as ItemEnchantment[],
+        }),
+      ),
   );
 }

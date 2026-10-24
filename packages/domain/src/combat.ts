@@ -1,3 +1,4 @@
+import { wearEquipmentInTx } from './durability';
 import { and, asc, eq, gt, inArray, lte, sql } from 'drizzle-orm';
 import { schema } from '@mmo/db';
 import type { DbOrTx, Tx } from '@mmo/db';
@@ -55,7 +56,10 @@ export async function getCombatProfile(
   if (!character) throw new DomainError(ErrorCode.NOT_FOUND, 'Character not found');
   const stats = (await getCharacterStats(db, ctx, characterId)).total;
   const [mainHand] = await db
-    .select({ templateId: schema.itemInstances.templateId })
+    .select({
+      templateId: schema.itemInstances.templateId,
+      durabilityCurrent: schema.itemInstances.durabilityCurrent,
+    })
     .from(schema.itemInstances)
     .where(
       and(
@@ -65,9 +69,10 @@ export async function getCombatProfile(
       ),
     );
   const rules = ctx.gameData.raw.combatRules;
-  const weaponBlock = mainHand
-    ? ctx.gameData.template(mainHand.templateId).equipment?.weapon
-    : null;
+  const weaponBlock =
+    mainHand && mainHand.durabilityCurrent !== 0
+      ? ctx.gameData.template(mainHand.templateId).equipment?.weapon
+      : null;
   const weapon = weaponBlock
     ? {
         min: weaponBlock.minDamage,
@@ -295,6 +300,8 @@ export async function awardKillInTx(
       if (!(err instanceof DomainError)) throw err; // wallet cap reached: skip gold
     }
   }
+
+  await wearEquipmentInTx(tx, ctx, character.id, input.killId);
 
   // Quest kill objectives advance in the same exactly-once transaction.
   const questsProgressed = await applyKillToQuestsInTx(tx, ctx, character.id, enemy.id);

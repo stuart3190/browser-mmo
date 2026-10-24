@@ -35,6 +35,16 @@ export class QuestActions {
       });
   }
 
+  repair(maxCopper: number): void {
+    const d = this.state.dialogue;
+    if (d)
+      this.net.send('npc.repair', {
+        entityId: d.entityId,
+        requestId: crypto.randomUUID(),
+        maxCopper,
+      });
+  }
+
   sell(itemId: string, expectedVersion: number): void {
     const d = this.state.dialogue;
     if (d)

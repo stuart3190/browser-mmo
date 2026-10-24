@@ -1,3 +1,4 @@
+import { repairAtNpc } from '@mmo/domain';
 import { isIP } from 'node:net';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -416,6 +417,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       'npc.interact',
       'npc.service',
       'npc.sell',
+      'npc.repair',
       'quest.accept',
       'quest.turn_in',
       'world.travel',
@@ -1212,6 +1214,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         flush();
         return;
       }
+      case 'npc.repair':
       case 'npc.sell':
       case 'npc.service': {
         const { npcId } = player.zone.npcInteraction(player.characterId, msg.d.entityId);
@@ -1224,22 +1227,30 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         )
           throw new DomainError(ErrorCode.CONFLICT, 'Leave combat before using a service');
         const result =
-          msg.t === 'npc.sell'
-            ? await sellAtNpc(ctx, {
+          msg.t === 'npc.repair'
+            ? await repairAtNpc(ctx, {
                 accountId: player.accountId,
                 characterId: player.characterId,
                 npcId,
-                itemId: msg.d.itemId,
-                expectedVersion: msg.d.expectedVersion,
                 requestId: msg.d.requestId,
+                maxCopper: msg.d.maxCopper,
               })
-            : await exchangeAtNpc(ctx, {
-                accountId: player.accountId,
-                characterId: player.characterId,
-                npcId,
-                offerId: msg.d.offerId,
-                requestId: msg.d.requestId,
-              });
+            : msg.t === 'npc.sell'
+              ? await sellAtNpc(ctx, {
+                  accountId: player.accountId,
+                  characterId: player.characterId,
+                  npcId,
+                  itemId: msg.d.itemId,
+                  expectedVersion: msg.d.expectedVersion,
+                  requestId: msg.d.requestId,
+                })
+              : await exchangeAtNpc(ctx, {
+                  accountId: player.accountId,
+                  characterId: player.characterId,
+                  npcId,
+                  offerId: msg.d.offerId,
+                  requestId: msg.d.requestId,
+                });
         send(conn, {
           t: 'inventory.updated',
           d: { reason: 'sync', items: result.items, removed: [] },
@@ -1247,6 +1258,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         send(conn, { t: 'wallet.updated', d: { balances: result.balances } });
         await sync.fullState(syncTarget(conn));
         await pushQuestLog(conn, true);
+        if (msg.t === 'npc.repair') await refreshCombat(player.characterId);
         await sendDialogue(conn, msg.d.entityId, npcId);
         await sendSystems(conn);
         // Completion acknowledgement follows all reconciliation work. An early ACK lets a

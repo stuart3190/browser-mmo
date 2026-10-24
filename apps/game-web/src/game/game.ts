@@ -578,6 +578,7 @@ function exposeDebug(
         version: i.instance.version,
         quantity: i.instance.quantity,
         location: i.instance.location,
+        durability: i.instance.durability,
       }));
     },
     get inventoryCount() {

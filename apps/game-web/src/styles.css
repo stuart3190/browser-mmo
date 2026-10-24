@@ -1654,6 +1654,7 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
 
 /* New NPC services keep reliable touch targets inside the existing scrollable dialogue. */
 .ui-root.touch .dialogue [data-service],
+.ui-root.touch .dialogue [data-testid='repair-all'],
 .ui-root.touch .dialogue [data-testid='vendor-sell'],
 .ui-root.touch .dialogue [data-testid='banker-vault'],
 .ui-root.touch .dialogue select[aria-label='Sell backpack item'] {
@@ -2390,4 +2391,32 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   body:has(.ui-root.touch .target-frame) .fullscreen-return {
     display: none;
   }
+}
+
+.slot-worn {
+  position: absolute;
+  left: 2px;
+  bottom: 2px;
+  border-radius: 50%;
+  background: #7c2020;
+  color: #fff0a8;
+  width: 18px;
+  height: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+.equipment-condition {
+  padding: 8px;
+  background: #e8bb6510;
+  border-left: 2px solid #c8a255;
+}
+
+.condition-warning {
+  padding: 4px 6px;
+  min-height: 44px;
+  width: 100%;
+  color: #ffcf86;
+  border-color: #ac663c;
+  font-size: 11px;
+  margin: 4px 0;
 }

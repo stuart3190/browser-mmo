@@ -1867,3 +1867,19 @@ Ranked player-facing gaps from the current client and content:
       start at level 3; this is functional combat evidence, not a newly earned progression journey.
       Screenshot review led to fixing fullscreen/Firebolt and mobile compass/target overlaps.
 - [ ] Next: wear/repair, then specialisation and quest/world milestones. Do not stop at a plan or unit pass.
+
+### Gear condition milestone — verified 2026-10-24
+
+- [x] Equipped durable gear loses one condition per credited victory, exactly once with rewards.
+- [x] Broken items retain identity/ownership, lose active bonuses, and recover through paid repair.
+      Main-hand fallback, comparison deltas, low-condition warnings and tooltips reflect condition.
+- [x] Town merchants/workshops offer atomic, replay-safe, price-capped repair; reject wrong owner,
+      wrong/distant NPC, dead player, stale quote and insufficient funds.
+- [x] Real fresh level-one Warrior journey: pick up/equip sword, kill wolf (80→79), inspect condition,
+      walk the north road, travel to Marches, relog on touch, pay one copper (79→80), relog again.
+      No grants, teleports or progression injection. Screenshots inspected; repair touch size fixed.
+- Evidence: `gameplay/evidence/gear-condition-2026-10-24/`. 21 domain combat/party/condition tests,
+  9 realtime ability/service tests, 124 game-data tests, 12 frontend tests and 10 UI tests pass.
+  Repository typecheck, lint and production build pass; no production changes.
+- [ ] Next: authored Amber Coast exploration/quest/encounter chapter, then meaningful specialisations
+      and further visual/playability refinement. Existing external release gates remain separate.

@@ -1388,3 +1388,23 @@ them. The client only draws the replicated state. Death/evade clears statuses. N
 engine, protocol bypass or new persistence service is needed. Preserve the historical starter catalog
 and its exact hash by applying current tactical definitions after compilation; optional new schema
 fields do not rewrite old serialized content. Other specialisations remain unimplemented.
+
+## 2026-10-24 — Gentle gear condition and town repair
+
+Use the existing item-instance durability fields. A credited victory removes one condition from
+currently equipped, unlocked durable gear inside the existing exactly-once kill-reward transaction.
+Bags, vaults and items without durability do not wear. No additional death penalty is introduced.
+At zero condition, equipment remains owned/equipped but contributes no stats; a broken main-hand
+weapon uses the ordinary unarmed profile. Warn at 20% condition. Preserve intrinsic rolls and item
+identity; repair restores their original bonuses. Equipment comparisons use active bonuses.
+
+Merchants and workshops with implemented buy/craft services repair equipped gear. Aggregate missing
+condition costs one copper per ten points, rounded up once for the whole set. The owning realtime
+host validates life, combat and NPC distance. A typed repair request includes a maximum accepted
+price; the domain recomputes the cost under character/item locks, atomically debits the existing
+currency ledger, updates condition/version/history and records the existing service receipt. Replay
+cannot charge or repair later damage again. No migration, inventory replacement or new economy
+service is needed. Existing change-feed/profile reconciliation carries wear to other live views.
+
+This deliberately makes upkeep predictable and cheap. Per-hit wear would punish different attack
+speeds and group roles unevenly. Victory wear applies consistently to eligible reward recipients.

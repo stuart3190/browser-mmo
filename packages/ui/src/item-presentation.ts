@@ -102,8 +102,9 @@ export interface StatDelta {
 
 /** Per-stat difference of equipping `candidate` instead of `current` (null = empty slot). */
 export function compareItemStats(candidate: Item, current: Item | null): StatDelta[] {
-  const a = itemTotalStats(candidate.instance);
-  const b: StatBlock = current ? itemTotalStats(current.instance) : {};
+  const a = candidate.instance.durability?.current === 0 ? {} : itemTotalStats(candidate.instance);
+  const b: StatBlock =
+    current && current.instance.durability?.current !== 0 ? itemTotalStats(current.instance) : {};
   const keys = new Set([...Object.keys(a), ...Object.keys(b)] as StatKey[]);
   return STAT_ORDER.filter((k) => keys.has(k))
     .map((stat) => {

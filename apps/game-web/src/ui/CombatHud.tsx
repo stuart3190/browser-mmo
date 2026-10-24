@@ -1,3 +1,4 @@
+import { conditionRules } from '@mmo/game-data';
 import { useEffect, useState } from 'react';
 import { useGame } from './context';
 
@@ -40,6 +41,12 @@ export function PlayerFrame() {
   const c = state.character;
   const v = state.vitals;
   const prog = state.progress;
+  const worn = [...state.items.equipped().values()].filter(
+    (i) =>
+      i.instance.durability &&
+      i.instance.durability.current / i.instance.durability.max <= conditionRules.warningFraction,
+  );
+  const broken = worn.some((i) => i.instance.durability?.current === 0);
   return (
     <div className="panel frame player-frame" data-testid="player-frame">
       <div className="frame-title">
@@ -48,6 +55,15 @@ export function PlayerFrame() {
         {v?.inCombat && <span className="tag combat-tag">In combat</span>}
         {v?.dead && <span className="tag dead-tag">Dead</span>}
       </div>
+      {worn.length > 0 && (
+        <button
+          className="condition-warning"
+          data-testid="condition-warning"
+          onClick={() => state.toggle('character', true)}
+        >
+          {broken ? 'Broken gear — repair to restore bonuses' : 'Gear is worn — repair soon'}
+        </button>
+      )}
       <StatusTags entityId={state.myEntityId} />
       {v && <Bar value={v.health} max={v.maxHealth} kind="hp" testId="player-hp" />}
       {prog && (

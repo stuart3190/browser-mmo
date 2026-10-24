@@ -168,3 +168,14 @@ it('filters and sorts by authored rarity/name/level without mutating authoritati
   expect(inventoryView(gd, input, { search: 'nothing' })).toEqual([]);
   expect(input).toEqual(before);
 });
+
+it('compares active bonuses when either the candidate or equipped item is broken', () => {
+  const candidate = item('weapon.sword.iron_longsword', { stats: { strength: 4 } });
+  const equipped = item('weapon.sword.iron_longsword', { stats: { strength: 3 } });
+  candidate.instance.durability = { current: 0, max: 80 };
+  expect(compareItemStats(candidate, equipped).find((d) => d.stat === 'strength')?.delta).toBe(-3);
+  equipped.instance.durability = { current: 0, max: 80 };
+  expect(compareItemStats(candidate, equipped)).toEqual([]);
+  candidate.instance.durability.current = 1;
+  expect(compareItemStats(candidate, equipped).find((d) => d.stat === 'strength')?.delta).toBe(4);
+});

@@ -8,10 +8,14 @@ capacity or infrastructure work. Keep production unchanged; release validation i
 
 Completed this gameplay pass: level-3 Iron Guard / Frost Nova, status VFX/HUD and touch combat clarity.
 Proof: `gameplay/evidence/tactical-abilities-2026-10-24/` (both class victories; isolated level-3 fixtures).
-Active milestones:
-(1) persistent gear wear/repair, (2) meaningful specialisations and exploration/quest progression,
-(3) visual/control improvements from actual playthroughs. Verify functional behavior in the isolated
-local game, preserve existing earned actors, make incremental commits and continue across milestones.
+Completed: gear condition/wear, broken-gear consequences and paid town repair. Proof:
+`gameplay/evidence/gear-condition-2026-10-24/` includes a fresh level-one real-input journey with
+no grants/teleports, earned 80→79 sword wear and touch repair/relogin at 80. Domain/RT/UI/content
+checks, types, lint and build passed. Tactical milestone is commit `3e7eaa6` (pushed).
+
+Active next milestones: authored Amber Coast exploration/quest/encounter chapter, meaningful
+specialisations, and further visual/control refinement. Verify functional behavior in the isolated
+local game, preserve existing earned actors, commit/push incrementally and continue across milestones.
 
 ## Source and live safety boundaries
 
@@ -100,6 +104,3 @@ specialisations and broader world art remain long-term incomplete; they are not 
 The prior release results above remain historical evidence, not a gameplay-development stop condition.
 Continue the ranked gameplay milestones. Do not publish, weaken data safeguards, repeat load tests or
 investigate infrastructure. Physical-device and deployment validation belong to a later release phase.
-
-Wear/repair implementation is drafted in uncommitted `packages/{game-data,domain}/src/durability.ts`
-and tests. It is not integrated or verified yet. Continue this milestone; no release gate blocks it.

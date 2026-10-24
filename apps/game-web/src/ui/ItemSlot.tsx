@@ -1,3 +1,4 @@
+import { conditionRules } from '@mmo/game-data';
 import type { Item } from '@mmo/schemas';
 import { rarityColor } from '@mmo/ui';
 import { useGame } from './context';
@@ -28,6 +29,8 @@ export function ItemSlot({
   }
   const color = rarityColor(gameData, item.instance.rarityId);
   const equipped = item.instance.location.kind === 'equipped';
+  const condition = item.instance.durability;
+  const worn = condition && condition.current / condition.max <= conditionRules.warningFraction;
   const selected = state.selectedItemId === item.instance.id;
   return (
     <button
@@ -49,6 +52,19 @@ export function ItemSlot({
       {equipped && (
         <span className="slot-equipped" title="Equipped">
           E
+        </span>
+      )}
+      {worn && (
+        <span
+          className="slot-worn"
+          title={
+            condition.current === 0
+              ? 'Broken — repair to restore bonuses'
+              : 'Low condition — repair soon'
+          }
+          aria-label={condition.current === 0 ? 'Broken equipment' : 'Low equipment condition'}
+        >
+          !
         </span>
       )}
       {state.pending.has(item.instance.id) && <span className="slot-pending" />}

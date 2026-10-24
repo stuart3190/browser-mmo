@@ -93,3 +93,5 @@ export const DEMO_ZONE_ID = 'zone.greenvale.meadows';
 export { keeperOutpostPillars } from './content/world';
 
 export { clipRoad } from './rules/world-roads';
+
+export * from './durability';

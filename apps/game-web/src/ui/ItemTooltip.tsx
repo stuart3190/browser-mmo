@@ -80,8 +80,12 @@ export function ItemTooltip({ item, compare = true }: { item: Item; compare?: bo
         </div>
       ))}
       {inst.durability && (
-        <div className="tt-line">
-          Durability {inst.durability.current} / {inst.durability.max}
+        <div className={inst.durability.current === 0 ? 'tt-line tt-unmet' : 'tt-line'}>
+          Condition {inst.durability.current} / {inst.durability.max}
+          {inst.durability.current === 0 ? ' — Broken: bonuses and weapon damage inactive' : ''}
+          {inst.durability.current < inst.durability.max && (
+            <div className="small">Equip and visit a merchant or workshop to repair.</div>
+          )}
         </div>
       )}
       {itemRequirements(gameData, item, viewer).map((r) => (

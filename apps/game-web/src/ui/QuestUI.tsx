@@ -1,4 +1,4 @@
-import { craftDuration } from '@mmo/game-data';
+import { craftDuration, canRepairAt, repairCost } from '@mmo/game-data';
 import { useState } from 'react';
 import type { QuestView } from '@mmo/schemas';
 import { formatCurrency } from '@mmo/ui';
@@ -49,6 +49,12 @@ export function DialoguePanel() {
   const stock = state.items
     .inContainer('backpack')
     .filter((i) => !i.instance.flags.locked && i.template.vendorValue > 0);
+  const repairer = canRepairAt(gameData.raw.serviceOffers ?? [], d.npcId);
+  const condition = [...state.items.equipped().values()]
+    .filter((i) => !i.instance.flags.locked)
+    .flatMap((i) => (i.instance.durability ? [i.instance.durability] : []));
+  const quote = repairCost(condition);
+  const copper = state.balances.find((b) => b.currencyId === 'gold')?.amount ?? 0;
   const selected = stock.find((i) => i.instance.id === sellId);
   const population = gameData.raw.worldCatalog?.populations.find((p) => p.id === d.npcId);
   const banker =
@@ -84,6 +90,29 @@ export function DialoguePanel() {
         >
           Open vault
         </button>
+      )}
+      {repairer && (
+        <section className="dialogue-quest" data-testid="repair-service">
+          <strong>Equipment repairs</strong>
+          <p className="small">
+            Restore the condition of all equipped gear. One copper repairs ten condition. Broken
+            equipment regains its bonuses.
+          </p>
+          <button
+            data-testid="repair-all"
+            disabled={
+              quote === 0 ||
+              copper < quote ||
+              state.connection !== 'open' ||
+              state.vitals?.inCombat ||
+              state.vitals?.dead
+            }
+            onClick={() => quests.repair(quote)}
+          >
+            {quote ? `Repair equipped gear · ${quote} copper` : 'Equipped gear is fully repaired'}
+          </button>
+          {copper < quote && <p className="small">You need {quote - copper} more copper.</p>}
+        </section>
       )}
       {vendor && (
         <section className="dialogue-quest">
