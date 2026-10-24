@@ -100,7 +100,7 @@ is clean at 6935376. Its own Vite 5182 preview can be stopped when no longer nee
 
 ## Capacity work in progress
 
-Uncommitted `--load` qualifier option runs production TLS/password smoke then production-load.ts
+Committed `--load` qualifier option runs production TLS/password smoke then production-load.ts
 against its own database. Extended workload includes friends/DM/read receipts alongside movement,
 combat, inventory moves and market sales. Load fixtures grant gear and set spawn positions only
 before admission in the disposable database; they are not earned-gameplay proof.
@@ -129,3 +129,20 @@ No live admission limits changed.
    World visuals remain largely procedural/greybox. Physical phone testing, off-host recovery and
    public release are not qualified. Do not claim complete game shippability.
 5. Keep this handoff concise/current, PROGRESS honest and incremental verified commits pushed.
+
+## Latest checkpoint (supersedes active statuses above)
+
+Frozen 57cd2e2 full run finished successfully: 48 browser assertions plus full tests/build/restore.
+Warrior solo Vault finished successfully, original UUID 01a16dcf-f42f-7376-8e59-170e92baf8f0;
+proof/screenshot archive in earned-classes evidence. Mage remedy/staff stages pass.
+Controller `/tmp/bo-earned-vault-resume.log` is now on Mage solo, then mixed-class party. Keep
+both existing earned users; no grants/reset/restart of their story. Main realtime is detached,
+log `/tmp/bo-completion-realtime-restart.log` (old session IDs no longer valid).
+
+Integrated production attempt Pxgwmo failed phone fetch (desktop succeeded); repeat EY27et
+passes all 13 production browser assertions and is now measuring five actors/60 seconds with
+CPU profiling. Sanitized request diagnostics added to friends.cjs. First failure is retained.
+Capacity optimizer worktree `/tmp/bo-checkpoint-performance`, branch codex/checkpoint-performance,
+is experimenting with schema-specific version-2 checkpoint encoding, preserving original JSON.
+It must pass compatibility tests, world/realtime recovery tests and fresh load before integration.
+Do not mutate main runtime while earned runs are active. No deployment authorized/performed.

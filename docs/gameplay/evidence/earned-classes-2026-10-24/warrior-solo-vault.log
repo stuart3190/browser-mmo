@@ -1,0 +1,28 @@
+ENTERED finishwar_mvm9azse zone.greenvale.broken_vault
+PASS Normal respawn preserves the existing private run 
+AT VAULT
+PASS Entered a private owned run {
+  id: '01a16dcf-f42f-7376-8e59-170e92baf8f0',
+  status: 'active',
+  expiresAtMs: 1792850907402,
+  kills: 0,
+  required: 3,
+  inside: true,
+  owner: true
+}
+PASS Actual private encounter defeated instance:01a16dcf-f42f-7376-8e59-170e92baf8f0:e:1
+PASS Reconnect returns to the same live instance 
+PASS Death recovers at the private threshold without resetting cleared objectives 
+PASS Actual private encounter defeated instance:01a16dcf-f42f-7376-8e59-170e92baf8f0:e:2
+DODGE {"center":{"x":95.36358606306058,"y":0,"z":32.0055154334496},"range":5,"to":{"x":102.36358606306058,"z":32.0055154334496}}
+DODGE {"center":{"x":99.26538606277445,"y":0,"z":32.0055154334496},"range":5,"to":{"x":104.21513353108028,"z":36.95526290175543}}
+DODGE {"center":{"x":98.32877305378874,"y":0,"z":32.189702424535376},"range":5,"to":{"x":103.27852052209457,"z":37.139449892841206}}
+DODGE {"center":{"x":99.90109569228343,"y":0,"z":33.762025063030066},"range":5,"to":{"x":104.85084316058926,"z":38.711772531335896}}
+DODGE {"center":{"x":100.64949750964306,"y":0,"z":34.51042688038965},"range":5,"to":{"x":105.59924497794889,"z":39.46017434869548}}
+DODGE {"center":{"x":103.17064997396967,"y":0,"z":36.78617934485926},"range":5,"to":{"x":108.1203974422755,"z":41.735926813165094}}
+PASS Actual private encounter defeated instance:01a16dcf-f42f-7376-8e59-170e92baf8f0:e:3
+PASS All encounters authoritatively complete the run 
+PASS Completed private state survives relog 
+PASS Exit returns to the real entrance 
+PASS Reset creates a fresh identity with no stale objective state 
+PASS No browser exceptions []

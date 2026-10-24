@@ -27,3 +27,11 @@ Their JSON reports and banker screenshots are archived here. Professions and sol
 Vault proof are still pending.
 The new all-stage orchestrator has not yet completed its full fresh-character route. This record
 does not claim full-game, physical-device or public-release readiness.
+
+Warrior solo Vault continuation passed: normal recovery of the failed attempt, both guardians,
+Bell Keeper ground-warning movement, reconnect, deliberate death/threshold respawn, completion,
+relog, exit, reset and fresh identity with zero objectives. Its original private UUID and earned
+state were retained; no grants or instance reset bypassed a failed encounter. Raw report/log and
+completion/death screenshots are archived. The report's second `users` entry is an unused legacy
+helper default; only the Warrior logged in for this solo run. The driver now reports only actual
+actors. Mage professions/staff/solo and mixed-class party remain in progress.

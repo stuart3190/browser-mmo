@@ -18,7 +18,11 @@ function check(name, ok, detail) {
   console.log(ok ? 'PASS' : 'FAIL', name, detail || '');
   fs.writeFileSync(
     `${OUT}/proof.json`,
-    JSON.stringify({ ok: false, mode: MODE, users: [USER, PARTY], checks }, null, 2),
+    JSON.stringify(
+      { ok: false, mode: MODE, users: MODE === 'party' ? [USER, PARTY] : [USER], checks },
+      null,
+      2,
+    ),
   );
   if (!ok) throw Error(name);
 }
@@ -612,7 +616,17 @@ function check(name, ok, detail) {
   } finally {
     fs.writeFileSync(
       `${OUT}/proof.json`,
-      JSON.stringify({ ok: completed, mode: MODE, users: [USER, PARTY], checks, errors }, null, 2),
+      JSON.stringify(
+        {
+          ok: completed,
+          mode: MODE,
+          users: MODE === 'party' ? [USER, PARTY] : [USER],
+          checks,
+          errors,
+        },
+        null,
+        2,
+      ),
     );
     await browser.close();
   }

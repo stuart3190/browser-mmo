@@ -40,9 +40,19 @@ const nameOf = (s) =>
     });
   const a = await desktop.newPage(),
     b = await phone.newPage();
+  const networkFailures = [];
   for (const p of [a, b]) {
     p.setDefaultTimeout(30000);
     p.on('pageerror', (e) => errors.push(e.message));
+    p.on('requestfailed', (request) => {
+      const url = new URL(request.url());
+      networkFailures.push({
+        player: p === a ? 'desktop' : 'phone',
+        path: url.pathname,
+        method: request.method(),
+        error: request.failure()?.errorText,
+      });
+    });
   }
   const stamp = Date.now().toString(36),
     userA = process.env.FRIENDS_USER_A || `frienda_${stamp}`,
@@ -157,6 +167,7 @@ const nameOf = (s) =>
     check('Renewed consent restores the existing durable conversation', true);
     check('No browser exceptions', errors.length === 0, errors);
   } catch (e) {
+    fs.writeFileSync(`${OUT}/network-failures.json`, JSON.stringify(networkFailures, null, 2));
     fs.writeFileSync(`${OUT}/failure.txt`, e.stack || String(e));
     await a.screenshot({ path: `${OUT}/failure-desktop.png` }).catch(() => {});
     await b.screenshot({ path: `${OUT}/failure-phone.png` }).catch(() => {});

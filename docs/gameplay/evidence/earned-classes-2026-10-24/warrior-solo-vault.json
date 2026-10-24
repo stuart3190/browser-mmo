@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "mode": "solo",
+  "users": ["finishwar_mvm9azse", "route_muuzc28m"],
+  "checks": [
+    {
+      "name": "Normal respawn preserves the existing private run",
+      "ok": true
+    },
+    {
+      "name": "Entered a private owned run",
+      "ok": true,
+      "detail": {
+        "id": "01a16dcf-f42f-7376-8e59-170e92baf8f0",
+        "status": "active",
+        "expiresAtMs": 1792850907402,
+        "kills": 0,
+        "required": 3,
+        "inside": true,
+        "owner": true
+      }
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a16dcf-f42f-7376-8e59-170e92baf8f0:e:1"
+    },
+    {
+      "name": "Reconnect returns to the same live instance",
+      "ok": true
+    },
+    {
+      "name": "Death recovers at the private threshold without resetting cleared objectives",
+      "ok": true
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a16dcf-f42f-7376-8e59-170e92baf8f0:e:2"
+    },
+    {
+      "name": "Actual private encounter defeated",
+      "ok": true,
+      "detail": "instance:01a16dcf-f42f-7376-8e59-170e92baf8f0:e:3"
+    },
+    {
+      "name": "All encounters authoritatively complete the run",
+      "ok": true
+    },
+    {
+      "name": "Completed private state survives relog",
+      "ok": true
+    },
+    {
+      "name": "Exit returns to the real entrance",
+      "ok": true
+    },
+    {
+      "name": "Reset creates a fresh identity with no stale objective state",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

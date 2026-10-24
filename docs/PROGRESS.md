@@ -1630,3 +1630,21 @@ same private UUID, the first guardian was defeated and reconnect retained it. Re
 full run completion and mixed-class proof are still in progress. The failed attempt and its
 NO_TARGET counts are archived in earned-class evidence; no combat balance change was made.
 Hosted CI 40092678899 passes the pushed c0a47f1 checkpoint. Merged types/lint pass locally.
+
+### Earned Vault and combined qualification — 2026-10-24
+
+- [x] Frozen 57cd2e2 full qualification: format/lint/types, 234 unit, 109 domain, 73 realtime,
+      11 HTTP tests; four builds/debug-hook guard, assets/content, 16-table upgrade/restore and
+      48 browser assertions. [Evidence](hardening/evidence/combined-qualification-2026-10-24/README.md).
+- [x] Earned Warrior solo Vault: two guardians/Bell Keeper, same-instance reconnect and normal
+      death/respawn, completion/relogin, exit/reset/new empty instance. Original completed UUID
+      `01a16dcf-f42f-7376-8e59-170e92baf8f0` independently has three rewarded durable kills.
+      [Evidence](gameplay/evidence/earned-classes-2026-10-24/README.md).
+- [x] Existing earned Mage completed remedy professions and staff crafting (five assertions each).
+      Solo and mixed-class Vault are running; these are resumable staged proofs, not an uninterrupted run.
+- [x] Integrated built-production TLS/password social smoke passes all 13 browser assertions on
+      repeat, including both classes and absent debug hook (`/tmp/brokenodyssey-qualification.EY27et`).
+- [ ] First integrated production attempt failed with a phone login network fetch error; desktop
+      succeeded. Added sanitized request-failure diagnostics; no authentication bypass or retry masking.
+- [ ] Capacity remains unqualified. Profiling/optimization is isolated in a separate source worktree
+      while earned actors continue. No production changes or admission-limit increase.
