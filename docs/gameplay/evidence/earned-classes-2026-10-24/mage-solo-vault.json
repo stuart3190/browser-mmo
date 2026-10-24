@@ -1,9 +1,7 @@
 {
   "ok": true,
   "mode": "solo",
-  "users": [
-    "finishmage_mvm9ku7m"
-  ],
+  "users": ["finishmage_mvm9ku7m"],
   "checks": [
     {
       "name": "Entered a private owned run",

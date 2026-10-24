@@ -1,10 +1,7 @@
 {
   "ok": true,
   "mode": "party",
-  "users": [
-    "finishwar_mvm9azse",
-    "finishmage_mvm9ku7m"
-  ],
+  "users": ["finishwar_mvm9azse", "finishmage_mvm9ku7m"],
   "checks": [
     {
       "name": "Entered a private owned run",
