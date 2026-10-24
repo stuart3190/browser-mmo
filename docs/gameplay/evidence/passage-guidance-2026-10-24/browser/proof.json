@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five actor at Amber Coast harbour. Normal quest guidance, menu selection, two real boat trips and relogin. No progress/item grants; initial position is a navigation fixture.",
+  "checks": [
+    {
+      "name": "Quest compass points from the harbour to its nearby ferry home",
+      "ok": true
+    },
+    {
+      "name": "World panel identifies the matching Willow Quay passage",
+      "ok": true
+    },
+    {
+      "name": "Real ferry arrival updates quest directions toward the north gate",
+      "ok": true
+    },
+    {
+      "name": "A distant atlas destination uses the boat at the current quay",
+      "ok": true
+    },
+    {
+      "name": "Suggested departure changes to the selected forest destination",
+      "ok": true
+    },
+    {
+      "name": "Atlas guidance survives travel and becomes local arrival guidance",
+      "ok": true
+    },
+    {
+      "name": "Ordinary travel persists the forest arrival on relogin",
+      "ok": true
+    },
+    {
+      "name": "No guidance or travel exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

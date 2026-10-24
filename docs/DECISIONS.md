@@ -1499,3 +1499,17 @@ and mute are exposed in a Settings/Controls window reachable from both input mod
 simultaneous impacts share one cue and overlapping voices are bounded for audible clarity. Unavailable
 audio leaves gameplay working and shows an explanation in settings. Native browser signal checks
 verify output and mute behavior; they do not claim physical speaker/headphone listening signoff.
+
+## 2026-10-24 — Passage guidance accounts for where the player actually walks
+
+The old zone-only breadth-first search chose the first equal-hop connection. From Tidecross Harbour
+it could send a player almost two kilometres to a boundary despite a nearby ferry. Guidance now
+searches actual arrival/departure nodes, adding straight-line walking estimates for each leg and
+25 metres of equivalent walking per crossing. It includes the actual quest objective position,
+rather than the first catalog location in that zone. Different arrivals in one zone remain distinct.
+
+This is directional help, not collision pathfinding or travel authority. The existing five-metre,
+life/combat, story and ownership checks still authorize travel on the server. Closed or unearned
+quest passages are excluded from guidance; the atlas explains their locks and highlights the
+recommended available route. Guidance may prefer an extra crossing when it avoids a long walk.
+Same-zone goals remain local bearings. No teleport shortcut or world topology changes.

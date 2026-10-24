@@ -112,7 +112,12 @@ export function Minimap() {
         ctx.arc(sx(m.x), sy(m.z), m.kind === 'enemy' ? 3 : 2.5, 0, Math.PI * 2);
         ctx.fill();
       }
-      const place = worldDestination(gameData.raw.worldCatalog, state.worldDestinationId, zoneId);
+      const place = worldDestination(gameData.raw.worldCatalog, state.worldDestinationId, zoneId, {
+        fromPosition: me,
+        completedQuestIds: new Set(
+          state.quests.filter((q) => q.state === 'completed').map((q) => q.questId),
+        ),
+      });
       const destination = place
         ? {
             questName: place.destination.name,

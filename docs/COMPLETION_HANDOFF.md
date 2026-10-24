@@ -54,13 +54,17 @@ bleed-through fixed; visual follow-up inspected. 22 frontend tests, types/lint/b
 No music/ambience or physical listening claim. `/tmp/bo-audio-draft/integrate.py` is now OBSOLETE;
 do not rerun it. Commission commit `660f75e` is pushed.
 
-Next gameplay priority: passage guidance chooses first zone BFS path, ignoring player and destination
-positions. This points coastal players beside a ferry at a boundary almost two kilometres away.
-Fix sensible route selection using walking distances between actual passage endpoints and route
-requirements; verify quest and atlas guidance through real travel. Then authored Elderwood chapter
-can follow. Initial content idea (NOT implemented): Pinewatch Landing outpost near256/4000,
-Keeper Tamsin, living-seal surveys, telegraphed Briar Spitters and Rootbound Cantor, level-five/six
-progression. Most other atlas regions and armour-specific appearance remain incomplete.
+Completed: walking-aware passage guidance, real objective positions and story/closed route filters.
+World highlights the recommended route. Eight real browser checks, 132 content and23 frontend tests,
+types/lint/build/debug guard pass; screenshots inspected. Evidence:
+`gameplay/evidence/passage-guidance-2026-10-24/`. Audio commit `6aa0342` is pushed.
+
+Next gameplay milestone: authored Elderwood chapter (NOT yet implemented). Pinewatch Landing
+outpost near256/4000, Keeper Tamsin, living-seal surveys, telegraphed Briar Spitters and Rootbound
+Cantor, level-five/six progression. Existing boats from Willow Quay arrive at256/4000. Build near
+this landing, not the generic town kilometres away. Most other atlas regions and armour-specific
+appearance remain incomplete. Use existing quest/encounter/crafting authority and procedural art;
+no production, capacity or infrastructure work.
 
 Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.

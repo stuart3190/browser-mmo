@@ -1,5 +1,6 @@
+import { questDestination } from '../state/quest-navigation';
 import { useEffect, useState } from 'react';
-import { distance2D } from '@mmo/game-data';
+import { distance2D, worldDestination } from '@mmo/game-data';
 import { Window } from './Window';
 import { useGame } from './context';
 
@@ -22,6 +23,18 @@ export function WorldWindow() {
   if (!world) return null;
   const region = world.regions.find((r) => r.id === regionId) ?? current;
   const pos = controls.position();
+  const completed = new Set(
+    state.quests.filter((q) => q.state === 'completed').map((q) => q.questId),
+  );
+  const zone = controls.zoneId() ?? state.character.zoneId;
+  const route = pos
+    ? state.worldDestinationId
+      ? worldDestination(world, state.worldDestinationId, zone, {
+          fromPosition: pos,
+          completedQuestIds: completed,
+        })
+      : questDestination(gameData, state.quests, state.trackedQuestId, zone, pos)
+    : null;
   const guide = (id: string) =>
     state.update((s) => {
       s.worldDestinationId = id;
@@ -106,19 +119,33 @@ export function WorldWindow() {
           const from = world.locations.find((l) => l.id === t.fromLocationId)!,
             to = world.locations.find((l) => l.id === t.toLocationId)!;
           const distance = pos ? distance2D(pos, from.position) : Infinity;
+          const locked = !!t.requiredQuestId && !completed.has(t.requiredQuestId);
+          const suggested = route?.travelId === t.id;
           return (
-            <div className="world-departure" key={t.id}>
+            <div
+              className={`world-departure${suggested ? ' suggested' : ''}`}
+              key={t.id}
+              data-recommended={suggested}
+            >
               <span>
+                {suggested && <strong className="suggested-passage">Suggested passage</strong>}
                 {from.name} → {to.name}
                 <small>
                   {t.mode} · {Math.round(distance)} m to departure
+                  {!t.enabled && ' · Passage closed'}
+                  {locked &&
+                    ` · Requires ${gameData.quests.get(t.requiredQuestId!)?.name ?? 'quest completion'}`}
                 </small>
               </span>
               <button onClick={() => guide(from.id)}>Guide</button>
               <button
                 data-travel={t.id}
                 disabled={
-                  !t.enabled || distance > 5 || state.vitals?.dead || state.vitals?.inCombat
+                  !t.enabled ||
+                  locked ||
+                  distance > 5 ||
+                  state.vitals?.dead ||
+                  state.vitals?.inCombat
                 }
                 onClick={() => {
                   controls.travel(t.id);
@@ -145,9 +172,9 @@ export function WorldWindow() {
         Resume quest guidance
       </button>
       <p className="small">
-        Greenvale offers gathering, shops, field-gear crafting and a shared Broken Vault ruin. Other
-        regions remain greybox. Broken Vault private runs and Greenvale field professions are
-        available.
+        Greenvale offers gathering, shops, fieldcraft and private Broken Vault runs. Amber Coast
+        adds the Tidewatch story and weapon commissions. Other regions remain greybox. Bearings
+        estimate walking distance between passages; follow roads around obstacles.
       </p>
     </Window>
   );

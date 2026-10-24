@@ -463,24 +463,72 @@ export function travelAt(
   );
 }
 
-/** Guidance to a real place, via the first edge of the current zone's shortest travel path. */
-export function worldDestination(w: WorldCatalog | undefined, id: string | null, zoneId: string) {
+export interface PassageOptions {
+  fromPosition?: { x: number; z: number };
+  destinationPosition?: { x: number; z: number };
+  completedQuestIds?: ReadonlySet<string>;
+}
+
+/** Bearings through real passage endpoints. Walking estimates include intermediate zones and
+ * the final objective, not just the number of zone crossings. Follow roads around obstacles.
+ * A small crossing cost avoids pointless detours. This never authorizes a travel command.
+ */
+export function worldDestination(
+  w: WorldCatalog | undefined,
+  id: string | null,
+  zoneId: string,
+  options: PassageOptions = {},
+) {
   const destination = w?.locations.find((l) => l.id === id);
   if (!w || !destination) return null;
-  if (destination.zoneId === zoneId) return { location: destination, destination };
-  const queue: [string, WorldCatalog['locations'][number] | null][] = [[zoneId, null]],
-    seen = new Set([zoneId]);
+  if (destination.zoneId === zoneId) return { location: destination, destination, travelId: null };
+  type Location = WorldCatalog['locations'][number];
+  const locations = new Map(w.locations.map((l) => [l.id, l]));
+  const links = w.travel
+    .filter(
+      (t) => t.enabled && (!t.requiredQuestId || options.completedQuestIds?.has(t.requiredQuestId)),
+    )
+    .map((t) => ({
+      travel: t,
+      from: locations.get(t.fromLocationId),
+      to: locations.get(t.toLocationId),
+    }))
+    .filter(
+      (l): l is { travel: WorldCatalog['travel'][number]; from: Location; to: Location } =>
+        !!l.from && !!l.to,
+    )
+    .sort((a, b) => a.travel.id.localeCompare(b.travel.id));
+  const end = options.destinationPosition ?? destination.position;
+  const queue = links
+    .filter((l) => l.from.zoneId === zoneId)
+    .map((l) => ({
+      at: l.to,
+      first: l.from,
+      travelId: l.travel.id,
+      cost: (options.fromPosition ? distance2D(options.fromPosition, l.from.position) : 0) + 25,
+    }));
+  const visited = new Map<string, number>();
+  let best: { location: Location; destination: Location; travelId: string } | null = null;
+  let bestCost = Infinity;
   while (queue.length) {
-    const [zone, first] = queue.shift()!;
-    for (const t of w.travel.filter((t) => t.enabled)) {
-      const a = w.locations.find((l) => l.id === t.fromLocationId)!,
-        b = w.locations.find((l) => l.id === t.toLocationId)!;
-      if (a.zoneId !== zone || seen.has(b.zoneId)) continue;
-      const node = first ?? a;
-      if (b.zoneId === destination.zoneId) return { location: node, destination };
-      seen.add(b.zoneId);
-      queue.push([b.zoneId, node]);
+    queue.sort((a, b) => a.cost - b.cost || a.travelId.localeCompare(b.travelId));
+    const current = queue.shift()!;
+    if (current.cost >= bestCost) break;
+    if (current.cost >= (visited.get(current.at.id) ?? Infinity)) continue;
+    visited.set(current.at.id, current.cost);
+    if (current.at.zoneId === destination.zoneId) {
+      const cost = current.cost + distance2D(current.at.position, end);
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = { location: current.first, destination, travelId: current.travelId };
+      }
+      continue;
+    }
+    for (const link of links.filter((l) => l.from.zoneId === current.at.zoneId)) {
+      const cost = current.cost + distance2D(current.at.position, link.from.position) + 25;
+      if (cost < (visited.get(link.to.id) ?? Infinity))
+        queue.push({ at: link.to, first: current.first, travelId: current.travelId, cost });
     }
   }
-  return null;
+  return best;
 }

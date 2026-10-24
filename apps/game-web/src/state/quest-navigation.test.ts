@@ -73,3 +73,14 @@ it('guides existing quest handoffs back through world travel without changing th
   });
   expect(questDestination(gd, [q], null, z, me)?.label).toBe('Return to Elder Maren');
 });
+it('uses the player and actual NPC objective positions to suggest the coastal ferry home', () => {
+  const q = log('quest.greenvale.well_records');
+  q.state = 'ready_to_turn_in';
+  const d = questDestination(gd, [q], null, 'zone.aurelian.amber_coast', { x: 272, z: 104 });
+  expect(d).toMatchObject({
+    position: { x: 256, z: 96 },
+    travelId: 'travel.amber_coast.port.to.greenvale_marches.port',
+  });
+  expect(d?.label).toContain('Tidecross Harbour');
+  expect(d?.label).toContain('Return to Elder Maren');
+});

@@ -7,6 +7,7 @@ export interface QuestDestination {
   questName: string;
   label: string;
   stage: 'objective' | 'turn_in' | 'offer';
+  travelId: string | null;
   zoneId: string | null;
   position: { x: number; z: number } | null;
 }
@@ -102,15 +103,26 @@ export function questDestination(
     return distance(a) - distance(b);
   });
   let target = candidates[0];
+  let travelId: string | null = null;
   if (target && target.zoneId !== zoneId && gd.raw.worldCatalog) {
     const place = gd.raw.worldCatalog.locations.find((l) => l.zoneId === target!.zoneId);
-    const route = place && worldDestination(gd.raw.worldCatalog, place.id, zoneId);
+    const route =
+      place &&
+      worldDestination(gd.raw.worldCatalog, place.id, zoneId, {
+        fromPosition: me,
+        destinationPosition: target.position,
+        completedQuestIds: new Set(
+          quests.filter((q) => q.state === 'completed').map((q) => q.questId),
+        ),
+      });
     if (route) {
+      travelId = route.travelId;
       target = { zoneId: route.location.zoneId, position: route.location.position };
       label = `Travel via ${route.location.name} · ${label}`;
     }
   }
   return {
+    travelId,
     questId: q.questId,
     questName: q.name,
     label,

@@ -1973,3 +1973,16 @@ Ranked player-facing gaps from the current client and content:
       a player beside the coastal ferry toward a boundary pass nearly two kilometres away. Prefer
       sensible walking distance through actual passage endpoints, preserve travel requirements,
       verify real directions. Then continue authored forest exploration and encounters.
+
+### Practical passage guidance — verified 2026-10-24
+
+- [x] Directions estimate walking through actual departures/arrivals and the real objective;
+      respect story requirements; highlight the suggested passage and explain closed/locked routes.
+- [x] Eight real browser checks: nearby coastal ferry, changed quest directions after travel,
+      selected atlas goal, correct second boat, local arrival guidance and relogin. Screenshots
+      reviewed. Navigation fixture starts at a harbour; no item/progress grants.
+- 132 content,23 frontend checks, repository types, lint, production build/debug guard pass.
+  Evidence: `gameplay/evidence/passage-guidance-2026-10-24/`. Guidance remains bearings, not automatic
+  collision pathfinding; existing server travel authorization remains intact.
+- [ ] Next: authored Elderwood/Pinewatch Landing continuation, living-seal investigation, distinct
+      forest creatures with dodgeable ground strikes, meaningful earned progression and forest art.

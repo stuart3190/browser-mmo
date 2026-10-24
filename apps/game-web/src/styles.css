@@ -2554,3 +2554,13 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
 .ui-root:has(.window-settings) .quest-guide {
   visibility: hidden;
 }
+
+.world-departure.suggested {
+  border-left: 3px solid var(--accent);
+  padding-left: 8px;
+}
+.suggested-passage {
+  display: block;
+  color: var(--accent);
+  font-size: 12px;
+}

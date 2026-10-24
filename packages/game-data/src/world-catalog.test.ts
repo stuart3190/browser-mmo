@@ -174,3 +174,80 @@ it('links playable herb nodes to catalog resources and rejects invalid harvestin
     ).toThrow();
   }
 });
+it('guides coastal players toward the nearby ferry instead of a distant boundary, including the final walking leg', () => {
+  const route = worldDestination(
+    world,
+    'location.greenvale.north_gate',
+    'zone.aurelian.amber_coast',
+    {
+      fromPosition: { x: 272, z: 104 },
+      destinationPosition: { x: -6, z: 6 },
+    },
+  );
+  expect(route?.location.id).toBe('location.amber_coast.port');
+  expect(route?.travelId).toBe('travel.amber_coast.port.to.greenvale_marches.port');
+});
+it('uses endpoint walking distances, can take an extra short connection, and excludes unavailable quest passages', () => {
+  const place = (id: string, zoneId: string, x: number) => ({
+    ...world.locations[0]!,
+    id,
+    zoneId,
+    position: { x, y: 0, z: 0 },
+  });
+  const link = (id: string, fromLocationId: string, toLocationId: string) => ({
+    id,
+    fromLocationId,
+    toLocationId,
+    name: id,
+    mode: 'boat' as const,
+    enabled: true,
+    requiredQuestId: null as string | null,
+  });
+  const w = {
+    ...world,
+    locations: [
+      place('a.near', 'a', 0),
+      place('a.far', 'a', 100),
+      place('b.near', 'b', 0),
+      place('b.far', 'b', 1000),
+      place('c.port', 'c', 0),
+      place('c.exit', 'c', 5),
+    ],
+    travel: [link('direct.near', 'a.near', 'b.far'), link('direct.far', 'a.far', 'b.near')],
+  };
+  expect(worldDestination(w, 'b.near', 'a', { fromPosition: { x: 0, z: 0 } })?.travelId).toBe(
+    'direct.far',
+  );
+  expect(
+    worldDestination(w, 'b.near', 'a', {
+      fromPosition: { x: 0, z: 0 },
+      destinationPosition: { x: 1000, z: 0 },
+    })?.travelId,
+  ).toBe('direct.near');
+  w.travel.push(link('via.c', 'a.near', 'c.port'), link('via.b', 'c.exit', 'b.near'));
+  expect(worldDestination(w, 'b.near', 'a', { fromPosition: { x: 0, z: 0 } })?.travelId).toBe(
+    'via.c',
+  );
+  w.travel.find((t) => t.id === 'via.b')!.requiredQuestId = 'quest.pass';
+  expect(worldDestination(w, 'b.near', 'a', { fromPosition: { x: 0, z: 0 } })?.travelId).toBe(
+    'direct.far',
+  );
+  expect(
+    worldDestination(w, 'b.near', 'a', {
+      fromPosition: { x: 0, z: 0 },
+      completedQuestIds: new Set(['quest.pass']),
+    })?.travelId,
+  ).toBe('via.c');
+  w.travel.find((t) => t.id === 'via.b')!.enabled = false;
+  expect(
+    worldDestination(w, 'b.near', 'a', {
+      fromPosition: { x: 0, z: 0 },
+      completedQuestIds: new Set(['quest.pass']),
+    })?.travelId,
+  ).toBe('direct.far');
+  w.travel.forEach((t) => {
+    t.enabled = false;
+  });
+  expect(worldDestination(w, 'b.near', 'a')).toBeNull();
+  expect(worldDestination(w, 'b.near', 'b')?.travelId).toBeNull();
+});
