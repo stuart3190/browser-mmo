@@ -1,0 +1,99 @@
+{
+  "ok": false,
+  "error": "Error: Walk deadline 337.5,163.5 (blocked route)\n    at walk (/root/browser-mmo/scripts/e2e/vertical-slice.cjs:34:15)\n    at async go (/root/browser-mmo/scripts/e2e/coast.cjs:126:11)\n    at async talk (/root/browser-mmo/scripts/e2e/coast.cjs:141:9)\n    at async quest (/root/browser-mmo/scripts/e2e/coast.cjs:147:9)\n    at async <anonymous> (/root/browser-mmo/scripts/e2e/coast.cjs:295:7)",
+  "checks": [
+    {
+      "name": "Warrior accepts Maren’s coastal letter",
+      "ok": true
+    },
+    {
+      "name": "Warrior walks the north road into the Marches",
+      "ok": true
+    },
+    {
+      "name": "Warrior reaches Amber Coast through two real travel links",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Warrior defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Warrior defeats Drowned Bellkeeper",
+      "ok": true,
+      "detail": {
+        "dodge": 7
+      }
+    },
+    {
+      "name": "Warrior responds to the Bellkeeper warning",
+      "ok": true,
+      "detail": {
+        "dodge": 7
+      }
+    },
+    {
+      "name": "Warrior completes all three new quests",
+      "ok": true
+    },
+    {
+      "name": "Warrior equips its earned seal with real bonuses",
+      "ok": true
+    },
+    {
+      "name": "Warrior retains chapter completion after login",
+      "ok": true
+    },
+    {
+      "name": "Mage accepts Maren’s coastal letter",
+      "ok": true
+    },
+    {
+      "name": "Mage walks the north road into the Marches",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches Amber Coast through two real travel links",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Drowned Bellkeeper",
+      "ok": true,
+      "detail": {
+        "dodge": 6
+      }
+    },
+    {
+      "name": "Mage responds to the Bellkeeper warning",
+      "ok": true,
+      "detail": {
+        "dodge": 6
+      }
+    }
+  ],
+  "errors": []
+}

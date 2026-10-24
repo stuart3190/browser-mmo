@@ -1866,7 +1866,7 @@ Ranked player-facing gaps from the current client and content:
       root + joystick escape, reconnect and unobstructed portrait/landscape ability controls. Fixtures
       start at level 3; this is functional combat evidence, not a newly earned progression journey.
       Screenshot review led to fixing fullscreen/Firebolt and mobile compass/target overlaps.
-- [ ] Next: wear/repair, then specialisation and quest/world milestones. Do not stop at a plan or unit pass.
+- Subsequent milestones and current next task are recorded below.
 
 ### Gear condition milestone — verified 2026-10-24
 
@@ -1883,3 +1883,19 @@ Ranked player-facing gaps from the current client and content:
   Repository typecheck, lint and production build pass; no production changes.
 - [ ] Next: authored Amber Coast exploration/quest/encounter chapter, then meaningful specialisations
       and further visual/playability refinement. Existing external release gates remain separate.
+
+### Amber Coast Tidewatch chapter — verified 2026-10-24
+
+- [x] Three authored quests after Greenvale's Marches closure: cross the sea with Maren's records,
+      read two shore marks and clear Glassback Crabs, then read the final oath and defeat the
+      Drowned Bellkeeper. Tideglass Seal rewards both playable classes.
+- [x] Distinct crab/Bellkeeper models, tidal shallows, marked survey sites and a clear shore path.
+- Both classes completed travel, surveys, crab fights, boss, ring equip and relogin through actual
+  controls. Initial Mage return route clipped a prop; short keyboard waypoints fixed the test driver,
+  and a fresh Mage run passed all eleven checks. Screenshots inspected; oversized world labels,
+  generic cleave wording and stale target feedback fixed. Evidence: `gameplay/evidence/amber-tidewatch-2026-10-24/`.
+- 126 content, 80 world and 13 frontend tests plus chapter domain integration pass; repository types,
+  final frontend/world types, lint, production build and content validation pass. Browser fixtures
+  start at level five with prior story closure; no new earned 1→5 claim. Other atlas regions remain greybox.
+- [ ] Active next: four meaningful level-five specialisations, mentor retraining, live ability feedback,
+      authority/replay checks and real-input class playthroughs. Continue gameplay; no release-gate work.

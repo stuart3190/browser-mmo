@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "fixture": "Visual-only fixtures at the shore. Functional chapter evidence is in coast suite.",
+  "checks": [
+    {
+      "name": "Coastal visual fixture joined",
+      "ok": true
+    },
+    {
+      "name": "Coastal visual fixture joined",
+      "ok": true
+    },
+    {
+      "name": "No rendering exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

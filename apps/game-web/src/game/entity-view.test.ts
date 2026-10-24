@@ -159,3 +159,38 @@ it('renders the frozen amber sector independently of enemy movement and cleans i
     engine.dispose();
   }
 });
+
+it('gives shore creatures distinct pickable rigs and preserves boss scale through animation', () => {
+  const engine = new NullEngine();
+  const scene = new Scene(engine);
+  try {
+    void scene.defaultMaterial;
+    const baseline = { meshes: scene.meshes.length, materials: scene.materials.length };
+    const views = new EntityViews(scene, 'local');
+    for (const [id, refId] of [
+      ['crab', 'enemy.amber_coast.glassback_crab'],
+      ['bell', 'enemy.amber_coast.drowned_bellkeeper'],
+    ] as const) {
+      views.upsert({
+        id,
+        refId,
+        kind: 'enemy',
+        name: id,
+        position: { x: 0, y: 0, z: 0 },
+        rotationY: 0,
+        characterId: null,
+      });
+    }
+    expect(views.entityIdOfMesh(scene.getMeshByName('crab_crab_claw')!)).toBe('crab');
+    expect(views.entityIdOfMesh(scene.getMeshByName('bell_anchor_flukes')!)).toBe('bell');
+    views.update(0.1);
+    expect(scene.getMeshByName('bell')!.scaling.y).toBeGreaterThan(1.3);
+    views.remove('crab');
+    views.remove('bell');
+    expect(scene.meshes).toHaveLength(baseline.meshes);
+    expect(scene.materials).toHaveLength(baseline.materials);
+  } finally {
+    scene.dispose();
+    engine.dispose();
+  }
+});

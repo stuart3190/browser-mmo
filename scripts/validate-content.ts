@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
-import { contentPacks, getGameData } from '../packages/game-data/src/index';
+import { contentPacks, chapterContentPacks, getGameData } from '../packages/game-data/src/index';
 const data = getGameData();
 console.log(
   JSON.stringify(
     {
-      packs: contentPacks.map(({ id, schemaVersion, revision }) => ({
+      packs: [...contentPacks, ...chapterContentPacks].map(({ id, schemaVersion, revision }) => ({
         id,
         schemaVersion,
         revision,

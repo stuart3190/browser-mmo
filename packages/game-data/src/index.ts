@@ -1,3 +1,5 @@
+import { withCoastalChapter } from './coastal-chapter';
+export { tidewatch, chapterContentPacks } from './coastal-chapter';
 import { withTacticalAbilities } from './tactical';
 import { withDungeonContent } from './dungeons';
 export * from './dungeons';
@@ -70,13 +72,15 @@ export const contentManifest: ContentManifest = {
 };
 
 const compiledGameData = compileContentCatalog(contentManifest, contentPacks);
-export const rawGameData = withTacticalAbilities(
-  withDungeonContent(
-    RawGameDataSchema.parse({
-      ...compiledGameData,
-      itemTemplates: [...compiledGameData.itemTemplates, ...professionItems],
-      serviceOffers: [...(compiledGameData.serviceOffers ?? []), ...professionOffers],
-    }),
+export const rawGameData = withCoastalChapter(
+  withTacticalAbilities(
+    withDungeonContent(
+      RawGameDataSchema.parse({
+        ...compiledGameData,
+        itemTemplates: [...compiledGameData.itemTemplates, ...professionItems],
+        serviceOffers: [...(compiledGameData.serviceOffers ?? []), ...professionOffers],
+      }),
+    ),
   ),
 );
 

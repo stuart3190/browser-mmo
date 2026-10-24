@@ -14,11 +14,12 @@ export class ActorModel {
   private phase = 0;
   private strike = 0;
   private dead = false;
+  private baseScaleY: number | undefined;
 
   constructor(
     scene: Scene,
     id: string,
-    readonly kind: 'hero' | 'wolf' | 'lantern' | 'warden',
+    readonly kind: 'hero' | 'wolf' | 'lantern' | 'warden' | 'crab' | 'tidekeeper',
     coat = '#426877',
   ) {
     const material = (hex: string) => {
@@ -43,7 +44,7 @@ export class ActorModel {
     const dark = material(kind === 'wolf' ? '#394951' : '#333b41');
     const light = material(kind === 'wolf' ? '#c5c9bd' : '#d2b58a');
     this.mesh =
-      kind === 'lantern'
+      kind === 'lantern' || kind === 'crab'
         ? MeshBuilder.CreateIcoSphere(id, { radius: 0.65, subdivisions: 0 }, scene)
         : MeshBuilder.CreateBox(
             id,
@@ -53,7 +54,7 @@ export class ActorModel {
             scene,
           );
     this.mesh.material = main;
-    this.mesh.position.y = kind === 'wolf' ? 0.65 : 1.05;
+    this.mesh.position.y = kind === 'wolf' ? 0.65 : kind === 'crab' ? 0.55 : 1.05;
     const part = (
       name: string,
       size: [number, number, number],
@@ -70,12 +71,40 @@ export class ActorModel {
       m.material = mat;
       return m;
     };
-    if (kind === 'warden') {
+    if (kind === 'crab') {
+      main.diffuseColor = Color3.FromHexString('#5aa7b4');
+      main.specularColor = Color3.FromHexString('#c4e4da');
+      dark.diffuseColor = Color3.FromHexString('#b57b45');
+      light.diffuseColor = Color3.FromHexString('#f6d887');
+      this.mesh.scaling.set(1.25, 0.6, 1);
+      for (const side of [-1, 1]) {
+        for (const z of [-0.4, 0, 0.4]) {
+          const leg = part('crab_leg', [0.9, 0.16, 0.14], [side * 0.8, -0.25, z], dark);
+          leg.rotation.z = side * -0.3;
+          this.limbs.push(leg);
+        }
+        const claw = part('crab_claw', [0.35, 0.35, 0.55], [side * 0.68, 0.1, 0.85], light);
+        claw.rotation.y = side * -0.35;
+        this.limbs.push(claw);
+        part('crab_eye_stalk', [0.09, 0.42, 0.09], [side * 0.25, 0.47, 0.4], dark);
+        part('crab_eye', [0.13, 0.16, 0.13], [side * 0.25, 0.72, 0.4], light);
+      }
+    } else if (kind === 'warden' || kind === 'tidekeeper') {
       main.diffuseColor = Color3.FromHexString('#758d8e');
       dark.diffuseColor = Color3.FromHexString('#435c63');
       light.diffuseColor = Color3.FromHexString('#56d5d6');
       light.emissiveColor = Color3.FromHexString('#257d87');
       this.mesh.scaling.x = 1.65;
+      if (kind === 'tidekeeper') {
+        main.diffuseColor = Color3.FromHexString('#3b6977');
+        dark.diffuseColor = Color3.FromHexString('#314655');
+        light.diffuseColor = Color3.FromHexString('#ebc774');
+        light.emissiveColor = Color3.FromHexString('#6e5126');
+        this.mesh.scaling.y = 1.35;
+        part('bell_crown', [0.9, 0.15, 0.65], [0, 0.94, 0], light);
+        part('anchor_shaft', [0.13, 1.4, 0.16], [-0.9, -0.2, 0.3], dark);
+        part('anchor_flukes', [0.85, 0.17, 0.2], [-0.9, -0.8, 0.3], light);
+      }
       part('crest', [0.7, 0.6, 0.45], [0, 0.6, 0], dark);
       part('seal', [0.25, 0.3, 0.15], [0, 0, 0.27], light);
       for (const x of [-0.65, 0.65]) {
@@ -142,7 +171,9 @@ export class ActorModel {
     const step = Math.min(dt, 0.1);
     this.phase += step * (speed > 0.1 ? 11 : 2);
     this.strike = Math.max(0, this.strike - step);
-    this.mesh.scaling.y = this.dead ? 1 : 1 + Math.sin(this.phase * 0.5) * 0.015;
+    this.baseScaleY ??= this.mesh.scaling.y;
+    this.mesh.scaling.y =
+      this.baseScaleY * (this.dead ? 1 : 1 + Math.sin(this.phase * 0.5) * 0.015);
     if (this.kind === 'lantern') {
       this.mesh.rotation.z = this.dead ? Math.PI / 2 : Math.sin(this.phase) * 0.12;
       this.limbs.forEach((limb, i) => {

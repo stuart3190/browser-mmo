@@ -1,3 +1,4 @@
+import { coastalScenery } from './coastal-scenery';
 import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
@@ -94,7 +95,9 @@ export class WorldView {
         );
     }
     this.scene.fogMode = 3;
-    this.scene.fogColor = Color3.FromHexString('#b4ccbf');
+    this.scene.fogColor = Color3.FromHexString(
+      zoneId === 'zone.aurelian.amber_coast' ? '#a5c4ca' : '#b4ccbf',
+    );
     this.scene.fogStart = 65;
     this.scene.fogEnd = 145;
     // Safe zones get a faint ground ring so players can read where enemies will not follow.
@@ -393,6 +396,7 @@ export class WorldView {
     );
     ground.isPickable = false;
     disposables.push(ground);
+    disposables.push(...coastalScenery(this.scene, chunk, size, (hex) => this.material(hex)));
 
     const atlas = this.gameData.raw.worldCatalog;
     if (atlas?.regions.some((r) => r.zoneId === chunk.zoneId)) {
@@ -426,7 +430,7 @@ export class WorldView {
       )) {
         const label = MeshBuilder.CreatePlane(
             `label_${l.id}`,
-            { width: 12, height: 3 },
+            { width: 4.8, height: 0.9 },
             this.scene,
           ),
           texture = new DynamicTexture(
@@ -435,12 +439,22 @@ export class WorldView {
             this.scene,
             false,
           );
-        texture.drawText(l.name, undefined, 76, 'bold 24px sans-serif', '#fff1cc', '#24342b', true);
+        texture.hasAlpha = true;
+        texture.drawText(
+          l.name,
+          undefined,
+          76,
+          'bold 30px sans-serif',
+          '#fff1cc',
+          'transparent',
+          true,
+        );
         const material = new StandardMaterial(`label_mat_${l.id}`, this.scene);
         material.diffuseTexture = texture;
+        material.useAlphaFromDiffuseTexture = true;
         material.emissiveColor = Color3.White();
         material.backFaceCulling = false;
-        label.position.set(l.position.x, 5, l.position.z);
+        label.position.set(l.position.x, 3.3, l.position.z);
         label.billboardMode = 7;
         label.material = material;
         label.isPickable = false;

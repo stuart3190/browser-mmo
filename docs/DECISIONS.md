@@ -1408,3 +1408,19 @@ service is needed. Existing change-feed/profile reconciliation carries wear to o
 
 This deliberately makes upkeep predictable and cheap. Per-hit wear would punish different attack
 speeds and group roles unevenly. Victory wear applies consistently to eligible reward recipients.
+
+## 2026-10-24 — Amber Coast Tidewatch chapter
+
+Continue the existing Greenvale keeper story across two existing travel links, rather than adding
+another disconnected starter chain. Level-five players who completed Maren's Marches closure carry
+records to Warden Iona, survey two tidal landmarks and clear Glassback Crabs, then read the final
+beacon oath and fight the Drowned Bellkeeper. Exploration remains personal; existing party kill
+credit and exactly-once quest rewards apply. The final bound Tideglass Seal benefits either class.
+
+Compile the new authored pack through the existing content validator against current definitions;
+preserve historical base packs and their hashes. Landmarks, roads, encounters and prop collision
+share the existing catalog. The coastal merchant now sells an existing remedy and consequently offers
+the existing repair service. Distinct crab/Bellkeeper silhouettes, shallow water and survey marks use
+the existing renderer; non-solid shore decoration does not invent hidden movement blockers. The boss
+uses the proven frozen cleave windup, with enough warning to escape and ordinary boss root immunity.
+No new quest engine, combat subsystem, database schema or deployment work is introduced.

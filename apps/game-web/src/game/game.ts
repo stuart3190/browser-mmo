@@ -249,7 +249,10 @@ export async function startGame(args: {
   });
   // ---- combat (server results only) ----
   net.on('combat.state', (m) => {
-    state.update((s) => (s.target = { id: m.d.targetId, attacking: m.d.attacking }));
+    state.update((s) => {
+      if (s.target.id !== m.d.targetId) s.combatLine = null;
+      s.target = { id: m.d.targetId, attacking: m.d.attacking };
+    });
     entities?.setTarget(m.d.targetId);
     if (m.d.reason === 'out_of_range') combatLine('Target out of range', 'error');
     if (m.d.reason === 'target_dead') combatLine('Target is dead');

@@ -107,7 +107,7 @@ export function TargetFrame() {
       {t.attackCue && !t.dead && (
         <div className="attack-warning" role="status">
           {t.attackCue.cleave
-            ? 'Amber sweep — flank or pass behind the sentinel!'
+            ? 'Sweeping strike — flank or move behind your foe!'
             : t.attackCue.groundPosition
               ? 'Ground surge — move out of the blue mark! Spread out!'
               : t.refId === 'enemy.greenvale.hollow_lantern'

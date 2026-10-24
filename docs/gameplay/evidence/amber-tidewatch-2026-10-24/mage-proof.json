@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five characters with prior Greenvale closure; all new chapter progress earned through actual travel, movement, combat and quest UI",
+  "checks": [
+    {
+      "name": "Mage accepts Maren’s coastal letter",
+      "ok": true
+    },
+    {
+      "name": "Mage walks the north road into the Marches",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches Amber Coast through two real travel links",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Drowned Bellkeeper",
+      "ok": true,
+      "detail": {
+        "dodge": 6
+      }
+    },
+    {
+      "name": "Mage responds to the Bellkeeper warning",
+      "ok": true,
+      "detail": {
+        "dodge": 6
+      }
+    },
+    {
+      "name": "Mage completes all three new quests",
+      "ok": true
+    },
+    {
+      "name": "Mage equips its earned seal with real bonuses",
+      "ok": true
+    },
+    {
+      "name": "Mage retains chapter completion after login",
+      "ok": true
+    },
+    {
+      "name": "No coastal gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

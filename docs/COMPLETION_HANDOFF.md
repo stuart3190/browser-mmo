@@ -11,10 +11,25 @@ Proof: `gameplay/evidence/tactical-abilities-2026-10-24/` (both class victories;
 Completed: gear condition/wear, broken-gear consequences and paid town repair. Proof:
 `gameplay/evidence/gear-condition-2026-10-24/` includes a fresh level-one real-input journey with
 no grants/teleports, earned 80→79 sword wear and touch repair/relogin at 80. Domain/RT/UI/content
-checks, types, lint and build passed. Tactical milestone is commit `3e7eaa6` (pushed).
+checks, types, lint and build passed. Tactical milestone is commit `3e7eaa6`; gear condition is `229bf55` (both pushed).
 
-Active next milestones: authored Amber Coast exploration/quest/encounter chapter, meaningful
-specialisations, and further visual/control refinement. Verify functional behavior in the isolated
+Completed: Amber Coast Tidewatch's three quests, shore exploration, crab encounters, Bellkeeper,
+ring reward and relogin, verified for both classes. Proof: `gameplay/evidence/amber-tidewatch-2026-10-24/`.
+The initial Mage return path failure is retained; fresh corrected Mage run passes eleven checks.
+Desktop/portrait/landscape screenshots reviewed; world labels and stale target feedback fixed.
+126 content, 80 world, 13 frontend and chapter integration tests pass, plus types/lint/build/content
+validation. Fixtures begin at level five with prior story closure; no earned 1→5 claim.
+
+Next milestone prepared: four level-five class paths. Unimported `specialisations.ts` and its two
+passing content tests are in the repo; they are NOT yet part of runtime. `/tmp/integrate-specs.py`
+integrates the prepared domain/protocol/simulation/client code and real-input browser driver after
+coast verification/commit (runtime source stays frozen while browser journeys run). Supporting
+`/tmp/specialisations*.ts`, `/tmp/specialisations.cjs`, `/tmp/SpecialisationChoices.tsx`,
+`/tmp/spec-world-tests.txt`, `/tmp/spec-realtime-test.txt` are drafts, not verified milestones.
+Guardian 70% Guard; Berserker Heavy Strike 4s; Fire Flame Burst 7s; Frost Nova 12s. Free mentor
+retraining at Maren/Iona outside combat, existing cooldowns retained, existing specialisation DB
+field and service receipts. Complete type/unit/integration/browser verification before committing.
+Then continue further visual/control and gameplay refinement. Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.
 
 ## Source and live safety boundaries

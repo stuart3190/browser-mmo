@@ -1,0 +1,355 @@
+{
+  "schemaVersion": 1,
+  "id": "pack.amber_coast.tidewatch",
+  "revision": 1,
+  "quests": [
+    {
+      "id": "quest.amber_coast.crossing",
+      "name": "Letters Across the Water",
+      "description": "Maren’s restored ward records mention a second bell on the Amber Coast. Follow the north road into the Marches, then the south road to Willow Quay. Use World / Travel at the quay to sail to Tidecross Harbour. Speak to Warden Iona beside the landing.",
+      "giverNpcId": "npc.greenvale.elder_maren",
+      "turnInNpcId": "npc.amber_coast.iona",
+      "minLevel": 5,
+      "prerequisites": ["quest.greenvale.marches_home"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "meet_iona",
+          "kind": "talk",
+          "npcId": "npc.amber_coast.iona",
+          "label": "Deliver Maren’s records to Iona at Tidecross Harbour"
+        }
+      ],
+      "dialogue": {
+        "offer": "The vault bell answered another bell, far beyond our spring. Iona keeps the tide records at Tidecross. Take the north road into the Marches, then follow the road south to Willow Quay. The shipmaster can carry you across the water. Tell Iona our seal still holds.",
+        "inProgress": "Willow Quay lies south of the Marches Roadhouse. Choose the Amber Coast passage in World / Travel while standing at the quay. Iona waits beside the Tidecross landing.",
+        "readyToTurnIn": "Maren’s handwriting. I feared the inland bell had fallen silent for good. The tide here has begun arriving before the moon calls it. These records name the warning stones along our shore. Help me read what the sea is trying to tell us.",
+        "completed": "Greenvale is listening again. We are no longer keeping watch alone."
+      },
+      "placeholder": false,
+      "rewardId": "reward.amber_coast.crossing"
+    },
+    {
+      "id": "quest.amber_coast.tide_marks",
+      "name": "What the Tide Remembers",
+      "description": "Follow the pale shore path east from Iona. Read the tide gauge, then inspect the broken windlass. Drive off two Glassback Crabs near the wreck and return to Iona. The crabs root normally: Frost Nova buys room, while Iron Guard softens their claws.",
+      "giverNpcId": "npc.amber_coast.iona",
+      "turnInNpcId": null,
+      "minLevel": 5,
+      "prerequisites": ["quest.amber_coast.crossing"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "tide_gauge",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.amber_coast",
+          "areaId": "landmark.amber_coast.tide_gauge",
+          "label": "Read the tide gauge along the shore path"
+        },
+        {
+          "id": "windlass",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.amber_coast",
+          "areaId": "landmark.amber_coast.windlass",
+          "label": "Inspect the broken windlass beyond the gauge"
+        },
+        {
+          "id": "crabs",
+          "kind": "kill",
+          "enemyId": "enemy.amber_coast.glassback_crab",
+          "count": 2,
+          "label": "Drive off Glassback Crabs at the wreck (2)"
+        }
+      ],
+      "dialogue": {
+        "offer": "The old gauge is east along the pale path. Its highest mark should be dry. Read it, inspect the windlass farther along the shore, and clear the glassback crabs nesting in the wreck. Do not force the bell yet; I need both readings.",
+        "inProgress": "Follow the shore path east: gauge first, broken windlass second. Clear two crabs near the wreck, then bring me your readings.",
+        "readyToTurnIn": "The gauge is wet above the storm line, but the windlass broke outward. Something below pushed it. Maren’s records say the bell is a lock, not a summons. The drowned keeper is trying to ring it open. We must quiet him without breaking the bell.",
+        "completed": "Your readings gave us the warning we needed."
+      },
+      "placeholder": false,
+      "rewardId": "reward.amber_coast.tide_marks"
+    },
+    {
+      "id": "quest.amber_coast.last_bell",
+      "name": "The Bell Below",
+      "description": "Continue south-east from the broken windlass to the drowned beacon. Read the keeper’s final inscription and silence the Drowned Bellkeeper. His amber sweep locks its direction before striking: move behind him or leave its reach. Bosses resist Frost Nova’s root. Return to Iona; each companion must accept, read and report personally.",
+      "giverNpcId": "npc.amber_coast.iona",
+      "turnInNpcId": null,
+      "minLevel": 5,
+      "prerequisites": ["quest.amber_coast.tide_marks"],
+      "repeatable": false,
+      "objectives": [
+        {
+          "id": "last_oath",
+          "kind": "explore",
+          "zoneId": "zone.aurelian.amber_coast",
+          "areaId": "landmark.amber_coast.drowned_beacon",
+          "label": "Read the final oath at the drowned beacon"
+        },
+        {
+          "id": "bellkeeper",
+          "kind": "kill",
+          "enemyId": "enemy.amber_coast.drowned_bellkeeper",
+          "count": 1,
+          "label": "Silence the Drowned Bellkeeper"
+        }
+      ],
+      "dialogue": {
+        "offer": "Beyond the windlass the shore path reaches the drowned beacon. Read the last oath, then silence its keeper. His amber sweep gives you time: pass behind him or step out of reach. Frost cannot hold him; use your distance. A warrior can brace with Iron Guard if escape is too late. Leave the bell whole.",
+        "inProgress": "The beacon is south-east of the wreck. Read its oath and quiet the keeper. Flank the amber sweep; do not trust a root against a boss.",
+        "readyToTurnIn": "“We held the tide so the deep could dream.” The same oath as Greenvale. The keeper is quiet, the bell is whole, and the water has begun to fall. Take this tideglass seal. You have joined two watches that believed themselves alone. When the deep speaks again, we will hear it together.",
+        "completed": "The shore is calm. Greenvale and Tidecross keep one watch now."
+      },
+      "placeholder": false,
+      "rewardId": "reward.amber_coast.last_bell"
+    }
+  ],
+  "rewards": [
+    {
+      "id": "reward.amber_coast.crossing",
+      "kind": "quest",
+      "value": {
+        "xp": 300,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 50
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "id": "reward.amber_coast.tide_marks",
+      "kind": "quest",
+      "value": {
+        "xp": 550,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 90
+          }
+        ],
+        "items": []
+      }
+    },
+    {
+      "id": "reward.amber_coast.last_bell",
+      "kind": "quest",
+      "value": {
+        "xp": 900,
+        "currency": [
+          {
+            "currencyId": "gold",
+            "amount": 180
+          }
+        ],
+        "items": [
+          {
+            "itemTemplateId": "accessory.ring.tideglass_seal",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "loot.amber_coast.shore",
+      "kind": "loot",
+      "value": {
+        "rolls": 1,
+        "emptyChance": 0,
+        "entries": [
+          {
+            "itemTemplateId": "material.world.field_hide",
+            "weight": 1,
+            "minQuantity": 1,
+            "maxQuantity": 2,
+            "rarityId": null
+          }
+        ],
+        "currency": {
+          "currencyId": "gold",
+          "min": 12,
+          "max": 18
+        }
+      }
+    },
+    {
+      "id": "loot.amber_coast.bell",
+      "kind": "loot",
+      "value": {
+        "rolls": 1,
+        "emptyChance": 0,
+        "entries": [
+          {
+            "itemTemplateId": "material.world.iron_shard",
+            "weight": 1,
+            "minQuantity": 1,
+            "maxQuantity": 2,
+            "rarityId": null
+          }
+        ],
+        "currency": {
+          "currencyId": "gold",
+          "min": 35,
+          "max": 55
+        }
+      }
+    }
+  ],
+  "npcs": [
+    {
+      "definition": {
+        "id": "npc.amber_coast.iona",
+        "name": "Warden Iona",
+        "title": "Keeper of the tide records",
+        "role": "quest_giver",
+        "modelId": null,
+        "dialogue": ["The tide leaves a record. Our task is to notice when it changes."]
+      },
+      "placements": [
+        {
+          "zoneId": "zone.aurelian.amber_coast",
+          "spawn": {
+            "id": "spawn.amber_coast.iona",
+            "kind": "npc",
+            "position": {
+              "x": 272,
+              "y": 0,
+              "z": 104
+            },
+            "rotationY": 0,
+            "refId": "npc.amber_coast.iona",
+            "quantity": 1,
+            "respawnMs": null,
+            "interactRadius": 4,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    }
+  ],
+  "encounters": [
+    {
+      "id": "encounter.amber_coast.wreck",
+      "enemy": {
+        "id": "enemy.amber_coast.glassback_crab",
+        "name": "Glassback Crab",
+        "level": 5,
+        "maxHealth": 125,
+        "family": "beast",
+        "xpReward": 90,
+        "modelId": "authored:crab",
+        "isBoss": false,
+        "isWorldBoss": false,
+        "combat": {
+          "damage": {
+            "min": 8,
+            "max": 12
+          },
+          "attackSpeedMs": 2400,
+          "attackRange": 2.5,
+          "aggroRange": 6,
+          "leashRange": 24,
+          "moveSpeed": 3.8,
+          "armor": 18,
+          "corpseMs": 4000
+        }
+      },
+      "lootRewardId": "loot.amber_coast.shore",
+      "placements": [
+        {
+          "zoneId": "zone.aurelian.amber_coast",
+          "spawn": {
+            "id": "spawn.amber_coast.crab_west",
+            "kind": "enemy",
+            "position": {
+              "x": 316,
+              "y": 0,
+              "z": 157
+            },
+            "rotationY": 0,
+            "refId": "enemy.amber_coast.glassback_crab",
+            "quantity": 1,
+            "respawnMs": 45000,
+            "interactRadius": 3,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        },
+        {
+          "zoneId": "zone.aurelian.amber_coast",
+          "spawn": {
+            "id": "spawn.amber_coast.crab_east",
+            "kind": "enemy",
+            "position": {
+              "x": 344,
+              "y": 0,
+              "z": 151
+            },
+            "rotationY": 0,
+            "refId": "enemy.amber_coast.glassback_crab",
+            "quantity": 1,
+            "respawnMs": 45000,
+            "interactRadius": 3,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "encounter.amber_coast.beacon",
+      "enemy": {
+        "id": "enemy.amber_coast.drowned_bellkeeper",
+        "name": "Drowned Bellkeeper",
+        "level": 6,
+        "maxHealth": 420,
+        "family": "undead",
+        "xpReward": 200,
+        "modelId": "authored:tidekeeper",
+        "isBoss": true,
+        "isWorldBoss": false,
+        "combat": {
+          "damage": {
+            "min": 22,
+            "max": 30
+          },
+          "attackSpeedMs": 3200,
+          "attackRange": 7,
+          "aggroRange": 9,
+          "leashRange": 40,
+          "moveSpeed": 2.6,
+          "armor": 22,
+          "corpseMs": 10000,
+          "windupMs": 1800,
+          "cleaveArcDegrees": 120
+        }
+      },
+      "lootRewardId": "loot.amber_coast.bell",
+      "placements": [
+        {
+          "zoneId": "zone.aurelian.amber_coast",
+          "spawn": {
+            "id": "spawn.amber_coast.bellkeeper",
+            "kind": "enemy",
+            "position": {
+              "x": 360,
+              "y": 0,
+              "z": 220
+            },
+            "rotationY": 0,
+            "refId": "enemy.amber_coast.drowned_bellkeeper",
+            "quantity": 1,
+            "respawnMs": 90000,
+            "interactRadius": 3,
+            "groupId": null,
+            "wanderRadius": 0
+          }
+        }
+      ]
+    }
+  ]
+}

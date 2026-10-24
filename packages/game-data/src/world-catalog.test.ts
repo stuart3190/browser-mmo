@@ -42,7 +42,7 @@ it('ships diverse reusable catalogs and focused Greenvale population while prese
   expect(world.monsterFamilies.flatMap((f) => f.variants)).toHaveLength(74);
   expect(world.populations).toHaveLength(249);
   expect(world.resources).toHaveLength(10);
-  expect(gd.quests.size).toBe(getStarterGameData().quests.size + 10);
+  expect(gd.quests.size).toBe(getStarterGameData().quests.size + 13);
   expect(gd.raw.chunks.length).toBeLessThan(700);
   for (const r of world.regions) {
     expect(
@@ -50,13 +50,25 @@ it('ships diverse reusable catalogs and focused Greenvale population while prese
         .chunksForZone(r.zoneId)
         .flatMap((c) => c.spawnPoints)
         .filter((s) => s.kind === 'enemy'),
-    ).toHaveLength(r.zoneId === 'zone.aurelian.greenvale_marches' ? 19 : 3);
+    ).toHaveLength(
+      r.zoneId === 'zone.aurelian.greenvale_marches'
+        ? 19
+        : r.zoneId === 'zone.aurelian.amber_coast'
+          ? 6
+          : 3,
+    );
     expect(
       gd
         .chunksForZone(r.zoneId)
         .flatMap((c) => c.spawnPoints)
         .filter((s) => s.kind === 'npc'),
-    ).toHaveLength(r.zoneId === 'zone.aurelian.greenvale_marches' ? 19 : 10);
+    ).toHaveLength(
+      r.zoneId === 'zone.aurelian.greenvale_marches'
+        ? 19
+        : r.zoneId === 'zone.aurelian.amber_coast'
+          ? 11
+          : 10,
+    );
   }
 });
 it('loads unmaterialized chunks on demand and rejects coordinates outside bounds', () => {
