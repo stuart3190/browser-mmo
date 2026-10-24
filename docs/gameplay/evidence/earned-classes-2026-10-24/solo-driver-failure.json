@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "phase": "first solo guardian",
+  "error": "locator.click: Timeout 30000ms exceeded.",
+  "instance": {
+    "id": "01a16dcf-f42f-7376-8e59-170e92baf8f0",
+    "status": "active",
+    "expiresAtMs": 1792850907402,
+    "kills": 0,
+    "required": 3,
+    "inside": true,
+    "owner": true
+  },
+  "vitals": {
+    "health": 0,
+    "maxHealth": 264,
+    "dead": true,
+    "inCombat": false,
+    "respawnAvailableAt": 1792843789152
+  },
+  "protocolErrorCounts": {
+    "NO_TARGET": 109
+  },
+  "cause": "Driver close() pressed Escape on every approach, clearing its target before casting; fixed by preserving target and validating Tab selection."
+}

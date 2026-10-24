@@ -1623,3 +1623,10 @@ with panel hit-tests). Frozen 57cd2e2 qualification continues independently; the
 profile is still required. Warrior solo qualification exposed a driver clearing its own target on
 repeated approaches, then issuing NO_TARGET attacks until death. Correct the driver and resume via
 normal respawn; preserve the failed run. This is not evidence for reducing guardian difficulty.
+
+Solo driver correction: removed the repeated Escape from approach cleanup, require the intended
+Tab-selected enemy before attacking, and bound ability click waits. Ordinary respawn resumed the
+same private UUID, the first guardian was defeated and reconnect retained it. Remaining encounters,
+full run completion and mixed-class proof are still in progress. The failed attempt and its
+NO_TARGET counts are archived in earned-class evidence; no combat balance change was made.
+Hosted CI 40092678899 passes the pushed c0a47f1 checkpoint. Merged types/lint pass locally.

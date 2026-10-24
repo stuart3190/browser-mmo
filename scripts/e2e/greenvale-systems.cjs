@@ -113,7 +113,6 @@ function check(name, ok, detail) {
     if (await dialogue.isVisible()) await dialogue[TOUCH ? 'tap' : 'click']();
     while (await p.locator('.window-header .icon-button:visible').count())
       await p.locator('.window-header .icon-button:visible').first()[TOUCH ? 'tap' : 'click']();
-    await p.keyboard.press('Escape');
   }
   async function skills(p) {
     if (!(await p.locator('[data-window=professions]').isVisible()))
@@ -207,6 +206,8 @@ function check(name, ok, detail) {
       await p.keyboard.press('Tab');
       await p.waitForTimeout(180);
     }
+    if (!(await p.evaluate((id) => window.__mmo.target.id === id, enemy.id)))
+      throw Error('Could not select the intended live encounter through Tab targeting');
     if (!(await p.evaluate(() => window.__mmo.target.attacking))) await p.keyboard.press('KeyF');
   }
   async function fight(p, ref, partner) {
@@ -246,10 +247,8 @@ function check(name, ok, detail) {
       if (state.v.dead) throw Error('Unexpected death fighting ' + ref);
       if (!state.alive) break;
       if (!state.cue) {
-        const destination = await p.evaluate((id) => window.__mmo.entityPos(id), enemy.id);
-        const classId = await p.evaluate(() => window.__mmo.abilities.classId);
-        if (destination)
-          await go(p, destination.x, destination.z, classId === 'class.mage' ? 18 : 3);
+        await startAttack(p, enemy);
+        if (partner) await startAttack(partner, enemy);
       }
       if (!partner && !used && state.v.health < state.v.maxHealth - 65) {
         await remedy(p);
@@ -262,7 +261,7 @@ function check(name, ok, detail) {
       )) {
         const btn = p.locator(`[data-testid="ability-${ability}"]`);
         if ((await btn.isEnabled()) && (await btn.getAttribute('data-ready')) === 'true')
-          await btn[TOUCH ? 'tap' : 'click']();
+          await btn[TOUCH ? 'tap' : 'click']({ timeout: 1500 });
       }
       await leaveGroundWarning(p, state.cue, gd.collisionWorld(await zone(p)));
       if (partner) {
@@ -275,7 +274,7 @@ function check(name, ok, detail) {
         )) {
           const btn = partner.locator(`[data-testid="ability-${ability}"]`);
           if ((await btn.isEnabled()) && (await btn.getAttribute('data-ready')) === 'true')
-            await btn[TOUCH ? 'tap' : 'click']();
+            await btn[TOUCH ? 'tap' : 'click']({ timeout: 1500 });
         }
       }
       await p.waitForTimeout(250);
@@ -291,6 +290,16 @@ function check(name, ok, detail) {
     await enter(page, USER, false);
     await page.waitForFunction(() => window.__systemEvents.some((m) => m.t === 'systems.state'));
     console.log('ENTERED', USER, await zone(page));
+    if (await page.evaluate(() => window.__mmo.vitals.dead)) {
+      const instanceBefore = (await status(page)).instance;
+      await page.locator('[data-testid=respawn]')[TOUCH ? 'tap' : 'click']();
+      await page.waitForFunction(() => !window.__mmo.vitals.dead);
+      check(
+        'Normal respawn preserves the existing private run',
+        (await status(page)).instance?.id === instanceBefore?.id &&
+          (await status(page)).instance?.kills === instanceBefore?.kills,
+      );
+    }
     await equipEarned(page, gd, TOUCH, check);
     if (MODE === 'professions' || MODE === 'touch-resume') {
       if (MODE !== 'touch-resume') {

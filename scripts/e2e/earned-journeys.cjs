@@ -6,7 +6,12 @@ const { spawn } = require('node:child_process');
 const out = path.resolve(process.argv[2] || '/tmp/bo-earned-journeys');
 fs.mkdirSync(out, { recursive: true });
 const systemsOnly = process.env.EARNED_SYSTEMS_ONLY === '1';
-if (systemsOnly && (!process.env.EARNED_WARRIOR_USER || !process.env.EARNED_MAGE_USER))
+const fromStage = process.env.EARNED_FROM_STAGE;
+let running = !fromStage;
+if (
+  (systemsOnly || fromStage) &&
+  (!process.env.EARNED_WARRIOR_USER || !process.env.EARNED_MAGE_USER)
+)
   throw Error('Systems continuation requires both existing earned users');
 const stamp = Date.now().toString(36);
 const warrior = process.env.EARNED_WARRIOR_USER || `journeyw_${stamp}`;
@@ -17,10 +22,17 @@ const result = {
   stages: [],
   authority: 'ordinary player inputs only',
   scope: systemsOnly ? 'systems continuation; story evidence is separate' : 'story and systems',
+  fromStage: fromStage || null,
 };
 const save = () => fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(result, null, 2));
 save();
 async function stage(name, script, env) {
+  if (!running && name !== fromStage) {
+    result.stages.push({ name, skipped: 'earlier stage is separate evidence; not rerun' });
+    save();
+    return;
+  }
+  running = true;
   const dir = path.join(out, name);
   fs.mkdirSync(dir, { recursive: true });
   const log = fs.openSync(`${dir}/run.log`, 'w');
@@ -75,6 +87,7 @@ async function stage(name, script, env) {
     SYSTEMS_MODE: 'party',
     SYSTEMS_TOUCH: '1',
   });
+  if (!running) throw Error('Requested resume stage was not found');
   result.ok = true;
   save();
 })().catch((error) => {

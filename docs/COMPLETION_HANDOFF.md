@@ -7,7 +7,8 @@ active. Do not declare shippability from feature existence or unit tests alone.
 ## Source and safety boundaries
 
 - Editable source: `/root/browser-mmo`, branch `codex/shippable-completion`, origin
-  `git@github.com:stuart3190/browser-mmo.git`. Latest implementation checkpoint: `c2478f7`; subsequent evidence commits are in git log.
+  `git@github.com:stuart3190/browser-mmo.git`. Current HEAD 28b1483 integrates presentation. Pushed checkpoint c0a47f1 includes capacity
+  gates and staged earned proof; merge and later corrections still need pushing.
 - Live source was recovered from `2c47b27`. `/srv/brokenodyssey/current` is immutable: never edit it.
   Production ports: PostgreSQL 55440, API 4461, realtime 4462, web 4460. No production mutations or
   deployments in this completion effort. Unsafe public deployment requires explicit permission.
@@ -57,7 +58,13 @@ XP. Read-only development observations assist the driver. Staged resumes are NOT
   reports/screenshots archived. Profession/solo/mixed-party controller is now active at
   `/tmp/bo-earned-systems-resume`, log of the same name plus `.log`. First controller stopped on
   an invalid test assumption that the five-second craft was still counting down. Resumed Warrior
-  profession stage now PASS five assertions; solo Vault traversal active.
+  profession stage PASS five assertions. That controller later failed solo: go() called close(),
+  whose Escape cleared target before every cast, causing NO_TARGET spam and death.
+- Latest controller `/tmp/bo-earned-vault-resume` starts at warrior-solo-vault. Uncommitted fixes
+  preserve targeting, assert Tab selection, bound ability clicks and use normal initial respawn.
+  First guardian defeated and reconnect verified in the same UUID 01a16dcf-f42f-7376-8e59-170e92baf8f0;
+  intentional death/remaining encounters next. It then runs Mage professions/staff/solo and mixed
+  party. Preserve `/tmp/bo-earned-systems-resume/warrior-solo-vault/failure.json` as failed evidence.
 - Earlier stage evidence: `/tmp/bo-earned-warrior{,-resume,-resume2}` and
   `/tmp/bo-earned-mage{,-resume,-marches}`. Warrior harness failures: tree route, invalid level-two
   ring equip attempt, fixed route timeout on kilometre trips. Mage died at Warden while stationary,
@@ -72,24 +79,24 @@ XP. Read-only development observations assist the driver. Staged resumes are NOT
   Avoid fresh-create flags for existing actors. `earned-journeys.cjs` orchestrator is not yet proven.
 - Avoid runtime source changes/restarts while earned runs are active. Script/docs edits are safe.
 
-## Separately verified presentation branch — awaiting integration
+## Presentation integration and current qualification
 
-`/tmp/bo-presentation-polish`, branch `codex/presentation-polish`, based on 1561e42; clean at last check.
-Own Vite 5182/session 2759 serves a guarded loopback asset preview, so main journeys remain unchanged.
+Inventory silhouettes, equipment requirement hints, class onboarding/ability icons and panel
+layering are integrated in main at merge `28b1483`. Source branch `/tmp/bo-presentation-polish`
+is clean at 6935376. Its own Vite 5182 preview can be stopped when no longer needed.
 
-- `ba27b32`: 37 item silhouettes, equipment eligibility hints/disabled invalid Equip; eleven browser
-  checks, types/lint/frontend tests/four builds pass. Evidence inventory-presentation-2026-10-24.
-- `f9b3fb4`: consistent Broken Odyssey onboarding, labeled class choice with combat descriptions,
-  responsive forms, pending controls and five ability icons. Seven browser checks and
-  types/lint/four builds pass. Evidence onboarding-2026-10-24.
-- Branch now also merges c2478f7 and adds onboarding to qualification at 57cd2e2. A detached
-  snapshot `/tmp/bo-qualification-source-57cd2e2` is now running full qualification; outer log
-  `/tmp/bo-combined-qualified.log`. Do not mutate this snapshot.
-  Integrate this branch after committing main work. Preserve PROGRESS additions when
-  resolving conflicts. Main's uncommitted vertical-slice blocked-walk change is also in f9b3fb4.
-  Onboarding is included (48 assertions at57cd2e2). New uncommitted panel layering fix in the
-  presentation worktree addresses Skills being covered by ability buttons; strengthened onboarding
-  browser run `/tmp/bo-panel-layer-proof{,.log}` is active. Qualify before committing this fix.
+- Inventory: eleven trade/inventory browser checks; types/lint/frontend tests/builds pass.
+- Onboarding: seven original checks, now ten including desktop/portrait/landscape Skills hit-tests.
+- Panel layering: screenshot review caught ability controls over Skills; explicit panel/detail/
+  tooltip/death layers fix hit ownership. Ten onboarding and eleven trade checks pass; game build
+  and script/format checks pass. Evidence `panel-layering-2026-10-24`.
+- Merged main passes full types/lint. Hosted CI 40092678899 for c0a47f1 PASSED (pre-merge checkpoint).
+- Frozen `/tmp/bo-qualification-source-57cd2e2` full qualifier is active, logs
+  `/tmp/bo-combined-qualified.log`, artifacts `/tmp/brokenodyssey-qualification.N0emuY`.
+  Aggregate checks/build/restore/assets passed; trade 11, market 8, chat 10 passed; friends/onboarding
+  remain. This snapshot contains original onboarding (48 assertions), not the later layering fix.
+- Main's default qualifier now includes 51 assertions. Run merged production TLS/password smoke
+  and appropriate combined checks after all edits; no public deployment.
 
 ## Capacity work in progress
 
@@ -111,10 +118,13 @@ No live admission limits changed.
 
 ## Next work and honest limits
 
-1. Finish and inspect the capacity run, fix failures, archive evidence and commit verified ops work.
+1. Diagnose capacity cadence: optional QUAL_CPU_PROFILE=1 on isolated --load. Keep diagnostic
+   results separate from quiet qualification. Full current UI smoke/profile can share this run.
+   Avoid extra browser workloads during a measurement intended as a capacity gate.
 2. Finish both earned stories, professions, solo and mixed-class private Vault, including persistence,
    reconnect, normal death/recovery and instance reset. Preserve and document all failures.
-3. Integrate presentation commits, qualify a frozen combined source, rerun built production profile.
+3. Finish frozen qualification, archive results, then verify merged production profile and push
+   verified merge/fixes. Main has only two uncommitted journey driver files at last check.
 4. Continue real remaining gaps: guilds, authoritative wear/repair and outer-region content/polish.
    World visuals remain largely procedural/greybox. Physical phone testing, off-host recovery and
    public release are not qualified. Do not claim complete game shippability.
