@@ -2113,3 +2113,12 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     display: none;
   }
 }
+
+.item-glyph {
+  display: block;
+  width: 44px;
+  height: 44px;
+  max-width: 100%;
+  filter: drop-shadow(0 2px 2px #0006);
+  pointer-events: none;
+}

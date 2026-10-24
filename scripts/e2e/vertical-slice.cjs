@@ -13,6 +13,7 @@ function check(name, ok, detail) {
   if (!ok) throw new Error(name);
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const previewRouted = new WeakSet();
 async function walk(page, x, z, range = 1.6, timeout = 90000) {
   const until = Date.now() + timeout;
   let held = [];
@@ -44,6 +45,24 @@ async function walk(page, x, z, range = 1.6, timeout = 90000) {
 }
 async function enter(page, username, create, classId = 'class.warrior') {
   await page.bringToFront();
+  // Optional isolated UI worktree: serve its assets at the already-authorized local test origin.
+  // HTTP game actions and realtime authority still use the normal test services.
+  if (process.env.ASSET_PREVIEW_URL && !previewRouted.has(page)) {
+    const preview = new URL(process.env.ASSET_PREVIEW_URL);
+    if (
+      !['127.0.0.1', 'localhost'].includes(preview.hostname) ||
+      !['127.0.0.1', 'localhost'].includes(new URL(WEB).hostname)
+    )
+      throw Error('Asset previews must stay local');
+    await page.route(new URL(WEB).origin + '/**', async (route) => {
+      const original = new URL(route.request().url());
+      const response = await route.fetch({
+        url: new URL(original.pathname + original.search, preview).toString(),
+      });
+      await route.fulfill({ response });
+    });
+    previewRouted.add(page);
+  }
   await page.goto(WEB);
   await page.fill('[name=username]', username);
   await page.click('#login-form button');

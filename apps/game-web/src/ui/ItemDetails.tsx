@@ -1,4 +1,5 @@
 import { canPlaceInContainerKind } from '@mmo/game-data';
+import { itemRequirements } from '@mmo/ui';
 import { useGame } from './context';
 import { ItemTooltip } from './ItemTooltip';
 
@@ -8,7 +9,7 @@ import { ItemTooltip } from './ItemTooltip';
  * Buttons are hints only — the server re-validates everything.
  */
 export function ItemDetails() {
-  const { state, actions, quests } = useGame();
+  const { state, actions, quests, gameData } = useGame();
   const item = state.selectedItemId ? state.items.get(state.selectedItemId) : undefined;
   if (!item) return null;
   const loc = item.instance.location;
@@ -31,6 +32,10 @@ export function ItemDetails() {
     item.instance.binding,
     'character_vault',
   ).ok;
+  const unmet = itemRequirements(gameData, item, {
+    level: state.character.level,
+    cls: gameData.characterClass(state.character.classId),
+  }).filter((requirement) => !requirement.met);
   const close = () => state.update((s) => (s.selectedItemId = null));
 
   return (
@@ -54,7 +59,12 @@ export function ItemDetails() {
           </button>
         )}
         {item.template.equipment && loc.kind !== 'equipped' && !inMailbox && (
-          <button disabled={busy} onClick={() => void actions.equip(item)} data-action="equip">
+          <button
+            disabled={busy || unmet.length > 0}
+            title={unmet.map((r) => r.text).join(' · ')}
+            onClick={() => void actions.equip(item)}
+            data-action="equip"
+          >
             Equip
           </button>
         )}

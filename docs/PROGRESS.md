@@ -1503,3 +1503,17 @@ The test now waits for the sale balance; all eleven focused realtime sync tests 
 403-restricted, but file/line/expected/actual annotations identify this failure. No hosted green claim.
 Fresh earned Warrior main/side quest journey is running without grants, teleportation or XP injection.
 Next: complete both class journeys, dungeon/profession/group proof, fix observed gaps and qualify again.
+
+### Inventory presentation — 2026-10-24
+
+- [x] Readable vector item silhouettes replace initials in inventory/equipment slots, preserving
+      rarity, stack counts, selection, accessible names and equipped markers.
+- [x] Equip respects existing visible class/level/proficiency requirements before submission;
+      server validation remains authoritative.
+- [x] Typecheck/lint, ten frontend tests, four builds/debug-hook guard; eleven two-player browser
+      checks using real pickup/trade and reviewed desktop/touch screenshots.
+      [Evidence](gameplay/evidence/inventory-presentation-2026-10-24/README.md).
+
+Prepared in an isolated worktree while earned story journeys continued on the original local
+stack. No production changes. Continue earned class/dungeon proof and release operations; this
+checkpoint does not claim full-game readiness or finished world art.

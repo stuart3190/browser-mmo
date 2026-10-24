@@ -1,0 +1,59 @@
+{
+  "checks": [
+    {
+      "name": "Fresh Warrior picks up a real uniquely identified sword",
+      "ok": true
+    },
+    {
+      "name": "Inventory renders a vector sword and allows the proficient Warrior to equip",
+      "ok": true
+    },
+    {
+      "name": "Mage receives the persisted invitation in the touch Trade window",
+      "ok": true
+    },
+    {
+      "name": "Changed offer clears confirmation and requires review again",
+      "ok": true
+    },
+    {
+      "name": "One sword transfers to the Mage and disappears from the Warrior",
+      "ok": true,
+      "detail": {
+        "sword": "01a16d8f-599f-71bf-aa2c-6671ff828cb8"
+      }
+    },
+    {
+      "name": "Both wallets reflect the net 100-copper exchange",
+      "ok": true
+    },
+    {
+      "name": "Touch Mage sees the sword requirement and cannot submit an invalid equip",
+      "ok": true
+    },
+    {
+      "name": "Fresh login retains the completed trade and the same item instance",
+      "ok": true
+    },
+    {
+      "name": "Landscape trade panel remains inside the viewport",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 28,
+        "width": 844,
+        "height": 292
+      }
+    },
+    {
+      "name": "A new trade can be cancelled without touching transferred ownership",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}
