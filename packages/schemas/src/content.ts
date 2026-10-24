@@ -135,6 +135,11 @@ export type QuestObjective = z.infer<typeof QuestObjectiveSchema>;
 
 const DialogueLineSchema = z.string().min(1).max(600);
 
+export const QuestItemRewardSchema = z.strictObject({
+  itemTemplateId: ContentIdSchema,
+  quantity: z.number().int().positive(),
+});
+
 export const QuestDefinitionSchema = z.object({
   id: ContentIdSchema,
   name: LocalizedNameSchema,
@@ -154,9 +159,9 @@ export const QuestDefinitionSchema = z.object({
     currency: z.array(
       z.object({ currencyId: ContentIdSchema, amount: z.number().int().nonnegative() }),
     ),
-    items: z
-      .array(z.object({ itemTemplateId: ContentIdSchema, quantity: z.number().int().positive() }))
-      .default([]),
+    items: z.array(QuestItemRewardSchema).default([]),
+    /** Optional replacements for the item list, resolved from the server-owned character class. */
+    classItems: z.record(ContentIdSchema, z.array(QuestItemRewardSchema).min(1).max(8)).optional(),
   }),
   /** What the quest NPC says in each state (no branching trees yet). */
   dialogue: z

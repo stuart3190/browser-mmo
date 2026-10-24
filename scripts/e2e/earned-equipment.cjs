@@ -11,6 +11,7 @@ async function equipEarned(page, gameData, touch = false, report = () => {}) {
   const priorities = [
     ['weapon.staff.oak_staff'],
     ['armor.leather.trapper_cap'],
+    ['armor.cloth.apprentice_robe'],
     ['accessory.ring.stillwater_seal'],
     ['accessory.ring.copper_band'],
     ['accessory.necklace.springward_pendant'],

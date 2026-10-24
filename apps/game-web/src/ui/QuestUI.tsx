@@ -63,7 +63,7 @@ function Rewards({ quest }: { quest: QuestView }) {
             )}
             {quest.state === 'completed' && (
               <p className="small muted">
-                Catalog preview of this quest reward; your earned item keeps its original roll.
+                Current quest reward preview; previously earned items are unchanged.
               </p>
             )}
           </details>

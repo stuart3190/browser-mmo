@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "username": "trailm_mvmyrkcm",
+  "classId": "class.mage",
+  "checks": [
+    {
+      "name": "Class-appropriate reward is offered before accepting",
+      "ok": true
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.wildlife.1"
+    },
+    {
+      "name": "Actual hunts and herb gathering satisfy both objectives",
+      "ok": true
+    },
+    {
+      "name": "Quest grants exactly one class-appropriate item",
+      "ok": true,
+      "detail": [
+        {
+          "id": "01a17005-ac65-7d31-8f53-1b9fb4041729",
+          "templateId": "armor.cloth.apprentice_robe",
+          "version": 0,
+          "quantity": 1,
+          "location": {
+            "kind": "container",
+            "containerId": "01a17001-b3b3-7c37-95fb-7c0037d39ea3",
+            "containerKind": "backpack",
+            "slot": 0
+          },
+          "durability": {
+            "current": 50,
+            "max": 50
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reward equips through ordinary inventory controls",
+      "ok": true
+    },
+    {
+      "name": "Relogin retains the earned item and completed quest",
+      "ok": true
+    },
+    {
+      "name": "No gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "fixture": "Fresh ordinary level-one character; real starter pickup, walking, travel, combat, gathering, quest turn-in, equipment and relogin. No direct DB writes, grants, teleports or XP injection."
+}

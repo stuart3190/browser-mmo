@@ -1,0 +1,127 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 41 item templates.
+PASS Fresh warrior takes and equips the actual starter sword
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 7.3089679787941835, z: -14.143767978865705 },
+  connected: true
+}
+GO 0 116
+REPATH {"from":{"x":7.3089679787941835,"z":-14.143767978865705},"waypoint":{"x":2.8231787957284187,"z":65.7303686074229},"clearance":2}
+REPATH {"from":{"x":3.1380279191860616,"z":52.55437208102857},"waypoint":{"x":0.5,"z":90.05437208102856},"clearance":2.5}
+GO 264 412
+REPATH {"from":{"x":256,"z":376},"waypoint":{"x":264,"z":412},"clearance":2}
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 263.80306475144624, z: 411.77026475137524 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+PASS Class-appropriate reward is offered before accepting
+GO 387.25 448.79
+GO 389.1653560000086 449.10154799999714
+GO 388.6 449.28
+GO 388.6 449.28
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.wildlife.1
+GO 397.03 450.04
+GO 398.17 450.71
+GO 398.17 450.71
+GO 398.17 450.71
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.wildlife.1
+GO 290 400
+REPATH {"from":{"x":396.5148371984037,"z":450.2607738564193},"waypoint":{"x":350.665008659406,"z":431.6213199888245},"clearance":2}
+PASS Actual hunts and herb gathering satisfy both objectives
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 290.5292394720199, z: 400.14417612789106 },
+  connected: true
+}
+GO 264 412
+REPATH {"from":{"x":290.5292394720199,"z":400.14417612789106},"waypoint":{"x":264,"z":412},"clearance":2}
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.3582261318321, z: 411.75925353721965 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+quest.greenvale.marches_remedy turn-in
+PASS Quest grants exactly one class-appropriate item [
+  {
+    id: '01a17001-27ba-7f95-bacc-e123645d1db8',
+    templateId: 'armor.leather.trapper_cap',
+    version: 0,
+    quantity: 1,
+    location: {
+      kind: 'container',
+      containerId: '01a16ffa-b2fe-744c-a3a2-3ad26d95edb2',
+      containerKind: 'backpack',
+      slot: 0
+    },
+    durability: { current: 60, max: 60 }
+  }
+]
+PASS Reward equips through ordinary inventory controls
+PASS Relogin retains the earned item and completed quest
+PASS No gameplay exceptions []
+NPC approach npc.world.greenvale_marches.profession { position: { x: 0, z: -8 }, connected: true }
+GO 0 116
+GO 264 412
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.01847635335736, z: 411.1486763507831 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+PASS Class-appropriate reward is offered before accepting
+GO 389.95 450.57
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+GO 388.97 447.42
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.wildlife.1
+GO 290 400
+PASS Actual hunts and herb gathering satisfy both objectives
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 290.7359271875947, z: 400.58932718602136 },
+  connected: true
+}
+GO 264 412
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.66208886737843, z: 411.79456550537896 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+quest.greenvale.marches_remedy turn-in
+PASS Quest grants exactly one class-appropriate item [
+  {
+    id: '01a17005-ac65-7d31-8f53-1b9fb4041729',
+    templateId: 'armor.cloth.apprentice_robe',
+    version: 0,
+    quantity: 1,
+    location: {
+      kind: 'container',
+      containerId: '01a17001-b3b3-7c37-95fb-7c0037d39ea3',
+      containerKind: 'backpack',
+      slot: 0
+    },
+    durability: { current: 50, max: 50 }
+  }
+]
+PASS Reward equips through ordinary inventory controls
+PASS Relogin retains the earned item and completed quest
+PASS No gameplay exceptions []

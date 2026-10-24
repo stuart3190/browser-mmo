@@ -359,7 +359,10 @@ export class GameData {
       for (const c of q.rewards.currency)
         if (!this.currencies.has(c.currencyId))
           errors.push(`quest ${q.id}: unknown currency ${c.currencyId}`);
-      for (const i of q.rewards.items) {
+      for (const classId of Object.keys(q.rewards.classItems ?? {}))
+        if (!this.classes.has(classId))
+          errors.push(`quest ${q.id}: unknown reward class ${classId}`);
+      for (const i of [...q.rewards.items, ...Object.values(q.rewards.classItems ?? {}).flat()]) {
         const t = this.itemTemplates.get(i.itemTemplateId);
         if (!t) errors.push(`quest ${q.id}: unknown reward item ${i.itemTemplateId}`);
         else if (i.quantity > t.maxStack)

@@ -160,6 +160,27 @@ describe('versioned content factory', () => {
     });
     expect(() => compileContentCatalog(manifest, [pack])).toThrow('reward.unused');
   });
+  it.each(['class', 'item', 'stack'])('validates unused class reward alternatives: %s', (fault) => {
+    const { manifest, pack } = fixture();
+    pack.rewards.push({
+      kind: 'quest',
+      id: 'reward.unused_class',
+      value: {
+        xp: 0,
+        currency: [],
+        items: [],
+        classItems: {
+          [fault === 'class' ? 'class.missing' : 'class.mage']: [
+            {
+              itemTemplateId: fault === 'item' ? 'item.missing' : 'armor.cloth.apprentice_robe',
+              quantity: fault === 'stack' ? 2 : 1,
+            },
+          ],
+        },
+      },
+    });
+    expect(() => compileContentCatalog(manifest, [pack])).toThrow('reward.unused_class');
+  });
   it.each(['quantity', 'currency', 'stack'])('rejects impossible loot bounds: %s', (fault) => {
     const { manifest, pack } = fixture();
     const r = pack.rewards[1]!;

@@ -9,6 +9,7 @@ import {
   questAvailability,
   questDialogue,
   questView,
+  questRewardItems,
   turnInCheck,
   turnInNpcOf,
   xpToNextLevel,
@@ -73,14 +74,16 @@ export async function getQuestLog(
   characterId: string,
 ): Promise<QuestView[]> {
   const [character] = await db
-    .select({ level: schema.characters.level })
+    .select({ level: schema.characters.level, classId: schema.characters.classId })
     .from(schema.characters)
     .where(eq(schema.characters.id, characterId));
   if (!character) throw new DomainError(ErrorCode.NOT_FOUND, 'Character not found');
   const records = new Map((await questRows(db, characterId)).map((r) => [r.questId, toRecord(r)]));
   const counts = await countCharacterItems(db, characterId, QUEST_ITEM_CONTAINERS);
   const count = (id: string) => counts.get(id) ?? 0;
-  return offeredQuests(ctx).map((def) => questView(def, character.level, records, count));
+  return offeredQuests(ctx).map((def) =>
+    questView(def, character.level, records, count, character.classId),
+  );
 }
 
 export interface NpcDialogue {
@@ -358,7 +361,7 @@ export async function turnInQuest(
       // 4. Items: bags first, Recovered loot on overflow (a full mailbox aborts the turn-in).
       const granted: ItemRow[] = [];
       const mailedItems: QuestReward['mailedItems'] = [];
-      for (const [n, reward] of def.rewards.items.entries()) {
+      for (const [n, reward] of questRewardItems(def, character.classId).entries()) {
         const grant = {
           accountId: character.accountId,
           characterId: character.id,

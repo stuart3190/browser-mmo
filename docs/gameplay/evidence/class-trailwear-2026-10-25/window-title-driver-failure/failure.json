@@ -1,0 +1,51 @@
+{
+  "ok": false,
+  "error": "locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Close Character', exact: true })\u001b[22m\n\n    at click (/root/browser-mmo/scripts/e2e/trailwear-journey.cjs:73:51)\n    at <anonymous> (/root/browser-mmo/scripts/e2e/trailwear-journey.cjs:448:13)",
+  "checks": [
+    {
+      "name": "Fresh warrior takes and equips the actual starter sword",
+      "ok": true
+    },
+    {
+      "name": "Quest grants exactly one class-appropriate item",
+      "ok": true,
+      "detail": [
+        {
+          "id": "01a17001-27ba-7f95-bacc-e123645d1db8",
+          "templateId": "armor.leather.trapper_cap",
+          "version": 1,
+          "quantity": 1,
+          "location": {
+            "kind": "equipped",
+            "characterId": "01a16ffa-b2f8-7fbe-bf98-669f062d3d7b",
+            "slotId": "head"
+          },
+          "durability": {
+            "current": 60,
+            "max": 60
+          }
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "username": "trailw_mvmyhrzw",
+  "state": {
+    "position": {
+      "x": 264.3582261318321,
+      "z": 411.75925353721965
+    },
+    "progress": {
+      "level": 1,
+      "xp": 246,
+      "xpToNext": 400
+    },
+    "vitals": {
+      "health": 144,
+      "maxHealth": 144,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  }
+}

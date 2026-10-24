@@ -93,11 +93,17 @@ export function questState(
   return questAvailability(def, level, records).ok ? 'available' : 'unavailable';
 }
 
+/** Item alternatives replace the default list; they never add a second reward payout. */
+export function questRewardItems(def: QuestDefinition, classId?: string) {
+  return (classId ? def.rewards.classItems?.[classId] : undefined) ?? def.rewards.items;
+}
+
 export function questView(
   def: QuestDefinition,
   level: number,
   records: ReadonlyMap<string, QuestRecord>,
   itemCount: (templateId: string) => number,
+  classId?: string,
 ): QuestView {
   const mine = records.get(def.id);
   return {
@@ -111,7 +117,7 @@ export function questView(
     rewards: {
       xp: def.rewards.xp,
       currency: def.rewards.currency,
-      items: def.rewards.items,
+      items: questRewardItems(def, classId),
     },
     acceptedAt: mine?.acceptedAt ?? null,
     completedAt: mine?.completedAt ?? null,

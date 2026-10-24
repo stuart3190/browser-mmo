@@ -103,3 +103,20 @@ Other live quests remain TS; final terrain/art/formulas remain code. World event
 dungeon instances and world-state effects still require the authoritative consumers listed above.
 Next, densify one region from these catalogs and add a bounded resource interaction; do not
 generate a mass of quests before its inhabitants, habitats and routes are convincing.
+
+## Optional gameplay authoring additions (2026-10-25)
+
+Enemy combat can declare an `attackPattern` of two to four named steps. Each step supplies its
+own `windupMs` (500–5000), `attackRange`, and optional ground radius OR cleave arc; they cannot be
+combined. Base damage/cooldown/aggro remain unchanged. A committed cue freezes its geometry,
+advances once on resolution (including a dodge), persists in recovery and resets to the first step
+on evade. Rootbound Cantor is the playable example; this is not a general encounter script engine.
+
+Quest reward values can include optional `classItems`, a map from class IDs to replacement item
+lists. The character's server-owned class selects the same list for offer previews and atomic
+turn-in. Classes without an override retain `items`; an override replaces rather than adds to it.
+Class/item references and stack quantities are checked even for unused named rewards. Fen's
+trailwear quest in `greenvale-complete.json` supplies Mage a robe and otherwise keeps its cap.
+Previously awarded items are not changed or paid again. These optional fields retain existing
+field semantics and default behavior; old packs do not need an authoring rewrite. Content hash
+compatibility remains a separate release concern.

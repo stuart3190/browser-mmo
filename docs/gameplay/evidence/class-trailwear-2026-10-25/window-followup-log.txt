@@ -1,0 +1,71 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 41 item templates.
+PASS Fresh warrior takes and equips the actual starter sword
+PASS Quest grants exactly one class-appropriate item [
+  {
+    id: '01a17001-27ba-7f95-bacc-e123645d1db8',
+    templateId: 'armor.leather.trapper_cap',
+    version: 1,
+    quantity: 1,
+    location: {
+      kind: 'equipped',
+      characterId: '01a16ffa-b2f8-7fbe-bf98-669f062d3d7b',
+      slotId: 'head'
+    },
+    durability: { current: 60, max: 60 }
+  }
+]
+PASS Item details remain while another item window is open
+PASS Closing the final item window dismisses its details card
+PASS Reward equips through ordinary inventory controls
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 264.3582261318321, z: 411.75925353721965 },
+  connected: true
+}
+GO 264 412
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.3582261318321, z: 411.75925353721965 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+PASS Item details do not obscure the next NPC conversation
+PASS Relogin retains the earned item and completed quest
+PASS No gameplay exceptions []
+PASS Quest grants exactly one class-appropriate item [
+  {
+    id: '01a17005-ac65-7d31-8f53-1b9fb4041729',
+    templateId: 'armor.cloth.apprentice_robe',
+    version: 1,
+    quantity: 1,
+    location: {
+      kind: 'equipped',
+      characterId: '01a17001-b1a0-724f-b03f-a55d53ba6591',
+      slotId: 'chest'
+    },
+    durability: { current: 50, max: 50 }
+  }
+]
+PASS Closing the final item window dismisses its details card
+PASS Reward equips through ordinary inventory controls
+NPC approach npc.world.greenvale_marches.profession {
+  position: { x: 264.66208886737843, z: 411.79456550537896 },
+  connected: true
+}
+GO 264 412
+NPC interact npc.world.greenvale_marches.profession {
+  position: { x: 264.66208886737843, z: 411.79456550537896 },
+  prompt: 'Press E to talk to Herbalist Fen',
+  connected: true
+}
+PASS Item details do not obscure the next NPC conversation
+PASS Relogin retains the earned item and completed quest
+PASS No gameplay exceptions []

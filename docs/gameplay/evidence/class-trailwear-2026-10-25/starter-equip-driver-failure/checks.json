@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "user": "trailw_mvmyhrzw",
+  "classId": "class.warrior",
+  "checks": [
+    {
+      "name": "Fresh warrior takes and equips the actual starter sword",
+      "ok": false
+    }
+  ]
+}

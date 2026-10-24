@@ -1,0 +1,49 @@
+{
+  "ok": false,
+  "user": "trailm_mvmyrkcm",
+  "classId": "class.mage",
+  "checks": [
+    {
+      "name": "Quest grants exactly one class-appropriate item",
+      "ok": true,
+      "detail": [
+        {
+          "id": "01a17005-ac65-7d31-8f53-1b9fb4041729",
+          "templateId": "armor.cloth.apprentice_robe",
+          "version": 1,
+          "quantity": 1,
+          "location": {
+            "kind": "equipped",
+            "characterId": "01a17001-b1a0-724f-b03f-a55d53ba6591",
+            "slotId": "chest"
+          },
+          "durability": {
+            "current": 50,
+            "max": 50
+          }
+        }
+      ]
+    },
+    {
+      "name": "Closing the final item window dismisses its details card",
+      "ok": true
+    },
+    {
+      "name": "Reward equips through ordinary inventory controls",
+      "ok": true
+    },
+    {
+      "name": "Item details do not obscure the next NPC conversation",
+      "ok": true
+    },
+    {
+      "name": "Relogin retains the earned item and completed quest",
+      "ok": true
+    },
+    {
+      "name": "No gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

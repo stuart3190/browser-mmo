@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "username": "trailw_mvmyhrzw",
+  "classId": "class.warrior",
+  "checks": [
+    {
+      "name": "Fresh warrior takes and equips the actual starter sword",
+      "ok": true
+    },
+    {
+      "name": "Class-appropriate reward is offered before accepting",
+      "ok": true
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.wildlife.1"
+    },
+    {
+      "name": "Real catalog enemy defeated",
+      "ok": true,
+      "detail": "enemy.world.greenvale_marches.wildlife.1"
+    },
+    {
+      "name": "Actual hunts and herb gathering satisfy both objectives",
+      "ok": true
+    },
+    {
+      "name": "Quest grants exactly one class-appropriate item",
+      "ok": true,
+      "detail": [
+        {
+          "id": "01a17001-27ba-7f95-bacc-e123645d1db8",
+          "templateId": "armor.leather.trapper_cap",
+          "version": 0,
+          "quantity": 1,
+          "location": {
+            "kind": "container",
+            "containerId": "01a16ffa-b2fe-744c-a3a2-3ad26d95edb2",
+            "containerKind": "backpack",
+            "slot": 0
+          },
+          "durability": {
+            "current": 60,
+            "max": 60
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reward equips through ordinary inventory controls",
+      "ok": true
+    },
+    {
+      "name": "Relogin retains the earned item and completed quest",
+      "ok": true
+    },
+    {
+      "name": "No gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "fixture": "Fresh ordinary level-one character; real starter pickup, walking, travel, combat, gathering, quest turn-in, equipment and relogin. No direct DB writes, grants, teleports or XP injection."
+}

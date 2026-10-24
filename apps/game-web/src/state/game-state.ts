@@ -204,6 +204,9 @@ export class GameState {
       if (w === 'chat') this.unreadChat = 0;
     } else next.delete(w);
     this.open = next;
+    const itemWindows: WindowId[] = ['inventory', 'character', 'bank'];
+    if (!on && itemWindows.includes(w) && !itemWindows.some((id) => next.has(id)))
+      this.selectedItemId = null;
     this.emit();
   }
 }

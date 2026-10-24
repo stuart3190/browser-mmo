@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "username": "trailw_mvmyhrzw",
+  "classId": "class.warrior",
+  "checks": [
+    {
+      "name": "Fresh warrior takes and equips the actual starter sword",
+      "ok": true
+    },
+    {
+      "name": "Quest grants exactly one class-appropriate item",
+      "ok": true,
+      "detail": [
+        {
+          "id": "01a17001-27ba-7f95-bacc-e123645d1db8",
+          "templateId": "armor.leather.trapper_cap",
+          "version": 1,
+          "quantity": 1,
+          "location": {
+            "kind": "equipped",
+            "characterId": "01a16ffa-b2f8-7fbe-bf98-669f062d3d7b",
+            "slotId": "head"
+          },
+          "durability": {
+            "current": 60,
+            "max": 60
+          }
+        }
+      ]
+    },
+    {
+      "name": "Item details remain while another item window is open",
+      "ok": true
+    },
+    {
+      "name": "Closing the final item window dismisses its details card",
+      "ok": true
+    },
+    {
+      "name": "Reward equips through ordinary inventory controls",
+      "ok": true
+    },
+    {
+      "name": "Item details do not obscure the next NPC conversation",
+      "ok": true
+    },
+    {
+      "name": "Relogin retains the earned item and completed quest",
+      "ok": true
+    },
+    {
+      "name": "No gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "fixture": "Fresh ordinary level-one character; real starter pickup, walking, travel, combat, gathering, quest turn-in, equipment and relogin. No direct DB writes, grants, teleports or XP injection."
+}

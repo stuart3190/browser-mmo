@@ -198,7 +198,7 @@ async function earnedActor(classId) {
           text.includes('Your class and level') &&
             text.includes('maximum health before replacing other gear') &&
             text.includes('Bonus attributes roll on creation') &&
-            text.includes('keeps its original roll'),
+            text.includes('previously earned items are unchanged'),
           text,
         );
         check(

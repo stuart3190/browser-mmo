@@ -158,7 +158,13 @@ export function compileContentCatalog(
       for (const c of reward.value.currency)
         if (!raw.currencies.some((v) => v.id === c.currencyId))
           throw new Error(`Reward ${reward.id}: unknown currency ${c.currencyId}`);
-      for (const i of reward.value.items) {
+      for (const classId of Object.keys(reward.value.classItems ?? {}))
+        if (!raw.classes.some((c) => c.id === classId))
+          throw new Error(`Reward ${reward.id}: unknown class ${classId}`);
+      for (const i of [
+        ...reward.value.items,
+        ...Object.values(reward.value.classItems ?? {}).flat(),
+      ]) {
         const template = raw.itemTemplates.find((t) => t.id === i.itemTemplateId);
         if (!template || i.quantity > template.maxStack)
           throw new Error(`Reward ${reward.id}: invalid item/quantity ${i.itemTemplateId}`);

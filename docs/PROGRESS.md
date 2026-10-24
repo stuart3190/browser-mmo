@@ -2057,3 +2057,20 @@ Ranked player-facing gaps from the current client and content:
 - [ ] Next: class-appropriate Fen quest reward. Mage currently receives an unusable leather cap;
       preserve past items and verify class-specific offer, atomic grant, equip and relogin.
 - Cantor `62ef82b` and equipment `09893fc` are pushed. Production unchanged.
+
+### Class-appropriate trailwear — verified 2026-10-25
+
+- [x] Fen offers Mage the existing Apprentice Robe instead of unusable leather. Default Warrior
+      cap stays intact. Server resolves optional class item replacements for offers and atomic grant;
+      no class choice is accepted from the client. Past reward items are not changed.
+- [x] Real level-one Warrior (nine checks, staged after starter-equip driver correction) and Mage
+      (seven checks) earn hides/herbs, turn in, equip and relog with the same single item. No grants,
+      teleports, injected XP or direct DB player writes. Screenshots reviewed; failures retained.
+- [x] Closing the last item window clears its details card; another open item window retains it.
+      Eight desktop/six touch browser follow-up checks pass, including unobscured NPC dialogue.
+- 138 content,28 frontend,8 schema and13 domain tests, repository types/lint/build/content validation
+  pass. Evidence: `gameplay/evidence/class-trailwear-2026-10-25/`.
+- Reward inspection `07c4087` pushed. Production unchanged.
+- [ ] Next: verify the integrated first-hour story/profession/dungeon journeys with ordinary fresh
+      Warrior/Mage, then extend earned continuity into Tidewatch and Elderwood. Use an isolated source
+      checkout for the longer browser run so further gameplay implementation can continue safely.

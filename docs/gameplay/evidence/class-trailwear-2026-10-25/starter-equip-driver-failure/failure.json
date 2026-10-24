@@ -1,0 +1,30 @@
+{
+  "ok": false,
+  "error": "Error: Fresh warrior takes and equips the actual starter sword\n    at check (/root/browser-mmo/scripts/e2e/trailwear-journey.cjs:24:18)\n    at <anonymous> (/root/browser-mmo/scripts/e2e/trailwear-journey.cjs:360:7)",
+  "checks": [
+    {
+      "name": "Fresh warrior takes and equips the actual starter sword",
+      "ok": false
+    }
+  ],
+  "errors": [],
+  "username": "trailw_mvmyhrzw",
+  "state": {
+    "position": {
+      "x": 7.3089679787941835,
+      "z": -14.143767978865705
+    },
+    "progress": {
+      "level": 1,
+      "xp": 0,
+      "xpToNext": 400
+    },
+    "vitals": {
+      "health": 144,
+      "maxHealth": 144,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  }
+}

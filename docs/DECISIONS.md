@@ -1581,3 +1581,13 @@ stock. Health contribution applies the existing stamina conversion and explicitl
 other gear; this is not a claim of a net upgrade. Rolled bonus attributes and already-earned item
 values remain distinct. Inspection invokes no grants/equip/quest mutations, and native summaries
 support keyboard/touch without placing another floating panel over the game.
+
+## 2026-10-25 — Class-appropriate quest item rewards
+
+Optional rewards.classItems replaces the item list for a named character class; it does not add a
+second payout or accept a client-selected class. The same questRewardItems function drives server
+quest views and the existing atomic turn-in, under the character/quest locks and source-ref dedupe.
+Class/item references and stack limits are validated. Fen's trailwear quest retains its default cap
+and supplies the existing Apprentice Robe to Mage. XP, costs and objectives stay the same. Old
+awarded items remain untouched; completed journal text explicitly describes the current catalog,
+not a retroactive replacement. This adds no branch engine or player reward-choice API.

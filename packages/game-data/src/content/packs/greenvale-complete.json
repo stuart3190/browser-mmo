@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "id": "pack.greenvale.complete",
-  "revision": 2,
+  "revision": 3,
   "quests": [
     {
       "id": "quest.greenvale.marches_call",
@@ -298,8 +298,8 @@
       "dialogue": {
         "offer": "Herbs soften the hides from the meadow hunt. Bring two hides and two herbs; I will show why gathering matters to a traveller. You can make more field gear through my workshop.",
         "inProgress": "Follow the quest compass and the pale roads. Each traveller must gather and investigate personally; nearby party members share hunt credit.",
-        "readyToTurnIn": "These materials belong in useful gear. Take a cap for the trail; the workshop can shape your next cloak or weapon.",
-        "completed": "These materials belong in useful gear. Take a cap for the trail; the workshop can shape your next cloak or weapon."
+        "readyToTurnIn": "These materials belong in useful gear. Take trailwear suited to you; the workshop can shape your next cloak or weapon.",
+        "completed": "These materials belong in useful gear. Take trailwear suited to you; the workshop can shape your next cloak or weapon."
       },
       "placeholder": false
     },
@@ -473,7 +473,15 @@
             "itemTemplateId": "armor.leather.trapper_cap",
             "quantity": 1
           }
-        ]
+        ],
+        "classItems": {
+          "class.mage": [
+            {
+              "itemTemplateId": "armor.cloth.apprentice_robe",
+              "quantity": 1
+            }
+          ]
+        }
       }
     },
     {
