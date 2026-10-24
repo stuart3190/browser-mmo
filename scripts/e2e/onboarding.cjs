@@ -89,6 +89,39 @@ function check(name, ok) {
       (await w.locator('.ability-glyph:visible').count()) === 3,
     );
     await w.screenshot({ path: out + '/05-warrior-hud.png' });
+    for (const [actor, viewport] of [
+      [w, { width: 900, height: 650 }],
+      [p, { width: 390, height: 844 }],
+      [p, { width: 844, height: 390 }],
+    ]) {
+      await actor.setViewportSize(viewport);
+      await actor.locator('[data-open=professions]').click();
+      await actor
+        .locator('.window-professions .window-body')
+        .evaluate((el) => (el.scrollTop = el.scrollHeight));
+      check(
+        `Skills panel owns its hit area at ${viewport.width}x${viewport.height}`,
+        await actor.locator('.window-professions').evaluate((el) => {
+          const rect = el.getBoundingClientRect();
+          // Sample the visible interior, including where the desktop ability bar crosses the panel.
+          for (let y = rect.top + 40; y < rect.bottom - 4; y += 12)
+            for (let x = rect.left + 8; x < rect.right - 8; x += 20) {
+              const hit = document.elementFromPoint(x, y);
+              if (!hit || !el.contains(hit)) return false;
+            }
+          return (
+            rect.left >= 0 &&
+            rect.right <= innerWidth &&
+            rect.top >= 0 &&
+            rect.bottom <= innerHeight
+          );
+        }),
+      );
+      await actor.screenshot({ path: out + `/06-skills-${viewport.width}.png` });
+      await actor
+        .getByRole('button', { name: 'Close Field Skills & Broken Vault', exact: true })
+        .click();
+    }
     check('No browser exceptions', errors.length === 0);
   } finally {
     await browser.close();

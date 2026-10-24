@@ -1571,3 +1571,12 @@ checkpoint does not claim full-game readiness or finished world art.
       lint, four builds and production debug-hook guard.
       [Evidence](gameplay/evidence/onboarding-2026-10-24/README.md).
 - [ ] Integrated production password profile and complete earned journeys remain next checks.
+
+### Menu layering — 2026-10-24
+
+- [x] Fix desktop combat controls covering Skills text/actions. Explicit window/detail/tooltip/death
+      layers preserve hit ownership without disabling gameplay underneath a menu.
+- [x] Ten onboarding checks include panel hit-testing at desktop, portrait and landscape sizes;
+      eleven trade/inventory checks pass again. Formatting, script syntax and production game build
+      pass; reviewed screenshots and reports in [evidence](gameplay/evidence/panel-layering-2026-10-24/README.md).
+- [ ] Combined-source production profile and earned dungeon continuation remain separate gates.

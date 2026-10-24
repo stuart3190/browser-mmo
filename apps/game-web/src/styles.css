@@ -2156,3 +2156,18 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   color: var(--muted);
   margin: 10px 0 16px;
 }
+
+/* Panels own their hit area; later-mounted combat buttons must not cover menu text/actions. */
+.windows {
+  z-index: 2;
+}
+.ui-root .details,
+.ui-root.touch .details {
+  z-index: 4;
+}
+.hover-tooltip {
+  z-index: 5;
+}
+.death-overlay {
+  z-index: 6;
+}
