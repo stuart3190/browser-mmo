@@ -1,3 +1,4 @@
+import { GameAudio } from './game-audio';
 import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
@@ -49,6 +50,9 @@ export async function startGame(args: {
   const light = new HemisphericLight('sun', new Vector3(0.3, 1, 0.2), scene);
   light.groundColor = new Color3(0.3, 0.3, 0.35);
 
+  const audio = new GameAudio();
+  const detachAudio = audio.attach();
+  scene.onDisposeObservable.addOnce(detachAudio);
   const state = new GameState(args.character);
   state.renderer = kind;
   const actions = new ItemActions(args.api, state, gameData);
@@ -86,6 +90,7 @@ export async function startGame(args: {
     if (enemy) combat.target(enemy.id);
   };
   mountGameUi(args.ui, {
+    audio,
     api: args.api,
     chat: (message) => net.send('chat.send', message),
     state,
@@ -245,6 +250,20 @@ export async function startGame(args: {
     state.emit();
   });
   net.on('entity.spawn', (m) => {
+    const prior = state.world.get(m.d.entity.id);
+    const guard = m.d.entity.statuses?.find((s) => s.kind === 'guard');
+    if (
+      m.d.entity.id === state.myEntityId &&
+      guard &&
+      guard.expiresAtMs !== prior?.statuses?.find((s) => s.kind === 'guard')?.expiresAtMs
+    )
+      audio.play('guard');
+    const cue = m.d.entity.attackCue;
+    if (cue && cue.endsAtMs !== prior?.attackCue?.endsAtMs && player) {
+      const at = cue.groundPosition ?? m.d.entity.position;
+      if (Math.hypot(at.x - player.position.x, at.z - player.position.z) <= cue.range + 3)
+        audio.play('warning');
+    }
     entities?.upsert(m.d.entity);
     if (m.d.entity.id === state.myEntityId) player?.actor.setAppearance(m.d.entity.appearance);
     effects.setStatuses(m.d.entity);
@@ -268,6 +287,17 @@ export async function startGame(args: {
     if (m.d.reason === 'target_dead') combatLine('Target is dead');
   });
   net.on('combat.damage', (m) => {
+    if (m.d.outcome !== 'miss') {
+      if (m.d.targetId === state.myEntityId) audio.play('hurt');
+      else if (m.d.sourceId === state.myEntityId)
+        audio.play(
+          m.d.abilityId === 'ability.mage.frost_nova'
+            ? 'frost'
+            : m.d.abilityId?.startsWith('ability.mage.')
+              ? 'fire'
+              : 'strike',
+        );
+    }
     if (m.d.sourceId === state.myEntityId) {
       const at = entities?.meshPosition(m.d.targetId);
       if (at) player?.face(at);
@@ -358,8 +388,10 @@ export async function startGame(args: {
   );
   net.on('combat.death', (m) => {
     patchEntity(m.d.entityId, { dead: true, health: 0 });
-    if (m.d.entityId === state.myEntityId) combatLine('You died', 'error');
-    else if (m.d.killerId === state.myEntityId)
+    if (m.d.entityId === state.myEntityId) {
+      audio.play('death');
+      combatLine('You died', 'error');
+    } else if (m.d.killerId === state.myEntityId)
       combatLine(`You killed ${state.nameOf(m.d.entityId)}`);
   });
   net.on('player.vitals', (m) => {
@@ -376,7 +408,10 @@ export async function startGame(args: {
       const at = player && projectToScreen(scene, player.position.add(new Vector3(0, 1.5, 0)));
       if (at) floating.spawn(at, `+${m.d.xpGained} XP`, 'xp');
     }
-    if (m.d.levelsGained > 0) state.toast(`Level up! You are now level ${m.d.level}`);
+    if (m.d.levelsGained > 0) {
+      audio.play('level');
+      state.toast(`Level up! You are now level ${m.d.level}`);
+    }
     if (m.d.level >= specialisationLevel && m.d.level - m.d.levelsGained < specialisationLevel) {
       state.toast('Class specialisations unlocked! Train with Maren or Iona.');
       state.addLog(
@@ -385,6 +420,7 @@ export async function startGame(args: {
     }
   });
   net.on('combat.loot', (m) => {
+    audio.play('loot');
     // One entry per visible stack: a drop merged into a stack the same kill just created is
     // reported as the final stack, not twice; merged-away rows are not shown.
     const stacks = new Map(m.d.items.map((i) => [i.instance.id, i]));
@@ -410,6 +446,7 @@ export async function startGame(args: {
       if (m.ack === s.remedyPendingSeq) {
         s.remedyPendingSeq = null;
         s.toast('Remedy used');
+        audio.play('heal');
       }
     }),
   );
@@ -438,6 +475,7 @@ export async function startGame(args: {
     }
   });
   net.on('quest.completed', (m) => {
+    audio.play('quest');
     const parts = [`+${m.d.xpGained} XP`];
     const gold = gameData.currencies.get('gold');
     if (m.d.gold > 0 && gold) parts.push(formatCurrency(gold, m.d.gold));

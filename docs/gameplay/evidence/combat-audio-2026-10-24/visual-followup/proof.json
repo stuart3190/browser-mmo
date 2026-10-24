@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-three actors; ordinary walking/combat/settings controls. Native AudioContext signal observed with an analyser; no injected game state or simulated audio implementation. No physical speaker listening claim.",
+  "checks": [
+    {
+      "name": "Warrior volume control accepts keyboard input",
+      "ok": true
+    },
+    {
+      "name": "Warrior user gesture produces a real Web Audio signal",
+      "ok": true,
+      "detail": {
+        "starts": 3,
+        "peak": 0.014390649273991585
+      }
+    },
+    {
+      "name": "Mage volume control accepts keyboard input",
+      "ok": true
+    },
+    {
+      "name": "Mage user gesture produces a real Web Audio signal",
+      "ok": true,
+      "detail": {
+        "starts": 3,
+        "peak": 0.010198845528066158
+      }
+    },
+    {
+      "name": "Sound controls are reachable at 390×844",
+      "ok": true
+    },
+    {
+      "name": "Sound controls are reachable at 844×480",
+      "ok": true
+    },
+    {
+      "name": "No audio or settings exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

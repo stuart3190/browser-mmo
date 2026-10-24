@@ -1,3 +1,4 @@
+import { SettingsWindow } from './SettingsWindow';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { classAbilities } from '@mmo/game-data';
 import { createRoot } from 'react-dom/client';
@@ -29,6 +30,7 @@ import { TouchControls, useTouchControls } from './TouchControls';
 const SHORTCUTS: Record<string, WindowId> = {
   Enter: 'chat',
   KeyO: 'market',
+  KeyK: 'settings',
   KeyN: 'social',
   KeyG: 'guild',
   KeyM: 'world',
@@ -141,6 +143,7 @@ function GameUI() {
         <MarketWindow />
         <SocialWindow />
         <GuildWindow />
+        <SettingsWindow />
       </div>
       <DialoguePanel />
       <ItemDetails />
@@ -259,6 +262,7 @@ function ActionBar() {
       {btn('market', 'Market', 'O')}
       {btn('social', state.socialUnread ? `Friends (${state.socialUnread})` : 'Friends', 'N')}
       {btn('guild', 'Guild', 'G')}
+      {btn('settings', 'Settings', 'K')}
       {btn('chat', state.unreadChat ? `Chat (${state.unreadChat})` : 'Chat', '↵')}
       {t && t.kind === 'enemy' && !t.dead && (
         <button

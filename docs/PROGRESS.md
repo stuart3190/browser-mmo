@@ -1958,3 +1958,18 @@ Ranked player-facing gaps from the current client and content:
   level-one-to-five claim, no injected new chapter progress/items.
 - [ ] Next: optional combat/reward sound feedback with saved volume/mute and desktop/touch controls;
       verify real audio output, confirmed gameplay events, mute persistence and responsive settings.
+
+### Combat/reward audio and settings — verified 2026-10-24
+
+- [x] Optional authored Web Audio cues for confirmed hits, guard, nearby warnings, loot, quests,
+      levels, death and healing. Gesture unlock, saved volume/mute, hidden-tab silence and teardown.
+- [x] Settings/Controls via K and the scrollable desktop/touch menu. Fifteen browser checks pass:
+      native signal during real class victories, mute/relogin, successful silent abilities and
+      touch portrait/landscape hit targets. First label association issue fixed; opaque surface
+      follow-up and screenshot review pass. Evidence: `gameplay/evidence/combat-audio-2026-10-24/`.
+- 22 frontend tests, repository/final affected types, lint and production build/debug guard pass.
+  Synthesized cues are a first sound pass; no music/ambience or physical speaker listening claim.
+- [ ] Next: quest/atlas passage guidance currently chooses the first zone path, sometimes sending
+      a player beside the coastal ferry toward a boundary pass nearly two kilometres away. Prefer
+      sensible walking distance through actual passage endpoints, preserve travel requirements,
+      verify real directions. Then continue authored forest exploration and encounters.

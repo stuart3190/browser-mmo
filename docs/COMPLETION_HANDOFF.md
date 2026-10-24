@@ -47,11 +47,20 @@ browser pass; Mage chapter/craft/equip passed before a sparse-stat assertion bug
 resumed without data mutations, proving 0→20 power, victory/wear and relogin. Original failure kept;
 this is staged evidence. Both functional test controllers stopped their own services/DB afterwards.
 
-Next active polish: sound feedback is entirely absent. Draft `/tmp/bo-audio-draft/` has GameAudio,
-SettingsWindow, unit/browser tests and `integrate.py`. Draft is NOT yet integrated/verified.
-It adds optional authored Web Audio cues, saved volume/mute, gesture/visibility rules and settings
-available on touch. Integration script is intended for one use only; after integration do not rerun.
-Continue with actual desktop/touch fights and native audio signal checks. No production work.
+Completed: optional combat/reward sound and Settings/Controls. Evidence:
+`gameplay/evidence/combat-audio-2026-10-24/`; 15 native-browser checks, actual class fights, saved
+volume/mute, silent successful abilities and touch layout checks pass. Label association and HUD
+bleed-through fixed; visual follow-up inspected. 22 frontend tests, types/lint/build/debug guard pass.
+No music/ambience or physical listening claim. `/tmp/bo-audio-draft/integrate.py` is now OBSOLETE;
+do not rerun it. Commission commit `660f75e` is pushed.
+
+Next gameplay priority: passage guidance chooses first zone BFS path, ignoring player and destination
+positions. This points coastal players beside a ferry at a boundary almost two kilometres away.
+Fix sensible route selection using walking distances between actual passage endpoints and route
+requirements; verify quest and atlas guidance through real travel. Then authored Elderwood chapter
+can follow. Initial content idea (NOT implemented): Pinewatch Landing outpost near256/4000,
+Keeper Tamsin, living-seal surveys, telegraphed Briar Spitters and Rootbound Cantor, level-five/six
+progression. Most other atlas regions and armour-specific appearance remain incomplete.
 
 Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.

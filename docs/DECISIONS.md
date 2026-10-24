@@ -1486,3 +1486,16 @@ No migration, special currency or second crafting implementation. Old offers omi
 Recipe cards explain actual carried unlocked costs and rarity-adjusted base roll ranges; random bonus
 attributes are disclosed as rolls, not promised values. The character sheet distinguishes base health
 from effective maximum health including stamina. External release gates remain separate.
+
+## 2026-10-24 — Optional sound reinforces authoritative combat feedback
+
+Use small authored Web Audio envelopes for strikes, fire/frost, guard, damage, nearby windups and
+reward/death/heal events already confirmed by the server. No sound predicts successful damage;
+existing visual cues stay available. No new network messages, asset licensing dependency or music.
+
+AudioContext is created/resumed only on user interaction; missed events are dropped, mute stops
+active voices, hidden tabs stop cues, scene disposal closes the context. Saved browser-local volume
+and mute are exposed in a Settings/Controls window reachable from both input modes. Repeated
+simultaneous impacts share one cue and overlapping voices are bounded for audible clarity. Unavailable
+audio leaves gameplay working and shows an explanation in settings. Native browser signal checks
+verify output and mute behavior; they do not claim physical speaker/headphone listening signoff.

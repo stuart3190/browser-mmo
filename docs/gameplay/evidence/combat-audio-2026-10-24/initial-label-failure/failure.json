@@ -1,0 +1,5 @@
+{
+  "error": "locator.focus: Error: strict mode violation: getByLabel('Sound effects volume') resolved to 2 elements:\n    1) <output>35%</output> aka getByRole('status', { name: 'Sound effects volume' })\n    2) <input min=\"0\" step=\"1\" max=\"100\" value=\"35\" type=\"range\" aria-label=\"Sound effects volume\"/> aka getByRole('slider', { name: 'Sound effects volume' })\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Sound effects volume')\u001b[22m\n\n    at /root/browser-mmo/scripts/e2e/audio.cjs:125:20",
+  "checks": [],
+  "errors": []
+}

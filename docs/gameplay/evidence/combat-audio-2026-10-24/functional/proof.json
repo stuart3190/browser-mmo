@@ -1,0 +1,76 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-three actors; ordinary walking/combat/settings controls. Native AudioContext signal observed with an analyser; no injected game state or simulated audio implementation. No physical speaker listening claim.",
+  "checks": [
+    {
+      "name": "Warrior volume control accepts keyboard input",
+      "ok": true
+    },
+    {
+      "name": "Warrior user gesture produces a real Web Audio signal",
+      "ok": true,
+      "detail": {
+        "starts": 3,
+        "peak": 0.012569831684231758
+      }
+    },
+    {
+      "name": "Warrior wins a real fight with audible server-confirmed feedback",
+      "ok": true
+    },
+    {
+      "name": "Warrior can mute effects",
+      "ok": true
+    },
+    {
+      "name": "Warrior volume and mute persist after relogin",
+      "ok": true
+    },
+    {
+      "name": "Warrior muted successful ability creates no audio voices",
+      "ok": true
+    },
+    {
+      "name": "Mage volume control accepts keyboard input",
+      "ok": true
+    },
+    {
+      "name": "Mage user gesture produces a real Web Audio signal",
+      "ok": true,
+      "detail": {
+        "starts": 3,
+        "peak": 0.008260603062808514
+      }
+    },
+    {
+      "name": "Sound controls are reachable at 390×844",
+      "ok": true
+    },
+    {
+      "name": "Sound controls are reachable at 844×480",
+      "ok": true
+    },
+    {
+      "name": "Mage wins a real fight with audible server-confirmed feedback",
+      "ok": true
+    },
+    {
+      "name": "Mage can mute effects",
+      "ok": true
+    },
+    {
+      "name": "Mage volume and mute persist after relogin",
+      "ok": true
+    },
+    {
+      "name": "Mage muted successful ability creates no audio voices",
+      "ok": true
+    },
+    {
+      "name": "No audio or settings exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

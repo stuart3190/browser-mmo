@@ -1,3 +1,4 @@
+import type { GameAudio } from '../game/game-audio';
 import { createContext, useContext, useSyncExternalStore } from 'react';
 import type { ClientPayload } from '@mmo/networking';
 import type { GameData } from '@mmo/game-data';
@@ -23,6 +24,7 @@ export interface Controls {
 }
 
 export interface UiDeps {
+  audio: GameAudio;
   api: ApiClient;
   chat: (message: ClientPayload<'chat.send'>) => number;
   party: {

@@ -2527,3 +2527,30 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   min-height: 44px;
   width: 100%;
 }
+
+.window-settings button {
+  min-height: 44px;
+}
+.sound-volume {
+  display: block;
+  margin: 16px 0;
+}
+.sound-volume output {
+  float: right;
+}
+.sound-volume input {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--accent);
+}
+.window-settings p {
+  line-height: 1.5;
+}
+.window-settings {
+  background: #172620;
+}
+.ui-root:has(.window-settings) .first-steps,
+.ui-root:has(.window-settings) .quest-guide {
+  visibility: hidden;
+}

@@ -1,0 +1,15 @@
+PASS Warrior volume control accepts keyboard input
+PASS Warrior user gesture produces a real Web Audio signal
+PASS Warrior wins a real fight with audible server-confirmed feedback
+PASS Warrior can mute effects
+PASS Warrior volume and mute persist after relogin
+PASS Warrior muted successful ability creates no audio voices
+PASS Mage volume control accepts keyboard input
+PASS Mage user gesture produces a real Web Audio signal
+PASS Sound controls are reachable at 390×844
+PASS Sound controls are reachable at 844×480
+PASS Mage wins a real fight with audible server-confirmed feedback
+PASS Mage can mute effects
+PASS Mage volume and mute persist after relogin
+PASS Mage muted successful ability creates no audio voices
+PASS No audio or settings exceptions
