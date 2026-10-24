@@ -22,3 +22,11 @@ exploit is added.
 The shoreline is walkable shallows. Rocks, trees and wreck ribs have shared visible/collision
 footprints; survey rings and foam are decoration. Existing other atlas regions remain mostly
 catalogued greybox content. This chapter does not claim those regions are finished.
+
+After The Bell Below, Iona opens two fieldcraft commissions: Tidewatch Blade (Warrior) and Tideglass
+Staff (Mage), both level five with 100 condition. Two Field Hides, one Iron Shard and 100 copper
+start a 15-second craft. A solo chapter earns at least these materials from its required kills;
+party companions share the existing loot-owner rules and can trade their salvage. Collect in
+Skills, including after logout, then equip from Bag. Both weapons bind on equip. Recipe cards
+show carried costs, class requirements and the base stat roll; bonus attributes roll on creation.
+The existing paid repair service restores their condition after use.

@@ -1,0 +1,62 @@
+
+ RUN  v5.0.3 /root/browser-mmo/packages/domain
+
+ ❯ test/coastal-commissions.test.ts (2 tests | 2 failed) 796ms
+   × gates the coastal sword commission before taking costs, and preserves one crafted upgrade under retries 435ms
+   × gates the coastal staff commission before taking costs, and preserves one crafted upgrade under retries 357ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/coastal-commissions.test.ts > gates the coastal sword commission before taking costs, and preserves one crafted upgrade under retries
+Error: Failed query: update "character_quests" set "status" = $1, "completed_at" = $2 where "character_quests"."character_id" = $3
+params: completed,2026-10-24T20:35:33.816Z,01a16fa0-37ea-7483-ad22-717243c04a0b
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.3_@types+pg@8.23.1_pg@8.23.1/node_modules/src/pg-core/session.ts:73:11
+ ❯ test/coastal-commissions.test.ts:55:5
+     53|       });
+     54|     await expectCode(exchangeAtNpc(ctx, req), 'QUEST_NOT_AVAILABLE');
+     55|     await ctx.db
+       |     ^
+     56|       .update(schema.characterQuests)
+     57|       .set({ status: 'completed', completedAt: new Date() })
+
+Caused by: error: new row for relation "character_quests" violates check constraint "character_quests_completed_ck"
+ ❯ ../../node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.3_@types+pg@8.23.1_pg@8.23.1/node_modules/drizzle-orm/node-postgres/session.js:113:20
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.3_@types+pg@8.23.1_pg@8.23.1/node_modules/drizzle-orm/pg-core/session.js:39:16
+ ❯ test/coastal-commissions.test.ts:55:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 456, severity: 'ERROR', code: '23514', detail: 'Failing row contains (01a16fa0-37ea-7483-ad22-717243c04a0b, quest.amber_coast.last_bell, completed, {"last_oath": 1, "bellkeeper": 1}, 2026-10-24 22:35:33.802+02, 2026-10-24 22:35:33.816+02, null, null, 1, 2026-10-24 22:35:33.803434+02).', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'character_quests', dataType: undefined, constraint: 'character_quests_completed_ck', file: 'execMain.c', routine: 'ExecConstraints' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  test/coastal-commissions.test.ts > gates the coastal staff commission before taking costs, and preserves one crafted upgrade under retries
+Error: Failed query: update "character_quests" set "status" = $1, "completed_at" = $2 where "character_quests"."character_id" = $3
+params: completed,2026-10-24T20:35:34.181Z,01a16fa0-397d-7159-a042-c26966c2f7d4
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.3_@types+pg@8.23.1_pg@8.23.1/node_modules/src/pg-core/session.ts:73:11
+ ❯ test/coastal-commissions.test.ts:55:5
+     53|       });
+     54|     await expectCode(exchangeAtNpc(ctx, req), 'QUEST_NOT_AVAILABLE');
+     55|     await ctx.db
+       |     ^
+     56|       .update(schema.characterQuests)
+     57|       .set({ status: 'completed', completedAt: new Date() })
+
+Caused by: error: new row for relation "character_quests" violates check constraint "character_quests_completed_ck"
+ ❯ ../../node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.3_@types+pg@8.23.1_pg@8.23.1/node_modules/drizzle-orm/node-postgres/session.js:113:20
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.3_@types+pg@8.23.1_pg@8.23.1/node_modules/drizzle-orm/pg-core/session.js:39:16
+ ❯ test/coastal-commissions.test.ts:55:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 456, severity: 'ERROR', code: '23514', detail: 'Failing row contains (01a16fa0-397d-7159-a042-c26966c2f7d4, quest.amber_coast.last_bell, completed, {"last_oath": 1, "bellkeeper": 1}, 2026-10-24 22:35:34.134+02, 2026-10-24 22:35:34.181+02, null, null, 1, 2026-10-24 22:35:34.141399+02).', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'character_quests', dataType: undefined, constraint: 'character_quests_completed_ck', file: 'execMain.c', routine: 'ExecConstraints' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 20 passed (22)
+   Start at  22:35:14
+   Duration  19.98s (tests 58%, import 30%, transform 12%)
+
+undefined
+/root/browser-mmo/packages/domain:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: vitest run test/coastal-commissions.test.ts test/greenvale-services.test.ts test/greenvale-systems.test.ts

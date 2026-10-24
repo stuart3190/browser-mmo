@@ -137,6 +137,61 @@ export function withCoastalChapter(source: ParsedGameData): ParsedGameData {
     output: { itemTemplateId: 'consumable.greenvale.remedy', quantity: 1 },
     copper: -30,
   });
+  // The completed shore expedition supplies enough guaranteed salvage for one commission.
+  // Reuse durable fieldcraft jobs and inventory authority; no new reward or currency path.
+  for (const [type, name, baseId, classId, stats, weapon] of [
+    [
+      'sword',
+      'Tidewatch Blade',
+      'weapon.sword.iron_longsword',
+      'class.warrior',
+      { strength: { min: 6, max: 6 }, attack_power: { min: 14, max: 14 } },
+      { minDamage: 10, maxDamage: 17, attackSpeedMs: 2400 },
+    ],
+    [
+      'staff',
+      'Tideglass Staff',
+      'weapon.staff.oak_staff',
+      'class.mage',
+      { intellect: { min: 7, max: 7 }, spell_power: { min: 18, max: 18 } },
+      { minDamage: 12, maxDamage: 21, attackSpeedMs: 3200 },
+    ],
+  ] as const) {
+    const base = raw.itemTemplates.find((i) => i.id === baseId)!;
+    const id = `weapon.${type}.tidewatch`;
+    raw.itemTemplates.push(
+      ItemTemplateSchema.parse({
+        ...base,
+        id,
+        name,
+        description:
+          'Shore salvage, reforged and bound with the oath of two watches. Commissioned by Warden Iona after The Bell Below.',
+        rarityId: 'uncommon',
+        itemLevel: 9,
+        requiredLevel: 5,
+        allowedClassIds: [classId],
+        binding: 'on_equip',
+        iconId: `icons/items/tidewatch_${type}`,
+        modelId: null,
+        vendorValue: 60,
+        equipment: { ...base.equipment, baseStats: stats, maxDurability: 100, weapon },
+      }),
+    );
+    raw.serviceOffers!.push({
+      id: `service.amber_coast.craft_${type}`,
+      name: `Commission ${name}`,
+      npcId: tidewatch.npcId,
+      kind: 'craft',
+      minLevel: 5,
+      requiresQuestId: 'quest.amber_coast.last_bell',
+      inputs: [
+        { itemTemplateId: 'material.world.field_hide', quantity: 2 },
+        { itemTemplateId: 'material.world.iron_shard', quantity: 1 },
+      ],
+      output: { itemTemplateId: id, quantity: 1 },
+      copper: -100,
+    });
+  }
   return RawGameDataSchema.parse(
     compileContentCatalog(
       {

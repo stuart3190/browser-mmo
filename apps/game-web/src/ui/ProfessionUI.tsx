@@ -37,8 +37,9 @@ export function ProfessionWindow() {
       </p>
       <h3>Crafts</h3>
       <p className="small">
-        Start a recipe at the Roadhouse workshop. One craft at a time; your paid materials stay
-        reserved across logout and restart. Results go to your bags or Recovered loot.
+        Start a recipe at the Roadhouse workshop, or commission Tidewatch weapons from Iona after
+        The Bell Below. One craft at a time; your paid materials stay reserved across logout and
+        restart. Results go to your bags or Recovered loot.
       </p>
       {state.systems.jobs.map((j) => (
         <section className="dialogue-quest" key={j.id}>

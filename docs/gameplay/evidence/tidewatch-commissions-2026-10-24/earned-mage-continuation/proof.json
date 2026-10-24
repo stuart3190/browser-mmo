@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "fixture": "Unmodified earned Mage resumed from iaQjr4; original chapter and craft proof retained, original sparse-stat assertion failure retained. Only read-only DB lookup; real UI unequip/equip, victory/wear/relogin.",
+  "checks": [
+    {
+      "name": "Resumed Mage has its earned quest completion and exactly one commissioned staff",
+      "ok": true
+    },
+    {
+      "name": "Mage staff raises effective spell power from the absent-stat zero baseline",
+      "ok": true,
+      "detail": {
+        "before": 0,
+        "after": 20
+      }
+    },
+    {
+      "name": "Character maximum health matches the authoritative vitals",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Earned staff identity, equipped slot and victory wear survive relogin",
+      "ok": true
+    },
+    {
+      "name": "No resumed gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

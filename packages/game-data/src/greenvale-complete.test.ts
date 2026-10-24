@@ -26,10 +26,15 @@ it('connects a complete Marches closure to deployed progression, existing geogra
     previous = q.id;
   }
   expect(gd.raw.dungeonEntries![0]!.mode).toBe('private_instance');
-  expect(gd.raw.serviceOffers!.filter((s) => s.kind === 'craft')).toHaveLength(4);
+  expect(
+    gd.raw.serviceOffers!.filter(
+      (s) => s.kind === 'craft' && s.id.startsWith('service.greenvale.'),
+    ),
+  ).toHaveLength(4);
   expect(new Set(gd.raw.worldCatalog!.resourceNodes.map((n) => n.resourceId)).size).toBe(3);
 });
 it.each([
+  'missing prerequisite',
   'missing npc',
   'missing item',
   'free buy',
@@ -43,6 +48,7 @@ it.each([
   const pack = packs.find((p) => p.schemaVersion === 3)!;
   if (pack.schemaVersion !== 3) throw Error('wrong fixture');
   const offer = pack.serviceOffers[0]!;
+  if (fault === 'missing prerequisite') offer.requiresQuestId = 'quest.missing';
   if (fault === 'missing npc') offer.npcId = 'npc.missing';
   if (fault === 'missing item') offer.output!.itemTemplateId = 'item.missing';
   if (fault === 'free buy') offer.copper = 0;

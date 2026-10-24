@@ -217,6 +217,19 @@ async function fixture(classId) {
         (await zone()) === tidewatch.zoneId,
       );
       await quest(crossing, 'turn-in', tidewatch.npcId);
+      if (process.env.COAST_COMMISSIONS === '1') {
+        await talk(tidewatch.npcId);
+        const locked = page.locator(
+          `[data-service="service.amber_coast.craft_${mage ? 'staff' : 'sword'}"]`,
+        );
+        await locked.scrollIntoViewIfNeeded();
+        check(
+          `${label} commission stays locked before completing the bell story`,
+          await locked.isDisabled(),
+        );
+        await page.screenshot({ path: `${out}/${label}-commission-locked.png` });
+        await close();
+      }
       await quest(marks, 'accept', tidewatch.npcId);
       await go(304, 136);
       await page.screenshot({ path: `${out}/${label}-shore.png` });
@@ -351,6 +364,119 @@ async function fixture(classId) {
           tidewatch.questIds,
         ),
       );
+      if (process.env.COAST_COMMISSIONS === '1') {
+        const type = mage ? 'staff' : 'sword',
+          name = mage ? 'Tideglass Staff' : 'Tidewatch Blade';
+        const offerId = `service.amber_coast.craft_${type}`,
+          template = `weapon.${type}.tidewatch`;
+        await talk(tidewatch.npcId);
+        const card = page.locator(`[data-offer="${offerId}"]`),
+          button = card.locator('[data-service]');
+        await button.scrollIntoViewIfNeeded();
+        check(
+          `${label} earned salvage unlocks its affordable commission`,
+          await button.isEnabled(),
+        );
+        const costBefore = await page.evaluate(() =>
+          Object.fromEntries(
+            ['material.world.field_hide', 'material.world.iron_shard'].map((t) => [
+              t,
+              window.__mmo.items
+                .filter((i) => i.templateId === t)
+                .reduce((n, i) => n + i.quantity, 0),
+            ]),
+          ),
+        );
+        check(
+          `${label} recipe previews weapon damage and rolled bonuses`,
+          (await card.locator('[data-testid=service-output]').innerText()).includes(
+            'weapon damage',
+          ),
+        );
+        await page.screenshot({ path: `${out}/${label}-commission-ready.png` });
+        await click(button);
+        await page.waitForFunction(
+          (id) => window.__mmo.systems.jobs.some((j) => j.offerId === id && !j.completed),
+          offerId,
+        );
+        const job = await page.evaluate(
+          (id) => window.__mmo.systems.jobs.find((j) => j.offerId === id && !j.completed),
+          offerId,
+        );
+        await close();
+        // A real reload leaves the timed craft paid and pending; collect through the ordinary UI.
+        await enter(page, username, false);
+        await page.waitForFunction(
+          (id) => window.__mmo.systems.jobs.some((j) => j.id === id),
+          job.id,
+        );
+        await click(page.locator('[data-open=professions]'));
+        const collect = page.locator(`[data-craft-finish="${job.id}"]`);
+        await page.waitForFunction(
+          (id) => !document.querySelector(`[data-craft-finish="${id}"]`)?.disabled,
+          job.id,
+        );
+        await click(collect);
+        await page.waitForFunction(
+          (t) => window.__mmo.items.some((i) => i.templateId === t),
+          template,
+        );
+        const costAfter = await page.evaluate(() =>
+          Object.fromEntries(
+            ['material.world.field_hide', 'material.world.iron_shard'].map((t) => [
+              t,
+              window.__mmo.items
+                .filter((i) => i.templateId === t)
+                .reduce((n, i) => n + i.quantity, 0),
+            ]),
+          ),
+        );
+        check(
+          `${label} craft survives logout and consumes exactly its reserved salvage`,
+          costBefore['material.world.field_hide'] - costAfter['material.world.field_hide'] === 2 &&
+            costBefore['material.world.iron_shard'] - costAfter['material.world.iron_shard'] === 1,
+        );
+        await close();
+        const statsBefore = await page.evaluate(() => window.__mmo.stats);
+        await click(page.locator('[data-open=inventory]'));
+        await click(page.getByRole('button', { name, exact: true }));
+        await page.screenshot({ path: `${out}/${label}-crafted-weapon.png` });
+        await click(page.locator('[data-action=equip]'));
+        await page.waitForFunction(
+          (t) =>
+            window.__mmo.items.some((i) => i.templateId === t && i.location.kind === 'equipped'),
+          template,
+        );
+        await page.waitForFunction(
+          ({ mage, before }) =>
+            window.__mmo.stats[mage ? 'spell_power' : 'attack_power'] >
+            (before[mage ? 'spell_power' : 'attack_power'] ?? 0),
+          { mage, before: statsBefore },
+        );
+        check(`${label} commissioned weapon increases effective combat power`, true);
+        await close();
+        await go(304, 136);
+        await fight('enemy.amber_coast.glassback_crab');
+        await page.waitForFunction(
+          (t) => window.__mmo.items.find((i) => i.templateId === t)?.durability.current === 99,
+          template,
+        );
+        await enter(page, username, false);
+        check(
+          `${label} crafted identity, equip and earned wear survive relogin`,
+          await page.evaluate(
+            (t) =>
+              window.__mmo.items.filter((i) => i.templateId === t).length === 1 &&
+              window.__mmo.items.some(
+                (i) =>
+                  i.templateId === t &&
+                  i.location.kind === 'equipped' &&
+                  i.durability.current === 99,
+              ),
+            template,
+          ),
+        );
+      }
       await context.close();
     }
     check('No coastal gameplay exceptions', errors.length === 0, errors);
@@ -360,7 +486,7 @@ async function fixture(classId) {
         {
           ok: true,
           fixture:
-            'Fresh level-five characters with prior Greenvale closure; all new chapter progress earned through actual travel, movement, combat and quest UI',
+            'Fresh level-five characters with prior Greenvale closure; all new chapter progress earned through actual travel, movement, combat and quest UI. When COAST_COMMISSIONS=1, all crafting materials come from real chapter victories; craft/equip/collection use ordinary UI',
           checks,
           errors,
         },

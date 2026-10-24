@@ -44,7 +44,7 @@ export function CharacterWindow() {
       </p>
       <p className="small equipment-condition" data-testid="equipment-condition">
         {repairQuote > 0
-          ? `Equipped gear can be restored for ${repairQuote} copper. Visit Provisioner Vale or the Marches workshop.`
+          ? `Equipped gear can be restored for ${repairQuote} copper. Visit a town merchant or workshop.`
           : 'Equipped gear is in full condition.'}{' '}
         Victories wear equipped gear by one condition. Broken gear stays yours, but grants no
         bonuses until repaired.
@@ -67,6 +67,13 @@ function StatsTable() {
   return (
     <table className="stats" data-testid="stats">
       <tbody>
+        {state.vitals && (
+          <tr data-testid="effective-health">
+            <th>Maximum health</th>
+            <td>{state.vitals.maxHealth}</td>
+            <td className="muted">Includes stamina</td>
+          </tr>
+        )}
         {STAT_ORDER.filter((k) => stats.total[k] !== undefined).map((k) => {
           const total = stats.total[k]!;
           const gear = stats.fromEquipment[k] ?? 0;
@@ -79,7 +86,7 @@ function StatsTable() {
               data-value={total}
               className={changed ? (total > (before ?? 0) ? 'stat-up' : 'stat-down') : ''}
             >
-              <th>{STAT_LABELS[k]}</th>
+              <th>{k === 'max_health' ? 'Base health' : STAT_LABELS[k]}</th>
               <td>{Math.round(total * 10) / 10}</td>
               <td className="muted">{gear ? `(${gear > 0 ? '+' : ''}${gear} gear)` : ''}</td>
             </tr>

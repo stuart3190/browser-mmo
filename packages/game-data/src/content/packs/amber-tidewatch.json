@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "pack.amber_coast.tidewatch",
-  "revision": 1,
+  "revision": 2,
   "quests": [
     {
       "id": "quest.amber_coast.crossing",
@@ -98,8 +98,8 @@
       "dialogue": {
         "offer": "Beyond the windlass the shore path reaches the drowned beacon. Read the last oath, then silence its keeper. His amber sweep gives you time: pass behind him or step out of reach. Frost cannot hold him; use your distance. A warrior can brace with Iron Guard if escape is too late. Leave the bell whole.",
         "inProgress": "The beacon is south-east of the wreck. Read its oath and quiet the keeper. Flank the amber sweep; do not trust a root against a boss.",
-        "readyToTurnIn": "“We held the tide so the deep could dream.” The same oath as Greenvale. The keeper is quiet, the bell is whole, and the water has begun to fall. Take this tideglass seal. You have joined two watches that believed themselves alone. When the deep speaks again, we will hear it together.",
-        "completed": "The shore is calm. Greenvale and Tidecross keep one watch now."
+        "readyToTurnIn": "“We held the tide so the deep could dream.” The same oath as Greenvale. The keeper is quiet, the bell is whole, and the water has begun to fall. Take this tideglass seal. You have joined two watches that believed themselves alone. When the deep speaks again, we will hear it together. Bring me two Field Hides from the crabs, one Iron Shard from the keeper and 100 copper. I can commission a Tidewatch Blade or Tideglass Staff for your next journey.",
+        "completed": "The shore is calm. Greenvale and Tidecross keep one watch now. My weapon commissions are open to you. Bring two Field Hides, one Iron Shard and 100 copper; collect the finished weapon in Skills."
       },
       "placeholder": false,
       "rewardId": "reward.amber_coast.last_bell"

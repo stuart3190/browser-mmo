@@ -1,0 +1,51 @@
+PASS Warrior accepts Maren’s coastal letter
+PASS Warrior walks the north road into the Marches
+PASS Warrior reaches Amber Coast through two real travel links
+PASS Warrior commission stays locked before completing the bell story
+PASS Warrior defeats Glassback Crab
+PASS Warrior defeats Glassback Crab
+DODGE {"center":{"x":359.4729776273792,"y":0,"z":218.82015752799066},"range":7.75,"to":{"x":360.1477234311885,"z":209.09353333969997}}
+DODGE {"center":{"x":359.4978762338136,"y":0,"z":217.6478229816797},"range":7.75,"to":{"x":360.2470228735092,"z":207.92664613356953}}
+DODGE {"center":{"x":359.5219542035082,"y":0,"z":216.34804663742304},"range":7.75,"to":{"x":360.7541623593713,"z":206.6762234866089}}
+DODGE {"center":{"x":359.68171166992346,"y":0,"z":214.79629553580222},"range":7.75,"to":{"x":365.44202481526116,"z":206.9298292091947}}
+DODGE {"center":{"x":360.2295509733449,"y":0,"z":213.9277431694722},"range":7.75,"to":{"x":364.25506790296936,"z":205.04755660334044}}
+DODGE {"center":{"x":360.5636335077708,"y":0,"z":213.07857878892955},"range":7.75,"to":{"x":358.7546492184398,"z":203.4978650451131}}
+DODGE {"center":{"x":360.2800773600453,"y":0,"z":211.6744162480522},"range":7.75,"to":{"x":355.9735983452245,"z":202.92703158205586}}
+PASS Warrior defeats Drowned Bellkeeper
+PASS Warrior responds to the Bellkeeper warning
+PASS Warrior completes all three new quests
+PASS Warrior equips its earned seal with real bonuses
+PASS Warrior retains chapter completion after login
+PASS Warrior earned salvage unlocks its affordable commission
+PASS Warrior recipe previews weapon damage and rolled bonuses
+PASS Warrior craft survives logout and consumes exactly its reserved salvage
+PASS Warrior commissioned weapon increases effective combat power
+PASS Warrior defeats Glassback Crab
+PASS Warrior crafted identity, equip and earned wear survive relogin
+PASS Mage accepts Maren’s coastal letter
+PASS Mage walks the north road into the Marches
+PASS Mage reaches Amber Coast through two real travel links
+PASS Mage commission stays locked before completing the bell story
+PASS Mage defeats Glassback Crab
+PASS Mage defeats Glassback Crab
+DODGE {"center":{"x":359.485598659535,"y":0,"z":212.60787640383862},"range":7.75,"to":{"x":358.8087547905027,"z":202.88139798783658}}
+DODGE {"center":{"x":359.4124075062826,"y":0,"z":211.42453982896893},"range":7.75,"to":{"x":358.82324838194734,"z":201.69235654225406}}
+DODGE {"center":{"x":359.333917641684,"y":0,"z":209.86391235863687},"range":7.75,"to":{"x":358.84417223029675,"z":200.1262201560652}}
+DODGE {"center":{"x":359.24754701445914,"y":0,"z":207.6529987748999},"range":7.75,"to":{"x":358.866947893315,"z":197.91043010390845}}
+DODGE {"center":{"x":359.2079859998575,"y":0,"z":206.48106631689575},"range":7.75,"to":{"x":358.8790418651439,"z":196.73661683238214}}
+DODGE {"center":{"x":359.16419688450435,"y":0,"z":204.92688307371728},"range":7.75,"to":{"x":358.8895995892298,"z":195.18075069592618}}
+DODGE {"center":{"x":359.13055953827705,"y":0,"z":203.5024801921775},"range":7.75,"to":{"x":358.9003769682906,"z":193.75519769988898}}
+DODGE {"center":{"x":359.1062311736476,"y":0,"z":202.3171298259674},"range":7.75,"to":{"x":358.90616238557624,"z":192.5691827354237}}
+PASS Mage defeats Drowned Bellkeeper
+PASS Mage responds to the Bellkeeper warning
+PASS Mage completes all three new quests
+PASS Mage equips its earned seal with real bonuses
+PASS Mage retains chapter completion after login
+PASS Mage earned salvage unlocks its affordable commission
+PASS Mage recipe previews weapon damage and rolled bonuses
+PASS Mage craft survives logout and consumes exactly its reserved salvage
+page.waitForFunction: Timeout 45000ms exceeded.
+    at <anonymous> (/root/browser-mmo/scripts/e2e/coast.cjs:450:20) {
+  log: [],
+  name: 'TimeoutError'
+}

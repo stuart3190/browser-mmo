@@ -1940,3 +1940,21 @@ Ranked player-facing gaps from the current client and content:
   Repeated identical notices deduplicate. Armour-slot-specific art is still incomplete.
 - [ ] Next: coastal weapon commissions unlocked by story completion, material/readiness and output
       previews, meaningful level-five upgrades, real-input craft/equip/relogin verification.
+
+### Tidewatch commissions and readable crafting — verified 2026-10-24
+
+- [x] Iona's level-five blade/staff commissions unlock after The Bell Below; existing timed
+      fieldcraft reserves salvage/copper exactly once. Recipe cards show story locks, usable
+      carried materials, copper, class/output rolls and collection instructions. Character sheet
+      now distinguishes base health from effective maximum health including stamina.
+- [x] Both classes earn the story, salvage and craft through real controls. Warrior full pass;
+      Mage completed craft/equip before a driver sparse-stat assertion failed. Corrected driver
+      resumed the exact earned Mage without data writes: unequip/equip proves 0→20 spell power,
+      effective health matches vitals, real victory and relogin preserve staff identity and 99/100
+      wear. Screenshots inspected; original failure retained. This is staged continuation evidence.
+- 130 content, 17 frontend, 22 domain checks pass (20 regression +2 corrected new cases), plus
+  repository types, lint, production build/debug guard and content validation. Evidence:
+  `gameplay/evidence/tidewatch-commissions-2026-10-24/`. Level-five/prior-story fixtures; no new earned
+  level-one-to-five claim, no injected new chapter progress/items.
+- [ ] Next: optional combat/reward sound feedback with saved volume/mute and desktop/touch controls;
+      verify real audio output, confirmed gameplay events, mute persistence and responsive settings.

@@ -1,5 +1,6 @@
+import { ServiceOffer } from './ServiceOffer';
 import { SpecialisationChoices } from './SpecialisationChoices';
-import { craftDuration, canRepairAt, repairCost } from '@mmo/game-data';
+import { canRepairAt, repairCost } from '@mmo/game-data';
 import { useState } from 'react';
 import type { QuestView } from '@mmo/schemas';
 import { formatCurrency } from '@mmo/ui';
@@ -201,33 +202,7 @@ export function DialoguePanel() {
       {(gameData.raw.serviceOffers ?? [])
         .filter((o) => o.npcId === d.npcId)
         .map((o) => (
-          <section key={o.id} className="dialogue-quest">
-            <strong>{o.name}</strong>
-            <p className="small">
-              {o.inputs
-                .map((i) => `${i.quantity} ${gameData.template(i.itemTemplateId).name}`)
-                .join(' + ')}
-              {o.copper < 0
-                ? ` · ${-o.copper} copper`
-                : o.copper > 0
-                  ? ` → ${o.copper} copper`
-                  : ''}
-              {o.output ? ` → ${gameData.template(o.output.itemTemplateId).name}` : ''}
-              {craftDuration(o) ? ` · ${craftDuration(o) / 1000}s · Fieldcraft +20 XP` : ''}
-            </p>
-            <button
-              data-service={o.id}
-              disabled={
-                state.connection !== 'open' ||
-                state.vitals?.dead ||
-                state.vitals?.inCombat ||
-                (o.kind === 'craft' && state.systems.jobs.some((j) => !j.completed))
-              }
-              onClick={() => quests.service(o.id)}
-            >
-              {o.kind === 'buy' ? 'Buy' : o.kind === 'sell' ? 'Sell one' : 'Craft'}
-            </button>
-          </section>
+          <ServiceOffer key={o.id} offer={o} />
         ))}
       <div className="dialogue-actions">
         <button

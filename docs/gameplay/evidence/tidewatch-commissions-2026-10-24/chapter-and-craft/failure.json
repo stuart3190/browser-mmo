@@ -1,0 +1,158 @@
+{
+  "ok": false,
+  "error": "page.waitForFunction: Timeout 45000ms exceeded.\n    at <anonymous> (/root/browser-mmo/scripts/e2e/coast.cjs:450:20)",
+  "checks": [
+    {
+      "name": "Warrior accepts Maren’s coastal letter",
+      "ok": true
+    },
+    {
+      "name": "Warrior walks the north road into the Marches",
+      "ok": true
+    },
+    {
+      "name": "Warrior reaches Amber Coast through two real travel links",
+      "ok": true
+    },
+    {
+      "name": "Warrior commission stays locked before completing the bell story",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Warrior defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Warrior defeats Drowned Bellkeeper",
+      "ok": true,
+      "detail": {
+        "dodge": 7
+      }
+    },
+    {
+      "name": "Warrior responds to the Bellkeeper warning",
+      "ok": true,
+      "detail": {
+        "dodge": 7
+      }
+    },
+    {
+      "name": "Warrior completes all three new quests",
+      "ok": true
+    },
+    {
+      "name": "Warrior equips its earned seal with real bonuses",
+      "ok": true
+    },
+    {
+      "name": "Warrior retains chapter completion after login",
+      "ok": true
+    },
+    {
+      "name": "Warrior earned salvage unlocks its affordable commission",
+      "ok": true
+    },
+    {
+      "name": "Warrior recipe previews weapon damage and rolled bonuses",
+      "ok": true
+    },
+    {
+      "name": "Warrior craft survives logout and consumes exactly its reserved salvage",
+      "ok": true
+    },
+    {
+      "name": "Warrior commissioned weapon increases effective combat power",
+      "ok": true
+    },
+    {
+      "name": "Warrior defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Warrior crafted identity, equip and earned wear survive relogin",
+      "ok": true
+    },
+    {
+      "name": "Mage accepts Maren’s coastal letter",
+      "ok": true
+    },
+    {
+      "name": "Mage walks the north road into the Marches",
+      "ok": true
+    },
+    {
+      "name": "Mage reaches Amber Coast through two real travel links",
+      "ok": true
+    },
+    {
+      "name": "Mage commission stays locked before completing the bell story",
+      "ok": true
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Glassback Crab",
+      "ok": true,
+      "detail": {
+        "dodge": 0
+      }
+    },
+    {
+      "name": "Mage defeats Drowned Bellkeeper",
+      "ok": true,
+      "detail": {
+        "dodge": 8
+      }
+    },
+    {
+      "name": "Mage responds to the Bellkeeper warning",
+      "ok": true,
+      "detail": {
+        "dodge": 8
+      }
+    },
+    {
+      "name": "Mage completes all three new quests",
+      "ok": true
+    },
+    {
+      "name": "Mage equips its earned seal with real bonuses",
+      "ok": true
+    },
+    {
+      "name": "Mage retains chapter completion after login",
+      "ok": true
+    },
+    {
+      "name": "Mage earned salvage unlocks its affordable commission",
+      "ok": true
+    },
+    {
+      "name": "Mage recipe previews weapon damage and rolled bonuses",
+      "ok": true
+    },
+    {
+      "name": "Mage craft survives logout and consumes exactly its reserved salvage",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

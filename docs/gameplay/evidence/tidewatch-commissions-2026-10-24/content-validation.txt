@@ -1,0 +1,32 @@
+
+> browser-mmo@ content:validate /root/browser-mmo
+> tsx scripts/validate-content.ts
+
+{
+  "packs": [
+    {
+      "id": "pack.greenvale.stillwater",
+      "schemaVersion": 1,
+      "revision": 1
+    },
+    {
+      "id": "pack.world.greybox",
+      "schemaVersion": 2,
+      "revision": 3
+    },
+    {
+      "id": "pack.greenvale.complete",
+      "schemaVersion": 3,
+      "revision": 1
+    },
+    {
+      "id": "pack.amber_coast.tidewatch",
+      "schemaVersion": 1,
+      "revision": 2
+    }
+  ],
+  "quests": 21,
+  "npcs": 253,
+  "enemies": 82,
+  "contentHash": "6381114b28373108c2f00bb96aa899598713493a204cbd6dc3563d0e7701a14e"
+}

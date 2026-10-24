@@ -54,6 +54,22 @@ export async function exchangeAtNpc(
     }
     if (character.level < offer.minLevel)
       throw new DomainError(ErrorCode.FORBIDDEN, 'Level too low');
+    if (offer.requiresQuestId) {
+      const [quest] = await tx
+        .select()
+        .from(schema.characterQuests)
+        .where(
+          and(
+            eq(schema.characterQuests.characterId, character.id),
+            eq(schema.characterQuests.questId, offer.requiresQuestId),
+          ),
+        );
+      if (quest?.status !== 'completed' || !quest.rewardedAt)
+        throw new DomainError(
+          ErrorCode.QUEST_NOT_AVAILABLE,
+          'Complete the commission’s story first',
+        );
+    }
     const correlationId = uuidv7();
     const changed = [];
     for (const cost of offer.inputs)

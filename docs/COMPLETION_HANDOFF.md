@@ -39,8 +39,19 @@ plus deduplicated toasts and narrow mouse layout fixes. Evidence:
 `gameplay/evidence/player-appearance-2026-10-24/`. Seven multiplayer browser checks, responsive
 follow-up and screenshot review pass; 16 frontend, 86 world, 17 domain tests plus types/lint/build.
 Fresh level-five fixtures use normal purchases. Armour-slot-specific art is not implemented.
-Remedy commit `b6ad7c4` is pushed. Next gameplay milestone: coastal weapon commissions unlocked
-by story completion, material/readiness and output previews, actual craft/equip/relogin proof.
+Remedy commit `b6ad7c4` and appearance commit `06fa657` are pushed.
+Completed: earned coastal weapon commissions, story gates and useful recipe cards; effective
+maximum health explained on character sheet. Evidence: `gameplay/evidence/tidewatch-commissions-2026-10-24/`.
+130 content,17 frontend,22 domain checks and types/lint/build/content validation pass. Warrior full
+browser pass; Mage chapter/craft/equip passed before a sparse-stat assertion bug. Same earned Mage
+resumed without data mutations, proving 0→20 power, victory/wear and relogin. Original failure kept;
+this is staged evidence. Both functional test controllers stopped their own services/DB afterwards.
+
+Next active polish: sound feedback is entirely absent. Draft `/tmp/bo-audio-draft/` has GameAudio,
+SettingsWindow, unit/browser tests and `integrate.py`. Draft is NOT yet integrated/verified.
+It adds optional authored Web Audio cues, saved volume/mute, gesture/visibility rules and settings
+available on touch. Integration script is intended for one use only; after integration do not rerun.
+Continue with actual desktop/touch fights and native audio signal checks. No production work.
 
 Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.

@@ -54,3 +54,27 @@ it('keeps the shore walking route and oath readable with real collision, rewards
   expect(reward.equipment?.baseStats.strength).toBeDefined();
   expect(reward.equipment?.baseStats.intellect).toBeDefined();
 });
+it('offers earned weapon upgrades for both classes, from guaranteed solo shore salvage and story rewards', () => {
+  for (const type of ['sword', 'staff']) {
+    const offer = gd.raw.serviceOffers!.find((o) => o.id === `service.amber_coast.craft_${type}`)!;
+    expect(offer.requiresQuestId).toBe(tidewatch.questIds[2]);
+    expect(offer.npcId).toBe(tidewatch.npcId);
+    expect(offer.copper).toBe(-100);
+    const gear = gd.template(offer.output!.itemTemplateId);
+    const starter = gd.template(
+      type === 'sword' ? 'weapon.sword.iron_longsword' : 'weapon.staff.oak_staff',
+    );
+    expect(gear.requiredLevel).toBe(5);
+    expect(gear.equipment!.weapon!.minDamage).toBeGreaterThan(starter.equipment!.weapon!.minDamage);
+    expect(gear.allowedClassIds).toEqual([type === 'sword' ? 'class.warrior' : 'class.mage']);
+    for (const cost of offer.inputs) {
+      const reward = ['enemy.amber_coast.glassback_crab', 'enemy.amber_coast.drowned_bellkeeper']
+        .map((id) => gd.lootTables.get(gd.enemies.get(id)!.lootTableId!)!)
+        .find((loot) => loot.entries.some((e) => e.itemTemplateId === cost.itemTemplateId))!;
+      expect(reward.emptyChance).toBe(0);
+      const entry = reward.entries.find((e) => e.itemTemplateId === cost.itemTemplateId)!;
+      const kills = cost.itemTemplateId.endsWith('field_hide') ? 2 : 1;
+      expect(entry.minQuantity * kills).toBeGreaterThanOrEqual(cost.quantity);
+    }
+  }
+});

@@ -2505,3 +2505,25 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     bottom: 148px;
   }
 }
+
+.service-materials {
+  list-style: none;
+  padding: 0;
+}
+.service-materials li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+}
+.service-materials .missing {
+  color: #efb09a;
+}
+.service-preview {
+  color: #d8dfbb;
+  line-height: 1.5;
+}
+.service-offer > button {
+  min-height: 44px;
+  width: 100%;
+}

@@ -170,6 +170,8 @@ export function compileContentCatalog(
     raw.dungeonEntries = extensions.flatMap((p) => p.dungeonEntries);
   }
   for (const offer of raw.serviceOffers ?? []) {
+    if (offer.requiresQuestId && !raw.quests.some((q) => q.id === offer.requiresQuestId))
+      throw new Error(`Service ${offer.id}: missing prerequisite quest`);
     if (!raw.npcs.some((n) => n.id === offer.npcId))
       throw new Error(`Service ${offer.id}: missing NPC`);
     if (new Set(offer.inputs.map((i) => i.itemTemplateId)).size !== offer.inputs.length)

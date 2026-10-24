@@ -1472,3 +1472,17 @@ shapes follow the equipped type; removing the item removes its held prop on ever
 Outfits are class cosmetics, not a claim that each armour slot already has bespoke visual art.
 Keep NPC/enemy rigs and existing movement/hit/death animation. Replacing an outfit disposes its
 meshes/materials, and repeated snapshots of the same appearance leave the current rig intact.
+
+## 2026-10-24 — Earned coastal commissions extend existing fieldcraft
+
+After The Bell Below, Warden Iona offers a level-five Warrior blade or Mage staff. The completed solo
+chapter guarantees the two hides/one shard used for one commission; 100 copper comes from normal
+rewards. Party loot still follows the existing loot-owner rules; companions may share materials.
+Commissions bind on equip and retain ordinary crafting provenance, trade/storage rules and condition.
+
+Optional `ServiceOffer.requiresQuestId` is checked against the owned character's rewarded completion
+inside the existing cost/job/receipt transaction. Content validation checks the quest reference.
+No migration, special currency or second crafting implementation. Old offers omit the optional field.
+Recipe cards explain actual carried unlocked costs and rarity-adjusted base roll ranges; random bonus
+attributes are disclosed as rolls, not promised values. The character sheet distinguishes base health
+from effective maximum health including stamina. External release gates remain separate.

@@ -11,6 +11,7 @@ export const ServiceOfferSchema = z.strictObject({
   npcId: ContentIdSchema,
   kind: z.enum(['buy', 'sell', 'craft']),
   minLevel: z.number().int().min(1),
+  requiresQuestId: ContentIdSchema.optional(),
   inputs: z.array(stack).max(8),
   output: stack.nullable(),
   copper: z.number().int().min(-100000).max(100000),
