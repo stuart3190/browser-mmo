@@ -15,7 +15,7 @@
   "content": true,
   "populatedUpgradeAndRestore": true,
   "browserAssertions": 78,
-  "capacity": "pending",
+  "capacity": "FAILED: cadence and RTT p95",
   "productionTouched": false,
   "earlierFailure": {
     "run": "qiceb9",
@@ -23,5 +23,11 @@
     "actualHealth": 200,
     "assertion": "health < 200",
     "issue": "Recovered simulation used unseeded attack RNG, allowing a legitimate miss. Test now uses a fixed hit roll; production combat unchanged."
+  },
+  "source": "9567e0e946be6fbcad31d29fec8904b8d483fab6",
+  "productionBrowserAssertions": 28,
+  "hostedCi": {
+    "run": 40104670712,
+    "conclusion": "success"
   }
 }

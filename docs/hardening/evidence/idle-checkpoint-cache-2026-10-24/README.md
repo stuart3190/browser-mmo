@@ -11,5 +11,14 @@ benchmark uses the same 26 simulations for 100 rounds each. `legacy` uses the re
 produce the same byte count. The byte-oracle tests additionally verify exact content equality,
 external party/effect mutations, resource changes, pending death recovery and escaped references.
 
-The built production TLS/password and quiet five-player workload are pending. No production
+Built production run `XMQkkz` passes all 28 TLS/password browser assertions and authentication,
+private-route, guild-consent and revocation checks. Its quiet unprofiled five-player/120 s workload
+**FAILS**: 19.2906 Hz (required ≥19.5), RTT p95 395 ms (required <250). HTTP p95 177.6 ms passes.
+CPU 0.165 cores, RSS 150.7 MB, sampled tick p95 9.75 ms, checkpoint p95 208.65 ms. There were zero
+unexpected protocol/HTTP errors or disconnects, all five players were alive at the end, four durable
+rewarded kills, 195 inventory writes, five sales, 65 direct and 65 guild messages. The earlier
+baseline used 0.296 cores and sampled tick p95 42.8 ms, but these sequential runs cannot isolate
+host variability. The saved report remains `ok:false`; latency and capacity are not certified.
+
+Runtime commit `9567e0e` also passes hosted CI run `40104670712`. No production
 services/data, admission limits or immutable releases changed. This is not release certification.

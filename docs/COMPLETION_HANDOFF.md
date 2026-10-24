@@ -83,11 +83,14 @@ control reached19.7996Hz (11skipped slots,p9978.106ms,max207.993ms). Hardware al
 as the cause of the workload failure. Active branch `codex/idle-checkpoint-cache` in
 `/tmp/bo-idle-checkpoint-cache`, based on618369c, conservatively reuses untouched idle simulation
 images and identical empty outer payloads. Full isolated run `lk7ghT` passed 241 unit + 204 integration tests, four builds, populated
-backup/restore, assets/content and all 78 browser assertions. Production capacity is pending. Do not edit existing release artifacts or repeat load tests without this concrete change.
+backup/restore, assets/content and all 78 browser assertions. Built production `XMQkkz` passes 28 browser assertions but FAILS capacity: 19.2906 Hz, RTT p95
+395 ms, HTTP p95 177.6 ms, tick p95 9.75 ms, checkpoint p95 208.65 ms, CPU 0.165 cores. No unexpected
+errors/disconnects. Runtime `9567e0e` passes hosted CI `40104670712`. Proof is archived under
+`hardening/evidence/idle-checkpoint-cache-2026-10-24`. The code improvement is verified; capacity is not. Do not edit existing release artifacts or repeat load tests without this concrete change.
 
 ## Remaining release gates — external input requested
 
-Latest quiet **unprofiled** five-player120s qWvlw8 FAILS cadence: **19.123Hz versus required19.5Hz**.
+Previous quiet **unprofiled** five-player120s qWvlw8 FAILS cadence: **19.123Hz versus required19.5Hz**.
 RTT p95162ms and HTTP p95231.8ms PASS. Zero unexpected protocol/HTTP errors/disconnects, all5alive,
 five normal respawn requests/eight durable rewarded kills,194 inventory writes/five sales,
 64 direct messages/60 read receipts,64 guild messages/194 history reads. CPU0.296cores,RSS183.6MB.
@@ -100,7 +103,7 @@ identical load without a concrete reason. This host has no established safe play
 The owner was asked asynchronously for an **existing staging host/SSH target and off-host backup
 destination**. No answer has arrived. Physical-phone performance testing is also pending. This is
 the first explicit waiting checkpoint in the external-blocker audit; goal remains ACTIVE, not
-complete or paused. This was the earlier checkpoint; active encoding work above now takes precedence. Avoid empty rerun loops.
+complete or paused. The encoding follow-up is now verified and still fails the release gates. Avoid empty rerun loops.
 
 Next: use supplied existing infrastructure for strict capacity and recovery qualification, preserving
 all production data. No new purchase is authorized. If input remains unavailable across consecutive

@@ -1810,3 +1810,13 @@ an unqualified release candidate, not a genuinely shippable game claim; external
 
 - Quiet benchmark: same 24,941,300 bytes across 2,600 captures; legacy 277.8 ms, fresh schema
   142.3 ms, idle cache 2.4 ms. This establishes encoding savings, not production capacity.
+
+- [x] Built production TLS/password browser assertions: 28/28, `XMQkkz`. Hosted CI for runtime
+      `9567e0e`: `40104670712` SUCCESS. Encoding improvement verified; integration ready.
+- [ ] Release capacity: quiet unprofiled five-player/120 s run **FAILED** at 19.2906 Hz and RTT
+      p95 395 ms. HTTP p95 177.6 ms passes; no unexpected errors/disconnects. Tick p95 9.75 ms and CPU
+      0.165 cores improved relative to the prior run, but checkpoint p95 was 208.65 ms. Preserve the
+      failed raw report; no safe capacity or sole hardware-cause claim. No identical rerun planned.
+- Next: integrate the verified change and prepare a new immutable development-preview artifact;
+  qualify on an existing staging target and configure/test off-host recovery when the owner supplies
+  those targets. Physical-phone acceptance remains external. Never weaken durability or inflate ticks.
