@@ -192,7 +192,7 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 - [x] Reconnect
   - Verified 2026-10-03 · Claude Opus 5.5 · `RealtimeClient` auto-reconnect with backoff, no retry on close codes ≥ 4000 (realtime tests: simulated drop, session replaced); Inventory E2E: socket drop and full realtime server kill/restart recovered without page reload · 418b1fd
 - [x] Chat protocol
-  - Verified 2026-10-03 · Claude Opus 5.5 · chat.send/chat.message for say/zone (test). Original say/zone support; party added and verified 2026-10-24. Guild/whisper unfinished · 0f0a413
+  - Verified 2026-10-03 · Claude Opus 5.5 · chat.send/chat.message for say/zone (test). Original say/zone support; party added and verified 2026-10-24. Original protocol commit: 0f0a413. Persistent direct/guild conversations are now verified through the HTTP social domain (2026-10-24).
 
 # Characters / Classes
 
@@ -200,8 +200,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · schema + table + create/list · 8454ea0
 - [x] Class architecture
   - Verified 2026-10-03 · Claude Opus 5.5 · 4 placeholder classes, cross-validated; proficiencies enforced by equip tests · 8454ea0
-- [x] Specialisation architecture
-  - Verified 2026-10-03 · Claude Opus 5.5 · 13 placeholder specs in data, validated at load. No spec selection flow · 8454ea0
+- [ ] Playable specialisations
+  - Thirteen validated placeholder definitions exist, but no selection flow. This is not a completed gameplay system; checklist corrected 2026-10-24.
 - [x] Stats
   - Verified 2026-10-03 · Claude Opus 5.5 · `getCharacterStats` (class base + level + equipped items) — unit test (game-data), domain integration test, API `/stats` test, realtime `character.stats` push test, Inventory E2E visible change · 418b1fd
 - [x] XP
@@ -239,10 +239,12 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-04 · Claude Opus 5.5 · attacks and idle aggro need LOS through `CollisionWorld`; trees/rocks/buildings block, fences don't (world-population tests: wall blocks swings) · 6db82ba
 - [x] Enemy pathfinding / steering
   - Verified 2026-10-04 · Claude Opus 5.5 · straight-line when clear, else cached A* on a 1 m NavGrid; leash, stuck detection, give-up on unreachable, return home (navigation + world-population tests: around a fence, unreachable enclosure, leash) · 6db82ba
-- [ ] Ranged combat
-  - Bows/crossbows exist as items; only melee auto-attack is implemented.
-- [ ] Magic combat
-- [ ] Healing
+- [ ] Ranged weapon combat (bows/crossbows)
+  - Templates exist; physical ranged weapon attacks remain unsupported. Mage ranged magic is separate.
+- [x] Mage magic combat
+  - Verified 2026-10-24 · Codex · earned Mage story, profession and solo/party Vault paths; Firebolt/Flame Burst use authoritative range/LOS/cooldowns and persisted progression. [Evidence](gameplay/evidence/earned-classes-2026-10-24/README.md).
+- [ ] Healing/support class abilities
+  - Actual healing remedies and out-of-combat recovery work; a support class is not implemented.
 - [ ] Resources (mana, rage)
   - Deliberately not built: cooldowns pace combat (ADR 0019).
 
@@ -418,10 +420,10 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 # Dungeons
 
-- [ ] Dungeon architecture
-  - Placeholder schema only.
-- [ ] Instance architecture
-- [ ] Boss encounters
+- [x] Private Broken Vault dungeon architecture
+- [x] Persistent instance ownership, membership, reconnect and reset
+- [x] Two guardian encounters and Bell Keeper completion
+  - Verified 2026-10-24 · Codex · earned Warrior solo, Mage solo continuation and mixed touch party; durable completion and all four rewarded membership records independently checked. Recovery/expiry/fencing tests pass. [Evidence](gameplay/evidence/earned-classes-2026-10-24/README.md). Dungeon terrain remains a functional greybox.
 
 # Crafting / Gathering
 
@@ -447,12 +449,13 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
     invitations, roles, reconnect/recovery, shared XP/quest kills, one rotating loot allocation;
     touch accept/leave/disband and reachable panel controls. See Current Work and `gameplay/parties.md`.
     Commit: `2f3aaeab5169d628c750bcf00a1b101e46364a84`.
-- [ ] Guilds
+- [x] Persistent character guilds
+  - Verified 2026-10-24 · Codex · eight domain concurrency/permission tests, authenticated HTTP test and 15 desktop/touch UI assertions. Guild vault remains unfinished. [Evidence](gameplay/evidence/guilds-2026-10-24/README.md).
 - [x] Direct messages — verified 2026-10-24; durable consent-bound conversations and read receipts.
 - [x] Group chat
   - Verified 2026-10-24 · Codex · server membership/range and rate-limit tests; three-player browser privacy and touch composer. [Evidence](gameplay/evidence/social-2026-10-24/README.md).
-- [ ] Guild chat
-  - Guild schemas remain placeholders; friends, direct messages and party chat are implemented.
+- [x] Durable guild chat
+  - Verified 2026-10-24 · Codex · membership-scoped history, idempotent messages, rate limits, relog, scrollback and responsive composer; same guild evidence above.
 
 # Mobile Companion App
 
@@ -1737,3 +1740,7 @@ and restores the documented minimum 19.5Hz gate. This workload has not yet been 
       changing `current`, installing configuration or stopping services. Bash syntax check passes.
 - [ ] Prepare the final committed candidate on this host after qualification, verify its manifest
       and unchanged live release/readiness. Preparation is not a public deployment or capacity pass.
+
+Checklist reconciliation, 2026-10-24: corrected stale magic, dungeon and guild placeholder entries
+to match verified implementation/evidence. Unticked playable specialisations because only definitions
+exist. Physical ranged weapons, support-class abilities, wear/repair and guild vault remain incomplete.
