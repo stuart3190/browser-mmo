@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "candidate": "9d1c769a1850505779c5cd012e8a47a036e18051",
+  "preparedRelease": "/srv/brokenodyssey/releases/9d1c769a1850505779c5cd012e8a47a036e18051",
+  "manifest": {
+    "commit": "9d1c769a1850505779c5cd012e8a47a036e18051",
+    "environment": "development-preview"
+  },
+  "liveReleaseUnchanged": "/srv/brokenodyssey/releases/2c47b27a38f0bc74f3a7192f713775c3a9361729",
+  "servicePidsAndStartTimesUnchanged": true,
+  "liveReadiness": {
+    "api": {
+      "status": "ok",
+      "checks": {
+        "database": "ok"
+      }
+    },
+    "realtime": {
+      "status": "ok",
+      "zones": [
+        "zone.greenvale.meadows",
+        "zone.aurelian.greenvale_marches",
+        "zone.aurelian.amber_coast",
+        "zone.aurelian.elderwood",
+        "zone.aurelian.crownspine",
+        "zone.frostmere.brinebreak",
+        "zone.frostmere.whitepine",
+        "zone.frostmere.rimefen",
+        "zone.frostmere.glasspeak",
+        "zone.cinderwake.ashstrand",
+        "zone.cinderwake.embersteppe",
+        "zone.cinderwake.redroot",
+        "zone.cinderwake.blackglass",
+        "zone.duneshara.oasis_reach",
+        "zone.duneshara.windcut",
+        "zone.duneshara.sunsea",
+        "zone.duneshara.saltmarch",
+        "zone.duneshara.broken_steps",
+        "zone.duneshara.high_saffron",
+        "zone.veilreach.mistwood",
+        "zone.veilreach.moonfen",
+        "zone.veilreach.silver_heath",
+        "zone.veilreach.crystal_vale",
+        "zone.veilreach.forgotten_march",
+        "zone.veilreach.veiled_spires"
+      ],
+      "players": 0,
+      "changeFeed": "ok"
+    }
+  },
+  "productionPublished": false,
+  "filesSha256": {
+    "apps/game-web/dist/index.html": "084a111c0493c3e3a881b80a3d71737a621f630641638d86b80015ae98c68fba",
+    "apps/admin/dist/index.html": "7f81e5f42aa203d5261c4ff1ca6f70ed2483000397ffe27c87e7ca6e2378cdf9",
+    "services/api/dist/main.js": "7b543da805ac2335f2cf8b687a8f70c7165dbff3753ca8defe53174ed0f98780",
+    "services/realtime/dist/main.js": "e1d90b9bdc000936b8c9e10ea4a5b012812a087fd3107258d6a660202e5a7553"
+  },
+  "runtimeCi": {
+    "commit": "9567e0e946be6fbcad31d29fec8904b8d483fab6",
+    "run": 40104670712,
+    "conclusion": "success"
+  },
+  "integratedRuntimeCi": {
+    "commit": "9d1c769a1850505779c5cd012e8a47a036e18051",
+    "run": 40105454236,
+    "conclusion": "success"
+  }
+}

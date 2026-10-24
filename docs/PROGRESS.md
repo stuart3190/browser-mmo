@@ -1820,3 +1820,11 @@ an unqualified release candidate, not a genuinely shippable game claim; external
 - Next: integrate the verified change and prepare a new immutable development-preview artifact;
   qualify on an existing staging target and configure/test off-host recovery when the owner supplies
   those targets. Physical-phone acceptance remains external. Never weaken durability or inflate ticks.
+
+- [x] Integrated as `9d1c769` and prepared a new immutable development-preview release at
+      `/srv/brokenodyssey/releases/9d1c769a1850505779c5cd012e8a47a036e18051`. Build/debug guard/Caddy
+      validation pass. Independent comparison confirms live release, service PIDs/start times and
+      readiness unchanged; manifest/bundle hashes archived. No publication occurred.
+- Current blocker: existing staging/SSH and off-host backup targets have not been supplied;
+  physical-phone acceptance remains pending. Code/qualification/preparation work is checkpointed.
+  Merge CI `40105454236` PASSED. Next: use supplied targets for the remaining release gates.

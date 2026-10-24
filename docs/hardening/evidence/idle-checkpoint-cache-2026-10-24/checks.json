@@ -29,5 +29,10 @@
   "hostedCi": {
     "run": 40104670712,
     "conclusion": "success"
+  },
+  "integratedRuntimeCi": {
+    "commit": "9d1c769a1850505779c5cd012e8a47a036e18051",
+    "run": 40105454236,
+    "conclusion": "success"
   }
 }
