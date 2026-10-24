@@ -1456,3 +1456,19 @@ cooldown, death, full health, reconnect or a pending request. H and a dedicated 
 the same exact-item consumption action as the bag. Quantity, health and ready time update only from
 server messages; reconnect clears pending input and waits for fresh readiness. The countdown uses
 the server clock offset. Hide irrelevant opening-village instructions outside the starter zone.
+
+## 2026-10-24 — Replicated player class and held-weapon appearance
+
+Add an optional player appearance record to existing world entities: class, specialisation and the
+actually equipped main-hand template. The domain derives it from the same persisted character and
+item read used by the combat profile. Broken equipment retains its visible identity even while its
+combat bonuses are inactive. The owning simulation publishes changes through ordinary entity
+updates/snapshots and checkpoint recovery. No client-supplied appearance, item-instance identifiers,
+new storage or gameplay-stat authority is introduced.
+
+Existing procedural hero rigs receive cosmetic class outfits: warrior cuirass/pauldrons/tabard,
+mage robe/hood/collar, and class-path accent colours. Main-hand sword/staff/wand/axe/mace/dagger
+shapes follow the equipped type; removing the item removes its held prop on every nearby client.
+Outfits are class cosmetics, not a claim that each armour slot already has bespoke visual art.
+Keep NPC/enemy rigs and existing movement/hit/death animation. Replacing an outfit disposes its
+meshes/materials, and repeated snapshots of the same appearance leave the current rig intact.

@@ -34,12 +34,13 @@ checks pass (merchant purchase, real crab injuries, keyboard/touch healing, coun
 relogin and portrait/landscape hit targets). 15 frontend, eight domain, six realtime checks plus
 types/lint/build pass. Specialisations commit `45df411` is pushed.
 
-Active next gameplay gap: class and equipment appearance. Local heroes share one rig and all
-held weapons look like a small blade; remote equipment is absent. Build server-replicated appearance
-from existing character/gear profiles, snapshots and updates; distinct warrior/mage silhouettes,
-sword/staff shapes, class-path accents, multiplayer/equip/relogin screenshot proof. Preserve all
-combat rules and existing renderer architecture. Deduplicate repeated feedback toasts as seen in
-quick-remedy screenshots. No performance/capacity/infrastructure work or production change.
+Completed: server-replicated class/path/held-weapon appearance, remote equip/unequip and relogin,
+plus deduplicated toasts and narrow mouse layout fixes. Evidence:
+`gameplay/evidence/player-appearance-2026-10-24/`. Seven multiplayer browser checks, responsive
+follow-up and screenshot review pass; 16 frontend, 86 world, 17 domain tests plus types/lint/build.
+Fresh level-five fixtures use normal purchases. Armour-slot-specific art is not implemented.
+Remedy commit `b6ad7c4` is pushed. Next gameplay milestone: coastal weapon commissions unlocked
+by story completion, material/readiness and output previews, actual craft/equip/relogin proof.
 
 Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.
@@ -96,8 +97,7 @@ runs and all four rewarded member records: Warrior `01a16dcf-f42f-7376-8e59-170e
 Evidence: `gameplay/evidence/earned-classes-2026-10-24`. Authority, persistence, inventory/equipment,
 XP/loot, quests, regions and combat architecture were preserved. Direct trade, marketplace UI,
 nearby/zone/party chat, friends/DM, persistent guilds/chat and responsive inventory/onboarding are
-integrated. Guilds use additive migration0024. Wear/repair, guild vault, additional classes/
-specialisations and broader world art remain long-term incomplete; they are not claimed complete.
+integrated. Guilds use additive migration0024. Guild vault, additional classes, remaining specialisations and broader world art remain long-term incomplete; they are not claimed complete.
 
 ## Latest verification and performance result
 

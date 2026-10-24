@@ -90,6 +90,7 @@ it('atomically repairs and restores stats, with one debit under concurrent repla
     .set({ durabilityCurrent: 0 })
     .where(eq(schema.itemInstances.id, id));
   const broken = await getCombatProfile(ctx.db, ctx, p.characterId);
+  expect(broken.appearance.mainHandTemplateId).toBe('weapon.sword.iron_longsword');
   expect(broken.stats.strength).toBeLessThan(healthy.stats.strength!);
   await inTransaction(ctx, (tx) =>
     adjustBalanceInTx(tx, ctx, {
@@ -112,6 +113,9 @@ it('atomically repairs and restores stats, with one debit under concurrent repla
       after.find((b) => b.currencyId === 'gold')!.amount,
   ).toBe(Math.ceil(item.durabilityMax! / 10));
   expect((await getCombatProfile(ctx.db, ctx, p.characterId)).stats).toEqual(healthy.stats);
+  expect((await getCombatProfile(ctx.db, ctx, p.characterId)).appearance.mainHandTemplateId).toBe(
+    'weapon.sword.iron_longsword',
+  );
   await ctx.db
     .update(schema.itemInstances)
     .set({ durabilityCurrent: 1 })

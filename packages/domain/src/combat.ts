@@ -10,7 +10,7 @@ import {
   xpToNextLevel,
 } from '@mmo/game-data';
 import type { WeaponProfile } from '@mmo/game-data';
-import type { Item, StatBlock } from '@mmo/schemas';
+import type { Item, StatBlock, PlayerAppearance } from '@mmo/schemas';
 import { DomainError, ErrorCode } from '@mmo/shared';
 import type { DomainContext } from './context';
 import { ensureMailbox } from './containers';
@@ -28,6 +28,7 @@ export interface CombatProfile {
   /** Persisted class (set at creation; the client never supplies it during play). */
   classId: string;
   specialisationId: string | null;
+  appearance: PlayerAppearance;
   level: number;
   xp: number;
   xpToNext: number;
@@ -92,6 +93,11 @@ export async function getCombatProfile(
     characterId,
     classId: character.classId,
     specialisationId: character.specialisationId,
+    appearance: {
+      classId: character.classId,
+      specialisationId: character.specialisationId,
+      mainHandTemplateId: mainHand?.templateId ?? null,
+    },
     abilityCooldowns: character.abilityCooldowns,
     level: character.level,
     xp: character.xp,

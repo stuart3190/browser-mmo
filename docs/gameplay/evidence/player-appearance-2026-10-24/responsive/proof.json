@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five town fixtures, actual merchant remedy purchase, desktop/portrait/landscape and narrow mouse layout checks. Functional chapter evidence is in coast suite.",
+  "checks": [
+    {
+      "name": "Coastal visual fixture joined",
+      "ok": true
+    },
+    {
+      "name": "Narrow mouse compass clears the health frame",
+      "ok": true,
+      "detail": {
+        "player": {
+          "x": 6,
+          "y": 6,
+          "width": 183,
+          "height": 89,
+          "top": 6,
+          "right": 189,
+          "bottom": 95,
+          "left": 6
+        },
+        "guide": {
+          "x": 12,
+          "y": 106,
+          "width": 366,
+          "height": 48,
+          "top": 106,
+          "right": 378,
+          "bottom": 154,
+          "left": 12
+        },
+        "remedy": {
+          "x": 12,
+          "y": 634,
+          "width": 60,
+          "height": 62,
+          "top": 634,
+          "right": 72,
+          "bottom": 696,
+          "left": 12
+        },
+        "remedyHit": true
+      }
+    },
+    {
+      "name": "Narrow mouse remedy is inside viewport and unobstructed",
+      "ok": true,
+      "detail": {
+        "player": {
+          "x": 6,
+          "y": 6,
+          "width": 183,
+          "height": 89,
+          "top": 6,
+          "right": 189,
+          "bottom": 95,
+          "left": 6
+        },
+        "guide": {
+          "x": 12,
+          "y": 106,
+          "width": 366,
+          "height": 48,
+          "top": 106,
+          "right": 378,
+          "bottom": 154,
+          "left": 12
+        },
+        "remedy": {
+          "x": 12,
+          "y": 634,
+          "width": 60,
+          "height": 62,
+          "top": 634,
+          "right": 72,
+          "bottom": 696,
+          "left": 12
+        },
+        "remedyHit": true
+      }
+    },
+    {
+      "name": "Coastal visual fixture joined",
+      "ok": true
+    },
+    {
+      "name": "No rendering exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

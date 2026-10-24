@@ -306,3 +306,35 @@ it('checkpoint recovery retains a trained path and its committed cooldown', () =
       .statuses!.find((s) => s.kind === 'guard')!.magnitude,
   ).toBe(0.7);
 });
+
+it('replicates server profile appearance to nearby players, including equipment removal and recovery', () => {
+  const t = setup();
+  const appearance = {
+    classId: 'class.warrior',
+    specialisationId: 'spec.warrior.guardian',
+    mainHandTemplateId: 'weapon.sword.iron_longsword',
+  };
+  const w = t.join(near, { ...warrior, level: 5, appearance });
+  const m = t.join({ ...near, x: near.x + 2 }, { ...mage, level: 5 });
+  const own = t.sim.getPlayer(w)!.entityId;
+  expect(
+    t
+      .of(m, 'zone.snapshot')
+      .at(-1)!
+      .d.entities.find((e) => e.id === own)!.appearance,
+  ).toEqual(appearance);
+  t.sim.updateCombatProfile(
+    w,
+    { ...warrior, level: 5, appearance: { ...appearance, mainHandTemplateId: null } },
+    t.now,
+  );
+  t.drain();
+  expect(t.of(m, 'entity.spawn').at(-1)!.d.entity.appearance?.mainHandTemplateId).toBeNull();
+  expect(t.of(w, 'entity.spawn').at(-1)!.d.entity.appearance?.mainHandTemplateId).toBeNull();
+  const restored = new ZoneSimulation(arenaGameData(), ARENA, { nowMs: t.now });
+  restored.restoreCheckpoint(t.sim.checkpoint());
+  expect(restored.listEntities().find((e) => e.id === own)!.appearance).toEqual({
+    ...appearance,
+    mainHandTemplateId: null,
+  });
+});

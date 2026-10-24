@@ -94,6 +94,7 @@ export class EntityViews {
     }
     const existing = this.views.get(entity.id);
     if (existing) {
+      this.actors.get(entity.id)?.setAppearance(entity.appearance);
       if (existing.entity.dead !== entity.dead) this.setDead(entity.id, entity.dead ?? false);
       existing.entity = entity;
       existing.target.set(entity.position.x, existing.target.y, entity.position.z);
@@ -305,6 +306,7 @@ export class EntityViews {
         const mat = actor.mesh.material as StandardMaterial;
         mat.diffuseColor = Color3.FromHexString('#554537');
       }
+      if (e.kind === 'player') actor.setAppearance(e.appearance);
       this.actors.set(e.id, actor);
       return actor.mesh;
     }

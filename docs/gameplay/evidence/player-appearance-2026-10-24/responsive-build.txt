@@ -1,0 +1,45 @@
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 859 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                        1.19 kB │ gzip:   0.60 kB
+dist/assets/index-DpyTDVH_.css                        34.32 kB │ gzip:   7.81 kB
+dist/assets/dds.pure-BhmDCYzh.js                       0.06 kB │ gzip:   0.07 kB
+dist/assets/webAudioBus-BIfaPpWW.js                    0.06 kB │ gzip:   0.08 kB
+dist/assets/webgpuEngine-s2MYLm5d.js                   0.06 kB │ gzip:   0.08 kB
+dist/assets/mesh.vertexData.functions-C27tWypl.js      0.07 kB │ gzip:   0.08 kB
+dist/assets/color.fragment-Ct_DbAtA.js                 0.07 kB │ gzip:   0.08 kB
+dist/assets/webAudioMainBus-Bn1xTIeV.js                0.07 kB │ gzip:   0.08 kB
+dist/assets/color.vertex-Cw0Iy2Ac.js                   0.07 kB │ gzip:   0.08 kB
+dist/assets/ddsTextureLoader-Dbr-DvEm.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/envTextureLoader-59S8V8Pp.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/exrTextureLoader-CFLq4ak_.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/hdrTextureLoader-BTBNj1pG.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/iesTextureLoader-DI9Ll-gY.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/ktxTextureLoader-BOgtrYSK.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/tgaTextureLoader-CH1fZR2A.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/default.fragment-CBJUuPGL.js               0.07 kB │ gzip:   0.08 kB
+dist/assets/basisTextureLoader-BQO8Vy1S.js             0.07 kB │ gzip:   0.09 kB
+dist/assets/default.vertex-D-9sr3Yo.js                 0.07 kB │ gzip:   0.09 kB
+dist/assets/color.fragment-YqFq5PsD.js                 0.07 kB │ gzip:   0.09 kB
+dist/assets/webAudioSoundSource-CTEyrq6-.js            0.07 kB │ gzip:   0.09 kB
+dist/assets/color.vertex-sWFMFJTt.js                   0.07 kB │ gzip:   0.09 kB
+dist/assets/rgbdDecode.fragment-B9DoljsS.js            0.07 kB │ gzip:   0.09 kB
+dist/assets/default.fragment-BxYN2br_.js               0.07 kB │ gzip:   0.09 kB
+dist/assets/default.vertex-CZL4A553.js                 0.07 kB │ gzip:   0.09 kB
+dist/assets/postprocess.vertex-D6Bzc5Eh.js             0.07 kB │ gzip:   0.09 kB
+dist/assets/webAudioStreamingSound-DMXzzy3I.js         0.07 kB │ gzip:   0.09 kB
+dist/assets/clearQuad.fragment-CuE8cha4.js             0.08 kB │ gzip:   0.09 kB
+dist/assets/clearQuad.vertex-fXL2Nhb-.js               0.08 kB │ gzip:   0.09 kB
+dist/assets/rgbdDecode.fragment-C39aeHZY.js            0.08 kB │ gzip:   0.09 kB
+dist/assets/postprocess.vertex-5dKjAA2M.js             0.08 kB │ gzip:   0.09 kB
+dist/assets/webAudioStaticSound-DRdY7yij.js            0.11 kB │ gzip:   0.10 kB
+dist/assets/preload-helper-DjzSQ1t3.js                 1.38 kB │ gzip:   0.75 kB
+dist/assets/index-CoNvahXL.js                          1.50 kB │ gzip:   0.79 kB │ map:     1.46 kB
+dist/assets/main-BKjyFYck.js                           5.85 kB │ gzip:   2.35 kB │ map:    14.70 kB
+dist/assets/api-BSt2nTP1.js                          550.27 kB │ gzip:  88.90 kB │ map: 1,495.05 kB
+dist/assets/game-CYwUCx3e.js                         636.20 kB │ gzip: 187.42 kB │ map: 2,418.96 kB
+dist/assets/babylon-DbzD--J_.js                    1,950.99 kB │ gzip: 460.99 kB │ map: 7,971.63 kB
+
+✓ built in 1.96s

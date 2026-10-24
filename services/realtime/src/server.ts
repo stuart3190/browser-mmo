@@ -1587,6 +1587,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
     return {
       classId: profile.classId,
       specialisationId: profile.specialisationId,
+      appearance: profile.appearance,
       abilityCooldowns: profile.abilityCooldowns,
       level: profile.level,
       stats: profile.stats,

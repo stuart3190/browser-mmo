@@ -27,6 +27,7 @@ import {
 import type { ServerMessage } from '@mmo/networking';
 import type {
   CombatRules,
+  PlayerAppearance,
   CombatStatus,
   EnemyDefinition,
   SpawnGroup,
@@ -66,6 +67,7 @@ export interface CombatantProfile {
   /** Persisted class (server data). Defaults to Warrior for tests that do not care. */
   classId?: string;
   specialisationId?: string | null;
+  appearance?: PlayerAppearance;
   /** Still-running cooldowns restored from persistence (epoch ms; '*' = global cooldown). */
   abilityCooldowns?: Record<string, number>;
   level: number;
@@ -496,6 +498,11 @@ export class ZoneSimulation {
       rotationY,
       refId: null,
       characterId: info.characterId,
+      appearance: info.combat.appearance ?? {
+        classId: info.combat.classId ?? 'class.warrior',
+        specialisationId: info.combat.specialisationId ?? null,
+        mainHandTemplateId: null,
+      },
       level: info.combat.level,
       health: Math.min(info.combat.health, info.combat.maxHealth),
       maxHealth: info.combat.maxHealth,
@@ -987,6 +994,15 @@ export class ZoneSimulation {
     p.health = Math.min(p.health, p.maxHealth);
     const entity = this.entities.get(p.entityId)!;
     entity.level = profile.level;
+    const appearance = profile.appearance ?? {
+      classId: p.classId,
+      specialisationId: p.specialisationId ?? null,
+      mainHandTemplateId: null,
+    };
+    if (JSON.stringify(entity.appearance) !== JSON.stringify(appearance)) {
+      entity.appearance = appearance;
+      this.toKnowers(entity.id, { t: 'entity.spawn', d: { entity: { ...entity } } });
+    }
     this.syncEntityHealth(p.entityId, Math.round(p.health), p.maxHealth, p.dead);
     this.sendVitals(p, nowMs);
     if (unlocked.length > 0 || changedPath)

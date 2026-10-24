@@ -1927,3 +1927,16 @@ Ranked player-facing gaps from the current client and content:
       Add server-replicated appearance using existing profiles/snapshots, distinct warrior/mage
       silhouettes, real sword/staff visuals and multiplayer/equip/relogin screenshot proof. Also
       deduplicate repeated feedback toasts. Continue gameplay; no production or capacity work.
+
+### Class and held-weapon appearance — verified 2026-10-24
+
+- [x] Server-derived appearance in existing snapshots/updates; warrior/mage outfits and path accents;
+      visible sword/staff and main-hand removal on local and remote actors. Seven two-player browser
+      checks pass with normal purchases, travel, mentor choices and relogin. Screenshots reviewed.
+- [x] Narrow mouse compass/vitals and remedy placement fixed from screenshot findings; follow-up
+      desktop/touch portrait/landscape checks pass. Initial layout failure retained.
+- 16 frontend, 86 world, 17 domain tests, repository/final affected types, lint/build pass.
+  Evidence: `gameplay/evidence/player-appearance-2026-10-24/`. Fresh level-five fixtures, no gear grants.
+  Repeated identical notices deduplicate. Armour-slot-specific art is still incomplete.
+- [ ] Next: coastal weapon commissions unlocked by story completion, material/readiness and output
+      previews, meaningful level-five upgrades, real-input craft/equip/relogin verification.

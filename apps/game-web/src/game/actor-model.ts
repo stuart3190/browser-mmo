@@ -1,3 +1,5 @@
+import { dressHero } from './hero-appearance';
+import type { PlayerAppearance } from '@mmo/schemas';
 import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
@@ -11,6 +13,8 @@ export class ActorModel {
   private readonly limbs: Mesh[] = [];
   private readonly materials: StandardMaterial[] = [];
   private weapon: Mesh | undefined;
+  private appearanceKey = '';
+  private clearOutfit?: () => void;
   private phase = 0;
   private strike = 0;
   private dead = false;
@@ -155,8 +159,17 @@ export class ActorModel {
     }
   }
 
+  setAppearance(appearance?: PlayerAppearance): void {
+    if (this.kind !== 'hero' || !appearance) return;
+    const key = JSON.stringify(appearance);
+    if (key === this.appearanceKey) return;
+    this.appearanceKey = key;
+    this.weapon?.setEnabled(false);
+    this.clearOutfit?.();
+    this.clearOutfit = dressHero(this.mesh.getScene(), this.mesh, this.limbs[3]!, appearance);
+  }
   setArmed(armed: boolean): void {
-    this.weapon?.setEnabled(armed);
+    this.weapon?.setEnabled(armed && !this.appearanceKey);
   }
 
   attack(): void {
@@ -191,6 +204,7 @@ export class ActorModel {
     });
   }
   dispose(): void {
+    this.clearOutfit?.();
     this.shadow.dispose();
     this.mesh.dispose();
     this.materials.forEach((m) => m.dispose());

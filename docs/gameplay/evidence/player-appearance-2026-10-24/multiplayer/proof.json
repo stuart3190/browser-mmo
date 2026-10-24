@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five characters at Marches merchant. Gear bought and equipped through UI, ordinary travel/walking, real mentor choices; no item grants or injected appearance.",
+  "checks": [
+    {
+      "name": "Warrior equipped weapon is replicated to the other player",
+      "ok": true
+    },
+    {
+      "name": "Mage equipped weapon is replicated to the other player",
+      "ok": true
+    },
+    {
+      "name": "Warrior class and trained path are visible to nearby players",
+      "ok": true
+    },
+    {
+      "name": "Mage class and trained path are visible to nearby players",
+      "ok": true
+    },
+    {
+      "name": "Unequipping staff removes it from both clients",
+      "ok": true
+    },
+    {
+      "name": "Relogin restores the same Mage outfit and equipped staff",
+      "ok": true
+    },
+    {
+      "name": "No multiplayer appearance exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

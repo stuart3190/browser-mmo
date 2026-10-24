@@ -2483,3 +2483,25 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
 .ui-root.touch .quick-remedy kbd {
   display: none;
 }
+
+/* Narrow mouse windows need the same clear vitals and reachable healing as phones. */
+@media (max-width: 720px) {
+  .ui-root:not(.touch) .quest-guide {
+    top: 106px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    transform: none;
+  }
+  .ui-root:not(.touch):has(.target-frame) .quest-guide,
+  .ui-root:not(.touch):has(.target-frame) .first-steps {
+    display: none;
+  }
+  .ui-root:not(.touch) .controls-help {
+    top: 164px;
+  }
+  .ui-root:not(.touch) .quick-remedy {
+    left: 12px;
+    bottom: 148px;
+  }
+}

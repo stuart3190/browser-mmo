@@ -1,5 +1,5 @@
 /* eslint-disable */
-// Functional combat playtest. Fresh level-three fixtures in a disposable qualification DB;
+// Functional appearance/layout playtest. Fresh level-five fixtures in a disposable qualification DB;
 // all gameplay actions use keyboard/touch. No live or earned-character data is changed.
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const { Client } = require('../../packages/db/node_modules/pg');
@@ -48,7 +48,7 @@ async function fixture(classId) {
   try {
     await db.query(
       'update characters set level = 5, zone_id=$2, pos_x=$3, pos_z=$4 where id = $1',
-      [character.id, 'zone.aurelian.amber_coast', 304, 136],
+      [character.id, 'zone.aurelian.amber_coast', 264, 402],
     );
   } finally {
     await db.end();
@@ -70,12 +70,47 @@ async function fixture(classId) {
       const page = await context.newPage();
       page.on('pageerror', (e) => errors.push(e.message));
       await enter(page, await fixture(touch ? 'class.mage' : 'class.warrior'), false);
+      await page.keyboard.press('KeyE');
+      await page.waitForFunction(
+        () => window.__mmo.dialogue?.npcId === 'npc.world.amber_coast.merchant',
+      );
+      await page.locator('[data-service="service.amber_coast.buy_remedy"]').click();
+      await page.locator('[data-testid=quick-remedy]').waitFor();
+      await page.getByRole('button', { name: 'Close dialogue', exact: true }).click();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: `${out}/${touch ? 'portrait' : 'desktop'}-shore.png` });
       check(
         'Coastal visual fixture joined',
-        await page.evaluate(() => Math.abs(window.__mmo.position.x - 304) < 2),
+        await page.evaluate(() => Math.abs(window.__mmo.position.x - 264) < 2),
       );
+      if (!touch) {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.waitForTimeout(200);
+        const layout = await page.evaluate(() => {
+          const rect = (s) => document.querySelector(s).getBoundingClientRect().toJSON();
+          const player = rect('.player-frame'),
+            guide = rect('.quest-guide'),
+            remedy = rect('.quick-remedy');
+          const hit = document.elementFromPoint(
+            remedy.x + remedy.width / 2,
+            remedy.y + remedy.height / 2,
+          );
+          return { player, guide, remedy, remedyHit: !!hit?.closest('.quick-remedy') };
+        });
+        console.log(JSON.stringify(layout));
+        await page.screenshot({ path: `${out}/narrow-mouse.png` });
+        check(
+          'Narrow mouse compass clears the health frame',
+          layout.guide.y >= layout.player.bottom,
+          layout,
+        );
+        check(
+          'Narrow mouse remedy is inside viewport and unobstructed',
+          layout.remedy.x >= 0 && layout.remedy.right <= 390 && layout.remedyHit,
+          layout,
+        );
+        await page.screenshot({ path: `${out}/narrow-mouse.png` });
+      }
       if (touch) {
         await page.setViewportSize({ width: 844, height: 480 });
         await page.screenshot({ path: `${out}/landscape-shore.png` });
@@ -89,7 +124,7 @@ async function fixture(classId) {
         {
           ok: true,
           fixture:
-            'Visual-only fixtures at the shore. Functional chapter evidence is in coast suite.',
+            'Fresh level-five town fixtures, actual merchant remedy purchase, desktop/portrait/landscape and narrow mouse layout checks. Functional chapter evidence is in coast suite.',
           checks,
           errors,
         },

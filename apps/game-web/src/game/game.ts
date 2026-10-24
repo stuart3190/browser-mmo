@@ -238,6 +238,7 @@ export async function startGame(args: {
   net.on('zone.snapshot', (m) => {
     for (const e of m.d.entities) {
       entities?.upsert(e);
+      if (e.id === state.myEntityId) player?.actor.setAppearance(e.appearance);
       effects.setStatuses(e);
       state.world.set(e.id, info(e));
     }
@@ -245,6 +246,7 @@ export async function startGame(args: {
   });
   net.on('entity.spawn', (m) => {
     entities?.upsert(m.d.entity);
+    if (m.d.entity.id === state.myEntityId) player?.actor.setAppearance(m.d.entity.appearance);
     effects.setStatuses(m.d.entity);
     state.world.set(m.d.entity.id, info(m.d.entity));
     state.emit();

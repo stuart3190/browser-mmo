@@ -1,0 +1,4 @@
+PASS Coastal visual fixture joined
+Error: Narrow mouse compass clears the health frame
+    at check (/root/browser-mmo/scripts/e2e/coast-visual.cjs:14:18)
+    at /root/browser-mmo/scripts/e2e/coast-visual.cjs:93:9

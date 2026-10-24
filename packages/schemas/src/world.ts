@@ -237,6 +237,13 @@ export const CombatStatusSchema = z.object({
 });
 export type CombatStatus = z.infer<typeof CombatStatusSchema>;
 
+export const PlayerAppearanceSchema = z.object({
+  classId: ContentIdSchema,
+  specialisationId: ContentIdSchema.nullable(),
+  mainHandTemplateId: ContentIdSchema.nullable(),
+});
+export type PlayerAppearance = z.infer<typeof PlayerAppearanceSchema>;
+
 export const WorldEntitySchema = z.object({
   id: EntityIdSchema,
   kind: EntityKindSchema,
@@ -253,6 +260,7 @@ export const WorldEntitySchema = z.object({
   dead: z.boolean().optional(),
   hostile: z.boolean().optional(),
   statuses: z.array(CombatStatusSchema).max(3).optional(),
+  appearance: PlayerAppearanceSchema.optional(),
   /** Persistent attack cue; null clears it. Snapshots also carry active cues. */
   attackCue: z
     .object({

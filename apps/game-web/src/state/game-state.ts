@@ -179,6 +179,7 @@ export class GameState {
   }
 
   toast(text: string, kind: Toast['kind'] = 'info'): void {
+    if (this.toasts.some((t) => t.text === text && t.kind === kind)) return;
     const t = { id: this.nextId++, text, kind };
     this.toasts = [...this.toasts.slice(-3), t];
     this.emit();

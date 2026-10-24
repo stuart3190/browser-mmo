@@ -194,3 +194,57 @@ it('gives shore creatures distinct pickable rigs and preserves boss scale throug
     engine.dispose();
   }
 });
+
+it('renders replicated class outfits and held gear, updates existing actors and releases removed outfits', () => {
+  const engine = new NullEngine(),
+    scene = new Scene(engine);
+  void scene.defaultMaterial;
+  try {
+    const views = new EntityViews(scene, 'local');
+    const before = { meshes: scene.meshes.length, materials: scene.materials.length };
+    const e = {
+      id: 'visitor',
+      kind: 'player' as const,
+      name: 'Visitor',
+      position: { x: 0, y: 0, z: 0 },
+      rotationY: 0,
+      refId: null,
+      characterId: null,
+      appearance: {
+        classId: 'class.mage',
+        specialisationId: 'spec.mage.frost',
+        mainHandTemplateId: 'weapon.staff.oak_staff',
+      },
+    };
+    views.upsert(e);
+    expect(scene.getMeshByName('visitor_mage_robe')).toBeTruthy();
+    expect(scene.getMeshByName('visitor_warrior_cuirass')).toBeNull();
+    const staff = scene.getMeshByName('visitor_held_staff')!;
+    expect(views.entityIdOfMesh(staff)).toBe('visitor');
+    const dressed = { meshes: scene.meshes.length, materials: scene.materials.length };
+    for (let i = 0; i < 5; i++) views.upsert(e);
+    expect(scene.meshes).toHaveLength(dressed.meshes);
+    expect(scene.materials).toHaveLength(dressed.materials);
+    views.upsert({ ...e, appearance: { ...e.appearance, mainHandTemplateId: null } });
+    expect(scene.getMeshByName('visitor_held_staff')).toBeNull();
+    expect(scene.getMeshByName('visitor_mage_robe')).toBeTruthy();
+    views.upsert({
+      ...e,
+      appearance: {
+        classId: 'class.warrior',
+        specialisationId: 'spec.warrior.guardian',
+        mainHandTemplateId: 'weapon.sword.iron_longsword',
+      },
+    });
+    expect(scene.getMeshByName('visitor_mage_robe')).toBeNull();
+    expect(scene.getMeshByName('visitor_warrior_cuirass')).toBeTruthy();
+    expect(views.entityIdOfMesh(scene.getMeshByName('visitor_held_sword')!)).toBe('visitor');
+    views.update(0.1);
+    views.remove(e.id);
+    expect(scene.meshes).toHaveLength(before.meshes);
+    expect(scene.materials).toHaveLength(before.materials);
+  } finally {
+    scene.dispose();
+    engine.dispose();
+  }
+});
