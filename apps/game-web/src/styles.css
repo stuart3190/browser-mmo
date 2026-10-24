@@ -2306,3 +2306,48 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     top: 8px;
   }
 }
+
+/* Keep the composer visible while guild history scrolls independently. */
+.window-guild:has(.guild-messages) .window-body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.window-guild:has(.guild-messages) .guild-title,
+.window-guild:has(.guild-messages) .guild-notice,
+.window-guild:has(.guild-messages) .tabs {
+  flex-shrink: 0;
+}
+.window-guild:has(.guild-messages) .guild-messages {
+  flex: 1;
+  min-height: 40px;
+  max-height: none;
+}
+.window-guild:has(.guild-messages) .guild-form {
+  flex-shrink: 0;
+  margin: 8px 0 0;
+}
+@media (pointer: coarse) and (max-height: 500px) {
+  .window-guild:has(.guild-messages) .guild-title,
+  .window-guild:has(.guild-messages) .guild-notice {
+    display: none;
+  }
+  .window-guild:has(.guild-messages) .guild-form {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .window-guild:has(.guild-messages) .guild-form label {
+    font-size: 12px;
+    gap: 2px;
+  }
+  .window-guild:has(.guild-messages) .guild-form textarea {
+    height: 44px;
+    min-height: 44px;
+    resize: none;
+  }
+  .window-guild:has(.guild-messages) .guild-form .small {
+    display: none;
+  }
+}

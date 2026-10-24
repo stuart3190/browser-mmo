@@ -23,6 +23,8 @@ export function GuildWindow() {
   const running = useRef(false),
     generation = useRef(0),
     mounted = useRef(true),
+    history = useRef<HTMLDivElement>(null),
+    atBottom = useRef(true),
     pendingMessage = useRef<{ id: string; body: string } | null>(null);
   useEffect(() => {
     mounted.current = true;
@@ -41,7 +43,7 @@ export function GuildWindow() {
     setMessages(history.messages);
   }, [api, characterId]);
   useEffect(() => {
-    if (!open || !(state.connection === 'open')) return;
+    if (!open || state.connection !== 'open') return;
     let stopped = false,
       timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
@@ -63,6 +65,10 @@ export function GuildWindow() {
       clearTimeout(timer);
     };
   }, [open, state.connection === 'open', refresh]);
+  useEffect(() => {
+    if (atBottom.current && history.current)
+      history.current.scrollTop = history.current.scrollHeight;
+  }, [messages, tab, open]);
   const run = async (work: () => Promise<unknown>, success = '') => {
     if (running.current) return;
     running.current = true;
@@ -90,6 +96,7 @@ export function GuildWindow() {
     setConfirm({ label, work: () => api.guildMember(characterId, guild!.id, targetId, action) });
   useEffect(() => {
     setBody('');
+    atBottom.current = true;
     pendingMessage.current = null;
     setConfirm(null);
     setTab('chat');
@@ -102,7 +109,8 @@ export function GuildWindow() {
       pendingMessage.current = { id: crypto.randomUUID(), body: text };
     const message = pendingMessage.current;
     void run(async () => {
-      await api.sendGuildMessage(characterId, guild!.id, message.id, message.body);
+      await api.sendGuildMessage(characterId, guild.id, message.id, message.body);
+      atBottom.current = true;
       pendingMessage.current = null;
       setBody('');
     });
@@ -217,6 +225,11 @@ export function GuildWindow() {
             <>
               <div
                 className="guild-messages"
+                ref={history}
+                onScroll={(e) => {
+                  const el = e.currentTarget;
+                  atBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 32;
+                }}
                 role="log"
                 aria-label="Guild messages"
                 aria-live="polite"

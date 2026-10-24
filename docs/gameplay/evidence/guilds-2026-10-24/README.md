@@ -16,3 +16,8 @@ into an occupied database is refused. Own fixture processes/databases only; no p
 
 Full combined-source and production password/TLS guild qualification remain required. Emulated
 phone functionality does not establish physical device performance or concurrent-player capacity.
+
+Final layout run oHpLwU passes 15 assertions, adding follow-latest, preserved scrollback, and a
+visible landscape composer with independently scrollable history. All final screenshots reviewed.
+The earlier HTTeSw attempt failed before login with 20 asset requests reporting ERR_NETWORK_CHANGED;
+no functional assertion ran. Its diagnostics remain in the isolated run directory.

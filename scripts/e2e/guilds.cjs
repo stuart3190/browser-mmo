@@ -112,6 +112,26 @@ const nameOf = (s) =>
     );
     await message(b, 'Ready for the next expedition');
     await text(a, 'Ready for the next expedition');
+    for (let i = 0; i < 3; i++)
+      await message(
+        a,
+        `Chronicle ${i}: ${'We will meet beyond the old gate when the company is ready. '.repeat(4)}`,
+      );
+    await text(b, 'Chronicle 2:');
+    const log = b.getByRole('log', { name: 'Guild messages' });
+    check(
+      'New guild messages follow the end of the conversation',
+      await log.evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight < 32),
+    );
+    await log.hover();
+    await b.mouse.wheel(0, -1000);
+    await b.waitForTimeout(200);
+    await message(a, 'A new message while you review earlier guild history');
+    await text(b, 'A new message while you review earlier guild history');
+    check(
+      'Incoming guild chat preserves a reader’s scrollback position',
+      await log.evaluate((el) => el.scrollTop < 32),
+    );
     await a.screenshot({ path: `${OUT}/desktop-chat.png` });
     await b.screenshot({ path: `${OUT}/portrait-chat.png` });
     const portrait = await b.locator('[data-window=guild]').boundingBox();
@@ -135,6 +155,18 @@ const nameOf = (s) =>
       'Landscape guild sheet stays within the viewport',
       landscape.y >= 0 && landscape.y + landscape.height <= 391,
       landscape,
+    );
+    const composer = await b
+      .getByRole('button', { name: 'Send to guild', exact: true })
+      .boundingBox();
+    check(
+      'Landscape keeps the guild composer visible below scrollable history',
+      composer.y >= landscape.y &&
+        composer.y + composer.height <= landscape.y + landscape.height &&
+        (await b
+          .getByRole('log', { name: 'Guild messages' })
+          .evaluate((el) => el.clientHeight >= 40)),
+      composer,
     );
     await b.setViewportSize({ width: 390, height: 844 });
     await tab(b, 'Guild settings');

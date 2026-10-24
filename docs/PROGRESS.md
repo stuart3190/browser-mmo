@@ -1666,3 +1666,8 @@ Guild qualification update: all 12 desktop/phone browser assertions pass; screen
 Full types, final lint, four builds/debug-hook guard pass. Populated upgrade and 20-table backup/
 restore pass with actual guild membership, invitation and chat rows. [Evidence](gameplay/evidence/guilds-2026-10-24/README.md).
 Combined-source regression and built-production guild profile remain before integration/release.
+
+Guild layout follow-up: 15 real browser assertions pass in oHpLwU; final screenshots reviewed.
+Chat follows new messages only at the end, preserves scrollback and keeps the landscape composer
+visible. Production load now includes consented guild membership, durable messages and history,
+and restores the documented minimum 19.5Hz gate. This workload has not yet been measured.
