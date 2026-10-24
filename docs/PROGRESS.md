@@ -1717,3 +1717,18 @@ Guild layout follow-up: 15 real browser assertions pass in oHpLwU; final screens
 Chat follows new messages only at the end, preserves scrollback and keeps the landscape composer
 visible. Production load now includes consented guild membership, durable messages and history,
 and restores the documented minimum 19.5Hz gate. This workload has not yet been measured.
+
+### Static world rendering — 2026-10-24 (isolated branch)
+
+- [x] Per-chunk/material static geometry batching preserves parent transforms and material ownership.
+      Initial frontend tests pass; null-renderer comparison retains 32,976 vertices/96,942 indices
+      while reducing starter meshes from 532 to 165. This is geometry evidence, not an FPS claim.
+- [ ] Extended starter-zone cleanup test, full type/lint/build and browser visual/input qualification
+      remain before integration. Main release candidate remains unchanged during its separate checks.
+
+Static-render browser qualification remains pending. Initial runs used the first replicated NPC
+rather than the nearby NPC; projected coordinates were outside the canvas. Read-only nearest-NPC
+and ray-hit diagnostics correct that driver assumption; no gameplay target rules changed. A later
+run ZwXpKt stopped before login on a blank page. Preserve failures and qualify with startup recovery
+integrated. Full types/lint/build and11 frontend tests pass for batching before these debug additions;
+latest frontend types pass. Final browser proof and production build remain required.

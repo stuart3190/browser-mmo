@@ -16,6 +16,7 @@ import {
 import type { GameData, PropKind } from '@mmo/game-data';
 import type { WorldChunk } from '@mmo/schemas';
 import { starterRoads } from './starter-roads';
+import { batchStaticProps } from './static-batches';
 
 /**
  * Static world rendering from the validated registry. Atlas regions stream a bounded nearby
@@ -492,6 +493,7 @@ export class WorldView {
       }
     }
 
+    const staticProps: Mesh[] = [];
     // Props: mesh dimensions come from the same shape table as the gameplay colliders.
     for (const prop of chunk.props) {
       const shape = propShapes[prop.kind].visual;
@@ -569,7 +571,7 @@ export class WorldView {
         for (const x of [-4.7, 0, 4.7]) detail('post', 0.3, 1.6, 0.3, x, 0.1, 0, '#68513a');
       }
       mesh.freezeWorldMatrix();
-      disposables.push(mesh);
+      staticProps.push(mesh);
     }
     // Explicit (non-prop) colliders are drawn as plain walls/posts so nothing blocks invisibly.
     for (const [i, c] of chunk.colliders.entries()) {
@@ -591,8 +593,9 @@ export class WorldView {
       mesh.material = this.material('#6b6258');
       mesh.isPickable = false;
       mesh.freezeWorldMatrix();
-      disposables.push(mesh);
+      staticProps.push(mesh);
     }
+    disposables.push(...batchStaticProps(staticProps, key));
     this.loaded.set(key, () => disposables.forEach((d) => d.dispose()));
   }
 }
