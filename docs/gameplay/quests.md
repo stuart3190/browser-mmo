@@ -19,10 +19,11 @@ persisted in PostgreSQL, rewards exactly once. Decision record: `docs/adr/0018-q
 ## Definition vs player state
 
 A **definition** has: id, name, description, giver NPC, turn-in NPC (default: giver), minimum level,
-prerequisite quests, `repeatable` (must be false for now), objectives (stable ids; `kill` and
-`collect` are supported, `talk`/`explore` are shape-only placeholders rejected for live quests),
+prerequisite quests, optional `repeatable` with explicit `repeatCooldownMs`, objectives (stable ids;
+`kill`, `collect`, `talk` and `explore` are implemented),
 rewards (XP, currencies, items) and one dialogue line per state (offer, in progress, ready,
-completed). `placeholder: true` quests exist only so references validate and are never offered.
+completed). Optional `rewards.classItems` replaces the default item list for that character's
+server-known class; it never appends a second reward set. `placeholder: true` quests exist only so references validate and are never offered.
 
 A **player quest row** (`character_quests`, PK `(character_id, quest_id)`) stores `status`
 (`active` | `completed`), kill counters (`progress` jsonb keyed by objective id), `accepted_at`,
@@ -44,13 +45,26 @@ currency ledger rows) and a version. A check constraint ties `completed` to both
 - **Kill**: counted inside the existing kill-reward transaction (`awardKillInTx` →
   `applyKillToQuestsInTx`). That transaction already runs exactly once per durable kill event
   (`kill_events` + `kill_rewards` PK, ADR 0017), so a kill can never count twice — not on retries,
-  replays, restarts or with several realtime nodes. Only the credited (tagging) character progresses;
-  kills before accepting do not count; counters are capped at the target.
+  replays, restarts or with several realtime nodes. The credited solo character or eligible
+  party members progress under [shared-hunt rules](parties.md); kills before accepting do not count.
+  Counters are capped at the target.
 - **Collect** (chosen rule): progress is **derived** from the character's authoritative inventory —
   units of the template in the **backpack, material pouch and Recovered loot (mailbox)**, excluding
   locked items. Vaults, equipped items and marketplace escrow do not count. Nothing is stored, so
   progress cannot drift or double-count; moving pelts to the vault or selling them lowers it again.
   Pelts that overflowed into Recovered loot count, and are consumed first on turn-in.
+
+- **Talk**: written only after an authoritative interaction with the required NPC.
+- **Explore**: written from the living character's server-accepted position near the authored
+  landmark in the correct zone. Prior discovery alone does not satisfy a new accepted survey.
+
+## Repeatable contracts
+
+Fresh acceptance is allowed only after the authored cooldown has elapsed since `completed_at`.
+The completed row is reused with fresh acceptance time, empty counters and cleared reward/turn-in
+fields. Kill and survey progress must be earned again. Repeatable item-grant source references
+include that acceptance time, preserving exactly-once rewards per accepted run. There is no
+calendar-midnight reset. The Daily Roadwatch Contract uses 24 hours after completion.
 
 ## Turn-in (one transaction)
 
@@ -91,5 +105,5 @@ client could use to report progress.
 
 ## Not yet
 
-Repeatable/daily quests, talk/explore objectives, quest chains beyond `prerequisites`, abandoning,
-party sharing, quest items, branching dialogue, multiple quests per NPC UI beyond a list.
+Quest abandonment, branching dialogue choices and a dedicated quest-item bag are not implemented.
+Further story branches and quest types remain future content work.

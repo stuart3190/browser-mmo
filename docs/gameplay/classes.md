@@ -22,10 +22,14 @@ A character stores `classId` (set at creation, never changed by gameplay; only c
 (`AbilityDefinition`, `SkillDefinition`). Ability `effects` stay opaque for a future effect grammar;
 live abilities use the `damage` block below. Decision record: `docs/adr/0019-class-abilities.md`.
 
-## Playable classes and abilities (2026-10-24)
+## Playable classes and abilities (2026-10-25)
 
 Only **Warrior** and **Mage** are playable. Ranger and Cleric remain placeholders.
-The bar is `baseAbilityIds` in slot order; `ability.common.attack` is shared.
+The bar is `baseAbilityIds` in slot order; `ability.common.attack` is shared. In Character, expand
+**Class abilities · learn your kit** to inspect all four abilities, future level unlocks, range,
+target requirements and recovery. This reference works on touch without casting anything. It
+shares effective definitions with the bar, including the selected specialisation; the Character
+header stays reachable while scrolling. [Browser proof](evidence/class-handbook-2026-10-25/README.md).
 
 | Slot | Warrior                                                                    | Mage                                                        |
 | ---- | -------------------------------------------------------------------------- | ----------------------------------------------------------- |

@@ -9,7 +9,8 @@ the distant generic Elderwood town.
 2. **What the Roots Remember:** investigate the Listening Roots and Briar Archive; quiet two
    Briar Spitters. Their blue circles stay at the position where each attack began.
 3. **A Song Left Unfinished:** investigate the Heartwood Oath and defeat the Rootbound Cantor.
-   Leave the larger blue circle, then return to attack between songs. The boss resists roots.
+   Leave the blue **Roots Reach** circle, then flank or move behind **Bough Sweep**. Return to
+   attack between warnings. The boss resists roots.
 
 All three personal surveys use the existing authoritative exploration check. Enemy credit, XP,
 loot and quest rewards use existing server and persistence rules. The three turn-ins award
@@ -22,7 +23,7 @@ or migration is introduced.
 The authored path includes three survey glyphs, broad-leaf trees and distinct rooted plant
 creatures. This is an authored landing chapter; it does not finish the whole Elderwood region
 or the other atlas greyboxes. Forest attacks reuse the fixed-position ground strike and its
-recovery logic. Normal spitters allow practice before the Cantor's wider, slower strike.
+recovery logic. Normal spitters prepare players for the Cantor's alternating circle/sweep rhythm.
 
 ## Functional verification recipe
 
