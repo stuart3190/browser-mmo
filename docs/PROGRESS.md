@@ -1503,3 +1503,34 @@ The test now waits for the sale balance; all eleven focused realtime sync tests 
 403-restricted, but file/line/expected/actual annotations identify this failure. No hosted green claim.
 Fresh earned Warrior main/side quest journey is running without grants, teleportation or XP injection.
 Next: complete both class journeys, dungeon/profession/group proof, fix observed gaps and qualify again.
+
+### Hosted CI green — 2026-10-24
+
+- [x] Hosted run [40086526089](https://github.com/stuart3190/browser-mmo/actions/runs/40086526089)
+      passes on social checkpoint `1561e42`: formatting/lint/types/unit/integration, matching PG16
+      client installation, populated upgrade/backup/restore, assets and production builds.
+      Metadata archived in hardening/evidence/completion-qualification-2026-10-24/hosted-ci.json.
+- [ ] Fixed snapshot local four-suite browser qualification still running; earned Warrior/Mage
+      main/side progression and mixed-class dungeon proof are separate active work.
+
+Journey harness fixes are in progress: use collision clearance consistently at short distances,
+limit repeated route attempts and save failure state/screenshots, respect earned item level/class
+requirements, choose the active class abilities and exact intended party invitee. The first Warrior
+run was interrupted after its initial quest when its driver stalled at a tree; earned state was kept.
+A resume attempted a level-three ring at level two and was correctly refused; the harness now skips
+it. Warrior has since completed Waystone/Brackenmaw and defeated Hollow Lantern using actual inputs.
+No production changes, no grants, XP injection or teleportation. Do not call partial journeys complete.
+
+### Four-suite fixed-source qualification — 2026-10-24
+
+- [x] Source `1561e42` passes full isolated qualification: format/lint/types, 234 unit tests,
+      domain109/realtime73/API11 integration tests, four builds, production debug guard,
+      assets/content, sixteen-table populated upgrade/restore and39 browser assertions.
+      [Evidence](hardening/evidence/social-qualification-2026-10-24/README.md). Own services stopped.
+- [ ] Earned class/story/dungeon journeys and presentation polish remain active and separate.
+
+Warrior completed seven starter story quests and entered Marches. Mage recovered through ordinary
+respawn after dying to a stationary test strategy at the Warden; with visible-warning movement it
+defeated the Warden without balance changes. Both retain all earned progress. The harness now uses
+class abilities, respects requirements and equips owned quest rewards; larger region routes get
+distance-proportional bounded deadlines. These journey changes are still being verified.

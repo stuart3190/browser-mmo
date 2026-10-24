@@ -35,8 +35,8 @@ Read MASTER_PLAN, PROGRESS, DECISIONS and AGENTS before changes.
 
 ## Active work and immediate next tasks
 
-1. Sync focused run passed all eleven tests (`/tmp/bo-sync-ci-timing.log`); commit social milestone
-   and test timing correction with proof. Push branch, inspect CI annotations (full logs403).
+1. Social + sync timing fix committed/pushed as `1561e42`. Hosted CI40086526089 PASSED all gates,
+   including backup/restore. Metadata archived in hardening evidence. Full logs403; metadata readable.
 2. Run full qualifier on a new detached committed snapshot. `scripts/qualify-local.sh` creates its
    own cluster/services, full aggregate/restore and four browser suites, cleans only its processes.
    Use fixed snapshot while implementation continues; do not mutate it during qualification.
@@ -56,3 +56,27 @@ Browser workflow skill read: game-studio/game-playtest. Playwright available at
 /opt/aria-browser/node_modules/playwright, Chrome /usr/bin/google-chrome. Use screenshots and actual
 UI input; read-only dev __mmo observations are not progression writes. `pnpm exec tsx` for scripts
 importing source TS. The durable goal remains active; no token budget or stop authorization.
+
+Latest live checkpoint: fixed1561e42 full qualifier session62977, source
+/tmp/bo-qualification-source-1561e42, outerlog/tmp/bo-social-qualified.log, evidence
+/tmp/brokenodyssey-qualification.ecZxm1. Full aggregate is reaching realtime crash tests.
+Local API/web were restarted: sessions10068/67940, RT97951 unchanged.
+Earned Warrior now session11709, /tmp/bo-earned-warrior-resume2.log (same username), original
+first combat proof /tmp/bo-earned-warrior.log; resume1 ring refusal /tmp/bo-earned-warrior-resume.
+Mage session29511, /tmp/bo-earned-mage.log, username finishmage_mvm9ku7m. Both advancing normally.
+Uncommitted journey scripts support Mage and correct navigation/equipment requirements; systems
+driver now uses each class's abilities and exact invitee. Need verify these paths before commit.
+
+Fixed1561e42 qualification PASSED: full checks +39 browser assertions; evidence archived under
+docs/hardening/evidence/social-qualification-2026-10-24. Own processes stopped.
+Mage died at Warden with standing-still script, recovered via normal respawn, then defeated it
+with keyboard ground-warning dodges. Current Mage session83599, /tmp/bo-earned-mage-resume.log.
+Warrior continues Marches supply, same session11709. Newcombat-inputs.cjs andearned-equipment.cjs
+helpers use observations/ordinary controls only; earned-journeys.cjs orchestrates both class arcs,
+professions, solo andmixed-class privateVault (not yet run end-to-end).
+Presentation edits are ISOLATED at/tmp/bo-presentation-polish, branchcodex/presentation-polish
+from1561e42; not merged and main runtimes unchanged. Vector inventory icons and disabled Equip
+for unmet visible requirements. All37 template preview visually inspected; smallslotType typo
+fixed, checks rerunning /tmp/bo-presentation-quality-final.log session55095. Preview files removed.
+Own Vite preview port5182/session2759 can be stopped when done. Need real inventory browserproof,
+quality checks/progress note/commit thencherry-pick when gameplay runs safely finish.
