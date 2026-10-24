@@ -2044,3 +2044,16 @@ Ranked player-facing gaps from the current client and content:
   Evidence: `gameplay/evidence/cantor-rhythm-2026-10-24/`. Production unchanged.
 - [ ] Next: inspectable quest rewards, sharing outfitter requirements/stat previews; desktop/touch proof.
 - Equipment milestone `09893fc` committed and pushed. Production unchanged.
+
+### Quest reward inspection — verified 2026-10-25
+
+- [x] Collapsible item previews in dialogue/journal; shared class/level, stat ranges, health,
+      condition, roll and binding information with outfitter. No grant or equip side effects.
+- [x] Seventeen earned/fresh-character browser checks, ten outfitter regression checks and seven
+      final opaque-dialogue checks pass; desktop/portrait screenshots reviewed. 28 frontend tests,
+      frontend types, repository lint and build/debug guard pass. Initial assertion failures retained.
+- Evidence: `gameplay/evidence/reward-inspection-2026-10-25/`. One visual follow-up hit the load-failure
+  screen; diagnostic rerun passed, root cause unknown. DEV-only console error added, no false fix claim.
+- [ ] Next: class-appropriate Fen quest reward. Mage currently receives an unusable leather cap;
+      preserve past items and verify class-specific offer, atomic grant, equip and relogin.
+- Cantor `62ef82b` and equipment `09893fc` are pushed. Production unchanged.

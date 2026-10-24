@@ -940,7 +940,7 @@ kbd {
   }
 }
 .dialogue {
-  background: rgba(14, 16, 22, 0.97);
+  background: #172620;
 }
 /* Touch: the Talk/Take button replaces the keyboard prompt; toasts sit below the tracker. */
 .ui-root.touch .prompt {
@@ -2621,4 +2621,59 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
 .window,
 .details {
   background: #172620;
+}
+
+/* Reward inspection works with mouse, keyboard and touch without opening an inventory action. */
+.reward-preview {
+  margin: 8px 0;
+  padding: 0 10px;
+  border: 1px solid #66775c;
+  border-radius: 7px;
+  background: #12231e;
+}
+.reward-preview summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 0;
+}
+.reward-preview summary::after {
+  content: '+';
+  margin-left: auto;
+  padding: 0 8px;
+}
+.reward-preview[open] summary::after {
+  content: '−';
+}
+.reward-preview summary small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+.reward-preview summary:focus-visible {
+  outline: 2px solid #e8cb83;
+  outline-offset: 3px;
+}
+.reward-glyph {
+  display: block;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+}
+.reward-glyph svg {
+  width: 100%;
+  height: 100%;
+}
+.reward-preview .small {
+  overflow-wrap: anywhere;
+}
+
+.ui-root:has(.dialogue) .first-steps,
+.ui-root:has(.dialogue) .quest-guide {
+  display: none;
+}
+.reward-preview summary {
+  -webkit-tap-highlight-color: rgba(232, 203, 131, 0.12);
 }

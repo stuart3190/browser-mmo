@@ -1,5 +1,6 @@
 // Keep this entry independent of the game/engine imports so startup failures remain recoverable.
-void import('./main').catch(() => {
+void import('./main').catch((error: unknown) => {
+  if (import.meta.env.DEV) console.error('Game startup failed', error);
   const root = document.getElementById('ui');
   if (!root) return;
   const panel = document.createElement('section');

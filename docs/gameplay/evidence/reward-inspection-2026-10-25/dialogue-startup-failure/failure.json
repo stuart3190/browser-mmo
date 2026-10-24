@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "error": "page.waitForFunction: Timeout 45000ms exceeded.\n    at enter (/root/browser-mmo/scripts/e2e/vertical-slice.cjs:91:14)\n    at async <anonymous> (/root/browser-mmo/scripts/e2e/reward-preview.cjs:238:7)",
+  "checks": [],
+  "errors": [],
+  "state": {}
+}

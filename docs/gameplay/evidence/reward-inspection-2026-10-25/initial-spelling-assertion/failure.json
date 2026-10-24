@@ -1,0 +1,40 @@
+{
+  "ok": false,
+  "error": "Error: Warrior sees reward base stats and binding\n    at check (/root/browser-mmo/scripts/e2e/reward-preview.cjs:16:18)\n    at <anonymous> (/root/browser-mmo/scripts/e2e/reward-preview.cjs:178:7)",
+  "checks": [
+    {
+      "name": "Warrior reward inspection has a usable hit target",
+      "ok": true,
+      "detail": {
+        "x": 688,
+        "y": 595.5,
+        "width": 378,
+        "height": 64
+      }
+    },
+    {
+      "name": "Warrior sees reward base stats and binding",
+      "ok": false,
+      "detail": "Heartwood Knot\nView reward\n\nA living knot that remembers three watches and one unfinished song. Awarded by Keeper Tamsin.\n\nLevel 5 · Necklace\n\nYour class and level can use this equipment.\n\nStamina +9 · Armour +11 · Spirit +4\n\nBase attributes add 18 maximum health before replacing other gear.\n\nBonus attributes roll on creation. Inspect the earned item for its final values.\n\nBinds to your character when received.\n\nCatalog preview of this quest reward; your earned item keeps its original roll."
+    }
+  ],
+  "errors": [],
+  "state": {
+    "position": {
+      "x": 270.51958424456245,
+      "z": 3987.168898904956
+    },
+    "progress": {
+      "level": 6,
+      "xp": 849,
+      "xpToNext": 7032
+    },
+    "vitals": {
+      "health": 266,
+      "maxHealth": 266,
+      "dead": false,
+      "inCombat": false,
+      "respawnAvailableAt": null
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "fixture": "Read-only lookup of earned Tidewatch actors. Earned level-six actors inspect journal rewards without mutations; fresh ordinary level-one actors inspect and accept the opening quest, receiving no reward early. No direct DB writes.",
+  "checks": [
+    {
+      "name": "Warrior opening dialogue exposes reward inspection before acceptance",
+      "ok": true
+    },
+    {
+      "name": "Warrior dialogue is opaque and hides competing onboarding",
+      "ok": true
+    },
+    {
+      "name": "Warrior accepts normally without receiving the reward early",
+      "ok": true
+    },
+    {
+      "name": "Mage opening dialogue exposes reward inspection before acceptance",
+      "ok": true
+    },
+    {
+      "name": "Mage dialogue is opaque and hides competing onboarding",
+      "ok": true
+    },
+    {
+      "name": "Mage accepts normally without receiving the reward early",
+      "ok": true
+    },
+    {
+      "name": "No reward-preview gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

@@ -1,4 +1,6 @@
 import { availableQuestOffers, questGiverPlace } from '../state/quest-offers';
+import { EquipmentPreview } from './EquipmentPreview';
+import { ItemGlyph } from './ItemGlyph';
 import { ServiceOffer } from './ServiceOffer';
 import { SpecialisationChoices } from './SpecialisationChoices';
 import { canRepairAt, repairCost } from '@mmo/game-data';
@@ -31,11 +33,44 @@ function Rewards({ quest }: { quest: QuestView }) {
     const def = gameData.currencies.get(c.currencyId);
     if (def) parts.push(formatCurrency(def, c.amount));
   }
-  for (const i of quest.rewards.items) {
-    const t = gameData.itemTemplates.get(i.itemTemplateId);
-    parts.push(i.quantity > 1 ? `${t?.name ?? i.itemTemplateId} ×${i.quantity}` : (t?.name ?? ''));
-  }
-  return <p className="quest-rewards small">Rewards: {parts.join(' · ')}</p>;
+  return (
+    <div className="quest-rewards">
+      <p className="small">Rewards: {parts.join(' · ')}</p>
+      {quest.rewards.items.map((i) => {
+        const template = gameData.itemTemplates.get(i.itemTemplateId);
+        if (!template) return null;
+        return (
+          <details className="reward-preview" key={i.itemTemplateId} data-reward={i.itemTemplateId}>
+            <summary>
+              <span className="reward-glyph">
+                <ItemGlyph template={template} />
+              </span>
+              <span>
+                {template.name}
+                {i.quantity > 1 ? ` ×${i.quantity}` : ''}
+                <small>View reward</small>
+              </span>
+            </summary>
+            {template.description && <p className="small">{template.description}</p>}
+            {template.equipment ? (
+              <EquipmentPreview template={template} testPrefix="reward" />
+            ) : (
+              <p className="small muted">
+                {template.binding === 'on_pickup'
+                  ? 'Binds to your character when received.'
+                  : 'Carried item.'}
+              </p>
+            )}
+            {quest.state === 'completed' && (
+              <p className="small muted">
+                Catalog preview of this quest reward; your earned item keeps its original roll.
+              </p>
+            )}
+          </details>
+        );
+      })}
+    </div>
+  );
 }
 
 function returnTo(quest: QuestView, npcName: (id: string) => string | undefined): string {

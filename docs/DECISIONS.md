@@ -1572,3 +1572,12 @@ dodge), persists in the enemy recovery image, defaults to zero for old images an
 The existing replicated cue freezes shape/heading/centre and carries the attack name for the HUD.
 Cantor alternates Roots Reach and Bough Sweep; quests explain their different counterplay. Existing
 enemies without patterns retain their behavior. This is gameplay authoring, not a replacement AI.
+
+## 2026-10-25 — Inspect catalog rewards before accepting quests
+
+Quest dialogue and journal item rewards use native collapsible previews. EquipmentPreview shares
+class/level checks, default-rarity stat ranges, weapon/condition and binding details with outfitter
+stock. Health contribution applies the existing stamina conversion and explicitly precedes replacing
+other gear; this is not a claim of a net upgrade. Rolled bonus attributes and already-earned item
+values remain distinct. Inspection invokes no grants/equip/quest mutations, and native summaries
+support keyboard/touch without placing another floating panel over the game.

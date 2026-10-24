@@ -1,0 +1,19 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 41 item templates.
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found)
+PASS Warrior opening dialogue exposes reward inspection before acceptance
+PASS Warrior dialogue is opaque and hides competing onboarding
+PASS Warrior accepts normally without receiving the reward early
+PASS Mage opening dialogue exposes reward inspection before acceptance
+PASS Mage dialogue is opaque and hides competing onboarding
+PASS Mage accepts normally without receiving the reward early
+PASS No reward-preview gameplay exceptions

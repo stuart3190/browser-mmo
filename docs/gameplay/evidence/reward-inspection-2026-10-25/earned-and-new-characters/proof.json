@@ -1,0 +1,92 @@
+{
+  "ok": true,
+  "fixture": "Read-only lookup of earned Tidewatch actors. Earned level-six actors inspect journal rewards without mutations; fresh ordinary level-one actors inspect and accept the opening quest, receiving no reward early. No direct DB writes.",
+  "checks": [
+    {
+      "name": "Warrior reward inspection has a usable hit target",
+      "ok": true,
+      "detail": {
+        "x": 688,
+        "y": 595.5,
+        "width": 378,
+        "height": 64
+      }
+    },
+    {
+      "name": "Warrior sees reward base stats and binding",
+      "ok": true,
+      "detail": "Heartwood Knot\nView reward\n\nA living knot that remembers three watches and one unfinished song. Awarded by Keeper Tamsin.\n\nUncommon · Level 5 · Necklace\n\nYour class and level can use this equipment.\n\nStamina +9 · Armour +11 · Spirit +4\n\nBase attributes add 18 maximum health before replacing other gear.\n\nBonus attributes roll on creation. Inspect the earned item for its final values.\n\nBinds to your character when received.\n\nCatalog preview of this quest reward; your earned item keeps its original roll."
+    },
+    {
+      "name": "Warrior sees class fit, health contribution and roll limits",
+      "ok": true,
+      "detail": "Heartwood Knot\nView reward\n\nA living knot that remembers three watches and one unfinished song. Awarded by Keeper Tamsin.\n\nUncommon · Level 5 · Necklace\n\nYour class and level can use this equipment.\n\nStamina +9 · Armour +11 · Spirit +4\n\nBase attributes add 18 maximum health before replacing other gear.\n\nBonus attributes roll on creation. Inspect the earned item for its final values.\n\nBinds to your character when received.\n\nCatalog preview of this quest reward; your earned item keeps its original roll."
+    },
+    {
+      "name": "Warrior reward panel fits the viewport",
+      "ok": true
+    },
+    {
+      "name": "Warrior can inspect a reward before accepting its quest",
+      "ok": true
+    },
+    {
+      "name": "Warrior inspecting reward preserves earned item identities",
+      "ok": true
+    },
+    {
+      "name": "Warrior opening dialogue exposes reward inspection before acceptance",
+      "ok": true
+    },
+    {
+      "name": "Warrior accepts normally without receiving the reward early",
+      "ok": true
+    },
+    {
+      "name": "Mage reward inspection has a usable hit target",
+      "ok": true,
+      "detail": {
+        "x": 22,
+        "y": 551.5,
+        "width": 348,
+        "height": 64
+      }
+    },
+    {
+      "name": "Mage sees reward base stats and binding",
+      "ok": true,
+      "detail": "Heartwood Knot\nView reward\n\nA living knot that remembers three watches and one unfinished song. Awarded by Keeper Tamsin.\n\nUncommon · Level 5 · Necklace\n\nYour class and level can use this equipment.\n\nStamina +9 · Armour +11 · Spirit +4\n\nBase attributes add 18 maximum health before replacing other gear.\n\nBonus attributes roll on creation. Inspect the earned item for its final values.\n\nBinds to your character when received.\n\nCatalog preview of this quest reward; your earned item keeps its original roll."
+    },
+    {
+      "name": "Mage sees class fit, health contribution and roll limits",
+      "ok": true,
+      "detail": "Heartwood Knot\nView reward\n\nA living knot that remembers three watches and one unfinished song. Awarded by Keeper Tamsin.\n\nUncommon · Level 5 · Necklace\n\nYour class and level can use this equipment.\n\nStamina +9 · Armour +11 · Spirit +4\n\nBase attributes add 18 maximum health before replacing other gear.\n\nBonus attributes roll on creation. Inspect the earned item for its final values.\n\nBinds to your character when received.\n\nCatalog preview of this quest reward; your earned item keeps its original roll."
+    },
+    {
+      "name": "Mage reward panel fits the viewport",
+      "ok": true
+    },
+    {
+      "name": "Mage can inspect a reward before accepting its quest",
+      "ok": true
+    },
+    {
+      "name": "Mage inspecting reward preserves earned item identities",
+      "ok": true
+    },
+    {
+      "name": "Mage opening dialogue exposes reward inspection before acceptance",
+      "ok": true
+    },
+    {
+      "name": "Mage accepts normally without receiving the reward early",
+      "ok": true
+    },
+    {
+      "name": "No reward-preview gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

@@ -83,8 +83,19 @@ shapes without damage; staged Warrior relogin and complete Mage run pass. Eviden
 `gameplay/evidence/cantor-rhythm-2026-10-24/`. First relogin driver failure retained; corrected to
 normal login. Screenshots reviewed. Test controllers stopped. `/tmp/bo-cantor-pattern.py` and
 `/tmp/bo-cantor-driver.py` are integrated/obsolete: DO NOT rerun.
-ACTIVE next: inspectable quest rewards sharing outfitter stat/requirement previews. Prepared draft
-under `/tmp/bo-reward-preview/` NOT applied: integrate.py + reward-preview.cjs; verify both viewports.
+Completed: inspectable quest rewards and shared outfitter previews. 17 earned/fresh-character,
+10 outfitter regression and7 final opaque-dialogue browser checks pass. 28 frontend tests and
+final frontend types/lint/build/debug guard pass. Evidence: `gameplay/evidence/reward-inspection-2026-10-25/`.
+Screenshot review fixed dialogue bleed-through and competing onboarding. One follow-up stopped
+on the game's load-failure screen; DEV bootstrap error logging added, rerun passed, cause remains
+unknown. Do not call this startup issue fixed. Earlier driver assertion mistakes retained honestly.
+All `/tmp/bo-reward-preview/` generators are integrated/obsolete: DO NOT rerun. Controllers stopped.
+Cantor `62ef82b` and armour `09893fc` pushed.
+ACTIVE next: class-appropriate rewards for Fen's Leather for the Long Walk. The new preview exposes
+Mage's unusable leather cap. Plan an optional server-resolved per-class quest-item override, shared
+by offer views and atomic reward grant; default Warrior cap, Mage existing Apprentice Robe. Keep
+all previously earned items intact. Validate class/item references and test concurrent turn-in,
+actual gathering/turn-in/equip/relogin. No runtime implementation of this next task yet.
 Private iaQjr4 simulation images were archived/reconstructed for changed content only after no
 pending rewards. Every earned character/item/quest row remains. Never apply this to production.
 Equipment milestone is verified (see latest entry above). All armour test controllers have stopped.
