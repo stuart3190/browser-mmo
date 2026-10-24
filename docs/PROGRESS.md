@@ -1752,3 +1752,15 @@ latest frontend types pass. Final browser proof and production build remain requ
       changing `current`, installing configuration or stopping services. Bash syntax check passes.
 - [ ] Prepare the final committed candidate on this host after qualification, verify its manifest
       and unchanged live release/readiness. Preparation is not a public deployment or capacity pass.
+
+Static rendering candidatea973ae5: fullformat/types/lint,11 frontend tests, four production builds
+and all-chunk debug guard pass. Six actual rendering/input assertions pass in vag71f, with reviewed
+desktop/portrait/landscape screenshots. Corrected nearest-NPC diagnostic to use rendered marker
+positions; earlier failures retained. Aggregate eight-suite and production/load checks continue.
+[Evidence](gameplay/evidence/static-rendering-2026-10-24/README.md).
+
+Final combined browser run vag71f PASSES all78 assertions on candidatea973ae5 (rendering6,startup6,
+trade11,market8,chat10,friends12,onboarding10,guilds15). Fullformat/types/lint,11 frontend tests, four
+production builds/all-chunk debug guard and release-preparation fixtures also pass. Backend unchanged
+from35ee149's204 integration checks and20-table restore. Password/TLS/deferred-engine profile and
+unprofiled guild load are now running separately. [Evidence](hardening/evidence/final-browser-2026-10-24/README.md).

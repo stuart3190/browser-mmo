@@ -1,0 +1,32 @@
+{
+  "before": [
+    {
+      "meshes": 532,
+      "vertices": 32976,
+      "indices": 96942,
+      "materials": 47,
+      "textures": 18,
+      "chunks": 16
+    },
+    {
+      "remainingMeshes": 0,
+      "remainingMaterials": 1,
+      "remainingTextures": 0
+    }
+  ],
+  "after": [
+    {
+      "meshes": 165,
+      "vertices": 32976,
+      "indices": 96942,
+      "materials": 47,
+      "textures": 18,
+      "chunks": 16
+    },
+    {
+      "remainingMeshes": 0,
+      "remainingMaterials": 1,
+      "remainingTextures": 0
+    }
+  ]
+}

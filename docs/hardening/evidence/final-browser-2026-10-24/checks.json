@@ -1,0 +1,17 @@
+{
+  "source": "a973ae5",
+  "assertions": {
+    "rendering": 6,
+    "startup": 6,
+    "trading": 11,
+    "marketplace": 8,
+    "social": 10,
+    "friends": 12,
+    "onboarding": 10,
+    "guilds": 15
+  },
+  "total": 78,
+  "ok": true,
+  "fullBackendRun": false,
+  "productionTouched": false
+}

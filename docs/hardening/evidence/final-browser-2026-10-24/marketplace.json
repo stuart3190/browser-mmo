@@ -1,0 +1,48 @@
+{
+  "checks": [
+    {
+      "name": "Seller sees the non-refundable deposit and net proceeds before listing",
+      "ok": true
+    },
+    {
+      "name": "Listing escrows the same sword and charges exactly ten copper",
+      "ok": true,
+      "detail": {
+        "sword": "01a16e36-2ea2-7980-b133-a90ea8dd67af",
+        "listing": "01a16e36-da67-7a29-a204-7dcc8807c817"
+      }
+    },
+    {
+      "name": "Touch buyer reviews the actual item tooltip and total price",
+      "ok": true
+    },
+    {
+      "name": "One sword transfers, buyer pays 100 copper, seller receives 95 after fees",
+      "ok": true
+    },
+    {
+      "name": "Fresh login retains the purchased item identity",
+      "ok": true
+    },
+    {
+      "name": "Cancelling returns the item without refunding the ten-copper listing fee",
+      "ok": true
+    },
+    {
+      "name": "Marketplace remains within the landscape viewport",
+      "ok": true,
+      "detail": {
+        "x": 0,
+        "y": 28,
+        "width": 844,
+        "height": 292
+      }
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}
