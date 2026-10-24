@@ -7,8 +7,8 @@ Do not declare shippability from feature existence or unit tests alone.
 ## Source and operational boundaries
 
 - Editable repository `/root/browser-mmo`, branch `codex/shippable-completion`, origin
-  `git@github.com:stuart3190/browser-mmo.git`. Main now integrates database lifecycle d85cb09 and
-  checkpoint encoding 843919d plus its follow-up abf3f2e. Guild integration is next.
+  `git@github.com:stuart3190/browser-mmo.git`. Main5b19b52 integrates guilds35ee149, checkpoint encoding, database lifecycle, startup recovery
+  fb8bc5e and release preparation84a3465. Rendering candidate a973ae5 remains isolated.
 - Immutable live `/srv/brokenodyssey/current` points to release `2c47b27a38f0bc74f3a7192f713775c3a9361729`.
   NEVER edit releases. Production API4461/realtime4462/web4460/PostgreSQL55440. No production
   mutations/deployments in this completion effort. Unsafe public deployment needs explicit permission.
@@ -46,27 +46,40 @@ Earlier driver/network failures are retained, not hidden. Evidence and reviewed 
 
 ## Current verification and branches
 
-- Frozen57cd2e2 full qualifier N0emuY passed 234unit,109domain,73RT,11HTTP, format/lint/types,
-  four builds/debug guard, assets/content,16-table populated upgrade/restore,48browser assertions.
-- Checkpoint843919d full backend qualifier05XEXU passed 236unit,109domain,73RT,11HTTP and same
-  build/restore gates. Trade11/market8 passed; third chat browser timed out. Diagnostics showed
-  31s before game WS,126ms auth. DPR0.5 for the three simultaneous worlds, unchanged CSS viewports
-  and gameplay checks: DGERJ8 passed chat10/friends12/onboarding10. This is staged proof.
-  Evidence `docs/hardening/evidence/checkpoint-encoding-2026-10-24`.
-- Database lifecycle d85cb09: real idle connection termination/recovery and coalesced close tests,
-  existing five ownership/crash tests, full types/lint/four builds all pass. Merged main.
-- Guild source `/tmp/bo-persistent-guilds`, branch `codex/persistent-guilds`, base b75ac7e:
-  migration0024, permissioned character guilds, consent, officers/leader, durable chat, transfer,
-  removal/disband, stale-guild binding and responsive UI. Eight domain+one HTTP tests, full
-  types/lint/four builds,20-table populated upgrade/restore passed. Final layout oHpLwU passes15
-  real browser assertions (follow-latest, preserved scrollback, visible landscape composer).
-  Latest layout/workload refinements await commit/integration. Guild vault remains unfinished.
-- Performance source `/tmp/bo-checkpoint-performance` abf3f2e is merged. Exact v2 checkpoint JSON
-  preserved and compatibility-tested over26zones/live combat; relative463ms→169ms benchmark
-  is NOT capacity certification. Focused QUAL_BROWSER_SUITES selector must survive guild merge.
-- Recovery source `/tmp/bo-database-recovery` d85cb09 is merged. Old presentation worktree also merged.
-- Hosted CI40095786743/40094260701 failed only formatting of six evidence JSON files; corrected
-  f4ceb55 and full local format check passes. Last known green40092678899/c0a47f1. Verify newer CI.
+- Hosted CI40098308166 for35ee149 PASSED. CI40100303234 for84a3465 is running. Earlier failed
+  evidence JSON formatting was correctedf4ceb55. Main5b19b52 archive commit is not yet pushed.
+- Integrated35ee149 OanPjT passes format/lint/types,236unit,117domain,75RT,12HTTP tests, four builds,
+  debug guard, assets/content and20-table populated upgrade/restore. Aggregate FAILED at blank
+  first trade login. Archive `docs/hardening/evidence/integrated-guilds-2026-10-24`. No network
+  diagnostic existed for that failure; do not claim a specific cause.
+- Guilds are integrated: migration0024, consent, roles, durable chat, notices/transfer/disband,
+  stale-guild binding, responsive UI. Final15 browser assertions passedoHpLwU. Guild vault unfinished.
+- Checkpoint encoding preserves exact v2 bytes; full backend proof plus staged51 browser checks.
+  Three simultaneous SwiftShader chat actors use DPR0.5 (CSS sizes/privacy checks unchanged).
+- Database lifecycle handles failed idle pool clients, preserves ownership fencing and coalesces
+  shutdown drains; real DB replacement/ownership tests and full build checks passed.
+- Startup recovery fb8bc5e: static HTML fallback, caught module errors, engine import after character
+  choice. Six injected network-failure browser assertions passed1BU62M. Login stays functional before
+  the game module; reload returns the existing character. Explicit production build passes all-chunk
+  debug guard. Engine-only codeSplitting group prevents preload helper pulling engine into login.
+  Production enter helper now asserts no early engine request; actual production check still pending.
+- Preparation mode7b61de5/merge84a3465: `deploy-broken-odyssey.sh --candidate --prepare-only` builds
+  and validates but exits before any live configuration/service/credential/DB/current mutation.
+  Private functional fixtures pass fresh preparation, immutable reuse and invalid flags. No real
+  candidate artifact prepared yet; no deployment authorized/performed.
+- Active rendering source `/tmp/bo-static-world-batching`, branch `codex/static-world-batching`,
+  candidatea973ae5 includes all main runtime changes through84a3465. Static geometry batching per
+  chunk/material reduces532→165 meshes with identical32,976vertices/96,942indices/materials/textures.
+  All11 frontend tests, fullformat/types/lint and four production builds/debug guard now pass.
+  No FPS claim. Initial browser driver picked first replicated NPC off-screen; nearest-NPC/ray-hit
+  read-only diagnostics correct that, preserving failed runs. ZwXpKt also failed blank beforelogin.
+- ACTIVE detached `/tmp/bo-final-render-candidate.sh`: code checks completed, now eight browser
+  suites in order rendering,startup,trading,marketplace,social,friends,onboarding,guilds (78 assertions).
+  Logs `/tmp/bo-final-render-browser.log`, exit `.exit`. If green, automatically runs unprofiled
+  five-player120s production --load; logs `/tmp/bo-final-render-load.log`, exit `.exit`.
+  No other builds/tests/browsers during measured load. Do not edit running candidate runtime.
+- Other worktrees performance/recovery/presentation/guilds/release-preparation are merged into main;
+  retain until final integration. Main runtime and earned actors remain stopped/intact.
 
 ## Capacity remains a release blocker
 
@@ -85,12 +98,14 @@ Evidence `docs/hardening/evidence/capacity-2026-10-24` and checkpoint encoding a
 
 ## Next actions
 
-1. Finish guild refinement checks/commit, merge preserving both append-only ADR/progress histories
-   and qualifier selector + guild mode. Run combined full qualifier (expected66 browser assertions),
-   20-table restore, production TLS/password profile (13friends+15guild). Push and confirm hosted CI.
-2. Run quiet **unprofiled** merged five-player120s load with guild traffic. No concurrent tests,
-   builds or browsers during measurement. If five fails, do not claim or test increased admission.
-3. Continue substantive gaps: authoritative durability/wear/repair (see greenvale-systems rationale),
-   outer-region/dungeon visual polish and frontend performance. Inspect existing systems first.
-4. Physical-phone performance, off-host recovery and public release remain unqualified. No purchase,
-   public deployment, reset or rewrite to bypass those limits. Keep evidence and handoff current.
+1. Finish a973ae5 browser qualification, inspect screenshots, fix real issues and preserve failures.
+   Its queued production workload must prove deferred engine login,28friends/guild UI checks and
+   strict guild/commerce/combat load. If five players fail, do not raise admission or test20.
+2. Archive results, commit evidence on rendering branch and merge into main preserving append-only
+   PROGRESS/DECISIONS and main's newer archive/handoff. Push and confirm final hosted CI.
+3. Prepare final committed candidate with --candidate --prepare-only, verify release manifest and
+   unchanged live2c47b27/current/PIDs/readiness. Never invoke publishing mode without authorization.
+4. Capacity, physical-phone performance and off-host recovery remain unqualified. No purchase,
+   public deployment, reset, durability weakening or architecture rewrite to bypass these limits.
+   Authoritative wear/repair and broader world art remain long-term incomplete; core requested
+   Warrior/Mage earned gameplay paths are genuinely verified. Maintain honest current release gates.
