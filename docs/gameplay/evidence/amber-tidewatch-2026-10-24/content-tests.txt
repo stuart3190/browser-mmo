@@ -1,0 +1,17 @@
+
+> @mmo/game-data@0.0.0 test /root/browser-mmo/packages/game-data
+> vitest run
+
+
+ RUN  v5.0.3 /root/browser-mmo/packages/game-data
+
+
+ Test Files  18 passed (18)
+      Tests  126 passed (126)
+   Start at  21:47:25
+   Duration  4.04s (import 47%, transform 41%, tests 11%)
+
+  Transform  transforming modules took 14.31s · 41% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

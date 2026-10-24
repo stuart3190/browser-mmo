@@ -2,7 +2,7 @@ import { Color3 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { Scene } from '@babylonjs/core/scene';
-import { getGameData } from '@mmo/game-data';
+import { getGameData, specialisationLevel } from '@mmo/game-data';
 import { formatCurrency } from '@mmo/ui';
 import { RealtimeClient } from '@mmo/networking';
 import type { PlayerCharacter } from '@mmo/schemas';
@@ -328,6 +328,8 @@ export async function startGame(args: {
   net.on('ability.state', (m) => {
     const offset = Date.now() - m.d.serverTime; // server -> local clock for countdowns
     state.update((s) => {
+      if (m.d.specialisationId !== undefined)
+        s.character = { ...s.character, specialisationId: m.d.specialisationId };
       s.abilities = m.d.abilities.map((a) => ({
         abilityId: a.abilityId,
         unlocked: a.unlocked,
@@ -365,6 +367,12 @@ export async function startGame(args: {
       if (at) floating.spawn(at, `+${m.d.xpGained} XP`, 'xp');
     }
     if (m.d.levelsGained > 0) state.toast(`Level up! You are now level ${m.d.level}`);
+    if (m.d.level >= specialisationLevel && m.d.level - m.d.levelsGained < specialisationLevel) {
+      state.toast('Class specialisations unlocked! Train with Maren or Iona.');
+      state.addLog(
+        'You can now choose a class specialisation. Visit Maren in Greenvale or Iona on Amber Coast.',
+      );
+    }
   });
   net.on('combat.loot', (m) => {
     // One entry per visible stack: a drop merged into a stack the same kill just created is

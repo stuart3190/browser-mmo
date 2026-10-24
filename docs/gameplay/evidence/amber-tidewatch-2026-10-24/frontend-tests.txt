@@ -1,0 +1,17 @@
+
+> @mmo/game-web@0.0.0 test /root/browser-mmo/apps/game-web
+> vitest run --passWithNoTests
+
+
+ RUN  v5.0.3 /root/browser-mmo/apps/game-web
+
+
+ Test Files  6 passed (6)
+      Tests  13 passed (13)
+   Start at  21:59:29
+   Duration  2.87s (transform 46%, import 44%, tests 9%)
+
+  Transform  transforming modules took 4.77s · 46% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

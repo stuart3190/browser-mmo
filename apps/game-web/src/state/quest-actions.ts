@@ -35,6 +35,16 @@ export class QuestActions {
       });
   }
 
+  specialise(specialisationId: string): void {
+    const d = this.state.dialogue;
+    if (d)
+      this.net.send('npc.specialise', {
+        entityId: d.entityId,
+        specialisationId,
+        requestId: crypto.randomUUID(),
+      });
+  }
+
   repair(maxCopper: number): void {
     const d = this.state.dialogue;
     if (d)

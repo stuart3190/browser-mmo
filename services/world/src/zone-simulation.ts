@@ -3,6 +3,7 @@ import {
   ENEMY_COLLISION_RADIUS,
   PLAYER_COLLISION_RADIUS,
   abilityAvailability,
+  effectiveAbility,
   applyDamage,
   classAbilities,
   cooldownRemainingMs,
@@ -64,6 +65,7 @@ export type OutMessage = ServerMessage extends infer M
 export interface CombatantProfile {
   /** Persisted class (server data). Defaults to Warrior for tests that do not care. */
   classId?: string;
+  specialisationId?: string | null;
   /** Still-running cooldowns restored from persistence (epoch ms; '*' = global cooldown). */
   abilityCooldowns?: Record<string, number>;
   level: number;
@@ -136,6 +138,7 @@ interface PlayerState extends PlayerInfo {
   lastOutOfRangeNoticeMs: number;
   // --- abilities ---
   classId: string;
+  specialisationId?: string | null;
   /** abilityId -> server time the ability is ready again. */
   cooldowns: Map<string, number>;
   globalReadyAtMs: number;
@@ -524,6 +527,7 @@ export class ZoneSimulation {
       inCombat: false,
       lastOutOfRangeNoticeMs: 0,
       classId: info.combat.classId ?? 'class.warrior',
+      specialisationId: info.combat.specialisationId ?? null,
       cooldowns: new Map(
         Object.entries(info.combat.abilityCooldowns ?? {}).filter(
           ([id, t]) => id !== '*' && t > nowMs,
@@ -969,6 +973,8 @@ export class ZoneSimulation {
     if (!p) return;
     const gained = Math.max(0, profile.maxHealth - p.maxHealth);
     const unlocked = newlyUnlockedAbilities(this.gameData, p.classId, p.level, profile.level);
+    const changedPath = p.specialisationId !== (profile.specialisationId ?? null);
+    p.specialisationId = profile.specialisationId ?? null;
     p.level = profile.level;
     p.stats = profile.stats;
     p.weapon = profile.weapon;
@@ -983,7 +989,7 @@ export class ZoneSimulation {
     entity.level = profile.level;
     this.syncEntityHealth(p.entityId, Math.round(p.health), p.maxHealth, p.dead);
     this.sendVitals(p, nowMs);
-    if (unlocked.length > 0)
+    if (unlocked.length > 0 || changedPath)
       this.sendAbilityState(
         p,
         nowMs,
@@ -1013,7 +1019,12 @@ export class ZoneSimulation {
             : [ErrorCode.ABILITY_NOT_AVAILABLE, 'Your class cannot use that ability'];
       throw new DomainError(code, message);
     }
-    const ability = this.gameData.abilities.get(abilityId)!;
+    const ability = effectiveAbility(
+      this.gameData.abilities.get(abilityId)!,
+      p.classId,
+      p.level,
+      p.specialisationId,
+    );
     if (p.dead) throw new DomainError(ErrorCode.YOU_ARE_DEAD, 'You are dead');
     if (ability.autoAttack) {
       if (p.attacking) this.stopAttack(characterId);
@@ -1125,6 +1136,7 @@ export class ZoneSimulation {
     this.push(p.characterId, {
       t: 'ability.state',
       d: {
+        specialisationId: p.specialisationId ?? null,
         abilities: classAbilities(this.gameData, p.classId).map((a) => ({
           abilityId: a.id,
           unlocked: abilityAvailability(this.gameData, a.id, p.classId, p.level).ok,

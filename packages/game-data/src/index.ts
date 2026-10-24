@@ -1,3 +1,5 @@
+import { withSpecialisationPaths } from './specialisations';
+export * from './specialisations';
 import { withCoastalChapter } from './coastal-chapter';
 export { tidewatch, chapterContentPacks } from './coastal-chapter';
 import { withTacticalAbilities } from './tactical';
@@ -72,7 +74,7 @@ export const contentManifest: ContentManifest = {
 };
 
 const compiledGameData = compileContentCatalog(contentManifest, contentPacks);
-export const rawGameData = withCoastalChapter(
+const chapterGameData = withCoastalChapter(
   withTacticalAbilities(
     withDungeonContent(
       RawGameDataSchema.parse({
@@ -83,6 +85,8 @@ export const rawGameData = withCoastalChapter(
     ),
   ),
 );
+
+export const rawGameData = withSpecialisationPaths(chapterGameData);
 
 let cached: GameData | undefined;
 

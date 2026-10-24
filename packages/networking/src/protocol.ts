@@ -112,6 +112,10 @@ export const NpcSellMsg = clientMsg(
     requestId: UuidSchema,
   }),
 );
+export const NpcSpecialiseMsg = clientMsg(
+  'npc.specialise',
+  z.object({ entityId: EntityIdSchema, specialisationId: ContentIdSchema, requestId: UuidSchema }),
+);
 export const NpcRepairMsg = clientMsg(
   'npc.repair',
   z.object({
@@ -175,6 +179,7 @@ export const ClientMessageSchema = z.discriminatedUnion('t', [
   NpcInteractMsg,
   NpcServiceMsg,
   NpcRepairMsg,
+  NpcSpecialiseMsg,
   NpcSellMsg,
   WorldTravelMsg,
   QuestAcceptMsg,
@@ -379,6 +384,7 @@ export const CombatDamageMsg = serverMsg(
 export const AbilityStateMsg = serverMsg(
   'ability.state',
   z.object({
+    specialisationId: ContentIdSchema.nullable().optional(),
     abilities: z.array(
       z.object({
         abilityId: ContentIdSchema,

@@ -232,3 +232,77 @@ describe('server-authoritative abilities', () => {
     expect(t.of(m, 'combat.state').at(-1)!.d.attacking).toBe(false);
   });
 });
+
+describe('specialisation combat profiles', () => {
+  it.each([
+    ['class.warrior', 'spec.warrior.berserker', HS, 4000],
+    ['class.mage', 'spec.mage.fire', FL, 7000],
+    ['class.mage', 'spec.mage.frost', 'ability.mage.frost_nova', 12000],
+  ])(
+    'applies %s / %s only through the server profile',
+    (classId, specialisationId, abilityId, cooldown) => {
+      const t = setup();
+      const profile = {
+        ...(classId === 'class.warrior' ? warrior : mage),
+        level: 5,
+        specialisationId,
+      };
+      const player = t.join(near, profile);
+      t.sim.useAbility(player, abilityId, t.now);
+      t.drain();
+      const state = t.of(player, 'ability.state').at(-1)!.d;
+      expect(state.specialisationId).toBe(specialisationId);
+      expect(state.abilities.find((a) => a.abilityId === abilityId)!.readyAt).toBe(
+        t.now + cooldown,
+      );
+      t.sim.updateCombatProfile(player, { ...profile, specialisationId: null }, t.now + 100);
+      t.drain();
+      const reset = t.of(player, 'ability.state').at(-1)!.d;
+      expect(reset.specialisationId).toBeNull();
+      expect(reset.abilities.find((a) => a.abilityId === abilityId)!.readyAt).toBe(
+        t.now + cooldown,
+      );
+      expect(code(() => t.sim.useAbility(player, abilityId, t.now + 500))).toBe('ON_COOLDOWN');
+    },
+  );
+  it('Guardian gives stronger guard; wrong-class and under-level profiles gain no perk', () => {
+    for (const [level, specialisationId, expected] of [
+      [5, 'spec.warrior.guardian', 0.7],
+      [4, 'spec.warrior.guardian', 0.5],
+      [5, 'spec.mage.frost', 0.5],
+    ] as const) {
+      const t = setup();
+      const player = t.join(near, { ...warrior, level, specialisationId });
+      t.sim.useAbility(player, 'ability.warrior.guard', t.now);
+      const entity = t.sim.listEntities().find((e) => e.characterId === player)!;
+      expect(entity.statuses!.find((s) => s.kind === 'guard')!.magnitude).toBe(expected);
+    }
+  });
+});
+
+it('checkpoint recovery retains a trained path and its committed cooldown', () => {
+  const t = setup();
+  const player = t.join(near, { ...warrior, level: 5, specialisationId: 'spec.warrior.guardian' });
+  t.sim.useAbility(player, 'ability.warrior.guard', t.now);
+  const restored = new ZoneSimulation(arenaGameData(), ARENA, { nowMs: t.now });
+  restored.restoreCheckpoint(t.sim.checkpoint());
+  restored.resyncPlayer(player, t.now + 100);
+  const state = restored
+    .drainOutbox()
+    .get(player)!
+    .find((m) => m.t === 'ability.state')!;
+  if (state.t !== 'ability.state') throw Error('missing state');
+  expect(state.d.specialisationId).toBe('spec.warrior.guardian');
+  expect(state.d.abilities.find((a) => a.abilityId === 'ability.warrior.guard')!.readyAt).toBe(
+    t.now + 20000,
+  );
+  expect(code(() => restored.useAbility(player, 'ability.warrior.guard', t.now + 100))).toBe(
+    'ON_COOLDOWN',
+  );
+  expect(
+    restored
+      .listEntities()
+      .find((e) => e.characterId === player)!
+      .statuses!.find((s) => s.kind === 'guard')!.magnitude,
+  ).toBe(0.7);
+});

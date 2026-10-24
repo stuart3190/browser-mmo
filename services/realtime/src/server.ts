@@ -1,4 +1,4 @@
-import { repairAtNpc } from '@mmo/domain';
+import { repairAtNpc, specialiseAtNpc } from '@mmo/domain';
 import { isIP } from 'node:net';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -418,6 +418,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
       'npc.service',
       'npc.sell',
       'npc.repair',
+      'npc.specialise',
       'quest.accept',
       'quest.turn_in',
       'world.travel',
@@ -1214,6 +1215,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
         flush();
         return;
       }
+      case 'npc.specialise':
       case 'npc.repair':
       case 'npc.sell':
       case 'npc.service': {
@@ -1226,6 +1228,18 @@ export function createRealtimeServer(deps: RealtimeDeps) {
           player.zone.getPlayer(player.characterId)?.attacking
         )
           throw new DomainError(ErrorCode.CONFLICT, 'Leave combat before using a service');
+        if (msg.t === 'npc.specialise') {
+          await specialiseAtNpc(ctx, {
+            accountId: player.accountId,
+            characterId: player.characterId,
+            npcId,
+            specialisationId: msg.d.specialisationId,
+            requestId: msg.d.requestId,
+          });
+          await refreshCombat(player.characterId);
+          await sendDialogue(conn, msg.d.entityId, npcId, msg.seq);
+          return;
+        }
         const result =
           msg.t === 'npc.repair'
             ? await repairAtNpc(ctx, {
@@ -1572,6 +1586,7 @@ export function createRealtimeServer(deps: RealtimeDeps) {
   function combatantFrom(profile: CombatProfile) {
     return {
       classId: profile.classId,
+      specialisationId: profile.specialisationId,
       abilityCooldowns: profile.abilityCooldowns,
       level: profile.level,
       stats: profile.stats,

@@ -30,3 +30,5 @@ export * from './social';
 export * from './guilds';
 
 export * from './durability';
+
+export * from './specialisations';

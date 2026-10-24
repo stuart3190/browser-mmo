@@ -22,13 +22,13 @@ const gd = getGameData(),
 const march = 'zone.aurelian.greenvale_marches';
 const running: ReturnType<typeof createRealtimeServer>[] = [];
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-async function boot() {
+async function boot(zoneId = march) {
   const server = createRealtimeServer({
     ctx,
     sessions,
     logger: createLogger({ service: 'world-travel-test', level: 'silent' }),
     metrics: new Metrics(),
-    zoneIds: [march],
+    zoneIds: [zoneId],
     tickHz: 20,
     allowedOrigins: ['http://localhost:5173'],
     lingerMs: 0,
@@ -321,5 +321,68 @@ it('repairs equipped gear through the real protocol and rejects distant/dead req
         .where(eq(schema.serviceReceipts.characterId, q.id)),
     ).toHaveLength(0);
     other.ws.close();
+  }
+});
+
+it('mentor training is server-owned, persists on reconnect and refuses remote/dead/combat requests', async () => {
+  const zoneId = 'zone.greenvale.meadows';
+  const h = await boot(zoneId);
+  const make = async (pos = { x: -6, z: 5 }, health = 70) => {
+    const p = await player(zoneId, pos, health);
+    await handle.db
+      .update(schema.characters)
+      .set({ level: 5 })
+      .where(eq(schema.characters.id, p.id));
+    return p;
+  };
+  const p = await make(),
+    c = await join(h.url, p);
+  const npc = (await c.wait('zone.snapshot')).d.entities.find(
+    (e) => e.refId === 'npc.greenvale.elder_maren',
+  )!;
+  const request = {
+    entityId: npc.id,
+    specialisationId: 'spec.warrior.guardian',
+    requestId: uuidv7(),
+  };
+  const seq = c.send('npc.specialise', request);
+  await c.wait('npc.dialogue', (m) => m.ack === seq);
+  await c.wait('ability.state', (m) => m.d.specialisationId === 'spec.warrior.guardian');
+  const duplicate = c.send('npc.specialise', request);
+  await c.wait('npc.dialogue', (m) => m.ack === duplicate);
+  c.ws.close();
+  await sleep(250);
+  const again = await join(h.url, p);
+  expect((await again.wait('ability.state')).d.specialisationId).toBe('spec.warrior.guardian');
+  const zone = h.server.zones.get(zoneId)!;
+  const threat = vi.spyOn(zone, 'isThreatened').mockReturnValue(true);
+  const blocked = again.send('npc.specialise', {
+    ...request,
+    requestId: uuidv7(),
+    specialisationId: 'spec.warrior.berserker',
+  });
+  await again.wait('error', (m) => m.ack === blocked && m.d.code === 'CONFLICT');
+  threat.mockRestore();
+  again.ws.close();
+  for (const [pos, health] of [
+    [{ x: 12, z: 6 }, 70],
+    [{ x: -6, z: 5 }, 0],
+  ] as const) {
+    const q = await make(pos, health),
+      client = await join(h.url, q);
+    const entity = (await client.wait('zone.snapshot')).d.entities.find(
+      (e) => e.refId === 'npc.greenvale.elder_maren',
+    )!;
+    const ack = client.send('npc.specialise', {
+      ...request,
+      entityId: entity.id,
+      requestId: uuidv7(),
+    });
+    await client.wait('error', (m) => m.ack === ack);
+    expect(
+      (await handle.db.select().from(schema.characters).where(eq(schema.characters.id, q.id)))[0]!
+        .specialisationId,
+    ).toBeNull();
+    client.ws.close();
   }
 });

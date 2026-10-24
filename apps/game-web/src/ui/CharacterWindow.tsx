@@ -1,4 +1,4 @@
-import { repairCost } from '@mmo/game-data';
+import { repairCost, specialisationPaths } from '@mmo/game-data';
 import { STAT_LABELS, STAT_ORDER } from '@mmo/ui';
 import { useGame } from './context';
 import { ItemSlot } from './ItemSlot';
@@ -36,6 +36,12 @@ export function CharacterWindow() {
       id="character"
       title={`${state.character.name} — level ${state.character.level} ${cls.name}`}
     >
+      <p className="small" data-testid="character-specialisation">
+        {specialisationPaths.find((p) => p.id === state.character.specialisationId)?.name ??
+          'No specialisation'}{' '}
+        · Visit Maren in Greenvale or Iona on Amber Coast to train or change your path from level
+        five.
+      </p>
       <p className="small equipment-condition" data-testid="equipment-condition">
         {repairQuote > 0
           ? `Equipped gear can be restored for ${repairQuote} copper. Visit Provisioner Vale or the Marches workshop.`

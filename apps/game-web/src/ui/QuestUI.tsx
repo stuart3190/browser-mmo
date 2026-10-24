@@ -1,3 +1,4 @@
+import { SpecialisationChoices } from './SpecialisationChoices';
 import { craftDuration, canRepairAt, repairCost } from '@mmo/game-data';
 import { useState } from 'react';
 import type { QuestView } from '@mmo/schemas';
@@ -80,6 +81,7 @@ export function DialoguePanel() {
           ×
         </button>
       </header>
+      <SpecialisationChoices />
       {banker && (
         <button
           data-testid="banker-vault"

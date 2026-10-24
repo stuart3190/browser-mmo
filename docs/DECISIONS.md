@@ -1424,3 +1424,22 @@ the existing repair service. Distinct crab/Bellkeeper silhouettes, shallow water
 the existing renderer; non-solid shore decoration does not invent hidden movement blockers. The boss
 uses the proven frozen cleave windup, with enough warning to escape and ordinary boss root immunity.
 No new quest engine, combat subsystem, database schema or deployment work is introduced.
+
+## 2026-10-24 — Level-five mentor specialisations
+
+Promote Guardian/Berserker and Fire/Frost from placeholder definitions into four playable paths.
+Guardian strengthens Iron Guard to 70% reduction. Berserker uses Heavy Strike every four seconds;
+Fire uses Flame Burst every seven; Frost uses Nova every twelve. Durations, boss root immunity and
+all ordinary ability authority remain intact. These modify existing slots rather than introducing
+placeholder spells, unimplemented resources or separate talent trees. Other specs remain placeholders.
+
+Training and retraining are free at Maren and Iona from level five, while alive and out of combat.
+The existing character specialisation field is the durable choice. The existing service receipt
+serializes retries under the character lock, preventing old requests from undoing newer choices.
+The realtime host verifies NPC proximity and combat, refreshes its server-derived profile, and
+replicates the choice through ability.state. A shared pure effectiveAbility function supplies the
+server's cast definition and the client's tooltip/cooldown presentation. Running cooldowns and
+already-cast effects are preserved; swapping cannot refresh them. No migration or economy change.
+
+Free mentor retraining encourages experimentation while the two playable classes and encounters
+continue to grow. It avoids locking new players into an irreversible choice or charging for learning.

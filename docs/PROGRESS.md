@@ -1899,3 +1899,16 @@ Ranked player-facing gaps from the current client and content:
   start at level five with prior story closure; no new earned 1→5 claim. Other atlas regions remain greybox.
 - [ ] Active next: four meaningful level-five specialisations, mentor retraining, live ability feedback,
       authority/replay checks and real-input class playthroughs. Continue gameplay; no release-gate work.
+
+### Level-five specialisations — verified 2026-10-24
+
+- [x] Guardian/Berserker and Fire/Frost paths, mentor selection/retraining, persistent choice and
+      effective ability tooltips/countdowns. 128 content, 85 world (including added recovery case), 13 frontend, one domain and 10 realtime
+      checks pass. Repository types, lint and production build pass. Browser verifies all four paths,
+      cooldown preservation, real victories and relogin on desktop/touch; screenshots inspected.
+      Evidence: `gameplay/evidence/specialisations-2026-10-24/`. Fixtures start at level five.
+- Keep path identity and running cooldowns across reconnect; no costs, extra slots or migration.
+
+- [ ] Next gameplay gap: healing requires opening the bag mid-fight and exposes no cooldown timer.
+      Add a carried-remedy shortcut with server-confirmed readiness, desktop/touch controls and
+      actual injury/use/cooldown/relogin checks. Continue gameplay only; production remains unchanged.

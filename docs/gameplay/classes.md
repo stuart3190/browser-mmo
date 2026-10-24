@@ -1,7 +1,7 @@
 # Classes & specialisations
 
-> All class and specialisation names below are **placeholders**, not final design
-> (`placeholder: true` in data). The architecture is what is decided.
+> Warrior and Mage have implemented abilities and four level-five specialisation paths.
+> Other classes and specialisations remain explicitly marked placeholders.
 
 ## Model
 
@@ -24,16 +24,15 @@ live abilities use the `damage` block below. Decision record: `docs/adr/0019-cla
 
 ## Playable classes and abilities (2026-10-24)
 
-Only **Warrior** and **Mage** are playable. Ranger and Cleric (and every spec) remain placeholders.
+Only **Warrior** and **Mage** are playable. Ranger and Cleric remain placeholders.
 The bar is `baseAbilityIds` in slot order; `ability.common.attack` is shared.
 
-| Slot | Warrior                                            | Mage                                                     |
-| ---- | -------------------------------------------------- | -------------------------------------------------------- |
-| 1    | Attack — toggles weapon auto-attack (3.5 m)        | Attack — toggles weapon auto-attack (3.5 m)              |
-| 2    | Heavy Strike — 3.5 m, 6 s cooldown, physical       | Firebolt — 25 m, 4 s cooldown, magic, projectile         |
-| 3    | Battle Strike — **level 2**, 3.5 m, 12 s, physical | Flame Burst — **level 2**, 20 m, 10 s, magic, projectile |
-
-| 4 | Iron Guard — **level 3**, self, 20 s cooldown, 4 s at 50% damage reduction | Frost Nova — **level 3**, 6 m area, 20 s cooldown, 3 s root |
+| Slot | Warrior                                                                    | Mage                                                        |
+| ---- | -------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| 1    | Attack — toggles weapon auto-attack (3.5 m)                                | Attack — toggles weapon auto-attack (3.5 m)                 |
+| 2    | Heavy Strike — 3.5 m, 6 s cooldown, physical                               | Firebolt — 25 m, 4 s cooldown, magic, projectile            |
+| 3    | Battle Strike — **level 2**, 3.5 m, 12 s, physical                         | Flame Burst — **level 2**, 20 m, 10 s, magic, projectile    |
+| 4    | Iron Guard — **level 3**, self, 20 s cooldown, 4 s at 50% damage reduction | Frost Nova — **level 3**, 6 m area, 20 s cooldown, 3 s root |
 
 Guard needs no target. Nova hits each living enemy in range and line of sight, with normal hit/crit
 rules; bosses take damage but resist its root. Rooted enemies can still attack in reach. Move away
@@ -75,7 +74,32 @@ Cooldowns are kept per character in the simulation, survive reconnects (linger) 
 `ability.state` (unlocks + ready times in server time) is pushed on join/resync, after each use and
 when a level-up unlocks an ability (`newlyUnlocked`).
 
-## Placeholder roster
+## Specialisations (level five)
+
+Speak to Elder Maren in Greenvale or Warden Iona on Amber Coast, then open **Class specialisation**
+in the dialogue. Training and retraining are free. You must be alive, near the mentor and outside
+combat. Your character window names the selected path, and affected ability descriptions/countdowns
+reflect it immediately. Reaching level five announces the feature.
+
+| Class   | Path      | Effect                                                                                |
+| ------- | --------- | ------------------------------------------------------------------------------------- |
+| Warrior | Guardian  | Iron Guard reduces incoming damage by 70% for four seconds (base 50%).                |
+| Warrior | Berserker | Heavy Strike cooldown becomes four seconds (base six).                                |
+| Mage    | Fire      | Flame Burst cooldown becomes seven seconds (base ten).                                |
+| Mage    | Frost     | Frost Nova cooldown becomes twelve seconds (base twenty). Boss root immunity remains. |
+
+Each path modifies an existing ability; no extra slots or unimplemented resource costs are added.
+Changing path never clears or shortens an already running cooldown. The next cast uses the newly
+selected path. Existing effects retain their cast-time magnitude until expiry. No additional passive
+stats are granted. These first paths create defensive/control versus offensive choices; wider
+endgame and group-role balance remains ongoing content work.
+
+The server validates class, level and mentor, persists `characters.specialisationId`, and uses the
+same pure `effectiveAbility` rule as the client presentation. Durable service receipts make duplicate
+training requests safe; retrying an old request cannot undo a later choice. The current path travels
+in the combat profile and `ability.state`, and survives relogin/checkpoint recovery.
+
+## Full roster (unimplemented entries remain placeholders)
 
 | Class   | Resource | Armour                              | Weapons                            | Specialisations (roles)                                                  |
 | ------- | -------- | ----------------------------------- | ---------------------------------- | ------------------------------------------------------------------------ |
@@ -93,5 +117,5 @@ when a level-up unlocks an ability (`newlyUnlocked`).
 
 Add definitions to `packages/game-data/src/content/classes.ts`; cross-validation fails fast on
 unknown abilities, specs or equipment types, abilities owned by another class, and live abilities
-using unsupported features (non-enemy targeting, cast times, resource costs). Set `playable: true`
+using unsupported features (cast times, resource costs or unsupported utility effects). Set `playable: true`
 once its abilities are live. No schema or DB changes needed.

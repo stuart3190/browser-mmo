@@ -20,16 +20,22 @@ Desktop/portrait/landscape screenshots reviewed; world labels and stale target f
 126 content, 80 world, 13 frontend and chapter integration tests pass, plus types/lint/build/content
 validation. Fixtures begin at level five with prior story closure; no earned 1→5 claim.
 
-Next milestone prepared: four level-five class paths. Unimported `specialisations.ts` and its two
-passing content tests are in the repo; they are NOT yet part of runtime. `/tmp/integrate-specs.py`
-integrates the prepared domain/protocol/simulation/client code and real-input browser driver after
-coast verification/commit (runtime source stays frozen while browser journeys run). Supporting
-`/tmp/specialisations*.ts`, `/tmp/specialisations.cjs`, `/tmp/SpecialisationChoices.tsx`,
-`/tmp/spec-world-tests.txt`, `/tmp/spec-realtime-test.txt` are drafts, not verified milestones.
-Guardian 70% Guard; Berserker Heavy Strike 4s; Fire Flame Burst 7s; Frost Nova 12s. Free mentor
-retraining at Maren/Iona outside combat, existing cooldowns retained, existing specialisation DB
-field and service receipts. Complete type/unit/integration/browser verification before committing.
-Then continue further visual/control and gameplay refinement. Verify functional behavior in the isolated
+Completed: four level-five specialisations and free mentor retraining, with server-owned effects,
+cooldown preservation, persisted choice, live tooltips and character summary. Evidence:
+`gameplay/evidence/specialisations-2026-10-24/`. Both-class real-input desktop/touch playthrough
+passes all choices, tactical effects, offensive cooldowns, victories and relogin. 128 content,
+85 world (84 suite + added recovery case), 13 frontend, one domain and ten realtime checks pass;
+repository types/lint/build pass. All prepared drafts are integrated; `/tmp/integrate-specs.py` is
+obsolete and MUST NOT be rerun. Coast milestone `8959ce7` is pushed.
+
+Active next gameplay milestone: quick carried-remedy use, because players currently must open the
+bag in combat and cannot see the persistent 30-second cooldown. Reuse the existing authoritative
+consumeRemedy/effect delivery. Add cooldown to existing systems.state, a pending request guard,
+H shortcut and a touch control without covering the playfield. Verify actual healing, counts,
+cooldown rejection/relogin, locked/vault exclusions and layout. No gameplay injection or new
+consumption authority; keep fixture evidence explicit. Continue visual/control refinement afterward.
+
+Verify functional behavior in the isolated
 local game, preserve existing earned actors, commit/push incrementally and continue across milestones.
 
 ## Source and live safety boundaries

@@ -2420,3 +2420,23 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
   font-size: 11px;
   margin: 4px 0;
 }
+
+/* Mentor choices remain compact until opened and retain finger-sized controls. */
+[data-testid='specialisation-choices'] > summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+}
+.specialisation-choice {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.specialisation-choice p {
+  line-height: 1.5;
+}
+.specialisation-choice button {
+  min-height: 44px;
+  width: 100%;
+}

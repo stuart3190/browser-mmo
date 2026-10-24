@@ -1,0 +1,9 @@
+
+ RUN  v5.0.3 /root/browser-mmo/packages/domain
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  22:05:09
+   Duration  7.98s (import 55%, transform 41%, tests 4%, worker 1%)
+

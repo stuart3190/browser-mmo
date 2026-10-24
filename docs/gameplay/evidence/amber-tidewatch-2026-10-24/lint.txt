@@ -1,0 +1,4 @@
+
+> browser-mmo@ lint /root/browser-mmo
+> eslint . --max-warnings=0
+

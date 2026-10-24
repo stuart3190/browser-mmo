@@ -1,0 +1,77 @@
+{
+  "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at /root/browser-mmo/scripts/e2e/specialisations.cjs:183:18",
+  "checks": [
+    {
+      "name": "Warrior mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Warrior tactical path has server-owned timing",
+      "ok": true,
+      "detail": {
+        "ready": 1792872395357,
+        "time": 1792872375357
+      }
+    },
+    {
+      "name": "Guardian replicates seventy-percent guard",
+      "ok": true
+    },
+    {
+      "name": "Warrior mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Warrior retraining preserves the running cooldown",
+      "ok": true,
+      "detail": {
+        "first": {
+          "ready": 1792872395357,
+          "time": 1792872375357
+        },
+        "retained": 1792872395357
+      }
+    },
+    {
+      "name": "Warrior offensive path changes its actual attack cooldown",
+      "ok": true,
+      "detail": 4000
+    },
+    {
+      "name": "Warrior wins a real fight with its chosen path",
+      "ok": true
+    },
+    {
+      "name": "Warrior retains its chosen path after login",
+      "ok": true
+    },
+    {
+      "name": "Mage mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Mage tactical path has server-owned timing",
+      "ok": true,
+      "detail": {
+        "ready": 1792872423037,
+        "time": 1792872411037
+      }
+    },
+    {
+      "name": "Mage mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Mage retraining preserves the running cooldown",
+      "ok": true,
+      "detail": {
+        "first": {
+          "ready": 1792872423037,
+          "time": 1792872411037
+        },
+        "retained": 1792872423037
+      }
+    }
+  ],
+  "errors": []
+}

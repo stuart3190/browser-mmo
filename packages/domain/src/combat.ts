@@ -27,6 +27,7 @@ export interface CombatProfile {
   characterId: string;
   /** Persisted class (set at creation; the client never supplies it during play). */
   classId: string;
+  specialisationId: string | null;
   level: number;
   xp: number;
   xpToNext: number;
@@ -90,6 +91,7 @@ export async function getCombatProfile(
   return {
     characterId,
     classId: character.classId,
+    specialisationId: character.specialisationId,
     abilityCooldowns: character.abilityCooldowns,
     level: character.level,
     xp: character.xp,

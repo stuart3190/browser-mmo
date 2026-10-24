@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { useTap } from './tap';
-import { classAbilities } from '@mmo/game-data';
+import { classAbilities, effectiveAbility } from '@mmo/game-data';
 import { useGame } from './context';
 import { AbilityGlyph } from './AbilityGlyph';
 
@@ -22,7 +22,14 @@ export function AbilityBar({ touch = false }: { touch?: boolean }) {
   }, [busy]);
   useEffect(() => setNow(Date.now()), [state.revision]);
 
-  const slots = classAbilities(gameData, state.character.classId);
+  const slots = classAbilities(gameData, state.character.classId).map((a) =>
+    effectiveAbility(
+      a,
+      state.character.classId,
+      state.progress?.level ?? state.character.level,
+      state.character.specialisationId,
+    ),
+  );
   const dead = state.vitals?.dead ?? false;
   return (
     <div
