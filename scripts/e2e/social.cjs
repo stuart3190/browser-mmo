@@ -24,28 +24,47 @@ const nameOf = (s) =>
     args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
   });
   const contexts = await Promise.all([
-    browser.newContext({ viewport: { width: 1280, height: 800 } }),
-    browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }),
-    browser.newContext({ viewport: { width: 1000, height: 740 } }),
+    browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 0.5 }),
+    browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
+      deviceScaleFactor: 0.5,
+    }),
+    browser.newContext({ viewport: { width: 1000, height: 740 }, deviceScaleFactor: 0.5 }),
   ]);
   for (const context of contexts)
     await context.addInitScript(() => {
       window.__chatObserved = [];
+      window.__chatLifecycle = [];
+      window.__chatActions = [];
       const Socket = window.WebSocket;
       window.WebSocket = class extends Socket {
         constructor(...args) {
           super(...args);
+          this.addEventListener('open', () =>
+            window.__chatLifecycle.push({ t: 'ws.open', ms: performance.now() }),
+          );
           this.addEventListener('message', (e) => {
             const m = JSON.parse(e.data);
+            if (window.__chatLifecycle.length < 30)
+              window.__chatLifecycle.push({ t: m.t, ms: performance.now() });
+            if (['error', 'party.update'].includes(m.t))
+              window.__chatActions.push({ t: m.t, d: m.d, ms: performance.now() });
             if (m.t === 'chat.message') window.__chatObserved.push(m.d);
           });
         }
       };
     });
   const [a, b, c] = await Promise.all(contexts.map((ctx) => ctx.newPage()));
+  const networkFailures = [];
   for (const p of [a, b, c]) {
-    p.setDefaultTimeout(30000);
+    // Three simultaneous SwiftShader worlds can spend over 30 seconds compiling their first frame.
+    p.setDefaultTimeout(60000);
     p.on('pageerror', (e) => errors.push(e.message));
+    p.on('requestfailed', (r) =>
+      networkFailures.push({ path: new URL(r.url()).pathname, error: r.failure()?.errorText }),
+    );
   }
   const stamp = Date.now().toString(36),
     users = [`chata_${stamp}`, `chatb_${stamp}`, `chatc_${stamp}`];
@@ -150,10 +169,44 @@ const nameOf = (s) =>
       (await a.locator('[data-window=chat]').count()) === 0,
     );
     check('No browser exceptions', errors.length === 0, errors);
+    fs.writeFileSync(
+      `${OUT}/entry-timings.json`,
+      JSON.stringify(
+        await Promise.all([a, b, c].map((p) => p.evaluate(() => window.__chatLifecycle))),
+        null,
+        2,
+      ),
+    );
   } catch (e) {
     fs.writeFileSync(`${OUT}/failure.txt`, e.stack || String(e));
+    fs.writeFileSync(
+      `${OUT}/diagnostics.json`,
+      JSON.stringify(
+        {
+          errors,
+          networkFailures,
+          actions: await Promise.all(
+            [a, b, c].map((p) => p.evaluate(() => window.__chatActions).catch(() => [])),
+          ),
+          lifecycle: await Promise.all(
+            [a, b, c].map((p) => p.evaluate(() => window.__chatLifecycle).catch(() => [])),
+          ),
+          pages: await Promise.all(
+            [a, b, c].map((p) =>
+              p
+                .locator('body')
+                .innerText()
+                .catch(() => ''),
+            ),
+          ),
+        },
+        null,
+        2,
+      ),
+    );
     await a.screenshot({ path: `${OUT}/failure-desktop.png` }).catch(() => {});
     await b.screenshot({ path: `${OUT}/failure-phone.png` }).catch(() => {});
+    await c.screenshot({ path: `${OUT}/failure-bystander.png` }).catch(() => {});
     throw e;
   } finally {
     await browser.close();

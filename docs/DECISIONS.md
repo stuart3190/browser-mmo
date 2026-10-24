@@ -1260,3 +1260,26 @@ propagate and ownership loss still fences the host.
 A real PostgreSQL test terminates only its own idle backend, observes one report and a fresh usable
 connection. Repeated close requests share one drain. Existing ownership-loss/crash tests remain
 mandatory; successful idle reconnect does not authorize continued simulation after ownership loss.
+
+## 2026-10-24 — Preserve recovery format while reducing checkpoint encoding cost
+
+**Decision**
+Keep version-2 zone checkpoint JSON, collection markers, transaction fencing and publication order.
+Encode Map/Set/Infinity at their typed schema locations before native JSON serialization, instead
+of invoking a recursive replacer for every primitive on every checkpoint. Keep the original encoder
+as a test-only compatibility oracle across all authored zones and representative live combat state.
+
+**Reason**
+An isolated production profile identified checkpoint encoding as substantial realtime CPU work.
+A relative 26-zone benchmark reduced 100 encodes from 463 ms to 169 ms with identical byte counts;
+byte-for-byte compatibility tests pass. Capacity qualification remains a separate gate.
+
+**Alternatives considered**
+Lower checkpoint frequency, publish before durability, or cache potentially mutated zone state.
+Those change recovery guarantees or require comprehensive mutation tracking and are not necessary
+for this targeted optimization.
+
+**Consequences**
+No migration or publication-semantics change. New checkpoint fields containing collections or
+non-finite numbers must be added to explicit encoding and compatibility coverage. Retain recovery,
+crash/fencing and load tests; a microbenchmark alone does not establish player capacity.

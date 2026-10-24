@@ -298,29 +298,47 @@ export class ZoneSimulation {
 
   /** Versioned recovery image. Static geometry/nav are rebuilt from game data. */
   checkpoint(): string {
-    return JSON.stringify(
-      {
-        version: 2,
-        parties: this.parties.checkpoint(),
-        appliedEffects: this.appliedEffects,
-        tickCount: this.tickCount,
-        nextEntity: this.nextEntity,
-        entities: this.entities,
-        players: this.players,
-        pickups: this.pickups,
-        respawnQueue: this.respawnQueue,
-        npcSpawns: this.npcSpawns,
-        enemies: this.enemies,
-        kills: this.kills,
-        groups: this.groups,
+    // Encode the version-2 collection markers at their schema locations. A JSON replacer
+    // visits every primitive in every static enemy/spawn definition on each durable tick.
+    // Keeping those plain objects on JSON.stringify's native path avoids that hot-loop cost.
+    // checkpoint.test.ts compares this image with the original recursive encoder.
+    return JSON.stringify({
+      version: 2,
+      parties: this.parties.checkpoint(),
+      appliedEffects: { $set: [...this.appliedEffects] },
+      tickCount: this.tickCount,
+      nextEntity: this.nextEntity,
+      entities: { $map: [...this.entities] },
+      players: {
+        $map: [...this.players].map(([id, player]) => [
+          id,
+          {
+            ...player,
+            known: { $set: [...player.known] },
+            cooldowns: { $map: [...player.cooldowns] },
+          },
+        ]),
       },
-      (_key, value: unknown) => {
-        if (value instanceof Map) return { $map: [...value] };
-        if (value instanceof Set) return { $set: [...value] };
-        if (value === Infinity) return { $infinity: true };
-        return value;
+      pickups: { $map: [...this.pickups] },
+      respawnQueue: this.respawnQueue,
+      npcSpawns: { $map: [...this.npcSpawns] },
+      enemies: {
+        $map: [...this.enemies].map(([id, enemy]) => [
+          id,
+          {
+            ...enemy,
+            bestDist: enemy.bestDist === Infinity ? { $infinity: true } : enemy.bestDist,
+          },
+        ]),
       },
-    );
+      kills: this.kills,
+      groups: {
+        $map: [...this.groups].map(([id, group]) => [
+          id,
+          { ...group, alive: { $set: [...group.alive] } },
+        ]),
+      },
+    });
   }
 
   restoreCheckpoint(raw: string): string[] {

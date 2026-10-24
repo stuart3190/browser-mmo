@@ -1670,3 +1670,27 @@ Connection lifecycle verification: all 14 packages and scripts typecheck; reposi
 production builds/debug-hook exclusion pass. Seven targeted real-database tests include idle-client
 replacement, coalesced close and existing five ownership/crash fencing cases. Combined-source
 regression remains required after integration; no production service or database was changed.
+
+### Checkpoint encoding optimization — 2026-10-24
+
+- [x] Exact version-2 JSON preserved using schema-specific collection encoding; two compatibility
+      tests cover all authored zones and combat/party/cooldown/effect recovery. All 68 world tests,
+      full types and lint pass. Relative benchmark: 463 ms legacy versus 169 ms schema encoder for
+      100 complete 26-zone snapshots, identical bytes. No durability/publication change.
+- [ ] Full isolated qualification running in `/tmp/brokenodyssey-qualification.05XEXU`; improved
+      capacity is not yet established. Main earned run stays on existing runtime until completion.
+
+Checkpoint optimization qualification update: full backend tests/build/restore pass (236 unit,
+109 domain, 73 realtime, 11 HTTP), plus trade11 and market8 browser assertions. Third-browser
+entry repeatedly exceeded 30 seconds before the game socket opened; its server auth then completed
+in 126 ms. A longer wait exposed an unobserved party acceptance under three full-resolution software
+renderers. DPR0.5 with unchanged CSS viewports/game rules passes chat10; friends/onboarding remain.
+The quiet profiled five-player run still FAILS capacity: 19.005 Hz, RTT p95 473 ms, HTTP p95 217 ms,
+zero operation errors/disconnects. Preserve the stricter historical 19.5 Hz release threshold.
+[Evidence](hardening/evidence/checkpoint-encoding-2026-10-24/README.md). No capacity certification.
+
+Checkpoint follow-up DGERJ8 passes 10 chat, 12 friends and 10 onboarding assertions with the
+three-player software renderer at DPR0.5; unchanged CSS viewports and gameplay/privacy checks.
+Together with earlier trade/market passes this is staged proof, not an uninterrupted aggregate run.
+Quiet profiled five-player capacity still fails (19.005Hz, RTT p95 473ms). Final merged qualification
+and strict 19.5Hz unprofiled workload remain required.
