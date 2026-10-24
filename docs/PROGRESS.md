@@ -1694,3 +1694,26 @@ three-player software renderer at DPR0.5; unchanged CSS viewports and gameplay/p
 Together with earlier trade/market passes this is staged proof, not an uninterrupted aggregate run.
 Quiet profiled five-player capacity still fails (19.005Hz, RTT p95 473ms). Final merged qualification
 and strict 19.5Hz unprofiled workload remain required.
+
+### Persistent guilds — 2026-10-24 (isolated implementation branch)
+
+- [x] Additive migration0024 and character membership, unique live names/tags, expiring accepted
+      invitations, leader/officer permissions, notices, durable private guild chat, stale-guild
+      request protection and structural audit entries. Eight domain concurrency/authorization tests
+      and one authenticated HTTP integration test pass on disposable bo_guilds_test.
+- [x] Full monorepo types pass after UI wiring corrections. Earlier lint passes; final lint/build
+      and complete integration remain required before integration.
+- [ ] Desktop/phone guild UI qualification is running in `/tmp/brokenodyssey-qualification.n0ldqE`.
+      Ten assertions pass so far; completion/disband and reviewed screenshots remain.
+- [ ] Extended 20-table populated upgrade/backup/restore proof running; full combined qualification
+      and production password/TLS guild smoke remain required. No production changes.
+
+Guild qualification update: all 12 desktop/phone browser assertions pass; screenshots reviewed.
+Full types, final lint, four builds/debug-hook guard pass. Populated upgrade and 20-table backup/
+restore pass with actual guild membership, invitation and chat rows. [Evidence](gameplay/evidence/guilds-2026-10-24/README.md).
+Combined-source regression and built-production guild profile remain before integration/release.
+
+Guild layout follow-up: 15 real browser assertions pass in oHpLwU; final screenshots reviewed.
+Chat follows new messages only at the end, preserves scrollback and keeps the landscape composer
+visible. Production load now includes consented guild membership, durable messages and history,
+and restores the documented minimum 19.5Hz gate. This workload has not yet been measured.

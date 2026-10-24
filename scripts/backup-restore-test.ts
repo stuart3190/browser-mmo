@@ -26,6 +26,10 @@ import {
   actOnFriend,
   sendDirectMessage,
   readDirectMessages,
+  createGuild,
+  inviteGuild,
+  respondGuild,
+  sendGuildMessage,
 } from '../packages/domain/src/index';
 const adminUrl = process.env.TEST_DATABASE_URL;
 if (!adminUrl || adminUrl === process.env.DATABASE_URL)
@@ -67,6 +71,10 @@ const durableTables = [
   'friendships',
   'social_blocks',
   'direct_messages',
+  'guilds',
+  'guild_members',
+  'guild_invites',
+  'guild_messages',
 ];
 const durableBefore = new Map<string, unknown>();
 let sourceCreated = false,
@@ -206,6 +214,21 @@ try {
     );
     await readDirectMessages(ctx, buyerActor, accountId, [message.id]);
     await sendDirectMessage(ctx, buyerActor, accountId, crypto.randomUUID(), 'An unread reply');
+    const guildId = await createGuild(ctx, sellerActor, 'Restore Company', 'PROOF');
+    await inviteGuild(ctx, { ...sellerActor, guildId }, buyer.name);
+    await respondGuild(ctx, buyerActor, guildId, true);
+    await sendGuildMessage(
+      ctx,
+      { ...sellerActor, guildId },
+      crypto.randomUUID(),
+      'The guild survives restoration',
+    );
+    const invitee = await createCharacter(ctx, {
+      accountId: buyerId,
+      name: 'Restoreinvitee',
+      classId: 'class.mage',
+    });
+    await inviteGuild(ctx, { ...sellerActor, guildId }, invitee.name);
     const legacy = (
       await source.pool.query(
         "select c.id,c.account_id,c.name from characters c join accounts a on a.id=c.account_id where a.username='legacy_restore'",
@@ -242,6 +265,10 @@ try {
       'kill_events',
       'kill_rewards',
       'sessions',
+      'guilds',
+      'guild_members',
+      'guild_invites',
+      'guild_messages',
     ]) {
       const rows = await restored.pool.query(`select count(*)::int n from ${table}`);
       if (rows.rows[0].n < 1) throw new Error(`Restore fixture missing ${table}`);

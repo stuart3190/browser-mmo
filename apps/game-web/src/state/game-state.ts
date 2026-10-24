@@ -19,7 +19,8 @@ export type WindowId =
   | 'trade'
   | 'chat'
   | 'market'
-  | 'social';
+  | 'social'
+  | 'guild';
 
 export type NpcDialogueView = ServerPayload<'npc.dialogue'>;
 

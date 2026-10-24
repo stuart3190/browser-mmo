@@ -67,6 +67,9 @@ const report: any = {
   socialReads: 0,
   messagesSent: 0,
   readReceipts: 0,
+  guildMessagesSent: 0,
+  guildHistoryReads: 0,
+  gates: { minimumSimulationHz: 19.5, maximumRttP95Ms: 250, maximumHttpP95Ms: 500 },
   skippedHttpCycles: 0,
 };
 let measuring = false;
@@ -274,6 +277,28 @@ try {
       });
     }
   }
+  // The real shared-IP role-change limiter also applies during public guild setup.
+  const leader = clients[0];
+  const { guildId } = await request(`/characters/${leader.id}/guild`, leader.token, {
+    name: `Load company ${randomBytes(6).toString('hex')}`,
+    tag: randomBytes(3).toString('hex').slice(0, 5),
+  });
+  for (const [i, c] of clients.entries()) {
+    if (i > 0) {
+      await sleep(1200);
+      await request(`/characters/${leader.id}/guild/invite`, leader.token, {
+        guildId,
+        name: c.name,
+      });
+      await request(`/characters/${c.id}/guild/respond`, c.token, { guildId, accept: true });
+    }
+    c.guildId = guildId;
+  }
+  assert.equal(
+    (await request(`/characters/${leader.id}/guild`, leader.token)).members.length,
+    count,
+  );
+  report.productionGates.guildConsent = true;
   const before = await metrics(),
     started = performance.now();
   report.measuredAt = new Date().toISOString();
@@ -379,6 +404,26 @@ try {
             report.messagesSent++;
           }
         }
+        let guildMessageId: string | undefined;
+        if (c.economyPhase % 3 === 0) {
+          guildMessageId = randomUUID();
+          await request(`/characters/${c.id}/guild/messages`, c.token, {
+            guildId: c.guildId,
+            id: guildMessageId,
+            body: 'Guild capacity fixture message',
+          });
+          report.guildMessagesSent++;
+        }
+        const guildHistory = await request(
+          `/characters/${c.id}/guild/messages?guildId=${c.guildId}`,
+          c.token,
+        );
+        report.guildHistoryReads++;
+        if (guildMessageId)
+          assert(
+            guildHistory.messages.some((m: any) => m.id === guildMessageId),
+            'committed guild message missing from member history',
+          );
         if (!c.sold && count > 1) {
           c.sold = true;
           const listing = (
@@ -470,7 +515,10 @@ try {
   assert.equal(Object.keys(report.httpErrors).length, 0, 'HTTP workload failed; inspect report');
   assert.equal(Object.keys(report.errors).length, 0, 'protocol workload failed; inspect report');
   assert(report.playerHits > 0 && Number(report.db.rewarded) > 0, 'combat workload inactive');
-  assert(report.simulationHz >= 19, 'simulation missed its 20Hz service target');
+  assert(
+    report.simulationHz >= report.gates.minimumSimulationHz,
+    'simulation missed its 20Hz service target',
+  );
   assert(
     report.rttMs.samples >= (count * seconds) / 6 && report.rttMs.p95 < 250,
     'local transport latency gate failed',
@@ -484,6 +532,10 @@ try {
       'social workload incomplete',
     );
   }
+  assert(
+    report.guildMessagesSent >= count && report.guildHistoryReads >= count * 5,
+    'guild workload incomplete',
+  );
   report.ok = true;
   await writeFile(
     process.env.LOAD_REPORT ?? '/tmp/mmo-production-load.json',

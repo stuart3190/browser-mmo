@@ -12,6 +12,9 @@ import type {
   Friendship,
   FriendAction,
   DirectMessage,
+  GuildState,
+  GuildMessage,
+  GuildMemberAction,
 } from '@mmo/schemas';
 import { config } from './config';
 
@@ -142,6 +145,59 @@ export class ApiClient {
       'POST',
       `/v1/marketplace/listings/${id}/buy`,
       { characterId, expectedPrice },
+    );
+  }
+  guild(characterId: string) {
+    return this.request<GuildState>('GET', `/v1/characters/${characterId}/guild`);
+  }
+  createGuild(characterId: string, name: string, tag: string) {
+    return this.request<{ guildId: string }>('POST', `/v1/characters/${characterId}/guild`, {
+      name,
+      tag,
+    });
+  }
+  inviteGuild(characterId: string, guildId: string, name: string) {
+    return this.request<void>('POST', `/v1/characters/${characterId}/guild/invite`, {
+      guildId,
+      name,
+    });
+  }
+  respondGuild(characterId: string, guildId: string, accept: boolean) {
+    return this.request<void>('POST', `/v1/characters/${characterId}/guild/respond`, {
+      guildId,
+      accept,
+    });
+  }
+  guildMember(characterId: string, guildId: string, targetId: string, action: GuildMemberAction) {
+    return this.request<void>('POST', `/v1/characters/${characterId}/guild/member`, {
+      guildId,
+      targetId,
+      action,
+    });
+  }
+  leaveGuild(characterId: string, guildId: string, disband: boolean) {
+    return this.request<void>('POST', `/v1/characters/${characterId}/guild/leave`, {
+      guildId,
+      disband,
+    });
+  }
+  guildNotice(characterId: string, guildId: string, motd: string) {
+    return this.request<void>('POST', `/v1/characters/${characterId}/guild/notice`, {
+      guildId,
+      motd,
+    });
+  }
+  guildMessages(characterId: string, guildId: string) {
+    return this.request<{ messages: GuildMessage[] }>(
+      'GET',
+      `/v1/characters/${characterId}/guild/messages?guildId=${encodeURIComponent(guildId)}`,
+    );
+  }
+  sendGuildMessage(characterId: string, guildId: string, id: string, body: string) {
+    return this.request<{ message: GuildMessage }>(
+      'POST',
+      `/v1/characters/${characterId}/guild/messages`,
+      { guildId, id, body },
     );
   }
   friends(characterId: string) {

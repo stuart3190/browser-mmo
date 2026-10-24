@@ -4,12 +4,14 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 production=false
 load_test=false
+guilds_only=false
 case "${1:-}" in
   '') checks=true ;;
   --skip-checks) checks=false ;;
   --production) checks=false; production=true ;;
+  --guilds) checks=false; guilds_only=true ;;
   --load) checks=false; production=true; load_test=true ;;
-  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks|--production|--load]' >&2; exit 2 ;;
+  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks|--production|--load|--guilds]' >&2; exit 2 ;;
 esac
 PG_BIN=${PG_BIN:-/usr/lib/postgresql/17/bin}
 for tool in initdb pg_ctl createdb; do [[ -x "$PG_BIN/$tool" ]] || { echo "Missing $PG_BIN/$tool" >&2; exit 1; }; done
@@ -86,10 +88,11 @@ for endpoint in "$VITE_API_URL/health/ready" "http://127.0.0.1:$REALTIME_PORT/he
   done
   $ready || { echo "Local endpoint failed to become ready: $endpoint" >&2; exit 1; }
 done
-qualification_suites=${QUAL_BROWSER_SUITES:-trading,marketplace,social,friends,onboarding}
+qualification_suites=${QUAL_BROWSER_SUITES:-trading,marketplace,social,friends,onboarding,guilds}
+if $guilds_only; then qualification_suites=guilds; fi
 read -r -a selected_suites <<< "${qualification_suites//,/ }"
 for suite in "${selected_suites[@]}"; do
-  case "$suite" in trading|marketplace|social|friends|onboarding) ;; *) echo "Unknown browser suite: $suite" >&2; exit 2 ;; esac
+  case "$suite" in trading|marketplace|social|friends|onboarding|guilds) ;; *) echo "Unknown browser suite: $suite" >&2; exit 2 ;; esac
   node "scripts/e2e/$suite.cjs" "$qualification_dir/$suite" > "$qualification_dir/$suite.log" 2>&1
 done
 QUAL_RESULT_PATH="$qualification_dir/result.json" QUAL_FULL_CHECKS="$checks" QUAL_RUN_SUITES="$qualification_suites" node --input-type=module - <<'JS'

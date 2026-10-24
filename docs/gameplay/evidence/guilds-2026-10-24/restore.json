@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "legacyUpgrade": "0005 -> current",
+  "durableTables": [
+    "accounts",
+    "characters",
+    "containers",
+    "item_instances",
+    "item_history",
+    "currency_balances",
+    "currency_ledger",
+    "character_quests",
+    "marketplace_listings",
+    "marketplace_transactions",
+    "kill_events",
+    "kill_rewards",
+    "direct_trades",
+    "friendships",
+    "social_blocks",
+    "direct_messages",
+    "guilds",
+    "guild_members",
+    "guild_invites",
+    "guild_messages"
+  ],
+  "tradeStates": ["completed", "open"],
+  "sessionsRevoked": true,
+  "occupiedTargetRefused": true
+}

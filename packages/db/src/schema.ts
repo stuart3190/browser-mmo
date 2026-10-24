@@ -842,3 +842,90 @@ export const directMessages = pgTable(
       .where(sql`${t.readAt} is null`),
   ],
 );
+
+/** Character guilds are durable across zone hosts; bank permissions remain separate future work. */
+export const guilds = pgTable(
+  'guilds',
+  {
+    id: uuid('id').primaryKey(),
+    name: text('name').notNull(),
+    tag: text('tag').notNull(),
+    leaderCharacterId: uuid('leader_character_id')
+      .notNull()
+      .references(() => characters.id),
+    motd: text('motd').notNull().default(''),
+    createdAt: createdAt(),
+    disbandedAt: timestamp('disbanded_at', { withTimezone: true }),
+  },
+  (t) => [
+    uniqueIndex('guilds_name_active_uq')
+      .on(sql`lower(${t.name})`)
+      .where(sql`${t.disbandedAt} is null`),
+    uniqueIndex('guilds_tag_active_uq')
+      .on(sql`lower(${t.tag})`)
+      .where(sql`${t.disbandedAt} is null`),
+    check('guilds_name_ck', sql`char_length(btrim(${t.name})) between 3 and 32`),
+    check('guilds_tag_ck', sql`${t.tag} ~ '^[A-Z0-9]{2,5}$'`),
+    check('guilds_motd_ck', sql`char_length(${t.motd}) <= 500`),
+  ],
+);
+export const guildMembers = pgTable(
+  'guild_members',
+  {
+    characterId: uuid('character_id')
+      .primaryKey()
+      .references(() => characters.id),
+    guildId: uuid('guild_id')
+      .notNull()
+      .references(() => guilds.id),
+    role: text('role').notNull().default('member'),
+    joinedAt: createdAt(),
+  },
+  (t) => [
+    index('guild_members_guild_idx').on(t.guildId),
+    check('guild_members_role_ck', sql`${t.role} in ('member','officer')`),
+  ],
+);
+export const guildInvites = pgTable(
+  'guild_invites',
+  {
+    guildId: uuid('guild_id')
+      .notNull()
+      .references(() => guilds.id),
+    characterId: uuid('character_id')
+      .notNull()
+      .references(() => characters.id),
+    invitedBy: uuid('invited_by')
+      .notNull()
+      .references(() => characters.id),
+    createdAt: createdAt(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.guildId, t.characterId] }),
+    index('guild_invites_character_idx').on(t.characterId),
+  ],
+);
+export const guildMessages = pgTable(
+  'guild_messages',
+  {
+    id: uuid('id').primaryKey(),
+    guildId: uuid('guild_id')
+      .notNull()
+      .references(() => guilds.id),
+    fromAccountId: uuid('from_account_id')
+      .notNull()
+      .references(() => accounts.id),
+    fromCharacterId: uuid('from_character_id')
+      .notNull()
+      .references(() => characters.id),
+    fromName: text('from_name').notNull(),
+    body: text('body').notNull(),
+    sentAt: timestamp('sent_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    index('guild_messages_history_idx').on(t.guildId, t.sentAt, t.id),
+    index('guild_messages_rate_idx').on(t.fromAccountId, t.sentAt),
+    check('guild_messages_body_ck', sql`char_length(btrim(${t.body})) between 1 and 500`),
+  ],
+);

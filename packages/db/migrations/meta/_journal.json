@@ -169,6 +169,13 @@
       "when": 1792836488502,
       "tag": "0023_persistent_social",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792845489611,
+      "tag": "0024_persistent_guilds",
+      "breakpoints": true
     }
   ]
 }
