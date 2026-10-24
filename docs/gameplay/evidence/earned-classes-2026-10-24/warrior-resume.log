@@ -1,0 +1,21 @@
+PASS Earned equipment equipped through inventory armor.leather.trapper_cap
+FAILURE STATE {
+  position: { x: -7.41879454731163, z: -73.91575307355218 },
+  vitals: {
+    health: 162,
+    maxHealth: 162,
+    dead: false,
+    inCombat: false,
+    respawnAvailableAt: null
+  },
+  recent: [
+    { v: 1, t: 'auth.ok', ack: 1, d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'party.update', d: [Object] }
+  ]
+}
+page.waitForFunction: Timeout 60000ms exceeded.
+    at <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:370:15) {
+  log: [],
+  name: 'TimeoutError'
+}

@@ -1,0 +1,161 @@
+PASS Normal respawn preserves earned progression 
+PASS Earned equipment equipped through inventory accessory.ring.copper_band
+PASS Earned equipment equipped through inventory accessory.cloak.wayfarer_cloak
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+DODGE {"center":{"x":71.81086679578411,"y":0,"z":25.859666796570792},"range":2.5,"to":{"x":74.99284731112357,"z":29.041647311910257}}
+GO 75 27
+GO 75 27
+GO 75 27
+DODGE {"center":{"x":75.03442518990794,"y":0,"z":29.0832251906946},"range":2.5,"to":{"x":78.2164057052474,"z":32.26520570603406}}
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+DODGE {"center":{"x":77.67546901763971,"y":0,"z":31.724269018426348},"range":2.5,"to":{"x":80.85744953297917,"z":34.90624953376581}}
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+DODGE {"center":{"x":80.67586451177276,"y":0,"z":34.72466451255942},"range":2.5,"to":{"x":77.4938839964333,"z":37.90664502789888}}
+GO 75 27
+GO 75 27
+GO 75.15 27.58
+GO 75.36 28.35
+GO 75.36 28.35
+GO 75.36 28.35
+GO 75.36 28.35
+GO 75.36 28.35
+GO 75.36 28.35
+DODGE {"center":{"x":77.81281964427134,"y":0,"z":37.68790938034694},"range":2.5,"to":{"x":80.9948001596108,"z":40.8698898956864}}
+GO 75.35631572448267 28.35389774521062
+GO 75.39129600002289 28.42824000005722
+PASS Real catalog enemy defeated enemy.greenvale.siltbound_warden
+GO -6 6
+quest.greenvale.stillwater turn-in
+PASS Persistent main arc completion quest.greenvale.stillwater
+GO -6 6
+quest.greenvale.well_records accept
+GO 8 12
+GO 8 110
+GO -6 6
+quest.greenvale.well_records turn-in
+PASS Persistent main arc completion quest.greenvale.well_records
+GO -6 6
+quest.greenvale.keeper_outpost accept
+GO 24 110
+GO 33 118
+DODGE {"center":{"x":32.839334110369755,"y":0,"z":117.84971203671178},"range":6.75,"to":{"x":24.090116499687667,"z":117.73270263140414}}
+GO 31.918783548813465 117.85
+GO 30.878415657587272 117.85
+GO 30.85 117.85
+GO 30.85 117.85
+DODGE {"center":{"x":30.848334418239336,"y":0,"z":117.84860842087642},"range":6.75,"to":{"x":22.09833566258152,"z":117.84394194612287}}
+GO 30.848334418239336 117.84860842087642
+GO 30.848334418239336 117.84860842087642
+GO 30.848334418239336 117.84860842087642
+GO 30.848334418239336 117.84860842087642
+GO 30.641838722719402 117.8499417505019
+GO 29.95 117.85
+GO 29.75 117.85
+DODGE {"center":{"x":29.750534534787565,"y":0,"z":117.84810256192308},"range":6.75,"to":{"x":21.00053546373365,"z":117.84407062000162}}
+GO 29.750534534787565 117.84810256192308
+GO 29.750534534787565 117.84810256192308
+GO 29.750534534787565 117.84810256192308
+GO 29.750534534787565 117.84810256192308
+GO 29.073072000017167 117.85
+GO 27.77 117.85
+GO 27.77 117.85
+GO 27.77 117.85
+DODGE {"center":{"x":27.772734658563493,"y":0,"z":117.84740284193428},"range":6.75,"to":{"x":19.022735206161535,"z":117.84430720541798}}
+GO 27.772734658563493 117.84740284193428
+GO 27.772734658563493 117.84740284193428
+GO 27.772734658563493 117.84740284193428
+GO 27.772734658563493 117.84740284193428
+GO 27.372934531363594 117.85
+GO 26.577855190370094 117.85
+GO 26.56 117.85
+GO 26.56 117.85
+GO 26.56 117.85
+GO 26.56 117.85
+DODGE {"center":{"x":26.562734713020255,"y":0,"z":117.84703981938968},"range":6.75,"to":{"x":17.812735106819176,"z":117.84441465636044}}
+GO 26.562734713020255 117.84703981938968
+GO 26.562734713020255 117.84703981938968
+GO 26.562734713020255 117.84703981938968
+GO 26.562734713020255 117.84703981938968
+GO 26.562734713020255 117.84703981938968
+GO 26.40741698990171 117.84940244846993
+GO 25.65338360430131 117.85
+GO 25.02 117.85
+GO 25.02 117.85
+GO 25.02 117.85
+GO 25.02 117.85
+DODGE {"center":{"x":25.02273475881791,"y":0,"z":117.8466642441434},"range":6.75,"to":{"x":16.272735019031842,"z":117.84453029388042}}
+GO 25.02273475881791 117.8466642441434
+GO 25.02273475881791 117.8466642441434
+GO 25.02273475881791 117.8466642441434
+GO 25.02273475881791 117.8466642441434
+GO 25.02273475881791 117.8466642441434
+GO 25.02273475881791 117.8466642441434
+GO 24.420381529796156 117.84998626978218
+GO 23.8 117.85
+GO 23.8 117.85
+GO 23.8 117.85
+GO 23.8 117.85
+PASS Real catalog enemy defeated enemy.greenvale.last_door_sentinel
+GO -6 6
+quest.greenvale.keeper_outpost turn-in
+PASS Persistent main arc completion quest.greenvale.keeper_outpost
+PASS Earned equipment equipped through inventory accessory.cloak.oathkeepers_mantle
+GO -6 6
+quest.greenvale.marches_call accept
+GO 0 116
+GO 248 412
+GO 248 412
+quest.greenvale.marches_call turn-in
+PASS Persistent main arc completion quest.greenvale.marches_call
+GO 248 412
+quest.greenvale.marches_supply accept
+GO 290 400
+GO 335 455
+GO 1408 900
+FAILURE STATE {
+  position: { x: 849.1566440965956, z: 668.9260481773382 },
+  vitals: {
+    health: 161,
+    maxHealth: 161,
+    dead: false,
+    inCombat: false,
+    respawnAvailableAt: null
+  },
+  recent: [
+    { v: 1, t: 'quest.completed', d: [Object] },
+    { v: 1, t: 'auth.ok', ack: 1213, d: [Object] },
+    { v: 1, t: 'party.update', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'quest.completed', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] }
+  ]
+}
+Error: Route deadline 1408,900
+    at go (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:88:48)
+    at async approachNpc (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:164:5)
+    at async <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:397:11)

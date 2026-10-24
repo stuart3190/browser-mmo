@@ -1,0 +1,60 @@
+GO 264 403
+PASS Specific carried gear sold through NPC UI 
+GO 335 455
+GO 510 660
+REPATH {"from":{"x":438.68486927654266,"z":576.122128194415},"waypoint":{"x":490.5047320969786,"z":637.070481882363},"clearance":2}
+GO 264 412
+FAILURE STATE {
+  position: { x: 263.96693549265825, z: 411.9506933782294 },
+  vitals: {
+    health: 264,
+    maxHealth: 264,
+    dead: false,
+    inCombat: false,
+    respawnAvailableAt: null
+  },
+  recent: [
+    { v: 1, t: 'auth.ok', ack: 1, d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'party.update', d: [Object] }
+  ]
+}
+locator.click: Timeout 60000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-service="service.greenvale.craft_sword"]')[22m
+[2m    - locator resolved to <button disabled data-service="service.greenvale.craft_sword">Craft</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    84 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not enabled[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+    at click (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:77:51)
+    at <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:514:11) {
+  log: [
+    `  - waiting for locator('[data-service="service.greenvale.craft_sword"]')`,
+    '    - locator resolved to <button disabled data-service="service.greenvale.craft_sword">Craft</button>',
+    '  - attempting click action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not enabled',
+    '    - retrying click action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not enabled',
+    '    - retrying click action',
+    '      - waiting 100ms',
+    '    84 × waiting for element to be visible, enabled and stable',
+    '       - element is not enabled',
+    '     - retrying click action',
+    '       - waiting 500ms'
+  ],
+  name: 'TimeoutError'
+}

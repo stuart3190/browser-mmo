@@ -1,0 +1,11 @@
+ENTERED finishwar_mvm9azse zone.aurelian.greenvale_marches
+PASS Inventory-backed field tool improves real herb yield 3
+PASS Interrupted paid craft remains collectible {
+  id: '9ada4cc8-3df7-4b88-b80a-7c1e4157c22b',
+  offerId: 'service.greenvale.craft_remedy',
+  readyAtMs: 1792843232523,
+  completed: false
+}
+PASS Timed craft survives relog and yields its real authored output consumable.greenvale.remedy
+PASS Craft completion awards profession XP 
+PASS No browser exceptions []

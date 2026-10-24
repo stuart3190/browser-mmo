@@ -1,0 +1,114 @@
+PASS Normal respawn preserves earned progression 
+GO 1440 1020
+quest.greenvale.marches_vault turn-in
+PASS Persistent main arc completion quest.greenvale.marches_vault
+GO 1440 1020
+quest.greenvale.marches_home accept
+GO 248 412
+REPATH {"from":{"x":1439.6303390472385,"z":1020.0171344071898},"waypoint":{"x":1403.8704176807523,"z":1015.1574918506108},"clearance":2}
+REPATH {"from":{"x":294.06870530924914,"z":435.882100667178},"waypoint":{"x":264.5,"z":426.5},"clearance":2.5}
+GO 256 376
+GO -6 6
+GO -6 6
+quest.greenvale.marches_home turn-in
+PASS Persistent main arc completion quest.greenvale.marches_home
+GO 0 116
+GO 328 455
+quest.greenvale.marches_timber accept
+GO 335 455
+GO 328 455
+quest.greenvale.marches_timber turn-in
+PASS Persistent main arc completion quest.greenvale.marches_timber
+GO 503 660
+REPATH {"from":{"x":431.3294405954069,"z":576.5570405944801},"waypoint":{"x":442.8294405954069,"z":595.0570405944801},"clearance":2}
+quest.greenvale.marches_ore accept
+GO 503 660
+quest.greenvale.marches_ore turn-in
+PASS Persistent main arc completion quest.greenvale.marches_ore
+GO 270 418
+quest.greenvale.marches_river accept
+GO 420 760
+GO 256 96
+GO 270 418
+quest.greenvale.marches_river turn-in
+PASS Persistent main arc completion quest.greenvale.marches_river
+GO 264 412
+quest.greenvale.marches_remedy accept
+GO 391.48 447.33
+GO 392.1923266303445 450.1025256575829
+GO 392.18 449.55
+GO 392.18 449.55
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.wildlife.1
+GO 290 400
+GO 264 412
+quest.greenvale.marches_remedy turn-in
+PASS Persistent main arc completion quest.greenvale.marches_remedy
+GO 248 403
+quest.greenvale.marches_patrol accept
+GO 470 580
+GO 470 610
+GO 470.94070257506377 607.2387060870435
+GO 470.88 607.34
+GO 470.88 607.34
+GO 470.88 607.34
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.boar.2
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+GO 472.19 608.9
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.boar.2
+GO 248 403
+quest.greenvale.marches_patrol turn-in
+PASS Persistent main arc completion quest.greenvale.marches_patrol
+GO 264 403
+PASS Specific carried gear sold through NPC UI 
+GO 335 455
+GO 510 660
+REPATH {"from":{"x":437.42247540361063,"z":575.5684793398692},"waypoint":{"x":489.57174420701966,"z":636.2352228099928},"clearance":2}
+GO 264 412
+PASS Real workshop equipment 
+GO 510 660
+GO 264 403
+REPATH {"from":{"x":454.61428670966285,"z":602.2029229244914},"waypoint":{"x":441.80551159876,"z":581.902063106219},"clearance":2}
+FAILURE STATE {
+  position: { x: 263.8305073530408, z: 403.59094356757964 },
+  vitals: {
+    health: 194,
+    maxHealth: 194,
+    dead: false,
+    inCombat: false,
+    respawnAvailableAt: null
+  },
+  recent: [
+    { v: 1, t: 'quest.completed', d: [Object] },
+    { v: 1, t: 'error', ack: 7282, d: [Object] },
+    { v: 1, t: 'combat.loot', d: [Object] },
+    { v: 1, t: 'quest.completed', d: [Object] },
+    { v: 1, t: 'error', ack: 7946, d: [Object] },
+    { v: 1, t: 'combat.loot', d: [Object] },
+    { v: 1, t: 'combat.loot', d: [Object] },
+    { v: 1, t: 'quest.completed', d: [Object] }
+  ]
+}
+page.waitForFunction: Timeout 60000ms exceeded.
+    at approachNpc (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:169:13)
+    at async <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:485:5) {
+  log: [],
+  name: 'TimeoutError'
+}

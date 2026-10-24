@@ -1,0 +1,11 @@
+GO 264 403
+PASS Specific carried gear sold through NPC UI 
+PASS Previously completed workshop and its equipment survived restart 205c681b-cd36-4b1e-a524-a9fda9104b17
+GO 264 403
+PASS Vendor sell/buy via actual NPC UI 
+PASS Exact purchased instance can be sold once 
+GO 270 390
+PASS Local banker opens existing real vault 
+PASS Persistent discovered atlas labels 
+PASS Crafted equipment survives relog 
+PASS No browser exceptions []

@@ -1,0 +1,151 @@
+PASS Earned equipment equipped through inventory accessory.ring.stillwater_seal
+PASS Earned equipment equipped through inventory accessory.ring.copper_band
+PASS Earned equipment equipped through inventory accessory.necklace.springward_pendant
+PASS Earned equipment equipped through inventory accessory.trinket.keepers_token
+PASS Earned equipment equipped through inventory accessory.cloak.oathkeepers_mantle
+GO 1408 900
+GO 248 412
+quest.greenvale.marches_supply turn-in
+PASS Persistent main arc completion quest.greenvale.marches_supply
+GO 248 412
+quest.greenvale.marches_boundary accept
+GO 600 820
+GO 600 850
+GO 599.69 848.52
+GO 599.69 848.52
+GO 599.69 848.52
+GO 599.69 848.52
+GO 599.69 848.52
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.outlaw.3
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+GO 602.91 849.54
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.outlaw.3
+GO 1440 1020
+GO 1440 1020
+quest.greenvale.marches_boundary turn-in
+PASS Persistent main arc completion quest.greenvale.marches_boundary
+GO 1440 1020
+quest.greenvale.marches_vault accept
+GO 1520 1040
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+GO 1515.71 1038.15
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.stonekin.5
+GO 1570.0955079999972 1080.4095719999743
+REPATH {"from":{"x":1518.07151829588,"z":1039.112523213198},"waypoint":{"x":1533.57151829588,"z":1047.612523213198},"clearance":2}
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+GO 1566.72 1079.17
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.stonekin.5
+GO 1580 1100
+GO 1440 1020
+REPATH {"from":{"x":1579.5209791523712,"z":1099.8635000694949},"waypoint":{"x":1538.590963269171,"z":1085.6209171833946},"clearance":2}
+REPATH {"from":{"x":1467.8635934343108,"z":1036.7563143520772},"waypoint":{"x":1449.5,"z":1029.5},"clearance":2.5}
+quest.greenvale.marches_vault turn-in
+PASS Persistent main arc completion quest.greenvale.marches_vault
+GO 1440 1020
+quest.greenvale.marches_home accept
+GO 248 412
+REPATH {"from":{"x":1439.8699782602107,"z":1020.4212991788343},"waypoint":{"x":1403.116880616882,"z":1014.5482861577732},"clearance":2}
+REPATH {"from":{"x":293.49293492819976,"z":435.27972290133044},"waypoint":{"x":263.5,"z":426.5},"clearance":2.5}
+GO 256 376
+GO -6 6
+GO -6 6
+quest.greenvale.marches_home turn-in
+PASS Persistent main arc completion quest.greenvale.marches_home
+GO 0 116
+GO 328 455
+quest.greenvale.marches_timber accept
+GO 335 455
+GO 328 455
+quest.greenvale.marches_timber turn-in
+PASS Persistent main arc completion quest.greenvale.marches_timber
+GO 503 660
+REPATH {"from":{"x":431.93473529196064,"z":576.9775352913205},"waypoint":{"x":441.43473529196064,"z":593.4775352913205},"clearance":2}
+quest.greenvale.marches_ore accept
+GO 503 660
+quest.greenvale.marches_ore turn-in
+PASS Persistent main arc completion quest.greenvale.marches_ore
+GO 270 418
+quest.greenvale.marches_river accept
+GO 420 760
+REPATH {"from":{"x":270.2578936970046,"z":418.0167212946608},"waypoint":{"x":289.7578936970046,"z":471.5167212946608},"clearance":2}
+GO 256 96
+GO 270 418
+quest.greenvale.marches_river turn-in
+PASS Persistent main arc completion quest.greenvale.marches_river
+GO 264 412
+quest.greenvale.marches_remedy accept
+GO 390.14 449.21
+GO 389.0283301440044 448.5783301440044
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.wildlife.1
+GO 290 400
+GO 264 412
+quest.greenvale.marches_remedy turn-in
+PASS Persistent main arc completion quest.greenvale.marches_remedy
+GO 248 403
+quest.greenvale.marches_patrol accept
+GO 470 580
+GO 470 610
+GO 468.19 608.61
+GO 468.19 608.61
+GO 468.19 608.61
+GO 468.19 608.61
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.boar.2
+GO 472.39 610.3
+GO 472.39 610.3
+GO 472.39 610.3
+GO 472.39 610.3
+GO 472.39 610.3
+GO 472.39 610.3
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.boar.2
+GO 248 403
+quest.greenvale.marches_patrol turn-in
+PASS Persistent main arc completion quest.greenvale.marches_patrol
+GO 264 403
+PASS Specific carried gear sold through NPC UI 
+GO 335 455
+GO 510 660
+REPATH {"from":{"x":438.18712472526266,"z":575.7323139818582},"waypoint":{"x":490.07670483108694,"z":636.6213234699526},"clearance":2}
+GO 264 412

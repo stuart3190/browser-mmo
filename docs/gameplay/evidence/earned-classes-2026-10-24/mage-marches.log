@@ -1,0 +1,136 @@
+PASS Earned equipment equipped through inventory accessory.ring.stillwater_seal
+PASS Earned equipment equipped through inventory accessory.necklace.springward_pendant
+PASS Earned equipment equipped through inventory accessory.trinket.keepers_token
+GO 1408 900
+GO 248 412
+quest.greenvale.marches_supply turn-in
+PASS Persistent main arc completion quest.greenvale.marches_supply
+GO 248 412
+quest.greenvale.marches_boundary accept
+GO 600 820
+GO 600 850
+GO 602.58 848.95
+GO 602.58 848.95
+GO 602.58 848.95
+GO 602.58 848.95
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.outlaw.3
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+GO 601.92 847.77
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.outlaw.3
+GO 1440 1020
+GO 1440 1020
+quest.greenvale.marches_boundary turn-in
+PASS Persistent main arc completion quest.greenvale.marches_boundary
+GO 1440 1020
+quest.greenvale.marches_vault accept
+GO 1520 1040
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+GO 1516.4 1041.11
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.stonekin.5
+GO 1569.79 1079.35
+REPATH {"from":{"x":1517.1899259368756,"z":1038.7503733064116},"waypoint":{"x":1539.6899259368756,"z":1051.2503733064116},"clearance":2}
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+GO 1568.14 1078.74
+PASS Real catalog enemy defeated enemy.world.greenvale_marches.stonekin.5
+GO 1580 1100
+GO 1440 1020
+FAILURE STATE {
+  position: { x: 1574.9002647494472, z: 1094.8822113862705 },
+  vitals: {
+    health: 0,
+    maxHealth: 183,
+    dead: true,
+    inCombat: false,
+    respawnAvailableAt: 1792840332650
+  },
+  recent: [
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'error', ack: 4724, d: [Object] },
+    { v: 1, t: 'combat.loot', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'error', ack: 4833, d: [Object] },
+    { v: 1, t: 'combat.loot', d: [Object] }
+  ]
+}
+Error: Died while travelling
+    at walk (/root/browser-mmo/scripts/e2e/vertical-slice.cjs:26:25)
+    at async go (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:115:11)
+    at async approachNpc (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:167:5)
+    at async questAction (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:184:5)
+    at async <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:420:7)

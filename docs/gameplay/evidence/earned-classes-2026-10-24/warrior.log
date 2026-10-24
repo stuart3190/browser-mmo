@@ -1,0 +1,49 @@
+GO 8 -14
+PASS Fresh arrival and actual starter pickup/equipment 
+GO -6 6
+quest.greenvale.wolves_at_the_edge accept
+GO 13.41518887203088 67.00481112796912
+GO 14.624305487581314 68.89050340498787
+GO 14.62 68.88
+GO 14.62 68.88
+GO 14.62 68.88
+GO 14.62 68.88
+GO 14.62 68.88
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -7.33 72.3
+GO -5.450000009623933 73.81000000467264
+GO -5.45 73.81
+GO -5.45 73.81
+GO -5.45 73.81
+GO -5.45 73.81
+GO -5.45 73.81
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -32.08 104.12
+GO -29.91 104
+GO -29.91 104
+GO -29.91 104
+GO -29.91 104
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO 2.296639999914169 59.913967999897004
+GO 2.75 63.05
+GO 2.75 63.05
+GO 2.75 63.05
+GO 2.75 63.05
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO 88.36597600000859 4.805019999992847
+GO 87.66000248900923 4.349992718905262
+GO 87.66 4.349999999999999
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -6 6
+quest.greenvale.wolves_at_the_edge turn-in
+PASS Persistent main arc completion quest.greenvale.wolves_at_the_edge
+GO -6 6
+quest.greenvale.old_waystone accept
+GO -8 -90
+keyboard.up: Target page, context or browser has been closed
+    at walk (/root/browser-mmo/scripts/e2e/vertical-slice.cjs:42:47)
+    at async go (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:106:11)
+    at async approachNpc (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:156:5)
+    at async <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:417:11) {
+  log: []
+}

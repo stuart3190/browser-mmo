@@ -1,0 +1,136 @@
+GO -6 6
+quest.greenvale.wolves_at_the_edge accept
+GO -7.25 74.04
+GO -8.21 71.88
+GO -8.21 71.88
+GO -8.21 71.88
+GO -8.21 71.88
+GO -8.21 71.88
+GO -8.21 71.88
+GO -8.21 71.88
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO 14.15 68.44
+GO 11.22 69.51
+GO 11.22 69.51
+GO 11.22 69.51
+GO 11.22 69.51
+GO 11.22 69.51
+GO 11.22 69.51
+GO 11.22 69.51
+GO 11.22 69.51
+GO 11.22 69.51
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -32.22 103.72
+GO -29.78 100.84
+GO -29.78 100.84
+GO -29.78 100.84
+GO -29.78 100.84
+GO -29.78 100.84
+GO -29.78 100.84
+GO -29.78 100.84
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO 1.5 61.99
+GO 2.04 62.75
+GO 2.04 62.75
+GO 2.04 62.75
+GO 2.04 62.75
+GO 2.04 62.75
+GO 2.04 62.75
+GO 2.04 62.75
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO 76.73 -2.81
+GO 74.23 -3.53
+GO 74.23 -3.53
+GO 74.23 -3.53
+GO 74.23 -3.53
+GO 74.23 -3.53
+GO 74.23 -3.53
+GO 74.23 -3.53
+PASS Real catalog enemy defeated enemy.greenvale.grey_wolf
+GO -6 6
+quest.greenvale.wolves_at_the_edge turn-in
+PASS Persistent main arc completion quest.greenvale.wolves_at_the_edge
+GO -6 6
+quest.greenvale.old_waystone accept
+GO -8 -90
+GO -6 6
+quest.greenvale.old_waystone turn-in
+PASS Persistent main arc completion quest.greenvale.old_waystone
+GO -8 -90
+quest.greenvale.hollow_trail accept
+GO -58.17 -87.57
+GO -54.38 -89.68
+GO -54.63 -89.53
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+GO -54.62629261862497 -89.53302099794672
+PASS Real catalog enemy defeated enemy.greenvale.brackenmaw
+GO -8 -90
+quest.greenvale.hollow_trail turn-in
+PASS Persistent main arc completion quest.greenvale.hollow_trail
+GO -8 -90
+quest.greenvale.root_wound accept
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+PASS Real catalog enemy defeated enemy.greenvale.hollow_lantern
+GO -8 -90
+quest.greenvale.root_wound turn-in
+PASS Persistent main arc completion quest.greenvale.root_wound
+GO -6 6
+quest.greenvale.stillwater accept
+GO 63 38
+REPATH {"from":{"x":-6.07683236405055,"z":5.583597694241698},"waypoint":{"x":15.42316763594945,"z":25.083597694241696},"clearance":2}
+REPATH {"from":{"x":13.118146896733805,"z":24.778576955026054},"waypoint":{"x":36.618146896733805,"z":35.278576955026054},"clearance":2.5}
+REPATH {"from":{"x":27.06877127612751,"z":35.47300133449128},"waypoint":{"x":63,"z":38},"clearance":3}
+GO 75 27
+REPATH {"from":{"x":60.765582614384996,"z":37.71481267346395},"waypoint":{"x":75,"z":27},"clearance":2}
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+FAILURE STATE {
+  position: { x: 74.51999199458336, z: 27.238803292764977 },
+  vitals: {
+    health: 0,
+    maxHealth: 128,
+    dead: true,
+    inCombat: false,
+    respawnAvailableAt: 1792838800034
+  },
+  recent: [
+    { v: 1, t: 'error', ack: 1720, d: [Object] },
+    { v: 1, t: 'error', ack: 1721, d: [Object] },
+    { v: 1, t: 'error', ack: 1723, d: [Object] },
+    { v: 1, t: 'error', ack: 1725, d: [Object] },
+    { v: 1, t: 'error', ack: 1728, d: [Object] },
+    { v: 1, t: 'error', ack: 1729, d: [Object] },
+    { v: 1, t: 'error', ack: 1730, d: [Object] },
+    { v: 1, t: 'error', ack: 1732, d: [Object] }
+  ]
+}
+Error: Died during enemy.greenvale.siltbound_warden
+    at fight (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:280:33)
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at process.processImmediate (node:internal/timers:452:9)
+    at process.callbackTrampoline (node:internal/async_hooks:130:17)
+    at async <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:435:11)

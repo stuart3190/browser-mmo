@@ -1,0 +1,112 @@
+PASS Earned equipment equipped through inventory armor.leather.trapper_cap
+PASS Earned equipment equipped through inventory accessory.cloak.wayfarer_cloak
+GO -8 -90
+GO -6 6
+quest.greenvale.old_waystone turn-in
+PASS Persistent main arc completion quest.greenvale.old_waystone
+GO -8 -90
+quest.greenvale.hollow_trail accept
+GO -57.702814822660315 -92.41747358618001
+GO -55.48 -91.44
+GO -55.4762150069593 -91.44496820700066
+GO -55.4762150069593 -91.44496820700066
+GO -55.4762150069593 -91.44496820700066
+GO -55.4762150069593 -91.44496820700066
+GO -55.4762150069593 -91.44496820700066
+PASS Real catalog enemy defeated enemy.greenvale.brackenmaw
+GO -8 -90
+quest.greenvale.hollow_trail turn-in
+PASS Persistent main arc completion quest.greenvale.hollow_trail
+GO -8 -90
+quest.greenvale.root_wound accept
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+GO -93 -82
+PASS Real catalog enemy defeated enemy.greenvale.hollow_lantern
+GO -8 -90
+quest.greenvale.root_wound turn-in
+PASS Persistent main arc completion quest.greenvale.root_wound
+GO -6 6
+quest.greenvale.stillwater accept
+GO 63 38
+REPATH {"from":{"x":-6.054343552926369,"z":5.185180474477748},"waypoint":{"x":26.44565644707363,"z":15.685180474477747},"clearance":2}
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+GO 75 27
+PASS Real catalog enemy defeated enemy.greenvale.siltbound_warden
+GO -6 6
+quest.greenvale.stillwater turn-in
+PASS Persistent main arc completion quest.greenvale.stillwater
+GO -6 6
+quest.greenvale.well_records accept
+GO 8 12
+GO 8 110
+GO -6 6
+REPATH {"from":{"x":-1.3897647276112015,"z":65.5348031658936},"waypoint":{"x":-2.823376299418179,"z":30.6027171869314},"clearance":2}
+quest.greenvale.well_records turn-in
+PASS Persistent main arc completion quest.greenvale.well_records
+GO -6 6
+quest.greenvale.keeper_outpost accept
+GO 24 110
+GO 33 118
+GO 32.75 117.8
+GO 32.75 117.8
+GO 32.750552691054544 117.804715642791
+GO 32.750552691054544 117.804715642791
+GO 32.750552691054544 117.804715642791
+GO 32.750552691054544 117.804715642791
+GO 32.750552691054544 117.804715642791
+GO 32.750552691054544 117.804715642791
+GO 32.750552691054544 117.804715642791
+PASS Real catalog enemy defeated enemy.greenvale.last_door_sentinel
+GO -6 6
+quest.greenvale.keeper_outpost turn-in
+PASS Persistent main arc completion quest.greenvale.keeper_outpost
+GO -6 6
+quest.greenvale.marches_call accept
+GO 0 116
+GO 248 412
+GO 248 412
+quest.greenvale.marches_call turn-in
+PASS Persistent main arc completion quest.greenvale.marches_call
+GO 248 412
+quest.greenvale.marches_supply accept
+GO 290 400
+GO 335 455
+GO 1408 900
+FAILURE STATE {
+  position: { x: 849.407177411562, z: 667.6310541923478 },
+  vitals: {
+    health: 198,
+    maxHealth: 198,
+    dead: false,
+    inCombat: false,
+    respawnAvailableAt: null
+  },
+  recent: [
+    { v: 1, t: 'auth.ok', ack: 1934, d: [Object] },
+    { v: 1, t: 'party.update', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'quest.completed', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] },
+    { v: 1, t: 'world.discoveries', d: [Object] }
+  ]
+}
+Error: Route deadline 1408,900
+    at go (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:86:48)
+    at async approachNpc (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:162:5)
+    at async <anonymous> (/root/browser-mmo/scripts/e2e/greenvale-complete.cjs:425:11)
