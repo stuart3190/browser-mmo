@@ -28,7 +28,7 @@ working systems, production uptime, credentials and player data. Do not stop at 
 - [x] Direct trading: revision-bound review/confirmation, atomic items/currency, concurrency proof,
       usable desktop/touch UI and real two-player browser checks.
 - [ ] Social communication/friends and group usability over existing parties.
-- [ ] Player-facing marketplace access over existing authoritative marketplace.
+- [x] Player-facing marketplace access over existing authoritative marketplace.
 - [ ] Combat/class/balance and persistence audit; fix verified gaps, including loot feedback.
 - [ ] Responsive presentation, controls, onboarding and screenshot-based browser review.
 - [ ] Complete playable region/quest/boss journey for both classes, with earned progression.
@@ -59,9 +59,14 @@ cluster and stopped its own processes. FullChecks=false for that runner pass; ag
 Keep the development stack (4471/4472/5180) available for next milestones.
 Chat implementation verified: protocol 8, world 10, gateway party 2 cases, ten three-player browser
 checks, format/lint/types/build. Evidence: `docs/gameplay/evidence/social-2026-10-24`.
-Next implementation: marketplace UI, public exact-item inspection and serialized account listing
-limits. Draft scripts in `/tmp/bo-market-backend.py`, `/tmp/bo-market-tests.py`, and
-`/tmp/bo-MarketWindow.tsx` are not yet applied; inspect before using. Then persistent social features. Do not stop at
-any of these milestones. Production remains unchanged.
+Marketplace implementation now verified: 20 marketplace/trade domain tests, one HTTP case,
+eight two-player browser checks, format/lint/types/build. Evidence in
+`docs/gameplay/evidence/marketplace-2026-10-24`. Current checkpoint is ready to commit.
+Next urgent gap: hosted CI passes all tests but fails `scripts/backup-restore-test.ts`. Logs
+are denied (GitHub token 403); local reproduction `/tmp/bo-backup-reproduce.log` is running on 55441. Old fixture removes migration 0006 but retains later dependents. Repair the fixture and
+prove real backup/restore, then qualify a fixed commit in a detached worktree with
+`scripts/qualify-local.sh` (full checks plus trading/marketplace/social browser suites), allowing
+continued source work without mutating the qualification snapshot. Then persistent friends/DM
+and further game journey/polish. Production remains unchanged. Do not stop at this milestone.
 Browser skill: game-studio/game-playtest; use existing Playwright scripts and inspect screenshots.
 No hosted CI, production capacity, off-host recovery or physical-phone performance claim yet.

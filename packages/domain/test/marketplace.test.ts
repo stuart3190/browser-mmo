@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { and, eq, sql } from 'drizzle-orm';
 import { schema } from '@mmo/db';
+import { GameData } from '@mmo/game-data';
 import type { Item } from '@mmo/schemas';
 import {
   adjustBalanceInTx,
   browseListings,
+  getListingOffer,
+  ownListings,
   buyListing,
   cancelListing,
   createDomainContext,
@@ -18,7 +21,7 @@ import {
   moveItem,
   setItemFlags,
 } from '../src/index';
-import { containerId, expectCode, makePlayer, setupContext } from './helpers';
+import { addCharacter, containerId, expectCode, makePlayer, setupContext } from './helpers';
 import type { TestPlayer } from './helpers';
 
 const ctx = setupContext();
@@ -266,4 +269,89 @@ describe('currency ledger', () => {
     expect(Number(total)).toBe(750);
     expect(await gold(p)).toBe(750);
   });
+});
+
+it('paginates equal-price offers, exposes exact escrowed rolls, and retains private expired/closed listings', async () => {
+  const seller = await makePlayer(ctx);
+  const items = await Promise.all(
+    Array.from({ length: 3 }, () => give(seller, 'weapon.sword.iron_longsword')),
+  );
+  const listings = [];
+  for (const item of items) listings.push(await list(seller, item, 100));
+  const first = await browseListings(ctx.db, ctx.now(), {
+    sellerAccountId: seller.accountId,
+    limit: 2,
+  });
+  const second = await browseListings(ctx.db, ctx.now(), {
+    sellerAccountId: seller.accountId,
+    limit: 2,
+    afterPrice: first[1]!.price,
+    afterId: first[1]!.id,
+  });
+  expect([...first, ...second].map((l) => l.id)).toEqual(listings.map((l) => l.id).sort());
+  const offer = await getListingOffer(ctx, listings[0]!.id);
+  expect(offer.item.instance).toMatchObject({
+    id: items[0]!.instance.id,
+    stats: items[0]!.instance.stats,
+    modifiers: items[0]!.instance.modifiers,
+    quantity: items[0]!.instance.quantity,
+    location: { kind: 'marketplace_escrow', listingId: listings[0]!.id },
+  });
+  await cancelListing(ctx, { actor: actorOf(seller), listingId: listings[0]!.id });
+  await expectCode(getListingOffer(ctx, listings[0]!.id), 'LISTING_NOT_ACTIVE');
+  const future = createDomainContext({
+    ...ctx,
+    now: () => new Date(ctx.now().getTime() + 25 * 3600000),
+  });
+  expect(
+    await browseListings(ctx.db, future.now(), { sellerAccountId: seller.accountId }),
+  ).toHaveLength(0);
+  await expectCode(getListingOffer(future, listings[1]!.id), 'LISTING_NOT_ACTIVE');
+  expect((await ownListings(future, seller.accountId)).map((l) => l.status).sort()).toEqual([
+    'active',
+    'active',
+    'cancelled',
+  ]);
+  const outsider = await makePlayer(ctx);
+  expect(await ownListings(ctx, outsider.accountId)).toEqual([]);
+});
+
+it('checks the reviewed item version and serializes listing limits across concurrent alts', async () => {
+  const seller = await makePlayer(ctx);
+  const alt = {
+    accountId: seller.accountId,
+    characterId: await addCharacter(ctx, seller.accountId),
+  };
+  const a = await give(seller, 'weapon.sword.iron_longsword'),
+    b = await give(alt, 'weapon.sword.iron_longsword');
+  const limited = createDomainContext({
+    ...ctx,
+    gameData: GameData.load({
+      ...ctx.gameData.raw,
+      marketplaceRules: { ...ctx.gameData.raw.marketplaceRules, maxActiveListingsPerAccount: 1 },
+    }),
+  });
+  const create = (p: TestPlayer, item: Item, version = item.instance.version) =>
+    createListing(limited, {
+      actor: actorOf(p),
+      itemInstanceId: item.instance.id,
+      expectedVersion: version,
+      price: 100,
+      durationHours: 12,
+    });
+  await expectCode(create(seller, a, a.instance.version + 1), 'CONFLICT');
+  const before = (await gold(seller)) + (await gold(alt));
+  const outcomes = await Promise.allSettled([create(seller, a), create(alt, b)]);
+  expect(outcomes.filter((x) => x.status === 'fulfilled')).toHaveLength(1);
+  expect(outcomes.filter((x) => x.status === 'rejected')).toHaveLength(1);
+  expect(await ownListings(ctx, seller.accountId)).toHaveLength(1);
+  expect((await gold(seller)) + (await gold(alt))).toBe(before - 10);
+  const owned = await Promise.all(
+    [seller, alt].map((p) => getCharacterItems(ctx.db, ctx, p.accountId, p.characterId)),
+  );
+  expect(
+    owned
+      .flatMap((i) => i.containers.flatMap((c) => c.items))
+      .filter((i) => [a.instance.id, b.instance.id].includes(i.instance.id)),
+  ).toHaveLength(1);
 });

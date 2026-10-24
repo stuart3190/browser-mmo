@@ -43,6 +43,7 @@ async function walk(page, x, z, range = 1.6, timeout = 90000) {
   }
 }
 async function enter(page, username, create, classId = 'class.warrior') {
+  await page.bringToFront();
   await page.goto(WEB);
   await page.fill('[name=username]', username);
   await page.click('#login-form button');

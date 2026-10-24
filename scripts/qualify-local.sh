@@ -74,6 +74,7 @@ for endpoint in "$VITE_API_URL/health/ready" "http://127.0.0.1:$REALTIME_PORT/he
   $ready || { echo "Local endpoint failed to become ready: $endpoint" >&2; exit 1; }
 done
 node scripts/e2e/trading.cjs "$qualification_dir/trading" > "$qualification_dir/trading.log" 2>&1
+node scripts/e2e/marketplace.cjs "$qualification_dir/marketplace" > "$qualification_dir/marketplace.log" 2>&1
 node scripts/e2e/social.cjs "$qualification_dir/social" > "$qualification_dir/social.log" 2>&1
-printf '{"ok":true,"fullChecks":%s,"browserSuites":["trading","social"],"productionTouched":false}\n' "$checks" > "$qualification_dir/result.json"
+printf '{"ok":true,"fullChecks":%s,"browserSuites":["trading","marketplace","social"],"productionTouched":false}\n' "$checks" > "$qualification_dir/result.json"
 cat "$qualification_dir/result.json"

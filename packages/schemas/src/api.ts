@@ -93,6 +93,7 @@ export const ItemResponseSchema = z.object({ item: ItemSchema });
 
 export const CreateListingRequestSchema = z.object({
   characterId: UuidSchema,
+  expectedVersion: z.number().int().nonnegative().optional(),
   itemInstanceId: UuidSchema,
   price: z.number().int().positive(),
   durationHours: z.number().int().positive(),

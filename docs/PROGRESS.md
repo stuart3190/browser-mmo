@@ -340,6 +340,9 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
 
 # Marketplace
 
+- [x] Player-facing marketplace
+  - Verified 2026-10-24 · Codex · exact item inspection, paginated browse, fee preview, list/buy/cancel and private history; eight desktop/touch browser assertions. [Evidence](gameplay/evidence/marketplace-2026-10-24/README.md).
+
 - [x] Listings
   - Verified 2026-10-03 · Claude Opus 5.5 · escrow + fee (test) · 8454ea0
 - [x] Buy
@@ -491,8 +494,8 @@ WASD to the sword → E → `inventory.updated` → HUD shows the item → row v
   - Verified 2026-10-03 · Claude Opus 5.5 · constraints + concurrency tests · 8454ea0
 - [x] Currency protection
   - Verified 2026-10-03 · Claude Opus 5.5 · CHECK >= 0, locked adjustments, ledger (tests) · 8454ea0
-- [ ] Trade protection
-  - Trading not implemented.
+- [x] Trade protection
+  - Verified 2026-10-24 · revision-bound consent, ownership/version checks, atomic rollback and duplicate-confirmation tests · 5b546e9.
 - [x] Marketplace race-condition protection
   - Verified 2026-10-03 · Claude Opus 5.5 · concurrent buyer test · 8454ea0
 - [x] WebSocket validation
@@ -1437,3 +1440,18 @@ still apply. Hosted CI, physical devices, capacity and off-host backup operation
 Next implementation: marketplace browse, exact rolled-item inspection, selling fees, purchase,
 cancellation and own-listing history. Audit found account-wide listing admission is not serialized
 between alts; fix and prove it concurrently while preserving existing item/ledger architecture.
+
+### Marketplace checkpoint — 2026-10-24
+
+- [x] Browse with keyset pagination and template filter; inspect the exact escrowed rolled item;
+      explicit purchase price, selling deposit/proceeds, version check, cancel and own listing history.
+- [x] Close account-wide listing-limit race between alts. Final marketplace + trade domain run:
+      20 tests pass; authenticated API case passes; real two-player browser eight checks pass.
+- [x] Format/lint/types/production builds pass. No DB/content migration; existing architecture retained.
+- [ ] Fresh combined full verification and three-suite isolated runner still pending.
+
+Hosted CI was inspected: run 40083438334 for chat commit 0679fc7 passed format/lint/types/unit and
+integration tests, then failed the backup-restore exercise. Full job logs are unavailable to the
+current GitHub token (403); the failure is being reproduced locally. The old fixture removes only
+migration 0006 while applying later migrations that reference its table. Fix the verified restore
+qualification issue before claiming release readiness. No production database will be used.

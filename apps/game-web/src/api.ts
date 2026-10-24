@@ -7,6 +7,8 @@ import type {
   SessionResponse,
   DirectTrade,
   TradeAction,
+  MarketplaceListing,
+  CreateListingRequest,
 } from '@mmo/schemas';
 import { config } from './config';
 
@@ -96,6 +98,47 @@ export class ApiClient {
       'POST',
       `/v1/characters/${characterId}/trades/${tradeId}`,
       action,
+    );
+  }
+  marketListings(templateId = '', after?: MarketplaceListing) {
+    const query = new URLSearchParams({ limit: '51' });
+    if (templateId) query.set('templateId', templateId);
+    if (after) {
+      query.set('afterPrice', String(after.price));
+      query.set('afterId', after.id);
+    }
+    return this.request<{ listings: MarketplaceListing[] }>(
+      'GET',
+      `/v1/marketplace/listings?${query}`,
+    );
+  }
+  myListings() {
+    return this.request<{ listings: MarketplaceListing[] }>('GET', '/v1/marketplace/mine');
+  }
+  marketOffer(id: string) {
+    return this.request<{ listing: MarketplaceListing; item: Item }>(
+      'GET',
+      `/v1/marketplace/listings/${id}`,
+    );
+  }
+  createListing(request: CreateListingRequest) {
+    return this.request<{ listing: MarketplaceListing }>(
+      'POST',
+      '/v1/marketplace/listings',
+      request,
+    );
+  }
+  cancelListing(id: string) {
+    return this.request<{ listing: MarketplaceListing }>(
+      'POST',
+      `/v1/marketplace/listings/${id}/cancel`,
+    );
+  }
+  buyListing(characterId: string, id: string, expectedPrice: number) {
+    return this.request<{ listing: MarketplaceListing }>(
+      'POST',
+      `/v1/marketplace/listings/${id}/buy`,
+      { characterId, expectedPrice },
     );
   }
 }

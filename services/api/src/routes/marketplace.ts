@@ -1,6 +1,13 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
-import { browseListings, buyListing, cancelListing, createListing } from '@mmo/domain';
+import {
+  browseListings,
+  buyListing,
+  cancelListing,
+  createListing,
+  ownListings,
+  getListingOffer,
+} from '@mmo/domain';
 import {
   BuyListingRequestSchema,
   ContentIdSchema,
@@ -11,10 +18,17 @@ import type { AppDeps } from '../app';
 import { parse, requireSession } from '../http';
 
 const ListingParams = z.object({ listingId: UuidSchema });
-const BrowseQuery = z.object({
-  templateId: ContentIdSchema.optional(),
-  limit: z.coerce.number().int().min(1).max(200).optional(),
-});
+const BrowseQuery = z
+  .object({
+    templateId: ContentIdSchema.optional(),
+    limit: z.coerce.number().int().min(1).max(200).optional(),
+    afterPrice: z.coerce.number().int().min(0).optional(),
+    afterId: UuidSchema.optional(),
+  })
+  .refine(
+    (q) => (q.afterPrice === undefined) === (q.afterId === undefined),
+    'Provide both cursor fields',
+  );
 
 export const marketplaceRoutes =
   (deps: AppDeps): FastifyPluginAsync =>
@@ -27,6 +41,16 @@ export const marketplaceRoutes =
       return { listings: await browseListings(ctx.db, ctx.now(), q) };
     });
 
+    app.get('/marketplace/mine', async (req) => {
+      const s = requireSession(req);
+      return { listings: await ownListings(ctx, s.account.id) };
+    });
+    app.get('/marketplace/listings/:listingId', async (req) => {
+      requireSession(req);
+      const { listingId } = parse(ListingParams, req.params);
+      return getListingOffer(ctx, listingId);
+    });
+
     app.post('/marketplace/listings', async (req, reply) => {
       const s = requireSession(req);
       const body = parse(CreateListingRequestSchema, req.body);
@@ -35,6 +59,7 @@ export const marketplaceRoutes =
         itemInstanceId: body.itemInstanceId,
         price: body.price,
         durationHours: body.durationHours,
+        expectedVersion: body.expectedVersion,
       });
       return reply.status(201).send({ listing });
     });

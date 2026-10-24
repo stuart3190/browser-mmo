@@ -1175,3 +1175,22 @@ from movement admission and survives socket reconnects within the host. Chat is 
 100 recent messages retained in the browser and an unread badge; it is not durable direct messaging.
 Text is trimmed/length-bounded and rendered as text. Persistent friends/DM/guilds remain separate
 unfinished work. The menu bar scrolls on narrow screens to retain readable 44-pixel tap targets.
+
+## 2026-10-24 — Marketplace review and account-wide listing admission
+
+The player marketplace UI reuses existing escrow, fees, item provenance, wallet ledger and atomic
+purchase/cancel/expiry transactions. A public authenticated listing-detail query joins an active
+listing to its exact escrowed item in one database snapshot. Arbitrary item IDs and sold/expired
+listings cannot be inspected through this route. The buyer reviews the existing full item tooltip
+and confirms the listed total price; the existing expected-price check remains authoritative.
+New clients also send the reviewed item version when selling; the additive field stays optional
+for compatibility with existing API clients. No DB/content migration is required.
+
+Listing creation previously checked the account-wide active count without serializing admission.
+It now locks the account `FOR NO KEY UPDATE` before locking the item/counting/charging. This
+serializes alts while allowing foreign-key key-share locks in unrelated item/history transactions.
+A concurrent-alt test with one listing place verifies one winner and one fee. Browse pages use
+(price, UUID) keyset ordering, so equal-price offers are not skipped. Authenticated own-listing
+history includes every active item awaiting return and the latest 50 closed listings, including
+expired escrow hidden from public browse. Full bags still defer automatic return as designed;
+the UI exposes cancellation/reclaim and explains the required free slot.

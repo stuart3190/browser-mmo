@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt, lte } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, lte, ne, or } from 'drizzle-orm';
 import { schema } from '@mmo/db';
 import type { DbOrTx, Tx } from '@mmo/db';
 import { defaultContainerKindFor, isCurrentlyTradeable, listingFee, saleFee } from '@mmo/game-data';
@@ -16,7 +16,7 @@ import { adjustBalanceInTx, lockWallets } from './currency';
 import { recordAudit, recordItemHistory } from './history';
 import { lockItem, requireOwnedCharacter } from './items';
 import type { ItemRow } from './items';
-import { bindingFromRow, locationColumns, locationFromRow } from './mappers';
+import { bindingFromRow, itemViewFromRow, locationColumns, locationFromRow } from './mappers';
 import { inTransaction } from './tx';
 
 type ListingRow = typeof schema.marketplaceListings.$inferSelect;
@@ -103,6 +103,7 @@ export async function createListing(
     itemInstanceId: string;
     price: number;
     durationHours: number;
+    expectedVersion?: number | undefined;
   },
 ): Promise<MarketplaceListing> {
   const rules = ctx.gameData.raw.marketplaceRules;
@@ -119,9 +120,20 @@ export async function createListing(
 
   return inTransaction(ctx, async (tx) => {
     await requireOwnedCharacter(tx, accountId, characterId);
+    // Serialize account-wide listing admission even when two alts list concurrently.
+    await tx
+      .select({ id: schema.accounts.id })
+      .from(schema.accounts)
+      .where(eq(schema.accounts.id, accountId))
+      .for('no key update');
     const item = await lockItem(tx, input.itemInstanceId);
     if (item.ownerAccountId !== accountId)
       throw new DomainError(ErrorCode.ITEM_NOT_OWNED, 'You do not own this item');
+    if (input.expectedVersion !== undefined && item.version !== input.expectedVersion)
+      throw new DomainError(
+        ErrorCode.CONFLICT,
+        'That item changed. Review it again before listing.',
+      );
     if (item.locationKind !== 'container') {
       throw new DomainError(
         ErrorCode.ITEM_NOT_IN_EXPECTED_LOCATION,
@@ -441,7 +453,13 @@ export async function expireListings(ctx: DomainContext, limit = 100): Promise<n
 export async function browseListings(
   db: DbOrTx,
   now: Date,
-  filter: { templateId?: string; sellerAccountId?: string; limit?: number },
+  filter: {
+    templateId?: string;
+    sellerAccountId?: string;
+    limit?: number;
+    afterPrice?: number;
+    afterId?: string;
+  },
 ): Promise<MarketplaceListing[]> {
   const conds = [
     eq(schema.marketplaceListings.status, 'active'),
@@ -450,11 +468,76 @@ export async function browseListings(
   if (filter.templateId) conds.push(eq(schema.marketplaceListings.templateId, filter.templateId));
   if (filter.sellerAccountId)
     conds.push(eq(schema.marketplaceListings.sellerAccountId, filter.sellerAccountId));
+  if (filter.afterPrice !== undefined && filter.afterId)
+    conds.push(
+      or(
+        gt(schema.marketplaceListings.price, filter.afterPrice),
+        and(
+          eq(schema.marketplaceListings.price, filter.afterPrice),
+          gt(schema.marketplaceListings.id, filter.afterId),
+        ),
+      )!,
+    );
   const rows = await db
     .select()
     .from(schema.marketplaceListings)
     .where(and(...conds))
-    .orderBy(asc(schema.marketplaceListings.price))
+    .orderBy(asc(schema.marketplaceListings.price), asc(schema.marketplaceListings.id))
     .limit(Math.min(filter.limit ?? 50, 200));
   return rows.map(listingFromRow);
+}
+
+/** All live/awaiting-return listings plus bounded recent history, for the authenticated account. */
+export async function ownListings(
+  ctx: DomainContext,
+  accountId: string,
+): Promise<MarketplaceListing[]> {
+  const [active, closed] = await Promise.all([
+    ctx.db
+      .select()
+      .from(schema.marketplaceListings)
+      .where(
+        and(
+          eq(schema.marketplaceListings.sellerAccountId, accountId),
+          eq(schema.marketplaceListings.status, 'active'),
+        ),
+      )
+      .orderBy(desc(schema.marketplaceListings.createdAt)),
+    ctx.db
+      .select()
+      .from(schema.marketplaceListings)
+      .where(
+        and(
+          eq(schema.marketplaceListings.sellerAccountId, accountId),
+          ne(schema.marketplaceListings.status, 'active'),
+        ),
+      )
+      .orderBy(desc(schema.marketplaceListings.closedAt))
+      .limit(50),
+  ]);
+  return [...active, ...closed].map(listingFromRow);
+}
+
+/** One consistent public snapshot of the exact escrowed item; no arbitrary item lookup. */
+export async function getListingOffer(ctx: DomainContext, listingId: string) {
+  const [row] = await ctx.db
+    .select({ listing: schema.marketplaceListings, item: schema.itemInstances })
+    .from(schema.marketplaceListings)
+    .innerJoin(
+      schema.itemInstances,
+      and(
+        eq(schema.itemInstances.id, schema.marketplaceListings.itemInstanceId),
+        eq(schema.itemInstances.listingId, schema.marketplaceListings.id),
+        eq(schema.itemInstances.locationKind, 'marketplace_escrow'),
+      ),
+    )
+    .where(
+      and(
+        eq(schema.marketplaceListings.id, listingId),
+        eq(schema.marketplaceListings.status, 'active'),
+        gt(schema.marketplaceListings.expiresAt, ctx.now()),
+      ),
+    );
+  if (!row) throw new DomainError(ErrorCode.LISTING_NOT_ACTIVE, 'Listing is no longer available');
+  return { listing: listingFromRow(row.listing), item: itemViewFromRow(ctx.gameData, row.item) };
 }
