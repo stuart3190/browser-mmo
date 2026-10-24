@@ -91,6 +91,14 @@ button.secondary {
   border-radius: var(--radius);
   padding: 16px;
 }
+.login a {
+  color: var(--accent);
+}
+.startup-reload {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
 .login input,
 .login select,
 .login button {

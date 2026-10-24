@@ -5,7 +5,8 @@ const path = require('node:path');
 const assets = path.resolve(__dirname, '../apps/game-web/dist/assets');
 const entries = fs.readdirSync(assets).filter((name) => /^index-.*\.js$/.test(name));
 if (!entries.length) throw new Error('Missing game release entrypoint');
-for (const name of entries) {
+// Lazy entry/engine chunks must satisfy the same boundary as the HTML entrypoint.
+for (const name of fs.readdirSync(assets).filter((name) => name.endsWith('.js'))) {
   const code = fs.readFileSync(path.join(assets, name), 'utf8');
   if (code.includes('__mmo') || code.includes('react.development'))
     throw new Error('Development/debug code in release bundle. Build with NODE_ENV=production.');

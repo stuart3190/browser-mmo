@@ -10,7 +10,16 @@ if (
 const password = fs.readFileSync(process.env.PROOF_PASSWORD_FILE, 'utf8').trim();
 async function enter(page, username, create, classId = 'class.warrior') {
   await page.bringToFront();
+  const earlyEngineRequests = [];
+  const observe = (request) => {
+    if (/\/assets\/babylon-[^/]+\.js$/.test(new URL(request.url()).pathname))
+      earlyEngineRequests.push(new URL(request.url()).pathname);
+  };
+  page.on('request', observe);
   await page.goto(WEB);
+  await page.locator('[name=username]').waitFor();
+  page.off('request', observe);
+  if (earlyEngineRequests.length) throw Error('Production login eagerly downloads the 3D engine');
   await page.fill('[name=username]', username);
   await page.fill('[name=password]', password);
   await page.click('#login-form button');

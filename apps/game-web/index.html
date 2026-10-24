@@ -12,7 +12,15 @@
   </head>
   <body>
     <canvas id="game" tabindex="0"></canvas>
-    <div id="ui"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div id="ui">
+      <section class="login" aria-label="Loading Broken Odyssey">
+        <div class="eyebrow">A world worth wandering</div>
+        <h1 class="game-title">Broken Odyssey</h1>
+        <p role="status">Loading your adventure…</p>
+        <p>If loading stops, check your connection and <a href="/">reload the game</a>.</p>
+        <noscript>JavaScript is needed to play Broken Odyssey.</noscript>
+      </section>
+    </div>
+    <script type="module" src="/src/bootstrap.ts"></script>
   </body>
 </html>

@@ -13,7 +13,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Keep the engine in its own long-cached chunk.
-        manualChunks: (id) => (id.includes('@babylonjs') ? 'babylon' : undefined),
+        codeSplitting: {
+          groups: [{ name: 'babylon', test: /@babylonjs/, includeDependenciesRecursively: false }],
+        },
       },
     },
   },

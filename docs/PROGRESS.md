@@ -1717,3 +1717,15 @@ Guild layout follow-up: 15 real browser assertions pass in oHpLwU; final screens
 Chat follows new messages only at the end, preserves scrollback and keeps the landscape composer
 visible. Production load now includes consented guild membership, durable messages and history,
 and restores the documented minimum 19.5Hz gate. This workload has not yet been measured.
+
+### Startup recovery — 2026-10-24
+
+- [x] Static loading/reload fallback, caught application/game import failures, and engine loading
+      after character choice. Six injected-failure browser assertions pass in1BU62M; existing
+      character recovers through reload. Types/lint/ten frontend tests pass; production build passes
+      the strengthened all-chunk debug guard. [Evidence](gameplay/evidence/startup-recovery-2026-10-24/README.md).
+- [x] Integrated35ee149 hosted CI40098308166 passes. Local OanPjT passes236unit,117domain,75realtime,
+      12HTTP, full checks/four builds/content/assets and20-table populated upgrade/restore.
+- [ ] OanPjT browser stage failed before first login on a blank page; cause not established.
+      Retained failure, added sanitized network diagnostics. Combined browsers, production delayed
+      engine assertion and unprofiled guild load remain required on the final candidate.
