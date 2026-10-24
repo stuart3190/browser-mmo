@@ -1583,3 +1583,43 @@ remedy job survives interruption/relog, collection grants the authored item and 
 and no browser exceptions. The first driver incorrectly assumed the five-second timer must still
 be running after opening Skills; it now compares a fresh job's ready time with submission time and
 resumes existing paid jobs. Solo Vault traversal is active. No solo/party completion claim yet.
+
+### Inventory presentation — 2026-10-24
+
+- [x] Readable vector item silhouettes replace initials in inventory/equipment slots, preserving
+      rarity, stack counts, selection, accessible names and equipped markers.
+- [x] Equip respects existing visible class/level/proficiency requirements before submission;
+      server validation remains authoritative.
+- [x] Typecheck/lint, ten frontend tests, four builds/debug-hook guard; eleven two-player browser
+      checks using real pickup/trade and reviewed desktop/touch screenshots.
+      [Evidence](gameplay/evidence/inventory-presentation-2026-10-24/README.md).
+
+Prepared in an isolated worktree while earned story journeys continued on the original local
+stack. No production changes. Continue earned class/dungeon proof and release operations; this
+checkpoint does not claim full-game readiness or finished world art.
+
+### Onboarding and ability presentation — 2026-10-24
+
+- [x] Broken Odyssey login branding, readable labeled character/class fields, live-class combat
+      descriptions, duplicate-submit guard/pending feedback, scrollable 44-pixel phone controls.
+- [x] Distinct live ability silhouettes preserve existing server unlock/cooldown/input semantics.
+- [x] Seven actual browser assertions, reviewed phone/landscape/class HUD screenshots; full types,
+      lint, four builds and production debug-hook guard.
+      [Evidence](gameplay/evidence/onboarding-2026-10-24/README.md).
+- [ ] Integrated production password profile and complete earned journeys remain next checks.
+
+### Menu layering — 2026-10-24
+
+- [x] Fix desktop combat controls covering Skills text/actions. Explicit window/detail/tooltip/death
+      layers preserve hit ownership without disabling gameplay underneath a menu.
+- [x] Ten onboarding checks include panel hit-testing at desktop, portrait and landscape sizes;
+      eleven trade/inventory checks pass again. Formatting, script syntax and production game build
+      pass; reviewed screenshots and reports in [evidence](gameplay/evidence/panel-layering-2026-10-24/README.md).
+- [ ] Combined-source production profile and earned dungeon continuation remain separate gates.
+
+Presentation integration: the verified inventory/onboarding/panel changes are now merged into
+`codex/shippable-completion`. Default qualification includes five browser suites (51 assertions
+with panel hit-tests). Frozen 57cd2e2 qualification continues independently; the merged production
+profile is still required. Warrior solo qualification exposed a driver clearing its own target on
+repeated approaches, then issuing NO_TARGET attacks until death. Correct the driver and resume via
+normal respawn; preserve the failed run. This is not evidence for reducing guardian difficulty.

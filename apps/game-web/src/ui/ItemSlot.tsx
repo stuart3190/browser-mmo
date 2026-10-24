@@ -1,10 +1,11 @@
 import type { Item } from '@mmo/schemas';
-import { iconInitials, rarityColor } from '@mmo/ui';
+import { rarityColor } from '@mmo/ui';
 import { useGame } from './context';
 import { hoverTooltip } from './hover';
+import { ItemGlyph } from './ItemGlyph';
 
 /**
- * One slot: icon placeholder (initials on a category colour), rarity border, stack count,
+ * One slot: vector item silhouette on a category colour, rarity border, stack count,
  * equipped marker. Tap/click selects (details sheet with actions, works on touch); mouse hover
  * shows a tooltip.
  */
@@ -41,7 +42,9 @@ export function ItemSlot({
       }
       onPointerLeave={() => hoverTooltip.hide()}
     >
-      <span className="slot-icon">{iconInitials(item)}</span>
+      <span className="slot-icon">
+        <ItemGlyph template={item.template} />
+      </span>
       {item.instance.quantity > 1 && <span className="slot-qty">{item.instance.quantity}</span>}
       {equipped && (
         <span className="slot-equipped" title="Equipped">

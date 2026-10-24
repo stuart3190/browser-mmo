@@ -13,7 +13,7 @@ LOAD_PLAYERS=5 LOAD_SECONDS=120 bash scripts/qualify-local.sh --load
 ```
 
 The default command runs format/lint/types/unit/integration/build, populated upgrade/restore,
-asset/content validation and trade/marketplace/chat/friends browser suites. `--skip-checks` runs
+asset/content validation and trade/marketplace/chat/friends/onboarding browser suites. `--skip-checks` runs
 only the development browser suites; it is not a full release gate.
 
 `--production` runs an additional built-bundle HTTPS/password-auth browser profile. It provisions

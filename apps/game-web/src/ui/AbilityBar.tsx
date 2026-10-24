@@ -3,6 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { useTap } from './tap';
 import { classAbilities } from '@mmo/game-data';
 import { useGame } from './context';
+import { AbilityGlyph } from './AbilityGlyph';
 
 /**
  * Class ability bar. Slots come from the class definition (data-driven); unlock and cooldown
@@ -60,7 +61,7 @@ export function AbilityBar({ touch = false }: { touch?: boolean }) {
             aria-label={label}
           >
             <span className="glyph" style={{ color: a.icon.color }}>
-              {a.icon.glyph}
+              <AbilityGlyph id={a.id} fallback={a.icon.glyph} />
             </span>
             {!touch && <kbd>{i + 1}</kbd>}
             <span className="ability-name">{a.name}</span>

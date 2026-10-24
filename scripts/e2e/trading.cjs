@@ -21,7 +21,12 @@ const characterName = (name) =>
 (async () => {
   const browser = await chromium.launch({
     executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome',
-    args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+    args: [
+      '--use-angle=swiftshader',
+      '--enable-unsafe-swiftshader',
+      '--ignore-gpu-blocklist',
+      ...(process.env.ASSET_PREVIEW_URL ? ['--disable-features=LocalNetworkAccessChecks'] : []),
+    ],
   });
   const desktop = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const phone = await browser.newContext({
@@ -69,6 +74,16 @@ const characterName = (name) =>
       () => window.__mmo.items.find((i) => i.templateId === 'weapon.sword.iron_longsword').id,
     );
     check('Fresh Warrior picks up a real uniquely identified sword', !!sword);
+    await click(a, '[data-open=inventory]');
+    await click(a, `[data-item-id="${sword}"]`);
+    check(
+      'Inventory renders a vector sword and allows the proficient Warrior to equip',
+      (await a.locator(`[data-item-id="${sword}"] svg`).count()) === 1 &&
+        (await a.locator('[data-action=equip]').isEnabled()),
+    );
+    await a.screenshot({ path: `${OUT}/inventory-warrior.png` });
+    await a.keyboard.press('Escape');
+    await a.keyboard.press('Escape');
     await tradeOpen(a);
     await a.getByLabel('Trade with character').fill(characterName(userB));
     await button(a, 'Invite to trade');
@@ -117,6 +132,17 @@ const characterName = (name) =>
         (await b.locator('[data-window=trade] [data-testid=wallet]').textContent()).includes('9s'),
     );
     await b.screenshot({ path: `${OUT}/03-completed-phone.png` });
+    await b.keyboard.press('Escape');
+    await click(b, '[data-open=inventory]');
+    await click(b, `[data-item-id="${sword}"]`);
+    check(
+      'Touch Mage sees the sword requirement and cannot submit an invalid equip',
+      (await b.locator('[data-action=equip]').isDisabled()) &&
+        (await b.locator('[data-action=equip]').getAttribute('title')).includes(
+          'Sword proficiency',
+        ),
+    );
+    await b.screenshot({ path: `${OUT}/inventory-mage-phone.png` });
     await enter(b, userB, false);
     await tradeOpen(b);
     await status(b, 'Trade completed');
