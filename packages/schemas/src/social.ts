@@ -1,31 +1,50 @@
 import { z } from 'zod';
 import { TimestampSchema, UuidSchema } from './common';
 
-/**
- * Account-wide friends and direct messages share contracts with future companion clients.
- * Guilds remain placeholders; the party core is implemented by the authoritative zone.
- */
-
-export const GuildRankSchema = z.object({
-  id: z.string().max(32),
-  name: z.string().max(32),
-  order: z.number().int(),
-  permissions: z.array(
-    z.enum(['invite', 'kick', 'promote', 'vault_deposit', 'vault_withdraw', 'edit_motd']),
-  ),
-});
-
+/** Persistent character guilds; parties continue to belong to the authoritative zone. */
+export const GuildNameSchema = z
+  .string()
+  .trim()
+  .min(3)
+  .max(32)
+  .regex(/^[A-Za-z][A-Za-z0-9 '’-]*[A-Za-z0-9]$/);
+export const GuildTagSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z0-9]{2,5}$/);
+export const GuildRoleSchema = z.enum(['leader', 'officer', 'member']);
 export const GuildSchema = z.object({
   id: UuidSchema,
-  name: z.string().min(3).max(32),
-  tag: z.string().min(2).max(5),
+  name: GuildNameSchema,
+  tag: GuildTagSchema,
   leaderCharacterId: UuidSchema,
-  ranks: z.array(GuildRankSchema),
   motd: z.string().max(500),
   createdAt: TimestampSchema,
-  placeholder: z.literal(true),
 });
 export type Guild = z.infer<typeof GuildSchema>;
+export const GuildMemberSchema = z.object({
+  characterId: UuidSchema,
+  name: z.string(),
+  level: z.number().int(),
+  classId: z.string(),
+  role: GuildRoleSchema,
+  joinedAt: TimestampSchema,
+});
+export const GuildInvitationSchema = z.object({
+  guildId: UuidSchema,
+  name: z.string(),
+  tag: z.string(),
+  expiresAt: TimestampSchema,
+});
+export const GuildStateSchema = z.object({
+  guild: GuildSchema.nullable(),
+  members: z.array(GuildMemberSchema),
+  invitations: z.array(GuildInvitationSchema),
+});
+export type GuildState = z.infer<typeof GuildStateSchema>;
+export const GuildMemberActionSchema = z.enum(['remove', 'promote', 'demote', 'transfer']);
+export type GuildMemberAction = z.infer<typeof GuildMemberActionSchema>;
 
 export const FriendshipSchema = z.object({
   /** Friendships are account-level so they survive alt characters. */
@@ -84,3 +103,13 @@ export type FriendAction = z.infer<typeof FriendActionSchema>;
 export const SendDirectMessageSchema = z
   .object({ id: UuidSchema, body: ChatMessageTextSchema })
   .strict();
+
+export const GuildMessageSchema = z.object({
+  id: UuidSchema,
+  guildId: UuidSchema,
+  fromCharacterId: UuidSchema,
+  fromName: z.string(),
+  body: ChatMessageTextSchema,
+  sentAt: TimestampSchema,
+});
+export type GuildMessage = z.infer<typeof GuildMessageSchema>;

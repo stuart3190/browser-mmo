@@ -1236,3 +1236,29 @@ social service. Contact polling supplies unread badges; active conversation poll
 The UI retains up to 500 messages, supports older-page navigation and pauses latest polling while
 reviewing history. Additive migration 0023 leaves existing gameplay tables untouched. Parties remain
 zone-local and guilds remain separate unfinished work. No public deployment is included.
+
+## 2026-10-24 — Character guilds through the durable social domain
+
+**Decision**
+Replace the unused guild contract placeholder with persistent character membership, consent-based
+invitations, leader/officer/member roles, notices and guild chat. Store guilds independently of
+zone-local parties. Use sorted account/character locks followed by the guild lock, with unique
+one-guild-per-character membership and case-insensitive live names/tags. Scope every HTTP guild
+action and history request to the UI's expected guild UUID. Retain structural audit records and
+message tombstones after disband; expose history only to current members.
+
+**Reason**
+Guilds and guild chat are in the master plan and were still placeholders. Players need persistent
+companions across regions and sessions. Reusing authenticated domain HTTP fits existing friends
+and direct messages, and avoids tying guild authority to a particular zone host. Exact guild
+identity prevents a stale tab from leaking messages or acting on a newly joined guild.
+
+**Alternatives considered**
+Account-wide membership (would prevent independent alt guilds), a zone-owned guild process
+(would couple persistence to travel), or guild vaults in this change (separate asset permission work).
+
+**Consequences**
+Guild UI polls while open; messages arrive within that interval. Membership and invitation limits,
+account-wide durable chat limits and role checks are server-enforced. Migration0024 and restore
+proof must accompany release. This does not increase realtime admission limits or claim 50-player
+capacity. Full rules are in docs/gameplay/guilds.md.

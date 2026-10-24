@@ -13,6 +13,7 @@ import { authRoutes } from './routes/auth';
 import { characterRoutes } from './routes/characters';
 import { marketplaceRoutes } from './routes/marketplace';
 import { tradingRoutes } from './routes/trading';
+import { guildRoutes } from './routes/guilds';
 import { socialRoutes } from './routes/social';
 
 export interface AppDeps {
@@ -166,6 +167,7 @@ export async function buildApp(deps: AppDeps) {
   await app.register(marketplaceRoutes(deps), { prefix: '/v1' });
   await app.register(tradingRoutes(deps), { prefix: '/v1' });
   await app.register(socialRoutes(deps), { prefix: '/v1' });
+  await app.register(guildRoutes(deps), { prefix: '/v1' });
   await app.register(adminRoutes(deps), { prefix: '/v1/admin' });
   return app;
 }

@@ -4,12 +4,14 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 production=false
 load_test=false
+guilds_only=false
 case "${1:-}" in
   '') checks=true ;;
   --skip-checks) checks=false ;;
   --production) checks=false; production=true ;;
+  --guilds) checks=false; guilds_only=true ;;
   --load) checks=false; production=true; load_test=true ;;
-  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks|--production|--load]' >&2; exit 2 ;;
+  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks|--production|--load|--guilds]' >&2; exit 2 ;;
 esac
 PG_BIN=${PG_BIN:-/usr/lib/postgresql/17/bin}
 for tool in initdb pg_ctl createdb; do [[ -x "$PG_BIN/$tool" ]] || { echo "Missing $PG_BIN/$tool" >&2; exit 1; }; done
@@ -86,10 +88,17 @@ for endpoint in "$VITE_API_URL/health/ready" "http://127.0.0.1:$REALTIME_PORT/he
   done
   $ready || { echo "Local endpoint failed to become ready: $endpoint" >&2; exit 1; }
 done
+if $guilds_only; then
+  node scripts/e2e/guilds.cjs "$qualification_dir/guilds" > "$qualification_dir/guilds.log" 2>&1
+  printf '{"ok":true,"browserSuites":["guilds"],"productionTouched":false}\n' > "$qualification_dir/result.json"
+  cat "$qualification_dir/result.json"
+  exit 0
+fi
 node scripts/e2e/trading.cjs "$qualification_dir/trading" > "$qualification_dir/trading.log" 2>&1
 node scripts/e2e/marketplace.cjs "$qualification_dir/marketplace" > "$qualification_dir/marketplace.log" 2>&1
 node scripts/e2e/social.cjs "$qualification_dir/social" > "$qualification_dir/social.log" 2>&1
 node scripts/e2e/friends.cjs "$qualification_dir/friends" > "$qualification_dir/friends.log" 2>&1
 node scripts/e2e/onboarding.cjs "$qualification_dir/onboarding" > "$qualification_dir/onboarding.log" 2>&1
-printf '{"ok":true,"fullChecks":%s,"browserSuites":["trading","marketplace","social","friends","onboarding"],"productionTouched":false}\n' "$checks" > "$qualification_dir/result.json"
+node scripts/e2e/guilds.cjs "$qualification_dir/guilds" > "$qualification_dir/guilds.log" 2>&1
+printf '{"ok":true,"fullChecks":%s,"browserSuites":["trading","marketplace","social","friends","onboarding","guilds"],"productionTouched":false}\n' "$checks" > "$qualification_dir/result.json"
 cat "$qualification_dir/result.json"

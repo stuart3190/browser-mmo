@@ -1648,3 +1648,21 @@ Hosted CI 40092678899 passes the pushed c0a47f1 checkpoint. Merged types/lint pa
       succeeded. Added sanitized request-failure diagnostics; no authentication bypass or retry masking.
 - [ ] Capacity remains unqualified. Profiling/optimization is isolated in a separate source worktree
       while earned actors continue. No production changes or admission-limit increase.
+
+### Persistent guilds — 2026-10-24 (isolated implementation branch)
+
+- [x] Additive migration0024 and character membership, unique live names/tags, expiring accepted
+      invitations, leader/officer permissions, notices, durable private guild chat, stale-guild
+      request protection and structural audit entries. Eight domain concurrency/authorization tests
+      and one authenticated HTTP integration test pass on disposable bo_guilds_test.
+- [x] Full monorepo types pass after UI wiring corrections. Earlier lint passes; final lint/build
+      and complete integration remain required before integration.
+- [ ] Desktop/phone guild UI qualification is running in `/tmp/brokenodyssey-qualification.n0ldqE`.
+      Ten assertions pass so far; completion/disband and reviewed screenshots remain.
+- [ ] Extended 20-table populated upgrade/backup/restore proof running; full combined qualification
+      and production password/TLS guild smoke remain required. No production changes.
+
+Guild qualification update: all 12 desktop/phone browser assertions pass; screenshots reviewed.
+Full types, final lint, four builds/debug-hook guard pass. Populated upgrade and 20-table backup/
+restore pass with actual guild membership, invitation and chat rows. [Evidence](gameplay/evidence/guilds-2026-10-24/README.md).
+Combined-source regression and built-production guild profile remain before integration/release.

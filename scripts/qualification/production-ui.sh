@@ -71,6 +71,7 @@ export FRIENDS_USER_A=$(node -e 'console.log(require(process.env.PRODUCTION_PROO
 export FRIENDS_USER_B=$(node -e 'console.log(require(process.env.PRODUCTION_PROOF_DIR+"/users.json")[1])')
 export PROOF_PASSWORD_FILE="$PRODUCTION_PROOF_DIR/password" QUAL_LOCAL_TLS=true
 node scripts/e2e/friends.cjs "$PRODUCTION_PROOF_DIR/browser" > "$PRODUCTION_PROOF_DIR/browser.log" 2>&1
+GUILDS_EXISTING=1 node scripts/e2e/guilds.cjs "$PRODUCTION_PROOF_DIR/guilds" > "$PRODUCTION_PROOF_DIR/guilds.log" 2>&1
 if $load_test; then
   TEST_DATABASE_URL="$DATABASE_URL" QUAL_URL="$VITE_API_URL" QUAL_ORIGIN="$WEB_URL" QUAL_REALTIME_URL="$VITE_REALTIME_URL/ws" QUAL_METRICS_URL="http://127.0.0.1:$REALTIME_PORT/metrics" NODE_EXTRA_CA_CERTS="$PRODUCTION_PROOF_DIR/cert.pem" LOAD_REPORT="$PRODUCTION_PROOF_DIR/load.json" pnpm exec tsx scripts/qualification/production-load.ts > "$PRODUCTION_PROOF_DIR/load.log" 2>&1
 fi
