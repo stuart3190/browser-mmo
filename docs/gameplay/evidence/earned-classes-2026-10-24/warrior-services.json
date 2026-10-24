@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "user": "finishwar_mvm9azse",
+  "classId": "class.warrior",
+  "checks": [
+    {
+      "name": "Specific carried gear sold through NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Previously completed workshop and its equipment survived restart",
+      "ok": true,
+      "detail": "205c681b-cd36-4b1e-a524-a9fda9104b17"
+    },
+    {
+      "name": "Vendor sell/buy via actual NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Exact purchased instance can be sold once",
+      "ok": true
+    },
+    {
+      "name": "Local banker opens existing real vault",
+      "ok": true
+    },
+    {
+      "name": "Persistent discovered atlas labels",
+      "ok": true
+    },
+    {
+      "name": "Crafted equipment survives relog",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

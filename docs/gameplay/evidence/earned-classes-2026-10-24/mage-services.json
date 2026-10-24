@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "user": "finishmage_mvm9ku7m",
+  "classId": "class.mage",
+  "checks": [
+    {
+      "name": "Specific carried gear sold through NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Previously completed workshop and its equipment survived restart",
+      "ok": true,
+      "detail": "d69917fa-c687-44e0-a4c5-71423ff4b2c8"
+    },
+    {
+      "name": "Vendor sell/buy via actual NPC UI",
+      "ok": true
+    },
+    {
+      "name": "Exact purchased instance can be sold once",
+      "ok": true
+    },
+    {
+      "name": "Local banker opens existing real vault",
+      "ok": true
+    },
+    {
+      "name": "Persistent discovered atlas labels",
+      "ok": true
+    },
+    {
+      "name": "Crafted equipment survives relog",
+      "ok": true
+    },
+    {
+      "name": "No browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

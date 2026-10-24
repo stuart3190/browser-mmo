@@ -3,6 +3,8 @@
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const fs = require('node:fs');
 const { enter, walk } = require('./vertical-slice.cjs');
+const { equipEarned } = require('./earned-equipment.cjs');
+const { leaveGroundWarning } = require('./combat-inputs.cjs');
 const OUT = process.argv[2] || '/tmp/greenvale-systems-browser';
 fs.mkdirSync(OUT, { recursive: true });
 const USER = process.env.SYSTEMS_USER || 'route_muvjmzr0';
@@ -10,17 +12,19 @@ const PARTY = process.env.SYSTEMS_PARTY_USER || 'route_muuzc28m';
 const MODE = process.env.SYSTEMS_MODE || 'solo';
 const TOUCH = process.env.SYSTEMS_TOUCH === '1';
 const checks = [];
+let completed = false;
 function check(name, ok, detail) {
   checks.push({ name, ok: !!ok, detail });
   console.log(ok ? 'PASS' : 'FAIL', name, detail || '');
   fs.writeFileSync(
     `${OUT}/proof.json`,
-    JSON.stringify({ mode: MODE, users: [USER, PARTY], checks }, null, 2),
+    JSON.stringify({ ok: false, mode: MODE, users: [USER, PARTY], checks }, null, 2),
   );
   if (!ok) throw Error(name);
 }
 (async () => {
-  const { getGameData, brokenVault } = await import('../../packages/game-data/src/index.ts');
+  const { getGameData, brokenVault, craftDuration } =
+    await import('../../packages/game-data/src/index.ts');
   const { NavGrid } = await import('../../services/world/src/navigation.ts');
   const gd = getGameData(),
     world = gd.raw.worldCatalog;
@@ -58,7 +62,12 @@ function check(name, ok, detail) {
     await p.bringToFront();
     await close(p);
     let clearance = 2;
-    for (let n = 0; n < 100; n++) {
+    const origin = await p.evaluate(() => window.__mmo.position);
+    const distance = Math.hypot(x - origin.x, z - origin.z);
+    const started = Date.now();
+    const budget = Math.max(120000, distance * 400);
+    for (let n = 0; n < Math.ceil(distance / 60) + 12; n++) {
+      if (Date.now() - started > budget) throw Error(`Route deadline ${x},${z}`);
       const pos = await p.evaluate(() => window.__mmo.position),
         d = Math.hypot(x - pos.x, z - pos.z);
       if (d <= range) return;
@@ -75,7 +84,7 @@ function check(name, ok, detail) {
           maxX: Math.min((bounds.maxCx + 1) * 64, Math.max(pos.x, goal.x) + 16),
           maxZ: Math.min((bounds.maxCz + 1) * 64, Math.max(pos.z, goal.z) + 16),
         },
-        d > 20 ? clearance : 0.8,
+        clearance,
       );
       const path = nav.findPath(pos, goal);
       if (!path) throw Error('No route');
@@ -85,7 +94,7 @@ function check(name, ok, detail) {
             p,
             pt.x,
             pt.z,
-            step === d && pt === path.at(-1) ? range : 1.3,
+            Math.min(range, 1.0),
             Math.max(18000, Math.hypot(pt.x - pos.x, pt.z - pos.z) * 900),
           );
         } catch (e) {
@@ -191,7 +200,8 @@ function check(name, ok, detail) {
   async function startAttack(p, enemy) {
     await p.bringToFront();
     const pos = await p.evaluate((id) => window.__mmo.entityPos(id), enemy.id);
-    await go(p, pos.x, pos.z, 2.5);
+    const classId = await p.evaluate(() => window.__mmo.abilities.classId);
+    await go(p, pos.x, pos.z, classId === 'class.mage' ? 18 : 2.5);
     for (let i = 0; i < 8; i++) {
       if (await p.evaluate((id) => window.__mmo.target.id === id, enemy.id)) break;
       await p.keyboard.press('Tab');
@@ -200,6 +210,16 @@ function check(name, ok, detail) {
     if (!(await p.evaluate(() => window.__mmo.target.attacking))) await p.keyboard.press('KeyF');
   }
   async function fight(p, ref, partner) {
+    for (const actor of partner ? [p, partner] : [p]) {
+      await actor.bringToFront();
+      await actor.waitForFunction(
+        () =>
+          window.__mmo.vitals.inCombat ||
+          window.__mmo.vitals.health >= window.__mmo.vitals.maxHealth - 1,
+        null,
+        { timeout: 120000 },
+      );
+    }
     const alive = await p.evaluate(
         (ref) => window.__mmo.enemies.filter((e) => !e.dead && e.refId === ref),
         ref,
@@ -213,7 +233,7 @@ function check(name, ok, detail) {
     await startAttack(p, enemy);
     if (partner) await startAttack(partner, enemy);
     let used = false;
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 360; i++) {
       await p.bringToFront();
       const state = await p.evaluate(
         (id) => ({
@@ -225,31 +245,40 @@ function check(name, ok, detail) {
       );
       if (state.v.dead) throw Error('Unexpected death fighting ' + ref);
       if (!state.alive) break;
+      if (!state.cue) {
+        const destination = await p.evaluate((id) => window.__mmo.entityPos(id), enemy.id);
+        const classId = await p.evaluate(() => window.__mmo.abilities.classId);
+        if (destination)
+          await go(p, destination.x, destination.z, classId === 'class.mage' ? 18 : 3);
+      }
       if (!partner && !used && state.v.health < state.v.maxHealth - 65) {
         await remedy(p);
         used = true;
       }
-      for (const ability of ['ability.warrior.heavy_strike', 'ability.warrior.battle_strike']) {
+      for (const ability of await p.evaluate(() =>
+        window.__mmo.abilities.list
+          .filter((a) => a.abilityId !== 'ability.common.attack')
+          .map((a) => a.abilityId),
+      )) {
         const btn = p.locator(`[data-testid="ability-${ability}"]`);
         if ((await btn.isEnabled()) && (await btn.getAttribute('data-ready')) === 'true')
           await btn[TOUCH ? 'tap' : 'click']();
       }
-      if (process.env.SYSTEMS_DODGE === '1' && state.cue?.groundPosition) {
-        const ep = state.cue.groundPosition;
-        await go(p, ep.x, ep.z > 32 ? ep.z - 8 : ep.z + 8, 1);
-        await p.waitForTimeout(700);
-        const dest = await p.evaluate((id) => window.__mmo.entityPos(id), enemy.id);
-        if (dest) await go(p, dest.x, dest.z, 2.5);
-      }
+      await leaveGroundWarning(p, state.cue, gd.collisionWorld(await zone(p)));
       if (partner) {
         await partner.bringToFront();
-        for (const ability of ['ability.warrior.heavy_strike', 'ability.warrior.battle_strike']) {
+        await leaveGroundWarning(partner, state.cue, gd.collisionWorld(await zone(partner)));
+        for (const ability of await partner.evaluate(() =>
+          window.__mmo.abilities.list
+            .filter((a) => a.abilityId !== 'ability.common.attack')
+            .map((a) => a.abilityId),
+        )) {
           const btn = partner.locator(`[data-testid="ability-${ability}"]`);
           if ((await btn.isEnabled()) && (await btn.getAttribute('data-ready')) === 'true')
             await btn[TOUCH ? 'tap' : 'click']();
         }
       }
-      await p.waitForTimeout(700);
+      await p.waitForTimeout(250);
     }
     check(
       'Actual private encounter defeated',
@@ -262,11 +291,15 @@ function check(name, ok, detail) {
     await enter(page, USER, false);
     await page.waitForFunction(() => window.__systemEvents.some((m) => m.t === 'systems.state'));
     console.log('ENTERED', USER, await zone(page));
+    await equipEarned(page, gd, TOUCH, check);
     if (MODE === 'professions' || MODE === 'touch-resume') {
       if (MODE !== 'touch-resume') {
         const offer = gd.raw.serviceOffers.find(
           (o) => o.id === (process.env.SYSTEMS_RECIPE || 'service.greenvale.craft_remedy'),
         );
+        const pendingCraft = (await status(page)).jobs.find((j) => !j.completed);
+        if (pendingCraft && pendingCraft.offerId !== offer.id)
+          throw Error('Another paid recipe is pending');
         const xpBefore = (await status(page)).professions.find((p) => p.id === 'crafting').xp;
         const outputBefore = await qty(page, offer.output.itemTemplateId);
         if ((await qty(page, 'tool.herbalism.tier1')) === 0) {
@@ -296,14 +329,28 @@ function check(name, ok, detail) {
             );
           }
         }
-        await npc(page, 'npc.world.greenvale_marches.profession');
-        await page.locator(`[data-service="${offer.id}"]`)[TOUCH ? 'tap' : 'click']();
-        await page.waitForTimeout(700);
-        await close(page);
+        let submittedAt = 0;
+        if (!pendingCraft) {
+          await npc(page, 'npc.world.greenvale_marches.profession');
+          submittedAt = Date.now();
+          await page.locator(`[data-service="${offer.id}"]`)[TOUCH ? 'tap' : 'click']();
+          await page.waitForTimeout(700);
+          await close(page);
+        }
         await skills(page);
         const state = await status(page),
           job = state.jobs.find((j) => !j.completed);
-        check('Craft reserves a durable timed job', job && job.readyAtMs > Date.now(), job);
+        check(
+          pendingCraft
+            ? 'Interrupted paid craft remains collectible'
+            : 'Craft reserves its authored timer',
+          job &&
+            job.offerId === offer.id &&
+            (pendingCraft
+              ? job.id === pendingCraft.id
+              : job.readyAtMs >= submittedAt + craftDuration(offer)),
+          job,
+        );
         await page.screenshot({ path: `${OUT}/craft-desktop.png` });
         await page.reload();
         await enter(page, USER, false);
@@ -390,12 +437,14 @@ function check(name, ok, detail) {
       console.log('AT VAULT');
       if (MODE === 'approach') {
         check('Earned party actor physically reached Vault entrance', true);
+        completed = true;
         return;
       }
       let partner = null;
       if (MODE === 'party') {
         partner = await context.newPage();
         await enter(partner, PARTY, false);
+        await equipEarned(partner, gd, TOUCH, check);
         if (
           !(await status(partner)).instance?.inside &&
           (await zone(partner)) !== 'zone.aurelian.greenvale_marches'
@@ -419,12 +468,12 @@ function check(name, ok, detail) {
         if (!(await status(page)).instance?.inside) {
           await page.bringToFront();
           await page.locator('[data-open=party]')[TOUCH ? 'tap' : 'click']();
-          const name = await partner.evaluate(
-            () => document.querySelector('[data-testid=player-frame]')?.textContent,
-          );
-          await page
-            .getByRole('button', { name: /Invite / })
+          const name = await partner
+            .locator('[data-testid=player-frame] strong')
             .first()
+            .textContent();
+          await page
+            .getByRole('button', { name: `Invite ${name.trim()}`, exact: true })
             [TOUCH ? 'tap' : 'click']();
           await partner.bringToFront();
           await partner
@@ -527,6 +576,7 @@ function check(name, ok, detail) {
       await cmd(page, 'reset');
     }
     check('No browser exceptions', errors.length === 0, errors);
+    completed = true;
     fs.writeFileSync(
       `${OUT}/events.json`,
       JSON.stringify(await page.evaluate(() => window.__systemEvents), null, 2),
@@ -551,6 +601,10 @@ function check(name, ok, detail) {
     );
     throw e;
   } finally {
+    fs.writeFileSync(
+      `${OUT}/proof.json`,
+      JSON.stringify({ ok: completed, mode: MODE, users: [USER, PARTY], checks, errors }, null, 2),
+    );
     await browser.close();
   }
 })().catch((e) => {

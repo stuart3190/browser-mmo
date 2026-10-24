@@ -1547,3 +1547,39 @@ distance-proportional bounded deadlines. These journey changes are still being v
 
 No public deployment or production data mutation. Inventory presentation is verified separately
 on isolated branch codex/presentation-polish, commit ba27b32, awaiting integration.
+
+### Earned journeys and capacity qualification — 2026-10-24, in progress
+
+- [x] Fresh Warrior and Mage actors have each earned twelve main quests and five Marches sides,
+      reaching level five through real movement/combat/UI. Staged logs and screenshots are retained
+      under `/tmp/bo-earned-warrior*` and `/tmp/bo-earned-mage*`; final evidence archive pending.
+- [ ] Service loops, professions, both solo Vault runs and mixed-class party qualification underway.
+      Interrupted Warrior browser left a paid Sword job intact. A resume correctly found the craft
+      button disabled; the driver now collects its existing paid job instead of submitting another.
+- [x] Extended isolated production workload exercises combat, inventory moves, market sales,
+      friendship consent, durable messages and recipient read state. Types/lint/shell syntax pass;
+      two real five-player runs verify workload operations and fail performance gates honestly.
+- [ ] Capacity gate remains red: first run 17.99 Hz/p95 RTT 704 ms; second 19.02 Hz/324 ms. Concurrent
+      software-rendered journeys consume substantial CPU. Quiet-host comparison remains required.
+      [Reports](hardening/evidence/capacity-2026-10-24/README.md). No admission/deployment changes.
+
+Presentation commits are merged with the production-smoke tooling on isolated branch
+`codex/presentation-polish` at `57cd2e2`; its default runner now includes onboarding. Integration
+into the active checkout and full combined qualification remain pending. No complete-game claim.
+
+Earned follow-up: both service continuations pass eight assertions each after the local realtime
+process restart. Paid craft/output state, vendor buy/sell, banker UI and relog persistence are
+verified. [Archived staged evidence](gameplay/evidence/earned-classes-2026-10-24/README.md) includes
+read-only confirmation of 17 paid quests per class. Profession/solo/party continuation now runs in
+`/tmp/bo-earned-systems-continuation`; the combined 57cd2e2 full qualifier is running separately.
+
+Capacity follow-up: the quiet comparison still fails cadence 18.80 Hz, despite RTT p95 improving to
+181 ms. All measured economy/social work succeeded; normal respawns maintained five live actors.
+Two expected target-death races are retained separately by the revised driver. The capacity gate
+remains open; no public limit increase or deployment. Optional CPU profiling is available for diagnosis.
+
+Warrior profession continuation now passes five assertions: field tool yields three herbs, the paid
+remedy job survives interruption/relog, collection grants the authored item and 20 profession XP,
+and no browser exceptions. The first driver incorrectly assumed the five-second timer must still
+be running after opening Skills; it now compares a fresh job's ready time with submission time and
+resumes existing paid jobs. Solo Vault traversal is active. No solo/party completion claim yet.

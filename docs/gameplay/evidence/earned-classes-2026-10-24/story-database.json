@@ -1,0 +1,192 @@
+{
+  "actors": [
+    {
+      "xp": 503,
+      "name": "finishmagemvmjkuhm",
+      "level": 5,
+      "quests": [
+        {
+          "id": "quest.greenvale.hollow_trail",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:43:07.013+02:00"
+        },
+        {
+          "id": "quest.greenvale.keeper_outpost",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:52:48.079+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_boundary",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:10:39.301+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_call",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:53:24.907+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_home",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:27:10.609+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_ore",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:30:25.576+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_patrol",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:40:46.092+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_remedy",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:38:16.081+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_river",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:37:01.781+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_supply",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:05:18.684+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_timber",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:29:06.993+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_vault",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:21:28.158+02:00"
+        },
+        {
+          "id": "quest.greenvale.old_waystone",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:41:44.376+02:00"
+        },
+        {
+          "id": "quest.greenvale.root_wound",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:44:12.07+02:00"
+        },
+        {
+          "id": "quest.greenvale.stillwater",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:49:50.998+02:00"
+        },
+        {
+          "id": "quest.greenvale.well_records",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:51:15.124+02:00"
+        },
+        {
+          "id": "quest.greenvale.wolves_at_the_edge",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:40:00.203+02:00"
+        }
+      ],
+      "classId": "class.mage"
+    },
+    {
+      "xp": 503,
+      "name": "finishwarmvmjazse",
+      "level": 5,
+      "quests": [
+        {
+          "id": "quest.greenvale.hollow_trail",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:41:27.374+02:00"
+        },
+        {
+          "id": "quest.greenvale.keeper_outpost",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:48:25.553+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_boundary",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:07:41.389+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_call",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:49:09.842+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_home",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:16:41.775+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_ore",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:20:29.358+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_patrol",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:32:11.387+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_remedy",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:28:51.4+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_river",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:27:34.787+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_supply",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:02:13.287+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_timber",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:19:02.328+02:00"
+        },
+        {
+          "id": "quest.greenvale.marches_vault",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T13:09:55.984+02:00"
+        },
+        {
+          "id": "quest.greenvale.old_waystone",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:39:42.093+02:00"
+        },
+        {
+          "id": "quest.greenvale.root_wound",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:42:29.638+02:00"
+        },
+        {
+          "id": "quest.greenvale.stillwater",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:44:24.247+02:00"
+        },
+        {
+          "id": "quest.greenvale.well_records",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:46:32.991+02:00"
+        },
+        {
+          "id": "quest.greenvale.wolves_at_the_edge",
+          "status": "completed",
+          "rewardedAt": "2026-10-24T12:31:15.649+02:00"
+        }
+      ],
+      "classId": "class.warrior"
+    }
+  ],
+  "source": "disposable bo_completion_dev; read-only query",
+  "observedAt": "2026-10-24T13:46:33.56955+02:00"
+}

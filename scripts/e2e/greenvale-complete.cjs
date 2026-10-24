@@ -2,20 +2,29 @@
 // Real progression inputs only. NavGrid chooses walking waypoints, not teleports or client claims.
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const { enter, walk } = require('./vertical-slice.cjs');
+const { equipEarned } = require('./earned-equipment.cjs');
+const { leaveGroundWarning } = require('./combat-inputs.cjs');
 const fs = require('node:fs');
 const OUT = process.argv[2] || '/tmp/greenvale-complete';
 fs.mkdirSync(OUT, { recursive: true });
 const CREATE = process.env.GREENVALE_CREATE === '1';
 const SERVICES = process.env.GREENVALE_SERVICES_ONLY === '1';
+const CLASS = process.env.GREENVALE_CLASS || 'class.warrior';
+if (!['class.warrior', 'class.mage'].includes(CLASS)) throw Error('Unsupported journey class');
 const USER =
   process.env.GREENVALE_USER ||
   (CREATE ? 'greenvale_' + Date.now().toString(36) : 'guard_muu9vm2y');
 if (CREATE && !process.env.GREENVALE_FULL)
   throw Error('Fresh playthrough requires GREENVALE_FULL=1');
 const checks = [];
+let completed = false;
 function check(name, ok, detail) {
   checks.push({ name, ok: !!ok, detail });
   console.log(ok ? 'PASS' : 'FAIL', name, detail || '');
+  fs.writeFileSync(
+    `${OUT}/checks.json`,
+    JSON.stringify({ ok: false, user: USER, classId: CLASS, checks }, null, 2),
+  );
   if (!ok) throw Error(name);
 }
 (async () => {
@@ -79,7 +88,12 @@ function check(name, ok, detail) {
     console.log('GO', x, z);
     await p.bringToFront();
     let clearance = 2;
-    for (let n = 0; n < 100; n++) {
+    const origin = await p.evaluate(() => window.__mmo.position);
+    const distance = Math.hypot(x - origin.x, z - origin.z);
+    const started = Date.now();
+    const budget = Math.max(120000, distance * 400);
+    for (let n = 0; n < Math.ceil(distance / 60) + 12; n++) {
+      if (Date.now() - started > budget) throw Error(`Route deadline ${x},${z}`);
       const pos = await p.evaluate(() => window.__mmo.position);
       const d = Math.hypot(x - pos.x, z - pos.z);
       if (d <= range) return;
@@ -96,7 +110,7 @@ function check(name, ok, detail) {
           maxX: Math.min((bounds.maxCx + 1) * 64, Math.max(pos.x, goal.x) + 16),
           maxZ: Math.min((bounds.maxCz + 1) * 64, Math.max(pos.z, goal.z) + 16),
         },
-        d > 20 ? clearance : 0.8,
+        clearance,
       );
       const path = nav.findPath(pos, goal);
       if (!path) throw Error('No walkable route ' + x + ',' + z);
@@ -107,12 +121,14 @@ function check(name, ok, detail) {
             p,
             pt.x,
             pt.z,
-            step === d ? Math.min(range, 1.3) : 1.3,
+            Math.min(range, 1.0),
             Math.max(10000, Math.hypot(pt.x - here.x, pt.z - here.z) * 600),
           );
         } catch (e) {
           if (!e.message.startsWith('Walk deadline')) throw e;
-          clearance = Math.min(5, clearance + 1);
+          console.log('REPATH', JSON.stringify({ from: here, waypoint: pt, clearance }));
+          await p.screenshot({ path: `${OUT}/route-retry.png` });
+          clearance = Math.min(5, clearance + 0.5);
           break;
         }
       }
@@ -151,9 +167,26 @@ function check(name, ok, detail) {
     throw Error('NPC ' + id);
   }
   async function approachNpc(id) {
+    console.log(
+      'NPC approach',
+      id,
+      await p.evaluate(() => ({
+        position: window.__mmo.position,
+        connected: window.__mmo.connected,
+      })),
+    );
     const t = npcPosition(id);
     await sameZone(t.zoneId);
     await go(t.x, t.z, 3);
+    console.log(
+      'NPC interact',
+      id,
+      await p.evaluate(() => ({
+        position: window.__mmo.position,
+        prompt: document.querySelector('.prompt')?.textContent,
+        connected: window.__mmo.connected,
+      })),
+    );
     await interact();
     await p.waitForFunction(
       (id) => document.querySelector('[data-testid=dialogue]') && window.__gvEvents,
@@ -167,6 +200,8 @@ function check(name, ok, detail) {
   async function close() {
     if (await p.getByRole('button', { name: 'Close dialogue', exact: true }).isVisible())
       await click(p.getByRole('button', { name: 'Close dialogue', exact: true }));
+    while (await p.locator('.window-header .icon-button:visible').count())
+      await click(p.locator('.window-header .icon-button:visible').first());
   }
   async function questAction(q, action) {
     const d = gd.quest(q);
@@ -186,6 +221,7 @@ function check(name, ok, detail) {
     );
   }
   async function gather(id, quantity) {
+    if ((await qty(id)) >= quantity) return;
     const nodes = world.resourceNodes.filter(
       (n) => world.resources.find((r) => r.id === n.resourceId).itemTemplateId === id,
     );
@@ -262,7 +298,7 @@ function check(name, ok, detail) {
         await go(sp[0].position.x, sp[0].position.z, 5);
       }
       let chosen = null;
-      for (let i = 0; i < 180; i++) {
+      for (let i = 0; i < 720; i++) {
         const state = await p.evaluate(
           (ref) => ({
             target: window.__mmo.target,
@@ -285,17 +321,24 @@ function check(name, ok, detail) {
           continue;
         }
         chosen = e.id;
+        if (await leaveGroundWarning(p, e.attackCue, gd.collisionWorld(await zone()))) {
+          await p.waitForTimeout(200);
+          continue;
+        }
         const ep = await p.evaluate((id) => window.__mmo.entityPos(id), e.id);
-        await go(ep.x, ep.z, 4);
+        await go(ep.x, ep.z, CLASS === 'class.mage' ? 18 : 3);
         if (!state.target.attacking) {
           if (touch) await p.locator('[data-testid=touch-attack]').tap();
           else await p.keyboard.press('KeyF');
         }
-        for (const id of ['ability.warrior.heavy_strike', 'ability.warrior.battle_strike']) {
+        for (const id of gd.classes
+          .get(CLASS)
+          .baseAbilityIds.filter((id) => id !== 'ability.common.attack')) {
           const button = p.locator(`[data-testid="ability-${id}"]`);
-          if (await button.isEnabled()) await click(button);
+          if ((await button.isEnabled()) && (await button.getAttribute('data-ready')) === 'true')
+            await click(button);
         }
-        await p.waitForTimeout(1200);
+        await p.waitForTimeout(250);
       }
       if (!chosen) throw Error('No real target ' + ref);
       check(
@@ -306,8 +349,8 @@ function check(name, ok, detail) {
     }
   }
   try {
-    await enter(p, USER, CREATE);
-    if (CREATE) {
+    await enter(p, USER, CREATE, CLASS);
+    if (CREATE && CLASS === 'class.warrior') {
       await go(8, -14);
       await interact();
       await p.waitForFunction(() =>
@@ -332,42 +375,7 @@ function check(name, ok, detail) {
       await p.waitForFunction(() => !window.__mmo.vitals.dead);
       check('Normal respawn preserves earned progression', true);
     }
-    // Use genuinely earned gear, via the inventory, before continuing harder encounters.
-    const earned = await p.evaluate(() =>
-      window.__mmo.items
-        .filter((i) => i.location.kind === 'container')
-        .map((i) => ({ id: i.id, templateId: i.templateId })),
-    );
-    for (const suffix of [
-      'armor.leather.trapper_cap',
-      'accessory.ring.copper_band',
-      'accessory.cloak.wayfarer_cloak',
-      'accessory.cloak.oathkeepers_mantle',
-    ]) {
-      if (
-        suffix === 'accessory.cloak.wayfarer_cloak' &&
-        (await p.evaluate(() =>
-          window.__mmo.items.some(
-            (i) =>
-              i.templateId === 'accessory.cloak.oathkeepers_mantle' &&
-              i.location.kind !== 'destroyed',
-          ),
-        ))
-      )
-        continue;
-      const item = earned.find((i) => i.templateId === suffix);
-      if (!item) continue;
-      await click(p.locator('[data-open=inventory]'));
-      await click(p.locator(`[data-container=backpack] [data-item-id="${item.id}"]`));
-      await click(p.locator('[data-action=equip]'));
-      await p.waitForFunction(
-        (id) => window.__mmo.items.find((i) => i.id === id)?.location.kind === 'equipped',
-        item.id,
-      );
-      await p.keyboard.press('Escape');
-      await p.keyboard.press('Escape');
-      check('Earned equipment equipped through inventory', true, suffix);
-    }
+    await equipEarned(p, gd, touch, check);
     await p.waitForFunction(
       () => window.__mmo.vitals.health >= window.__mmo.vitals.maxHealth - 1,
       null,
@@ -407,48 +415,102 @@ function check(name, ok, detail) {
         ]) {
       const id = 'quest.greenvale.' + suffix,
         def = gd.quest(id);
-      let state = await p.evaluate((id) => window.__mmo.quests.find((q) => q.questId === id), id);
-      if (state.state === 'completed') continue;
-      if (state.state === 'available') await questAction(id, 'accept');
-      for (const objective of def.objectives) {
-        state = await p.evaluate((id) => window.__mmo.quests.find((q) => q.questId === id), id);
-        if (state.objectives.find((o) => o.id === objective.id).done) continue;
-        if (objective.kind === 'talk') {
-          await approachNpc(objective.npcId);
-          await close();
-        }
-        if (objective.kind === 'collect') await gather(objective.itemTemplateId, objective.count);
-        if (objective.kind === 'explore') {
-          const l = gd.zones.get(objective.zoneId).landmarks.find((l) => l.id === objective.areaId);
-          await sameZone(objective.zoneId);
-          await go(l.position.x, l.position.z, EXPLORATION_RADIUS - 0.5);
-          await p.waitForTimeout(1600);
-        }
-        if (objective.kind === 'kill')
-          await fight(
-            objective.enemyId,
-            objective.count - state.objectives.find((o) => o.id === objective.id).current,
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          let state = await p.evaluate(
+            (id) => window.__mmo.quests.find((q) => q.questId === id),
+            id,
           );
+          if (state.state === 'completed') break;
+          if (state.state === 'available') await questAction(id, 'accept');
+          for (const objective of def.objectives) {
+            state = await p.evaluate((id) => window.__mmo.quests.find((q) => q.questId === id), id);
+            if (state.objectives.find((o) => o.id === objective.id).done) continue;
+            if (objective.kind === 'talk') {
+              await approachNpc(objective.npcId);
+              await close();
+            }
+            if (objective.kind === 'collect')
+              await gather(objective.itemTemplateId, objective.count);
+            if (objective.kind === 'explore') {
+              const l = gd.zones
+                .get(objective.zoneId)
+                .landmarks.find((l) => l.id === objective.areaId);
+              await sameZone(objective.zoneId);
+              await go(l.position.x, l.position.z, EXPLORATION_RADIUS - 0.5);
+              await p.waitForTimeout(1600);
+            }
+            if (objective.kind === 'kill')
+              await fight(
+                objective.enemyId,
+                objective.count - state.objectives.find((o) => o.id === objective.id).current,
+              );
+          }
+          await p.waitForFunction(
+            (id) => window.__mmo.quests.find((q) => q.questId === id)?.state === 'ready_to_turn_in',
+            id,
+          );
+          await questAction(id, 'turn-in');
+          check(
+            'Persistent main arc completion',
+            await p.evaluate(
+              (id) => window.__mmo.quests.find((q) => q.questId === id)?.state === 'completed',
+              id,
+            ),
+            id,
+          );
+          await p.screenshot({ path: `${OUT}/${suffix}.png` });
+          await equipEarned(p, gd, touch, check);
+          break;
+        } catch (error) {
+          if (attempt === 2 || !(await p.evaluate(() => window.__mmo.vitals.dead))) throw error;
+          const before = await p.evaluate(
+            (id) => ({
+              quest: window.__mmo.quests.find((q) => q.questId === id),
+              progress: window.__mmo.progress,
+            }),
+            id,
+          );
+          await p.screenshot({ path: `${OUT}/${suffix}-death-${attempt + 1}.png` });
+          await click(p.locator('[data-testid=respawn]'));
+          await p.waitForFunction(() => !window.__mmo.vitals.dead);
+          const after = await p.evaluate(
+            (id) => ({
+              quest: window.__mmo.quests.find((q) => q.questId === id),
+              progress: window.__mmo.progress,
+            }),
+            id,
+          );
+          check(
+            'Normal quest recovery preserves earned objectives and XP',
+            (after.progress.level > before.progress.level ||
+              (after.progress.level === before.progress.level &&
+                after.progress.xp >= before.progress.xp)) &&
+              (after.quest.state === 'completed' ||
+                (before.quest.state !== 'completed' &&
+                  before.quest.objectives.every((old) =>
+                    after.quest.objectives.some(
+                      (current) => current.id === old.id && current.current >= old.current,
+                    ),
+                  ))),
+            id,
+          );
+          await p.waitForFunction(
+            () => window.__mmo.vitals.health >= window.__mmo.vitals.maxHealth - 1,
+            null,
+            { timeout: 120000 },
+          );
+          await equipEarned(p, gd, touch, check);
+        }
       }
-      await p.waitForFunction(
-        (id) => window.__mmo.quests.find((q) => q.questId === id)?.state === 'ready_to_turn_in',
-        id,
-      );
-      await questAction(id, 'turn-in');
-      check(
-        'Persistent main arc completion',
-        await p.evaluate(
-          (id) => window.__mmo.quests.find((q) => q.questId === id)?.state === 'completed',
-          id,
-        ),
-        id,
-      );
-      await p.screenshot({ path: `${OUT}/${suffix}.png` });
     }
     // Clear one genuinely earned unwanted cap through the exact-instance vendor interface.
     const unwanted = await p.evaluate(() =>
       window.__mmo.items.find(
-        (i) => i.templateId === 'armor.leather.trapper_cap' && i.location.kind === 'container',
+        (i) =>
+          i.templateId === 'armor.leather.trapper_cap' &&
+          i.location.kind === 'container' &&
+          i.location.containerKind === 'backpack',
       ),
     );
     if (unwanted) {
@@ -463,40 +525,68 @@ function check(name, ok, detail) {
       await close();
     }
     // A complete loop: gather -> craft real equipment -> sell material -> buy real equipment.
-    await gather('material.world.hardwood', 2);
-    await gather('material.world.iron_shard', 4);
-    await approachNpc('npc.world.greenvale_marches.profession');
+    // An interrupted browser can leave an already paid job. Collect that durable result normally.
+    await p.waitForFunction(() => window.__mmo.systems);
+    const pendingWorkshop = await p.evaluate(() =>
+      window.__mmo.systems.jobs.find((j) => !j.completed),
+    );
+    const completedWorkshop =
+      SERVICES && !pendingWorkshop
+        ? await p.evaluate(() =>
+            window.__mmo.systems.jobs.find(
+              (j) => j.completed && j.offerId === 'service.greenvale.craft_sword',
+            ),
+          )
+        : null;
+    if (pendingWorkshop && pendingWorkshop.offerId !== 'service.greenvale.craft_sword')
+      throw Error('Another paid craft is pending; collect it before the workshop journey');
+    if (!pendingWorkshop && !completedWorkshop) {
+      await gather('material.world.hardwood', 2);
+      await gather('material.world.iron_shard', 4);
+      await approachNpc('npc.world.greenvale_marches.profession');
+    } else if (pendingWorkshop)
+      check('Resumed the existing paid workshop job', true, pendingWorkshop.id);
     const before = await p.evaluate(
       () =>
         window.__mmo.items.filter(
           (i) => i.templateId === 'weapon.sword.iron_longsword' && i.location.kind !== 'destroyed',
         ).length,
     );
-    await click(p.locator('[data-service="service.greenvale.craft_sword"]'));
-    await close();
-    await click(p.locator('[data-open=professions]'));
-    await p.waitForFunction(() =>
-      window.__mmo.systems.jobs.some(
-        (j) => j.offerId === 'service.greenvale.craft_sword' && !j.completed,
-      ),
-    );
-    const job = await p.evaluate(() =>
-      window.__mmo.systems.jobs.find(
-        (j) => j.offerId === 'service.greenvale.craft_sword' && !j.completed,
-      ),
-    );
-    await p.waitForTimeout(Math.max(0, job.readyAtMs - Date.now()) + 500);
-    await click(p.locator(`[data-craft-finish="${job.id}"]`));
-    await p.waitForFunction(
-      (n) =>
-        window.__mmo.items.filter(
-          (i) => i.templateId === 'weapon.sword.iron_longsword' && i.location.kind !== 'destroyed',
-        ).length ===
-        n + 1,
-      before,
-    );
-    await close();
-    check('Real workshop equipment', true);
+    if (completedWorkshop) {
+      check(
+        'Previously completed workshop and its equipment survived restart',
+        before > 0,
+        completedWorkshop.id,
+      );
+    } else {
+      if (!pendingWorkshop)
+        await click(p.locator('[data-service="service.greenvale.craft_sword"]'));
+      await close();
+      await click(p.locator('[data-open=professions]'));
+      await p.waitForFunction(() =>
+        window.__mmo.systems.jobs.some(
+          (j) => j.offerId === 'service.greenvale.craft_sword' && !j.completed,
+        ),
+      );
+      const job = await p.evaluate(() =>
+        window.__mmo.systems.jobs.find(
+          (j) => j.offerId === 'service.greenvale.craft_sword' && !j.completed,
+        ),
+      );
+      await p.waitForTimeout(Math.max(0, job.readyAtMs - Date.now()) + 500);
+      await click(p.locator(`[data-craft-finish="${job.id}"]`));
+      await p.waitForFunction(
+        (n) =>
+          window.__mmo.items.filter(
+            (i) =>
+              i.templateId === 'weapon.sword.iron_longsword' && i.location.kind !== 'destroyed',
+          ).length ===
+          n + 1,
+        before,
+      );
+      await close();
+      check('Real workshop equipment', true);
+    }
     await gather('material.world.iron_shard', 1);
     await approachNpc('npc.world.greenvale_marches.merchant');
     const old = await qty('material.world.iron_shard');
@@ -614,12 +704,33 @@ function check(name, ok, detail) {
               i.templateId === 'weapon.sword.iron_longsword' && i.location.kind !== 'destroyed',
           ).length,
       )) >=
-        before + 1,
+        before + (completedWorkshop ? 0 : 1),
     );
     check('No browser exceptions', !errors.length, errors);
+    completed = true;
+  } catch (error) {
+    await p.screenshot({ path: `${OUT}/failure.png` }).catch(() => {});
+    console.error(
+      'FAILURE STATE',
+      JSON.stringify(
+        await p
+          .evaluate(() => ({
+            position: window.__mmo?.position,
+            vitals: window.__mmo?.vitals,
+            connected: window.__mmo?.connected,
+            prompt: document.querySelector('.prompt')?.textContent,
+            recent: window.__gvEvents?.slice(-8),
+          }))
+          .catch(() => null),
+      ),
+    );
+    throw error;
   } finally {
     await b.close();
-    fs.writeFileSync(`${OUT}/checks.json`, JSON.stringify({ user: USER, checks, errors }, null, 2));
+    fs.writeFileSync(
+      `${OUT}/checks.json`,
+      JSON.stringify({ ok: completed, user: USER, classId: CLASS, checks, errors }, null, 2),
+    );
   }
 })().catch((e) => {
   console.error(e);

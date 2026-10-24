@@ -16,6 +16,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function walk(page, x, z, range = 1.6, timeout = 90000) {
   const until = Date.now() + timeout;
   let held = [];
+  let previous = null,
+    stalledSince = Date.now();
   try {
     while (Date.now() < until) {
       const s = await page.evaluate(() => ({
@@ -24,6 +26,12 @@ async function walk(page, x, z, range = 1.6, timeout = 90000) {
         dead: window.__mmo.vitals.dead,
       }));
       if (s.dead) throw new Error('Died while travelling');
+      if (!previous || Math.hypot(s.p.x - previous.x, s.p.z - previous.z) > 0.05) {
+        previous = s.p;
+        stalledSince = Date.now();
+      } else if (Date.now() - stalledSince > 1800) {
+        throw new Error(`Walk deadline ${x},${z} (blocked route)`);
+      }
       const dx = x - s.p.x,
         dz = z - s.p.z;
       if (Math.hypot(dx, dz) <= range) return;

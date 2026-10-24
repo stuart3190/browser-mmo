@@ -1,11 +1,13 @@
-# browser-mmo
+# Broken Odyssey
 
-Foundation for **one persistent, browser-first fantasy MMORPG** intended to grow for years.
+One persistent, browser-first fantasy MMORPG, built with TypeScript, Babylon.js and PostgreSQL.
 
-> Status (2026-10-03): architecture foundation, a playable inventory/equipment loop and a
-> server-authoritative combat foundation (one melee auto-attack loop against a placeholder Grey Wolf:
-> targeting, enemy AI, death/respawn, XP, loot). No abilities, quests, crafting or social systems yet.
-> See [`docs/PROGRESS.md`](docs/PROGRESS.md) for exactly what is verified.
+The playable Greenvale route includes Warrior and Mage combat, a seventeen-quest main/side journey,
+gathering and timed crafting, persistent equipment and loot, a private solo/party Broken Vault,
+trading, a marketplace, chat and friends/direct messages. Further regions are explorable but remain
+largely greybox. Guilds and equipment wear/repair are unfinished. Complete-game release readiness
+is **not** claimed; current verification, failures and next work are recorded in
+[PROGRESS](docs/PROGRESS.md) and the [resumable handoff](docs/COMPLETION_HANDOFF.md).
 
 **Agents: read [`AGENTS.md`](AGENTS.md) first**, then `docs/MASTER_PLAN.md`, `docs/PROGRESS.md`,
 `docs/DECISIONS.md`.
@@ -19,17 +21,20 @@ browser (Babylon.js) ──HTTP──▶ services/api (Fastify) ──┐
                               └─ hosts @mmo/world zone simulation (in-process)
 ```
 
-1. Dev-login and create a character in the browser (HTTP API).
-2. The game connects over WebSocket, authenticates with the session token, joins the zone.
-3. Walk (WASD) — the server validates speed/bounds and replicates movement to other players.
-4. Press **E** at a glowing box — the server checks range, reserves the pickup, mints a uniquely
-   identified item instance in PostgreSQL in one transaction, and pushes `inventory.updated`.
-5. **B** bag, **C** character, **V** bank: equip/unequip, compare, deposit/retrieve. Every action is
-   an authoritative API call; changes from any server process are pushed back over the WebSocket
-   (PostgreSQL change feed), and dropped connections reconnect automatically.
-6. Walk north to the **Grey Wolf**, tap/click it (or Tab), press **F**/Attack. The server times every
-   swing, resolves damage, runs the wolf's AI, awards XP and loot exactly once on its death; the loot
-   lands in your bag and can be equipped. See [`docs/gameplay/combat.md`](docs/gameplay/combat.md).
+1. Log in and create a **Warrior** or **Mage**. Development login is local-only; production uses
+   provisioned password accounts. Sessions authenticate both HTTP and WebSocket actions.
+2. Move with **WASD** or the touch joystick. The server validates movement/collision and replicates
+   players. Select enemies with **Tab** or a tap/click; **F** toggles attacks and **1–3** use abilities.
+3. Follow the opening guide to Elder Maren. **E** interacts with nearby NPCs, pickups and resources.
+   Quests, enemy deaths, XP, currency and item ownership persist on the server.
+4. **B** opens Bag, **C** Character and **V** Bank. Equip, compare and store actual item instances.
+   The Marches workshop reserves timed crafts; **Skills** collects completed results and manages
+   private Broken Vault runs. Reconnects restore authoritative state.
+5. **P** opens Party, **T** direct Trade, **O** Market and **N** Friends. **Enter** opens Nearby,
+   Zone or Party chat. Private conversations require accepted friendship. Touch players use the
+   corresponding menu buttons.
+6. **M** opens World / Travel. Follow guidance to physical departure nodes to visit other regions.
+   See [Greenvale systems](docs/gameplay/greenvale-systems.md) for private-run and profession rules.
 
 ## Quick start
 
@@ -37,16 +42,30 @@ Requirements: **Node 22.13+**, **pnpm 10**, **PostgreSQL 16+**. Docker is not re
 
 ```bash
 cp .env.example .env              # adjust DATABASE_URL / TEST_DATABASE_URL if needed
-pnpm install
+pnpm install --frozen-lockfile
 pnpm db:migrate                   # apply SQL migrations
 pnpm db:seed                      # demo accounts: admin, alice, bob
 pnpm dev                          # api :4000, realtime :4001, game :5173, admin :5174
 ```
 
-Open <http://localhost:5173>, log in with any username, create a character, press E near the
-glowing boxes. Admin tool: <http://localhost:5174> (login `admin`).
+With development login enabled, open <http://localhost:5173>, log in with a username, create a
+character and follow the opening guide. Admin tool: <http://localhost:5174> (login `admin`).
 
 Full setup incl. creating the Postgres role: [`docs/architecture/local-development.md`](docs/architecture/local-development.md).
+
+## Isolated qualification
+
+The qualification runner creates separate loopback services and disposable databases, retains
+logs/screenshots and stops only its own processes:
+
+```bash
+bash scripts/qualify-local.sh               # full checks and browser smoke
+bash scripts/qualify-local.sh --production  # built client, password auth, HTTPS/WSS
+```
+
+[Qualification instructions](docs/hardening/LOCAL_RELEASE_QUALIFICATION.md) describe requirements,
+capacity gates and the longer earned-character journeys. Browser smoke alone does not qualify
+all gameplay, public scale or physical phones. Never point integration tests at persistent data.
 
 ## Common commands
 
