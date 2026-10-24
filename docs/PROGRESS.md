@@ -2074,3 +2074,12 @@ Ranked player-facing gaps from the current client and content:
 - [ ] Next: verify the integrated first-hour story/profession/dungeon journeys with ordinary fresh
       Warrior/Mage, then extend earned continuity into Tidewatch and Elderwood. Use an isolated source
       checkout for the longer browser run so further gameplay implementation can continue safely.
+
+### Integrated earned journeys — started 2026-10-25
+
+- [ ] Fresh Warrior/Mage story, professions, solo and mixed-class Vault through existing ordinary
+      player-action orchestrator. Explicit gameplay-only qualifier registration; isolated source
+      checkout prevents live test reloads while further gameplay implementation continues.
+- Ported the short keyboard path segments validated in Mage's trailwear journey into the full story
+  driver; earlier long segments caused safe replans at fences/props. No runtime pathfinding change.
+- Trailwear commit `63b0869` pushed. Production unchanged. No performance/release qualification.

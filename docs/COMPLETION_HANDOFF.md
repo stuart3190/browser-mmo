@@ -9,10 +9,10 @@ safety validation belongs to a separate later phase; do not claim shipping readi
 ## Source and current milestone
 
 Editable source: `/root/browser-mmo`, branch `codex/shippable-completion`, origin
-`git@github.com:stuart3190/browser-mmo.git`. Last pushed `07c4087` before current trailwear commit.
+`git@github.com:stuart3190/browser-mmo.git`. Latest gameplay commit `63b0869` pushed (trailwear); functional journey registration follows.
 Production initially observed at immutable `2c47b27`; no production mutations in this work.
 
-Class-appropriate trailwear is implemented and verified, ready for commit/push: optional authored
+Class-appropriate trailwear is implemented, verified and pushed as `63b0869`: optional authored
 rewards.classItems; shared server questRewardItems for offers/atomic grant; used and unused class/
 item/stack validation. Fen supplies Mage the existing Apprentice Robe, keeps Warrior cap. Prior
 awards untouched. UI clears selected details when the last inventory/character/bank closes, keeps
@@ -51,7 +51,7 @@ broader art remain long-term incomplete; neither these nor shipping readiness ar
 
 ## Next useful work
 
-1. Commit/push the verified trailwear milestone, then continue gameplay independently.
+1. Continue gameplay independently; the verified trailwear milestone is pushed.
 2. Verify integrated fresh Warrior/Mage story/profession/dungeon journeys against the accumulated
    gameplay changes. `scripts/e2e/earned-journeys.cjs` already orchestrates ordinary player actions,
    with durable stage results/resume. It currently ends at the Vault, not the new chapters. Use a

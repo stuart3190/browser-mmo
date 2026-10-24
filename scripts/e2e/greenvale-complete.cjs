@@ -117,13 +117,16 @@ function check(name, ok, detail) {
       for (const pt of path) {
         const here = await p.evaluate(() => window.__mmo.position);
         try {
-          await walk(
-            p,
-            pt.x,
-            pt.z,
-            Math.min(range, 1.0),
-            Math.max(10000, Math.hypot(pt.x - here.x, pt.z - here.z) * 600),
-          );
+          // Follow the collision-checked path with short eight-direction keyboard segments.
+          const hops = Math.max(1, Math.ceil(Math.hypot(pt.x - here.x, pt.z - here.z) / 2));
+          for (let hop = 1; hop <= hops; hop++)
+            await walk(
+              p,
+              here.x + ((pt.x - here.x) * hop) / hops,
+              here.z + ((pt.z - here.z) * hop) / hops,
+              Math.min(range, 1.0),
+              10000,
+            );
         } catch (e) {
           if (!e.message.startsWith('Walk deadline')) throw e;
           console.log('REPATH', JSON.stringify({ from: here, waypoint: pt, clearance }));
