@@ -3,11 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 production=false
+load_test=false
 case "${1:-}" in
   '') checks=true ;;
   --skip-checks) checks=false ;;
   --production) checks=false; production=true ;;
-  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks|--production]' >&2; exit 2 ;;
+  --load) checks=false; production=true; load_test=true ;;
+  *) echo 'Usage: bash scripts/qualify-local.sh [--skip-checks|--production|--load]' >&2; exit 2 ;;
 esac
 PG_BIN=${PG_BIN:-/usr/lib/postgresql/17/bin}
 for tool in initdb pg_ctl createdb; do [[ -x "$PG_BIN/$tool" ]] || { echo "Missing $PG_BIN/$tool" >&2; exit 1; }; done

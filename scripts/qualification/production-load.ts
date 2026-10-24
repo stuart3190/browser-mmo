@@ -3,7 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import assert from 'node:assert/strict';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import { WebSocket } from 'ws';
@@ -18,8 +18,13 @@ import {
 import { getGameData } from '../../packages/game-data/src/index';
 import { parseServerMessage } from '../../packages/networking/src/index';
 const url = process.env.TEST_DATABASE_URL;
-assert(url && /^\/mmo_load_/.test(new URL(url).pathname), 'isolated mmo_load_* database required');
+assert(
+  url && /^\/(mmo_load_|qualification_prod_)/.test(new URL(url).pathname),
+  'isolated mmo_load_* or qualification_prod_* database required',
+);
 const api = process.env.QUAL_URL ?? 'https://127.0.0.1:4443';
+const origin = process.env.QUAL_ORIGIN ?? new URL(api).origin;
+const realtime = process.env.QUAL_REALTIME_URL ?? api.replace('https:', 'wss:') + '/ws';
 assert(
   api.startsWith('https://'),
   'TLS required; trust the qualification CA with NODE_EXTRA_CA_CERTS',
@@ -33,13 +38,20 @@ const q = (a: number[], p: number) =>
   [...a].sort((a, b) => a - b)[Math.min(a.length - 1, Math.floor(a.length * p))] ?? 0;
 const count = Number(process.env.LOAD_PLAYERS ?? 5),
   seconds = Number(process.env.LOAD_SECONDS ?? 120);
+assert(Number.isInteger(count) && count >= 2 && count <= 20, 'LOAD_PLAYERS must be 2..20');
+assert(
+  Number.isInteger(seconds) && seconds >= 30 && seconds <= 600,
+  'LOAD_SECONDS must be 30..600',
+);
 const clients: any[] = [];
 const report: any = {
+  ok: false,
   at: new Date().toISOString(),
   players: count,
   intendedSeconds: seconds,
   transport: 'TLS, production password auth',
   errors: {},
+  expectedRejections: {},
   httpErrors: {},
   disconnects: 0,
   corrections: 0,
@@ -47,10 +59,14 @@ const report: any = {
   bytesOut: 0,
   damage: 0,
   playerHits: 0,
+  respawnsRequested: 0,
   kills: 0,
   vitals: 0,
   economyWrites: 0,
   sales: 0,
+  socialReads: 0,
+  messagesSent: 0,
+  readReceipts: 0,
   skippedHttpCycles: 0,
 };
 let measuring = false;
@@ -87,7 +103,8 @@ function send(c: any, t: string, d: unknown) {
   if (measuring) report.bytesOut += Buffer.byteLength(raw);
 }
 const metric = (s: string, n: string) => Number(new RegExp(`^${n} (.+)$`, 'm').exec(s)?.[1] ?? 0);
-const metrics = () => fetch('http://127.0.0.1:4401/metrics').then((r) => r.text());
+const metrics = () =>
+  fetch(process.env.QUAL_METRICS_URL ?? 'http://127.0.0.1:4401/metrics').then((r) => r.text());
 let movement: NodeJS.Timeout | undefined,
   actions: NodeJS.Timeout | undefined,
   sampling: NodeJS.Timeout | undefined;
@@ -100,8 +117,8 @@ try {
     body: JSON.stringify({ username: 'disabled', client: 'game_web' }),
   });
   assert.equal(dev.status, 404);
-  assert.equal((await fetch(api + '/metrics')).status, 403);
-  report.productionGates = { onlyPassword: true, devLogin404: true, privateMetrics403: true };
+  assert([403, 404].includes((await fetch(api + '/metrics')).status));
+  report.productionGates = { onlyPassword: true, devLogin404: true, privateMetricsHidden: true };
   for (let i = 0; i < count; i++) {
     const username = `qual_${Date.now()}_${i}`,
       password = randomBytes(24).toString('hex');
@@ -130,8 +147,11 @@ try {
       questId: 'quest.greenvale.wolves_at_the_edge',
       npcId: 'npc.greenvale.elder_maren',
     });
-    const checkpoint = (await handle.pool.query('select payload from zone_checkpoints limit 1'))
-      .rows[0];
+    const checkpoint = (
+      await handle.pool.query(
+        "select payload from zone_checkpoints where zone_id='zone.greenvale.meadows'",
+      )
+    ).rows[0];
     const world = JSON.parse(JSON.parse(checkpoint.payload).simulation);
     const wolves = world.entities.$map
       .map((e: any) => e[1])
@@ -155,6 +175,8 @@ try {
       .container.id;
     const c: any = {
       id: char.id,
+      accountId,
+      name: char.name,
       token,
       itemId: item.instance.id,
       saleId: sale.instance.id,
@@ -170,7 +192,7 @@ try {
       economyPhase: 0,
       sold: false,
     };
-    const ws = new WebSocket(api.replace('https:', 'wss:') + '/ws', { origin: api });
+    const ws = new WebSocket(realtime, { origin });
     c.ws = ws;
     clients.push(c);
     await new Promise<void>((resolve, reject) => {
@@ -210,6 +232,7 @@ try {
         }
         if (m.t === 'player.vitals') {
           c.health = m.d.health;
+          c.respawnAt = m.d.respawnAvailableAt;
           if (measuring) report.vitals++;
         }
         if (m.t === 'combat.damage') {
@@ -226,10 +249,30 @@ try {
           if (measuring) report.kills++;
         }
         if (m.t === 'pong' && measuring) rtts.push(Date.now() - m.d.clientTime);
-        if (m.t === 'error' && measuring) increment(report.errors, m.d.code + ': ' + m.d.message);
+        if (m.t === 'error' && measuring) {
+          // Another player can kill the selected target before our in-flight attack reaches the host.
+          // Retain this normal multiplayer rejection separately; all other protocol errors fail.
+          increment(
+            m.d.code === 'TARGET_DEAD' ? report.expectedRejections : report.errors,
+            m.d.code + ': ' + m.d.message,
+          );
+        }
       });
     });
     await sleep(2200); // real shared-IP login/upgrade admission limits; no spoofed forwarding headers
+  }
+  if (count > 1) {
+    for (let i = 0; i < count; i++) {
+      const from = clients[i],
+        to = clients[(i + 1) % count];
+      from.peer = to;
+      from.inboxPeer = clients[(i + count - 1) % count];
+      if (count === 2 && i === 1) continue;
+      await request(`/characters/${from.id}/social`, from.token, { name: to.name });
+      await request(`/characters/${to.id}/social/${from.accountId}`, to.token, {
+        action: 'accept',
+      });
+    }
   }
   const before = await metrics(),
     started = performance.now();
@@ -237,7 +280,20 @@ try {
   measuring = true;
   movement = setInterval(() => {
     for (const c of clients) {
-      if (c.health <= 0) continue;
+      if (c.health <= 0) {
+        if (
+          c.respawnAt !== null &&
+          c.respawnAt !== undefined &&
+          Date.now() >= c.respawnAt &&
+          Date.now() - (c.lastRespawnRequest ?? 0) > 3000
+        ) {
+          send(c, 'combat.respawn', {});
+          c.lastRespawnRequest = Date.now();
+          c.target = null;
+          report.respawnsRequested++;
+        }
+        continue;
+      }
       const enemies = [...c.entities.values()].filter(
         (e: any) => e.kind === 'enemy' && !e.dead && e.health > 0,
       ) as any[];
@@ -297,6 +353,32 @@ try {
         });
         report.economyWrites++;
         c.economyPhase++;
+        if (c.peer) {
+          await request(`/characters/${c.id}/social`, c.token);
+          const conversation = await request(
+            `/characters/${c.id}/social/${c.inboxPeer.accountId}/messages`,
+            c.token,
+          );
+          report.socialReads += 2;
+          const unread = conversation.messages
+            .filter((m: any) => m.toAccountId === c.accountId && !m.readAt)
+            .map((m: any) => m.id);
+          if (unread.length) {
+            await request(
+              `/characters/${c.id}/social/${c.inboxPeer.accountId}/messages/read`,
+              c.token,
+              { ids: unread },
+            );
+            report.readReceipts += unread.length;
+          }
+          if (c.economyPhase % 3 === 0) {
+            await request(`/characters/${c.id}/social/${c.peer.accountId}/messages`, c.token, {
+              id: randomUUID(),
+              body: 'Private capacity fixture message',
+            });
+            report.messagesSent++;
+          }
+        }
         if (!c.sold && count > 1) {
           c.sold = true;
           const listing = (
@@ -341,6 +423,7 @@ try {
   measuring = false;
   Object.assign(report, {
     elapsedSeconds: elapsed,
+    livePlayersAtEnd: clients.filter((c) => c.health > 0).length,
     simulationHz:
       (metric(after, 'world_ticks_total') - metric(before, 'world_ticks_total')) / elapsed,
     skippedSlots:
@@ -379,6 +462,29 @@ try {
   );
   report.productionGates.logoutDisconnectAndBearerRejection = true;
   console.log(JSON.stringify(report, null, 2));
+  await writeFile(
+    process.env.LOAD_REPORT ?? '/tmp/mmo-production-load.json',
+    JSON.stringify(report, null, 2),
+  );
+  assert.equal(report.disconnects, 0, 'unexpected socket disconnect');
+  assert.equal(Object.keys(report.httpErrors).length, 0, 'HTTP workload failed; inspect report');
+  assert.equal(Object.keys(report.errors).length, 0, 'protocol workload failed; inspect report');
+  assert(report.playerHits > 0 && Number(report.db.rewarded) > 0, 'combat workload inactive');
+  assert(report.simulationHz >= 19, 'simulation missed its 20Hz service target');
+  assert(
+    report.rttMs.samples >= (count * seconds) / 6 && report.rttMs.p95 < 250,
+    'local transport latency gate failed',
+  );
+  assert(report.httpMs.p95 < 500, 'HTTP latency gate failed');
+  assert(report.economyWrites >= count * 5, 'not enough completed economy work');
+  if (count > 1) {
+    assert.equal(report.sales, count, 'marketplace workload incomplete');
+    assert(
+      report.messagesSent >= count && report.readReceipts >= count,
+      'social workload incomplete',
+    );
+  }
+  report.ok = true;
   await writeFile(
     process.env.LOAD_REPORT ?? '/tmp/mmo-production-load.json',
     JSON.stringify(report, null, 2),

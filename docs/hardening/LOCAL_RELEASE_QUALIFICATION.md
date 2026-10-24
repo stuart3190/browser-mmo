@@ -9,6 +9,7 @@ paths print at completion and retain logs/screenshots for investigation.
 pnpm install --frozen-lockfile
 bash scripts/qualify-local.sh
 bash scripts/qualify-local.sh --production
+LOAD_PLAYERS=5 LOAD_SECONDS=120 bash scripts/qualify-local.sh --load
 ```
 
 The default command runs format/lint/types/unit/integration/build, populated upgrade/restore,
@@ -20,9 +21,16 @@ only disposable accounts; both characters are created through the UI. It verifie
 login and public administrative/metrics routes are unavailable, and the client has no development
 observation hook. Its self-signed localhost certificate is a local fixture, not public TLS proof.
 
-Requirements: Node22, pnpm10, PostgreSQL server/client tools (`PG_BIN`, default17 Linux path),
+`--load` adds a bounded concurrent public HTTP/WSS workload after the production browser smoke.
+It uses operator-created equipment/spawn fixtures in its disposable database, not earned actors.
+It exercises combat, inventory moves, marketplace sales, friendship consent, direct messages and
+read receipts, and checks latency, simulation cadence, operation counts and errors. LOAD_PLAYERS
+is 2..20 and LOAD_SECONDS is 30..600; defaults are 5 and 120. Run on a quiet host and retain failed
+reports. A passing local sample does not establish public capacity or authorize admission changes.
+
+Requirements: Node 22, pnpm 10, PostgreSQL server/client tools (`PG_BIN`, default 17 Linux path),
 Chromium (`CHROME_PATH` for the main suites), Playwright (`PLAYWRIGHT_PATH`), setsid, curl and
-Python3. The production profile also needs OpenSSL and Caddy (`CADDY_BIN`, default host binary
+Python 3. The production profile also needs OpenSSL and Caddy (`CADDY_BIN`, default host binary
 /usr/local/bin/brokenodyssey-caddy). No package or service is purchased/provisioned externally.
 
 Private temporary production proof directories contain generated test passwords and TLS keys.
