@@ -241,6 +241,15 @@ export const PlayerAppearanceSchema = z.object({
   classId: ContentIdSchema,
   specialisationId: ContentIdSchema.nullable(),
   mainHandTemplateId: ContentIdSchema.nullable(),
+  /** Visible equipped identities only; omitted by older snapshots. Never client-authored. */
+  gear: z
+    .object({
+      head: ContentIdSchema.nullable(),
+      chest: ContentIdSchema.nullable(),
+      cloak: ContentIdSchema.nullable(),
+      offHand: ContentIdSchema.nullable(),
+    })
+    .optional(),
 });
 export type PlayerAppearance = z.infer<typeof PlayerAppearanceSchema>;
 

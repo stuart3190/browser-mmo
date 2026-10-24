@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five characters at Marches merchant. Existing starting copper buys all gear through real UI; actual equip/remove/movement and relogin on two clients. Mage touch controls/screens. No item grants or injected appearance.",
+  "checks": [
+    {
+      "name": "Warrior shop explains plate proficiency before buying",
+      "ok": true
+    },
+    {
+      "name": "Warrior buys a complete outfit through ordinary merchant stock",
+      "ok": true
+    },
+    {
+      "name": "Warrior equipped armour, cloak and held gear reach both clients",
+      "ok": true
+    },
+    {
+      "name": "Mage shop explains plate proficiency before buying",
+      "ok": true
+    },
+    {
+      "name": "Mage buys a complete outfit through ordinary merchant stock",
+      "ok": true
+    },
+    {
+      "name": "Mage equipped armour, cloak and held gear reach both clients",
+      "ok": true
+    },
+    {
+      "name": "Removing armour, cap, cloak and buckler clears every matching remote slot",
+      "ok": true
+    },
+    {
+      "name": "Warrior relogin preserves exact equipped identities and world appearance",
+      "ok": true
+    },
+    {
+      "name": "Mage relogin preserves exact equipped identities and world appearance",
+      "ok": true
+    },
+    {
+      "name": "No equipment appearance gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

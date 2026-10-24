@@ -1,0 +1,63 @@
+
+> @mmo/game-web@0.0.0 test /root/browser-mmo/apps/game-web
+> vitest run --passWithNoTests
+
+
+ RUN  v5.0.3 /root/browser-mmo/apps/game-web
+
+
+ Test Files  10 passed (10)
+      Tests  28 passed (28)
+   Start at  23:37:47
+   Duration  4.49s (transform 52%, import 43%, tests 5%)
+
+  Transform  transforming modules took 14.23s · 52% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+
+> @mmo/game-data@0.0.0 test /root/browser-mmo/packages/game-data
+> vitest run
+
+
+ RUN  v5.0.3 /root/browser-mmo/packages/game-data
+
+
+ Test Files  20 passed (20)
+      Tests  133 passed (133)
+   Start at  23:37:53
+   Duration  5.35s (import 49%, transform 41%, tests 10%)
+
+  Transform  transforming modules took 19.64s · 41% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+
+> @mmo/world@0.0.0 test /root/browser-mmo/services/world
+> vitest run
+
+
+ RUN  v5.0.3 /root/browser-mmo/services/world
+
+
+ Test Files  18 passed (18)
+      Tests  90 passed (90)
+   Start at  23:37:59
+   Duration  9.87s (transform 54%, import 35%, tests 10%)
+
+  Transform  transforming modules took 51.08s · 54% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+
+> @mmo/schemas@0.0.0 test /root/browser-mmo/packages/schemas
+> vitest run
+
+
+ RUN  v5.0.3 /root/browser-mmo/packages/schemas
+
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  23:38:11
+   Duration  1.46s (transform 72%, import 25%, tests 3%)

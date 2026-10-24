@@ -1543,3 +1543,22 @@ long return from a generic town. Server revival clears the old target and attack
 health rules, cooldowns, items and XP. The death countdown reads the current clock on its first
 visible render; the prior timer initialized while alive could briefly display an inflated wait.
 World damage text renders below the UI, and attack warnings take precedence over transient notices.
+
+## 2026-10-24 — Actual equipment overlays the existing class rig
+
+Extend the optional player appearance record with equipped head, chest, cloak and off-hand template
+identities. Derive them from persisted equipment alongside the main hand; retain broken identities
+and exclude bags/vaults. Existing entity updates, snapshots and checkpoints carry the optional data;
+older snapshots without it still render the class outfit. No item instance IDs or client-selected
+cosmetic authority are added.
+
+The procedural rig gains cap, plate/robe details, three cloak palettes and an articulated buckler.
+Class/path accents and existing weapon art remain. Empty slots remove only the corresponding gear
+overlay. This covers existing authored items, not future armour-slot templates or a transmog system.
+The Marches merchant now sells three previously inaccessible existing armour templates using normal
+exchange/equip rules and prices. The Greenvale completion content pack advances to revision two.
+
+The shop uses the existing equip-rule function to explain class and level eligibility before
+purchase, without preventing legitimate purchases for trading. It no longer implies that an item
+with no explicit class allowlist bypasses equipment proficiency. Inventory/character sheets use
+opaque surfaces so world labels and HUD text do not bleed through the item controls.

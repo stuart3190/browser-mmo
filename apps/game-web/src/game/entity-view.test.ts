@@ -281,3 +281,79 @@ it.each([
     engine.dispose();
   }
 });
+
+it('shows actual equipped armour, cap, cloak and shield, preserves picking and removes them cleanly', () => {
+  const engine = new NullEngine(),
+    scene = new Scene(engine);
+  void scene.defaultMaterial;
+  try {
+    const views = new EntityViews(scene, 'local');
+    const baseline = { meshes: scene.meshes.length, materials: scene.materials.length };
+    const e = {
+      id: 'outfitted',
+      kind: 'player' as const,
+      name: 'Outfitted',
+      position: { x: 0, y: 0, z: 0 },
+      rotationY: 0,
+      refId: null,
+      characterId: null,
+      appearance: {
+        classId: 'class.warrior',
+        specialisationId: null,
+        mainHandTemplateId: 'weapon.sword.iron_longsword',
+        gear: {
+          head: 'armor.leather.trapper_cap',
+          chest: 'armor.plate.recruit_breastplate',
+          cloak: 'accessory.cloak.wayfarer_cloak',
+          offHand: 'armor.shield.oak_buckler',
+        },
+      },
+    };
+    views.upsert(e);
+    for (const name of [
+      'equipped_head_crown',
+      'equipped_chest_plate',
+      'equipped_cloak',
+      'equipped_shield',
+      'equipped_shield_rim',
+    ]) {
+      const mesh = scene.getMeshByName(`outfitted_${name}`)!;
+      expect(mesh).toBeTruthy();
+      expect(views.entityIdOfMesh(mesh)).toBe(e.id);
+    }
+    const count = scene.meshes.length;
+    views.upsert(e);
+    expect(scene.meshes.length).toBe(count);
+    views.upsert({
+      ...e,
+      appearance: {
+        ...e.appearance,
+        gear: { head: null, chest: null, cloak: null, offHand: null },
+      },
+    });
+    expect(scene.meshes.filter((m) => m.name.startsWith('outfitted_equipped_'))).toHaveLength(0);
+    expect(scene.getMeshByName('outfitted_held_sword')).toBeTruthy();
+    views.upsert({
+      ...e,
+      appearance: {
+        classId: 'class.mage',
+        specialisationId: null,
+        mainHandTemplateId: null,
+        gear: {
+          head: null,
+          chest: 'armor.cloth.apprentice_robe',
+          cloak: 'accessory.cloak.rootward_mantle',
+          offHand: null,
+        },
+      },
+    });
+    expect(scene.getMeshByName('outfitted_equipped_chest_sash')).toBeTruthy();
+    expect(scene.getMeshByName('outfitted_equipped_chest_plate')).toBeNull();
+    views.remove(e.id);
+    expect(scene.meshes.length).toBe(baseline.meshes);
+    expect(scene.materials.length).toBe(baseline.materials);
+  } finally {
+    scene.dispose();
+    engine.dispose();
+  }
+});

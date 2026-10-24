@@ -2616,3 +2616,9 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     top: 8px;
   }
 }
+
+/* Inventory and character sheets need the same readable surface as the quest journal. */
+.window,
+.details {
+  background: #172620;
+}

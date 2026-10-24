@@ -2019,3 +2019,16 @@ Ranked player-facing gaps from the current client and content:
       character/inventory panels alongside actual equipment changes and multiplayer browser proof.
 - Most atlas regions, remaining classes/specialisations, guild vault and broader armour/art remain
   long-term incomplete. Production remains unchanged; separate release validation is still required.
+
+### Earned equipment appearance — verified 2026-10-24
+
+- [x] Optional server-derived head/chest/cloak/off-hand identities in existing appearance messages.
+      Existing cap, breastplate, robe, cloaks and buckler render and cleanly disappear on removal.
+      Broken gear retains its identity; stored gear is absent. No new combat rules or migration.
+- [x] Marches outfitter sells existing breastplate (240c), robe (180c), buckler (180c), completing
+      normal access to these templates. Existing prices and quest rewards remain intact.
+- 28 frontend,133 content,90 world,7 schema and18 domain checks pass; repository types/lint/build/
+  content validation pass. Ten two-client ordinary-purchase/equip/remove/relogin browser checks pass.
+- [x] Screenshot review, truthful class/proficiency shop preview, opaque equipment panels and folded
+      cloaks. Three visual follow-up browser checks pass. Evidence: `gameplay/evidence/equipment-appearance-2026-10-24/`.
+- [ ] Next: varied, readable Rootbound Cantor attack sequence with real both-class encounter proof.

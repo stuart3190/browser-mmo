@@ -57,19 +57,29 @@ export async function getCombatProfile(
     .where(eq(schema.characters.id, characterId));
   if (!character) throw new DomainError(ErrorCode.NOT_FOUND, 'Character not found');
   const stats = (await getCharacterStats(db, ctx, characterId)).total;
-  const [mainHand] = await db
+  const visibleEquipment = await db
     .select({
       templateId: schema.itemInstances.templateId,
       durabilityCurrent: schema.itemInstances.durabilityCurrent,
+      slot: schema.itemInstances.equipSlot,
     })
     .from(schema.itemInstances)
     .where(
       and(
         eq(schema.itemInstances.locationKind, 'equipped'),
         eq(schema.itemInstances.equipCharacterId, characterId),
-        eq(schema.itemInstances.equipSlot, 'main_hand'),
+        inArray(schema.itemInstances.equipSlot, [
+          'main_hand',
+          'off_hand',
+          'head',
+          'chest',
+          'cloak',
+        ]),
       ),
     );
+  const mainHand = visibleEquipment.find((i) => i.slot === 'main_hand');
+  const visible = (slot: string) =>
+    visibleEquipment.find((i) => i.slot === slot)?.templateId ?? null;
   const rules = ctx.gameData.raw.combatRules;
   const weaponBlock =
     mainHand && mainHand.durabilityCurrent !== 0
@@ -97,6 +107,12 @@ export async function getCombatProfile(
       classId: character.classId,
       specialisationId: character.specialisationId,
       mainHandTemplateId: mainHand?.templateId ?? null,
+      gear: {
+        head: visible('head'),
+        chest: visible('chest'),
+        cloak: visible('cloak'),
+        offHand: visible('off_hand'),
+      },
     },
     abilityCooldowns: character.abilityCooldowns,
     level: character.level,

@@ -200,7 +200,13 @@ export class ActorModel {
     this.appearanceKey = key;
     this.weapon?.setEnabled(false);
     this.clearOutfit?.();
-    this.clearOutfit = dressHero(this.mesh.getScene(), this.mesh, this.limbs[3]!, appearance);
+    this.clearOutfit = dressHero(
+      this.mesh.getScene(),
+      this.mesh,
+      this.limbs[3]!,
+      appearance,
+      this.limbs[2]!,
+    );
   }
   setArmed(armed: boolean): void {
     this.weapon?.setEnabled(armed && !this.appearanceKey);

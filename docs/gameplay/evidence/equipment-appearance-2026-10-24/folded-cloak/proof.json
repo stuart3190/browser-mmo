@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "fixture": "Read-only lookup of earned outfitter actors; actual login/movement/camera wheel, no state grants.",
+  "checks": [
+    {
+      "name": "Warrior still wears its purchased cloak after visual follow-up login",
+      "ok": true
+    },
+    {
+      "name": "Mage still wears its purchased cloak after visual follow-up login",
+      "ok": true
+    },
+    {
+      "name": "No cloak visual exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

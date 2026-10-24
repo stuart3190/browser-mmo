@@ -8,6 +8,13 @@ capacity or infrastructure work. Keep production unchanged; release validation i
 
 Completed this gameplay pass: level-3 Iron Guard / Frost Nova, status VFX/HUD and touch combat clarity.
 Proof: `gameplay/evidence/tactical-abilities-2026-10-24/` (both class victories; isolated level-3 fixtures).
+Latest completed: visible cap, plate, robe, three cloaks and buckler; server-derived local/remote
+appearance, ordinary Marches merchant access and honest proficiency previews. Ten multiplayer
+purchase/equip/remove/relogin checks plus three folded-cloak follow-up checks pass; screenshots
+reviewed. 28 frontend,133 content,90 world,7 schema,18 domain tests and types/lint/build/content
+validation pass. Evidence: `gameplay/evidence/equipment-appearance-2026-10-24/`. `/tmp/bo-shop-fit.py`
+is integrated and obsolete; do not rerun. Next gameplay task: varied Cantor attack sequence.
+
 Completed: gear condition/wear, broken-gear consequences and paid town repair. Proof:
 `gameplay/evidence/gear-condition-2026-10-24/` includes a fresh level-one real-input journey with
 no grants/teleports, earned 80→79 sword wear and touch repair/relogin at 80. Domain/RT/UI/content
@@ -70,13 +77,11 @@ completed story history; 9 desktop +10 touch browser checks and final screenshot
 Evidence: `gameplay/evidence/adventure-journal-2026-10-24/`. Portrait sizing and a temporary status
 clock regression fixed; failures preserved. Passage-guidance commit `358e314` is pushed.
 
-Next gameplay milestone: earned equipment appearance for existing head/chest/cloak/off-hand items,
-with server-derived identity, local/remote equip/remove and relogin. Current class outfits/weapons
-are cosmetic plus actual main hand; armour-specific art is NOT implemented yet. Candidate items:
-Trapper's Cap, Recruit Breastplate, Apprentice Robe, three earned cloaks, Oak Buckler. Preserve the
-existing appearance/snapshot/rig pipeline and stats rules. Character/inventory translucent panels
-still benefit from opaque backgrounds; verify during real equip UI. Most atlas regions remain
-incomplete. No production, capacity or infrastructure work.
+ACTIVE next gameplay milestone: varied, readable Rootbound Cantor encounter. Existing forest boss
+uses only a fixed ground circle; add authored attack sequencing through the current authoritative
+cue/damage pipeline, preserve checkpoint recovery, and verify actual dodging with both classes.
+Equipment milestone is verified (see latest entry above). All armour test controllers have stopped.
+Most atlas regions remain incomplete. No production, capacity or infrastructure work.
 
 All `/tmp/bo-*-draft.py`, `/tmp/build-forest-driver.py`, `/tmp/bo-gameplay-polish.py` generators used
 this pass are OBSOLETE and must not be rerun. Current source contains their corrected integration.

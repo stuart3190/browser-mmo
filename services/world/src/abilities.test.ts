@@ -313,6 +313,12 @@ it('replicates server profile appearance to nearby players, including equipment 
     classId: 'class.warrior',
     specialisationId: 'spec.warrior.guardian',
     mainHandTemplateId: 'weapon.sword.iron_longsword',
+    gear: {
+      head: 'armor.leather.trapper_cap',
+      chest: 'armor.plate.recruit_breastplate',
+      cloak: 'accessory.cloak.wayfarer_cloak',
+      offHand: 'armor.shield.oak_buckler',
+    },
   };
   const w = t.join(near, { ...warrior, level: 5, appearance });
   const m = t.join({ ...near, x: near.x + 2 }, { ...mage, level: 5 });
@@ -331,6 +337,7 @@ it('replicates server profile appearance to nearby players, including equipment 
   t.drain();
   expect(t.of(m, 'entity.spawn').at(-1)!.d.entity.appearance?.mainHandTemplateId).toBeNull();
   expect(t.of(w, 'entity.spawn').at(-1)!.d.entity.appearance?.mainHandTemplateId).toBeNull();
+  expect(t.of(m, 'entity.spawn').at(-1)!.d.entity.appearance?.gear).toEqual(appearance.gear);
   const restored = new ZoneSimulation(arenaGameData(), ARENA, { nowMs: t.now });
   restored.restoreCheckpoint(t.sim.checkpoint());
   expect(restored.listEntities().find((e) => e.id === own)!.appearance).toEqual({
