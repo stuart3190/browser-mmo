@@ -2834,3 +2834,73 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
 .atlas-pin {
   -webkit-tap-highlight-color: transparent;
 }
+
+.combat-handbook {
+  border: 1px solid #66775c;
+  border-radius: 6px;
+  background: #12231e;
+  margin: 10px 0;
+  padding: 0 10px;
+}
+.combat-handbook summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  color: #e5cd85;
+  -webkit-tap-highlight-color: transparent;
+}
+.combat-handbook article {
+  border-top: 1px solid #66775c;
+  padding: 10px 0;
+}
+.combat-handbook article header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.combat-handbook article header strong {
+  flex: 1;
+}
+.combat-handbook p {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.handbook-glyph {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+.handbook-glyph svg {
+  width: 100%;
+  height: 100%;
+}
+.handbook-ready {
+  color: #a7dca5;
+}
+.combat-handbook dl {
+  margin: 8px 0;
+  font-size: 12px;
+}
+.combat-handbook dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 4px 0;
+}
+.combat-handbook dt {
+  color: #b9c1ad;
+}
+.combat-handbook dd {
+  margin: 0;
+  text-align: right;
+}
+
+/* Keep the Character close control reachable while reading a long class reference on touch. */
+.window-character .window-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  flex-shrink: 0;
+  background: #172620;
+}

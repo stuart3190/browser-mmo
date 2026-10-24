@@ -2099,3 +2099,19 @@ Ranked player-facing gaps from the current client and content:
   `/tmp/bo-integrated-earned-browser.log`. Do not edit its runtime while browser runs.
 - Prepared explicit existing-user coast/forest continuation and optional `EARNED_CHAPTERS=1`;
   not browser-verified yet. Preserve staged evidence and never claim an uninterrupted run.
+
+### Class ability handbook — verified 2026-10-25
+
+- [x] Collapsed reference in Character makes all four current/future class abilities readable on
+      touch. Uses server unlocks and shared effectiveAbility for path-specific cooldowns/reduction;
+      explains reach, target requirements and tactical effects without casting on inspection.
+- [x] Fifteen fresh level-one desktop/portrait checks and twenty mentor/retraining/combat checks
+      pass. Guardian/Berserker/Frost/Fire text follows real training and cooldowns. Seventeen final
+      inspection checks prove the Character close button stays on screen while reading on touch.
+- 31 frontend tests, repository types/lint/build pass. Final CSS production build passes. Screenshots
+  reviewed; evidence `gameplay/evidence/class-handbook-2026-10-25/`.
+- Initial browser failed before login: failed fetch of /src/main.ts, now captured in DEV console.
+  Diagnostic rerun after build passed; cause is unproven, not claimed fixed. Failure retained.
+- [ ] Next: a return-home conclusion and short post-story regional patrols, using existing quest,
+      reward and 24-hour cooldown rules. Continue the independent earned story/systems journey.
+- Regional chart committed/pushed as `2a02a70`. Production untouched.

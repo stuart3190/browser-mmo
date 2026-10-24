@@ -1602,3 +1602,11 @@ multiple zones exposes a Map area selector instead of plotting unrelated coordin
 The chart starts at the player (or a remote region's port), supports explicit zoom/pan/recenter,
 and groups close places to preserve touch-sized targets. The original accessible place list stays
 available. This adds exploration readability without changing content, discoveries or authority.
+
+## 2026-10-25 — Inspect class abilities without casting
+
+Character includes a collapsed, touch-readable class reference. It reads the same classAbilities
+and effectiveAbility definitions as the combat bar and uses the server's unlock state. It shows
+reach, recovery, target rules and tactical effects; it never submits a combat action. Path changes
+therefore update both the bar and reference together. Keep this information out of the permanent
+HUD and preserve current hotkeys. No combat, progression or specialisation rules change.

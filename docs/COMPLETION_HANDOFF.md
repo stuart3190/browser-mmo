@@ -9,7 +9,7 @@ safety validation belongs to a separate later phase; do not claim shipping readi
 ## Source and current milestone
 
 Editable source: `/root/browser-mmo`, branch `codex/shippable-completion`, origin
-`git@github.com:stuart3190/browser-mmo.git`. Latest gameplay commit `63b0869` pushed (trailwear); functional journey registration follows.
+`git@github.com:stuart3190/browser-mmo.git`. Latest pushed gameplay commit `2a02a70` (regional chart); verified handbook commit follows.
 Production initially observed at immutable `2c47b27`; no production mutations in this work.
 
 Class-appropriate trailwear is implemented, verified and pushed as `63b0869`: optional authored
@@ -109,21 +109,35 @@ All generators used so far are integrated and OBSOLETE; do not rerun them over c
 `/tmp/bo-cantor-pattern.py`, `/tmp/bo-cantor-driver.py`, `/tmp/bo-shop-fit.py`, and older
 forest/journal/audio/spec draft generators. No pending unapplied drafts remain.
 
-## Active work after 3f1e538 (2026-10-25)
+## Current gameplay work — 2026-10-25
 
-Regional chart verified: 31 frontend tests, repository types/lint/build and final UI checks pass.
-21 ordinary level-one desktop/portrait journey checks, 21 layout follow-up and 15 selection checks
-pass; screenshots reviewed. Evidence regional-chart-2026-10-25. Map browser/check controllers stopped.
-Retained fixture SpSdTx. Main still has prepared earned-chapter continuation drivers (not yet browser
-verified). Next useful UI: touch-readable class ability handbook in Character, with current spec
-recovery/reduction from effectiveAbility. Drafts /tmp/bo-CombatHandbook.tsx and /tmp/bo-handbook.cjs
-are NOT applied yet. Integrate/test only after committing the chart.
+Regional chart pushed as **2a02a70**. 31 frontend tests, repository types/lint/build; 21 fresh
+journey,21 desktop-layout,15 selection-visibility browser checks. Evidence regional-chart-2026-10-25.
+Retained fixture SpSdTx; all map controllers stopped.
 
-Independent full earned story/professions/Vault run at `/tmp/bo-earned-gameplay-20261025` detached
-3f1e538, own installed workspace dependencies. Controller PID1097045,
-`/tmp/bo-integrated-earned-browser.log`, fixture `/tmp/brokenodyssey-qualification.ACsH5X`.
-Read earned-journeys/result.json and per-stage run.log. Users journeyw_mvmz9wvw/journeym_mvmz9wvw;
-Warrior story currently active. Main changes cannot reload this checkout. Do not mutate runtime
-there during its run. Continue actual earned coast/forest later with new explicit-user driver
-modes; use separate output directories, retained fixture and EARNED_FROM_STAGE=earned-tidewatch,
-EARNED_CHAPTERS=1 plus both EARNED_*_USER values. Main scripts are prepared but not yet verified.
+Class handbook implemented and verified, commit pending: collapsed Character reference shares
+classAbilities/effectiveAbility and server unlocks. Fifteen fresh inspection checks, twenty actual
+mentor/retraining/combat/relogin checks, seventeen final checks with sticky Character header pass.
+31 frontend tests/types/lint/build pass. Evidence class-handbook-2026-10-25, screenshots reviewed.
+All browser controllers stopped. Final CSS build /tmp/bo-handbook-final-build.log. gM6Bsk retained.
+First load failed before login with DEV diagnostic failed fetch of /src/main.ts. Diagnostic rerun
+after build passed; cause unknown. Do not claim fixed. Future browser runs capture console and
+request failures; run same-checkout builds before browsers to keep the served source stable.
+Drafts /tmp/bo-CombatHandbook.tsx,/tmp/bo-handbook.cjs,/tmp/bo-handbook-header-patch.py are obsolete.
+
+Independent full earned journey still ACTIVE at `/tmp/bo-earned-gameplay-20261025`, detached
+**3f1e538**, own installed dependencies. Controller PID1097045;
+`/tmp/bo-integrated-earned-browser.log`; fixture `/tmp/brokenodyssey-qualification.ACsH5X`.
+Read earned-journeys/result.json and stage run.log. Warrior journeyw_mvmz9wvw is on Marches supply;
+Mage journeym_mvmz9wvw is scheduled later. Do not mutate that checkout's runtime during its run.
+Main changes cannot reload it. Prepared coast/forest/earned-journeys script changes in main remain
+UNCOMMITTED and not browser-verified. Explicit users bypass fixture grants; EARNED_CHAPTERS=1 adds
+coast then forest. After story/systems success, resume same earned users from earned-tidewatch
+with both EARNED_*_USER values; stage separately and retain original evidence.
+
+Next gameplay: return-home epilogue + short post-story Tidewatch/Pinewatch patrols. Design draft
+`/tmp/bo-epilogue-plan.txt`; `/tmp/bo-epilogue-draft.py` generates ONLY
+`/tmp/bo-elderwood-epilogue.json` from current forest pack, no repo mutation yet. Draft quest/reward
+references Watchkeeper's Compass (template NOT implemented). Need implement template, review
+balance/content, completion cooldown UI, meaningful tests and actual earned browser journeys.
+No direction/architecture replacement: use existing quests/rewards/repeat cooldown mechanisms.

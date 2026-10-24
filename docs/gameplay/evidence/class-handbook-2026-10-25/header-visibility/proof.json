@@ -1,0 +1,76 @@
+{
+  "ok": true,
+  "fixture": "Fresh actual level-one characters; inspection UI only, no DB player writes",
+  "checks": [
+    {
+      "name": "Warrior: ability reference starts collapsed",
+      "ok": true
+    },
+    {
+      "name": "Warrior: inspect control is touch sized",
+      "ok": true
+    },
+    {
+      "name": "Warrior: four real class abilities are inspectable",
+      "ok": true
+    },
+    {
+      "name": "Warrior: future unlocks and current abilities are distinct",
+      "ok": true
+    },
+    {
+      "name": "Warrior: self effect explains range, recovery and target",
+      "ok": true
+    },
+    {
+      "name": "Warrior: close stays on screen after reading the whole kit",
+      "ok": true
+    },
+    {
+      "name": "Warrior: inspecting never casts or changes cooldowns",
+      "ok": true
+    },
+    {
+      "name": "Warrior: closes back to playable scene",
+      "ok": true
+    },
+    {
+      "name": "Mage: ability reference starts collapsed",
+      "ok": true
+    },
+    {
+      "name": "Mage: inspect control is touch sized",
+      "ok": true
+    },
+    {
+      "name": "Mage: four real class abilities are inspectable",
+      "ok": true
+    },
+    {
+      "name": "Mage: future unlocks and current abilities are distinct",
+      "ok": true
+    },
+    {
+      "name": "Mage: self effect explains range, recovery and target",
+      "ok": true
+    },
+    {
+      "name": "Mage: close stays on screen after reading the whole kit",
+      "ok": true
+    },
+    {
+      "name": "Mage: inspecting never casts or changes cooldowns",
+      "ok": true
+    },
+    {
+      "name": "Mage: closes back to playable scene",
+      "ok": true
+    },
+    {
+      "name": "No class handbook exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

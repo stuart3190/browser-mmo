@@ -92,7 +92,7 @@ qualification_suites=${QUAL_BROWSER_SUITES:-trading,marketplace,social,friends,o
 if $guilds_only; then qualification_suites=guilds; fi
 read -r -a selected_suites <<< "${qualification_suites//,/ }"
 for suite in "${selected_suites[@]}"; do
-  case "$suite" in trading|marketplace|social|friends|onboarding|guilds|rendering|startup|tactical|repair|coast|coast-visual|specialisations|remedy|appearance|audio|guidance|forest|forest-recovery|journal|armor|cantor|reward-preview|trailwear|earned-journeys|atlas) ;; *) echo "Unknown browser suite: $suite" >&2; exit 2 ;; esac
+  case "$suite" in trading|marketplace|social|friends|onboarding|guilds|rendering|startup|tactical|repair|coast|coast-visual|specialisations|remedy|appearance|audio|guidance|forest|forest-recovery|journal|armor|cantor|reward-preview|trailwear|earned-journeys|atlas|handbook) ;; *) echo "Unknown browser suite: $suite" >&2; exit 2 ;; esac
   if [[ "$suite" == coast || "$suite" == remedy || "$suite" == appearance || "$suite" == forest || "$suite" == armor || "$suite" == cantor || "$suite" == reward-preview || "$suite" == trailwear || "$suite" == earned-journeys ]]; then
     pnpm exec tsx "scripts/e2e/$suite.cjs" "$qualification_dir/$suite" > "$qualification_dir/$suite.log" 2>&1
   else

@@ -1,0 +1,29 @@
+waiting for server to start.... done
+server started
+
+> browser-mmo@ db:sync-content /root/browser-mmo
+> pnpm --filter @mmo/db db:sync-content
+
+
+> @mmo/db@0.0.0 db:sync-content /root/browser-mmo/packages/db
+> tsx scripts/sync-content.ts
+
+Synced 41 item templates.
+BROWSER ERROR Failed to load resource: the server responded with a status of 404 (Not Found)
+PASS Warrior: ability reference starts collapsed
+PASS Warrior: inspect control is touch sized
+PASS Warrior: four real class abilities are inspectable
+PASS Warrior: future unlocks and current abilities are distinct
+PASS Warrior: self effect explains range, recovery and target
+PASS Warrior: close stays on screen after reading the whole kit
+PASS Warrior: inspecting never casts or changes cooldowns
+PASS Warrior: closes back to playable scene
+PASS Mage: ability reference starts collapsed
+PASS Mage: inspect control is touch sized
+PASS Mage: four real class abilities are inspectable
+PASS Mage: future unlocks and current abilities are distinct
+PASS Mage: self effect explains range, recovery and target
+PASS Mage: close stays on screen after reading the whole kit
+PASS Mage: inspecting never casts or changes cooldowns
+PASS Mage: closes back to playable scene
+PASS No class handbook exceptions

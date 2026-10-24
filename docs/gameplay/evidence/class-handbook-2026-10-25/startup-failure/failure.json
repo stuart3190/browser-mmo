@@ -1,0 +1,5 @@
+{
+  "error": "page.fill: Timeout 45000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[name=username]')\u001b[22m\n\n    at enter (/root/browser-mmo/scripts/e2e/vertical-slice.cjs:78:14)\n    at async /root/browser-mmo/scripts/e2e/handbook.cjs:33:7",
+  "checks": [],
+  "errors": []
+}

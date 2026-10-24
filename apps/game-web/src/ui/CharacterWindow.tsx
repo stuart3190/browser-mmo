@@ -1,6 +1,7 @@
 import { repairCost, specialisationPaths } from '@mmo/game-data';
 import { STAT_LABELS, STAT_ORDER } from '@mmo/ui';
 import { useGame } from './context';
+import { CombatHandbook } from './CombatHandbook';
 import { ItemSlot } from './ItemSlot';
 import { Window } from './Window';
 
@@ -42,6 +43,7 @@ export function CharacterWindow() {
         · Visit Maren in Greenvale or Iona on Amber Coast to train or change your path from level
         five.
       </p>
+      <CombatHandbook />
       <p className="small equipment-condition" data-testid="equipment-condition">
         {repairQuote > 0
           ? `Equipped gear can be restored for ${repairQuote} copper. Visit a town merchant or workshop.`

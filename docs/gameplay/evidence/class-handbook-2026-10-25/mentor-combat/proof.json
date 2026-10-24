@@ -1,0 +1,112 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-five fixtures; mentor choices, retraining, attacks, victories and relogin through actual UI. No earned level-one-to-five claim.",
+  "checks": [
+    {
+      "name": "Warrior mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Warrior handbook reflects Guardian training",
+      "ok": true
+    },
+    {
+      "name": "Warrior tactical path has server-owned timing",
+      "ok": true,
+      "detail": {
+        "ready": 1792882176510,
+        "time": 1792882156510
+      }
+    },
+    {
+      "name": "Guardian replicates seventy-percent guard",
+      "ok": true
+    },
+    {
+      "name": "Warrior mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Warrior retraining preserves the running cooldown",
+      "ok": true,
+      "detail": {
+        "first": {
+          "ready": 1792882176510,
+          "time": 1792882156510
+        },
+        "retained": 1792882176510
+      }
+    },
+    {
+      "name": "Warrior handbook reflects Berserker training",
+      "ok": true
+    },
+    {
+      "name": "Warrior offensive path changes its actual attack cooldown",
+      "ok": true,
+      "detail": 4000
+    },
+    {
+      "name": "Warrior wins a real fight with its chosen path",
+      "ok": true
+    },
+    {
+      "name": "Warrior retains its chosen path after login",
+      "ok": true
+    },
+    {
+      "name": "Mage mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Mage handbook reflects Frost training",
+      "ok": true
+    },
+    {
+      "name": "Mage tactical path has server-owned timing",
+      "ok": true,
+      "detail": {
+        "ready": 1792882279512,
+        "time": 1792882267512
+      }
+    },
+    {
+      "name": "Mage mentor choice is tappable",
+      "ok": true
+    },
+    {
+      "name": "Mage retraining preserves the running cooldown",
+      "ok": true,
+      "detail": {
+        "first": {
+          "ready": 1792882279512,
+          "time": 1792882267512
+        },
+        "retained": 1792882279512
+      }
+    },
+    {
+      "name": "Mage handbook reflects Fire training",
+      "ok": true
+    },
+    {
+      "name": "Mage offensive path changes its actual attack cooldown",
+      "ok": true,
+      "detail": 7000
+    },
+    {
+      "name": "Mage wins a real fight with its chosen path",
+      "ok": true
+    },
+    {
+      "name": "Mage retains its chosen path after login",
+      "ok": true
+    },
+    {
+      "name": "No specialisation gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

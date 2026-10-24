@@ -124,10 +124,26 @@ async function fixture(classId) {
           id,
         );
       };
+      async function inspectKit(pathName, ability, expected) {
+        await click(page.locator('[data-open=character]'));
+        const book = page.getByTestId('combat-handbook');
+        if (!(await book.evaluate((e) => e.open))) await click(book.locator('summary'));
+        check(
+          `${label} handbook reflects ${pathName} training`,
+          (await book.getByTestId('handbook-path').innerText()).includes(pathName) &&
+            (await book.locator(`[data-handbook-ability="${ability}"]`).innerText()).includes(
+              expected,
+            ),
+        );
+        await book.locator(`[data-handbook-ability="${ability}"]`).scrollIntoViewIfNeeded();
+        await page.screenshot({ path: `${out}/${label}-${pathName}-handbook.png` });
+        await click(page.locator('[data-window=character] .window-header .icon-button'));
+      }
       await talk();
       await train(initial);
       await page.screenshot({ path: `${out}/${label}-mentor.png` });
       await close();
+      await inspectKit(touch ? 'Frost' : 'Guardian', utility, touch ? '12 seconds' : 'Blocks 70%');
       await click(page.locator(`[data-testid="ability-${utility}"]`));
       await page.waitForFunction(
         (id) =>
@@ -172,6 +188,7 @@ async function fixture(classId) {
         retained,
       });
       await close();
+      await inspectKit(touch ? 'Fire' : 'Berserker', strike, touch ? '7 seconds' : '4 seconds');
       await walk(page, 0, 10);
       await walk(page, 0, 48);
       await page.keyboard.press('Tab');
