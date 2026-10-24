@@ -1729,3 +1729,11 @@ and restores the documented minimum 19.5Hz gate. This workload has not yet been 
 - [ ] OanPjT browser stage failed before first login on a blank page; cause not established.
       Retained failure, added sanitized network diagnostics. Combined browsers, production delayed
       engine assertion and unprofiled guild load remain required on the final candidate.
+
+### Release preparation — 2026-10-24 (isolated branch)
+
+- [x] Add `--prepare-only` to the existing deployment command. Private fixture execution verifies
+      fresh build, immutable reuse and invalid-flag refusal without reading runtime credentials,
+      changing `current`, installing configuration or stopping services. Bash syntax check passes.
+- [ ] Prepare the final committed candidate on this host after qualification, verify its manifest
+      and unchanged live release/readiness. Preparation is not a public deployment or capacity pass.

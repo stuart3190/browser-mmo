@@ -19,6 +19,18 @@ switches `current` and restarts its systemd services. Builds happen before downt
 qualifies a committed feature-branch HEAD before merge; normal deployment always uses origin/main.
 The operator is responsible for verifying that main passed the milestone checks before deployment.
 
+To prepare a committed candidate for review without publishing it:
+
+```sh
+sudo bash scripts/deploy-broken-odyssey.sh --candidate --prepare-only
+```
+
+This builds its immutable release and validates the private Caddy configuration, then exits before
+installing live configuration, stopping services, reading runtime credentials, dumping/migrating the
+database or changing `current`. It reuses an already built release without modifying it. The result
+is a prepared artifact, not deployment approval or a substitute for gameplay/capacity qualification.
+Normal deployment still requires the operator to choose and authorize the verified revision.
+
 A failed build leaves the running release alone. Failed migration leaves the preview stopped for
 inspection; do not automatically roll back binaries across changed checkpoint/content formats.
 Old releases and local dumps are retained; they are not an off-host backup service. Periodically
