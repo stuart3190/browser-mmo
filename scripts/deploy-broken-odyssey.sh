@@ -7,13 +7,20 @@ cd "$(dirname "$0")/.."
 exec 9>/run/lock/brokenodyssey-deploy.lock
 flock -n 9 || { echo 'Another deployment is running.' >&2; exit 1; }
 [[ -z $(git status --porcelain) ]] || { echo 'Commit or stash repository changes first.' >&2; exit 1; }
-if [[ ${1:-} == --candidate ]]; then
+candidate=false
+prepare_only=false
+for argument in "$@"; do
+  case "$argument" in
+    --candidate) candidate=true ;;
+    --prepare-only) prepare_only=true ;;
+    *) echo 'Usage: sudo bash scripts/deploy-broken-odyssey.sh [--candidate] [--prepare-only]' >&2; exit 2 ;;
+  esac
+done
+if $candidate; then
   revision=$(git rev-parse HEAD)
-elif [[ $# -eq 0 ]]; then
+else
   git fetch origin main:refs/remotes/origin/main
   revision=$(git rev-parse origin/main)
-else
-  echo 'Usage: sudo bash scripts/deploy-broken-odyssey.sh [--candidate]' >&2; exit 1
 fi
 release="/srv/brokenodyssey/releases/$revision"
 [[ -f /etc/brokenodyssey/runtime.env && -x /usr/local/bin/brokenodyssey-caddy ]]
@@ -39,6 +46,10 @@ PY
   )
 fi
 /usr/local/bin/brokenodyssey-caddy validate --config "$release/ops/broken-odyssey/Caddyfile" --adapter caddyfile
+if $prepare_only; then
+  printf 'Prepared immutable release %s. Live services, configuration, database and current symlink were not changed.\n' "$release"
+  exit 0
+fi
 install -m 644 "$release"/ops/broken-odyssey/*.service "$release"/ops/broken-odyssey/*.socket /etc/systemd/system/
 install -m 644 "$release/ops/broken-odyssey/Caddyfile" /etc/brokenodyssey/Caddyfile
 systemctl daemon-reload

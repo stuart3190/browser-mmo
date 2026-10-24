@@ -1717,3 +1717,11 @@ Guild layout follow-up: 15 real browser assertions pass in oHpLwU; final screens
 Chat follows new messages only at the end, preserves scrollback and keeps the landscape composer
 visible. Production load now includes consented guild membership, durable messages and history,
 and restores the documented minimum 19.5Hz gate. This workload has not yet been measured.
+
+### Release preparation — 2026-10-24 (isolated branch)
+
+- [x] Add `--prepare-only` to the existing deployment command. Private fixture execution verifies
+      fresh build, immutable reuse and invalid-flag refusal without reading runtime credentials,
+      changing `current`, installing configuration or stopping services. Bash syntax check passes.
+- [ ] Prepare the final committed candidate on this host after qualification, verify its manifest
+      and unchanged live release/readiness. Preparation is not a public deployment or capacity pass.
