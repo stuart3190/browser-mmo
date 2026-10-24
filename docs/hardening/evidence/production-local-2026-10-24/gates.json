@@ -1,0 +1,7 @@
+{
+  "ok": true,
+  "passwordOnly": true,
+  "devLoginDisabled": true,
+  "privateRoutesHidden": true,
+  "tls": "isolated one-day localhost certificate"
+}

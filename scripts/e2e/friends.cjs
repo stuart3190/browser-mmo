@@ -1,9 +1,14 @@
 /* eslint-disable */
 // Two real players use friend requests, private messages, read receipts and blocking through the UI.
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
-const { enter } = require('./vertical-slice.cjs');
+const { enter } = require(
+  process.env.PROOF_PASSWORD_FILE ? './production-enter.cjs' : './vertical-slice.cjs',
+);
 const fs = require('node:fs');
 const OUT = process.argv[2] || '/tmp/bo-friends-browser';
+const localTls = process.env.QUAL_LOCAL_TLS === 'true';
+if (localTls && !['localhost', '127.0.0.1'].includes(new URL(process.env.WEB_URL).hostname))
+  throw Error('Test certificate allowance is loopback only');
 fs.mkdirSync(OUT, { recursive: true });
 const checks = [],
   errors = [];
@@ -23,9 +28,13 @@ const nameOf = (s) =>
     executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome',
     args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
   });
-  const desktop = await browser.newContext({ viewport: { width: 1280, height: 800 } }),
+  const desktop = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+      ignoreHTTPSErrors: localTls,
+    }),
     phone = await browser.newContext({
       viewport: { width: 390, height: 844 },
+      ignoreHTTPSErrors: localTls,
       isMobile: true,
       hasTouch: true,
     });
@@ -36,8 +45,8 @@ const nameOf = (s) =>
     p.on('pageerror', (e) => errors.push(e.message));
   }
   const stamp = Date.now().toString(36),
-    userA = `frienda_${stamp}`,
-    userB = `friendb_${stamp}`,
+    userA = process.env.FRIENDS_USER_A || `frienda_${stamp}`,
+    userB = process.env.FRIENDS_USER_B || `friendb_${stamp}`,
     nameA = nameOf(userA),
     nameB = nameOf(userB);
   async function click(p, loc) {
@@ -68,6 +77,12 @@ const nameOf = (s) =>
   try {
     await enter(a, userA, true);
     await enter(b, userB, true, 'class.mage');
+    if (process.env.PROOF_PASSWORD_FILE)
+      check(
+        'Production password login creates both classes with no development hook',
+        !(await a.evaluate(() => '__mmo' in window)) &&
+          !(await b.evaluate(() => '__mmo' in window)),
+      );
     await open(a);
     await invite(a, nameB);
     await waitText(a, 'Request sent');

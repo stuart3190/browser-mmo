@@ -1504,6 +1504,50 @@ The test now waits for the sale balance; all eleven focused realtime sync tests 
 Fresh earned Warrior main/side quest journey is running without grants, teleportation or XP injection.
 Next: complete both class journeys, dungeon/profession/group proof, fix observed gaps and qualify again.
 
+### Hosted CI green — 2026-10-24
+
+- [x] Hosted run [40086526089](https://github.com/stuart3190/browser-mmo/actions/runs/40086526089)
+      passes on social checkpoint `1561e42`: formatting/lint/types/unit/integration, matching PG16
+      client installation, populated upgrade/backup/restore, assets and production builds.
+      Metadata archived in hardening/evidence/completion-qualification-2026-10-24/hosted-ci.json.
+- [ ] Fixed snapshot local four-suite browser qualification still running; earned Warrior/Mage
+      main/side progression and mixed-class dungeon proof are separate active work.
+
+Journey harness fixes are in progress: use collision clearance consistently at short distances,
+limit repeated route attempts and save failure state/screenshots, respect earned item level/class
+requirements, choose the active class abilities and exact intended party invitee. The first Warrior
+run was interrupted after its initial quest when its driver stalled at a tree; earned state was kept.
+A resume attempted a level-three ring at level two and was correctly refused; the harness now skips
+it. Warrior has since completed Waystone/Brackenmaw and defeated Hollow Lantern using actual inputs.
+No production changes, no grants, XP injection or teleportation. Do not call partial journeys complete.
+
+### Four-suite fixed-source qualification — 2026-10-24
+
+- [x] Source `1561e42` passes full isolated qualification: format/lint/types, 234 unit tests,
+      domain109/realtime73/API11 integration tests, four builds, production debug guard,
+      assets/content, sixteen-table populated upgrade/restore and39 browser assertions.
+      [Evidence](hardening/evidence/social-qualification-2026-10-24/README.md). Own services stopped.
+- [ ] Earned class/story/dungeon journeys and presentation polish remain active and separate.
+
+Warrior completed seven starter story quests and entered Marches. Mage recovered through ordinary
+respawn after dying to a stationary test strategy at the Warden; with visible-warning movement it
+defeated the Warden without balance changes. Both retain all earned progress. The harness now uses
+class abilities, respects requirements and equips owned quest rewards; larger region routes get
+distance-proportional bounded deadlines. These journey changes are still being verified.
+
+### Built production-profile smoke — 2026-10-24
+
+- [x] Repeatable `bash scripts/qualify-local.sh --production`: own database/ports/password accounts,
+      built bundles, separate loopback TLS ingress, password-only API and WSS runtime.
+- [x] Development login404, public private-routes404, no browser development hook. Thirteen real
+      UI assertions pass, including both classes, friends/DM persistence, read state, blocking
+      and responsive controls. Script types, shell syntax and production builds pass.
+      [Evidence](hardening/evidence/production-local-2026-10-24/README.md).
+- [ ] Longer earned gameplay and final combined source qualification remain active.
+
+No public deployment or production data mutation. Inventory presentation is verified separately
+on isolated branch codex/presentation-polish, commit ba27b32, awaiting integration.
+
 ### Inventory presentation — 2026-10-24
 
 - [x] Readable vector item silhouettes replace initials in inventory/equipment slots, preserving
@@ -1521,7 +1565,7 @@ checkpoint does not claim full-game readiness or finished world art.
 ### Onboarding and ability presentation — 2026-10-24
 
 - [x] Broken Odyssey login branding, readable labeled character/class fields, live-class combat
-      descriptions, duplicate-submit guard/pending feedback, scrollable44-pixel phone controls.
+      descriptions, duplicate-submit guard/pending feedback, scrollable 44-pixel phone controls.
 - [x] Distinct live ability silhouettes preserve existing server unlock/cooldown/input semantics.
 - [x] Seven actual browser assertions, reviewed phone/landscape/class HUD screenshots; full types,
       lint, four builds and production debug-hook guard.
