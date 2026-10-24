@@ -1,0 +1,110 @@
+{
+  "ok": true,
+  "fixture": "Fresh level-three characters; normal movement and combat controls",
+  "checks": [
+    {
+      "name": "Warrior tactical ability unlocked at level three",
+      "ok": true
+    },
+    {
+      "name": "A live enemy can be selected",
+      "ok": true
+    },
+    {
+      "name": "guard status has visible HUD feedback",
+      "ok": true
+    },
+    {
+      "name": "Warrior continues taking real combat hits while guarded",
+      "ok": true
+    },
+    {
+      "name": "Repeated Guard is refused by the server",
+      "ok": true
+    },
+    {
+      "name": "guard expires and leaves the ability cooling down",
+      "ok": true
+    },
+    {
+      "name": "Warrior finishes the fight with class attacks",
+      "ok": true
+    },
+    {
+      "name": "Reconnect retains the learned tactical slot",
+      "ok": true
+    },
+    {
+      "name": "Mage tactical ability unlocked at level three",
+      "ok": true
+    },
+    {
+      "name": "Nova is visible and tappable at 390×844",
+      "ok": true
+    },
+    {
+      "name": "All touch abilities are unobstructed at 390×844",
+      "ok": true
+    },
+    {
+      "name": "Nova is visible and tappable at 844×390",
+      "ok": true
+    },
+    {
+      "name": "All touch abilities are unobstructed at 844×390",
+      "ok": true
+    },
+    {
+      "name": "A live enemy can be selected",
+      "ok": true
+    },
+    {
+      "name": "root status has visible HUD feedback",
+      "ok": true
+    },
+    {
+      "name": "Root holds the wolf while the touch joystick creates space",
+      "ok": true,
+      "detail": {
+        "before": {
+          "x": 15.581275662355292,
+          "z": 67.35958874080235
+        },
+        "after": {
+          "x": 15.581275662355292,
+          "z": 67.35958874080235
+        },
+        "me": {
+          "x": 16.304043896429544,
+          "z": 63.92044389628647
+        },
+        "moved": {
+          "x": 16.304043896429544,
+          "z": 60.24344389640568
+        }
+      }
+    },
+    {
+      "name": "Nova deals server-confirmed damage",
+      "ok": true
+    },
+    {
+      "name": "root expires and leaves the ability cooling down",
+      "ok": true
+    },
+    {
+      "name": "Mage finishes the fight with class attacks",
+      "ok": true
+    },
+    {
+      "name": "Reconnect retains the learned tactical slot",
+      "ok": true
+    },
+    {
+      "name": "No browser gameplay exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

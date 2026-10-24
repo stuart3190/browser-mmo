@@ -148,6 +148,7 @@ export async function startGame(args: {
     dead: e.dead,
     hostile: e.hostile,
     attackCue: e.attackCue,
+    statuses: e.statuses,
     refId: e.refId,
   });
   const patchEntity = (id: string, patch: Partial<EntityInfo>) => {
@@ -183,6 +184,7 @@ export async function startGame(args: {
   const joined = new Promise<void>((r) => (firstJoin = r));
 
   net.on('auth.ok', (m) => {
+    effects.clearStatuses();
     const changedZone = zoneId !== m.d.zoneId;
     zoneId = m.d.zoneId;
     if (changedZone) worldView.loadZone(m.d.zoneId);
@@ -228,17 +230,20 @@ export async function startGame(args: {
   net.on('zone.snapshot', (m) => {
     for (const e of m.d.entities) {
       entities?.upsert(e);
+      effects.setStatuses(e);
       state.world.set(e.id, info(e));
     }
     state.emit();
   });
   net.on('entity.spawn', (m) => {
     entities?.upsert(m.d.entity);
+    effects.setStatuses(m.d.entity);
     state.world.set(m.d.entity.id, info(m.d.entity));
     state.emit();
   });
   net.on('entity.despawn', (m) => {
     entities?.remove(m.d.entityId);
+    effects.clearStatuses(m.d.entityId);
     state.world.delete(m.d.entityId);
     state.emit();
   });
@@ -504,7 +509,9 @@ export async function startGame(args: {
     player.update(dt);
     worldView.update(player.position);
     entities.update(dt);
-    effects.update(dt);
+    effects.update(dt, Date.now() + state.serverOffsetMs, (id) =>
+      id === state.myEntityId ? player?.position : entities?.meshPosition(id),
+    );
     const pickup =
       entities.nearest('resource_node', player.position, INTERACT_RANGE) ??
       entities.nearest('pickup', player.position, INTERACT_RANGE);

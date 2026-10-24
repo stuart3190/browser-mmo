@@ -1841,3 +1841,29 @@ an unqualified release candidate, not a genuinely shippable game claim; external
   then qualify strict capacity/headroom, operated recovery and physical iOS/Android behavior.
   No purchase, public deployment, production mutation or admission increase is authorized by this audit.
 - Durable resume instructions and proof locations: [completion handoff](COMPLETION_HANDOFF.md).
+
+## 2026-10-24 — Owner-directed gameplay completion (ACTIVE)
+
+The owner explicitly supersedes prior release-blocker conclusions. No performance optimization,
+benchmarking, capacity tests, infrastructure investigation, staging or backup planning. Production
+remains untouched. Gameplay development and real functional playthroughs continue independently.
+
+Ranked player-facing gaps from the current client and content:
+
+1. Combat has only auto-attack plus two damage abilities per playable class. Add tactical defensive/
+   control choices at level 3, visible status feedback and functional encounter playtests.
+2. Item condition fields exist but never wear or repair. Complete condition, clear consequences and
+   affordable town repair through the existing authoritative inventory/economy path.
+3. Specialisations are definitions only; most further regions lack authored quest progression. Add
+   meaningful class choices and a coherent next exploration/encounter chapter.
+4. Improve world presentation, onboarding and input feedback from desktop/touch playthrough findings.
+
+- [x] Tactical milestone: Warrior guard and Mage Frost Nova, earned at level 3. Four-second 50% guard;
+      six-metre three-second root with low damage and boss immunity. Authority, cooldowns, recovery,
+      visual feedback and playable desktop/touch fights verified. Proof: `gameplay/evidence/tactical-abilities-2026-10-24/`.
+      78 world, 123 content, 12 frontend and 5 realtime ability tests pass; repository typecheck, lint,
+      production build pass. Browser verifies both class victories, status expiry, cooldown rejection,
+      root + joystick escape, reconnect and unobstructed portrait/landscape ability controls. Fixtures
+      start at level 3; this is functional combat evidence, not a newly earned progression journey.
+      Screenshot review led to fixing fullscreen/Firebolt and mobile compass/target overlaps.
+- [ ] Next: wear/repair, then specialisation and quest/world milestones. Do not stop at a plan or unit pass.

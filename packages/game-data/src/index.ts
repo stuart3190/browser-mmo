@@ -1,3 +1,4 @@
+import { withTacticalAbilities } from './tactical';
 import { withDungeonContent } from './dungeons';
 export * from './dungeons';
 import { professionItems, professionOffers } from './professions';
@@ -69,12 +70,14 @@ export const contentManifest: ContentManifest = {
 };
 
 const compiledGameData = compileContentCatalog(contentManifest, contentPacks);
-export const rawGameData = withDungeonContent(
-  RawGameDataSchema.parse({
-    ...compiledGameData,
-    itemTemplates: [...compiledGameData.itemTemplates, ...professionItems],
-    serviceOffers: [...(compiledGameData.serviceOffers ?? []), ...professionOffers],
-  }),
+export const rawGameData = withTacticalAbilities(
+  withDungeonContent(
+    RawGameDataSchema.parse({
+      ...compiledGameData,
+      itemTemplates: [...compiledGameData.itemTemplates, ...professionItems],
+      serviceOffers: [...(compiledGameData.serviceOffers ?? []), ...professionOffers],
+    }),
+  ),
 );
 
 let cached: GameData | undefined;

@@ -54,6 +54,7 @@ export interface EntityInfo {
   dead?: boolean | undefined;
   hostile?: boolean | undefined;
   attackCue?: WorldEntity['attackCue'];
+  statuses?: WorldEntity['statuses'];
 }
 
 export interface Vitals {

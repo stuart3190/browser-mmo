@@ -112,7 +112,7 @@ function GameUI() {
       <details className="controls-help panel">
         <summary>Controls</summary>
         <p>WASD to move · drag the view to orbit · scroll to zoom.</p>
-        <p>Click a creature or press Tab to target. F toggles attack; 1–3 use abilities.</p>
+        <p>Click a creature or press Tab to target. F toggles attack; 1–4 use abilities.</p>
         <p>
           Enter for chat · E to talk or pick up · B for Bag · C for gear · J for quests · Escape to
           close.

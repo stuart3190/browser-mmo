@@ -28,11 +28,13 @@ describe('class abilities', () => {
       'ability.common.attack',
       'ability.warrior.heavy_strike',
       'ability.warrior.battle_strike',
+      'ability.warrior.guard',
     ]);
     expect(classAbilities(gd, M).map((a) => a.id)).toEqual([
       'ability.common.attack',
       'ability.mage.firebolt',
       'ability.mage.flame_burst',
+      'ability.mage.frost_nova',
     ]);
     expect([...gd.classes.values()].filter((c) => c.playable).map((c) => c.id)).toEqual([W, M]);
   });
@@ -68,8 +70,11 @@ describe('class abilities', () => {
     ]);
     expect(newlyUnlockedAbilities(gd, M, 1, 3).map((a) => a.id)).toEqual([
       'ability.mage.flame_burst',
+      'ability.mage.frost_nova',
     ]);
-    expect(newlyUnlockedAbilities(gd, M, 2, 3)).toEqual([]);
+    expect(newlyUnlockedAbilities(gd, M, 2, 3).map((a) => a.id)).toEqual([
+      'ability.mage.frost_nova',
+    ]);
   });
 });
 

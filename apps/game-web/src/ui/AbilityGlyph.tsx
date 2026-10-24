@@ -52,6 +52,28 @@ export function AbilityGlyph({ id, fallback }: { id: string; fallback: string })
         <path d="m4 10 5 8m35-8-5 8M2 28l4 2m40-2-4 2" stroke="currentColor" strokeWidth="2" />
       </>
     );
+  else if (id === 'ability.warrior.guard')
+    shape = (
+      <>
+        <path
+          d="M24 4 41 11v13c0 10-8 17-17 21C15 41 7 34 7 24V11Z"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path d="M24 11v25M14 21h20" stroke="currentColor" strokeWidth="4" />
+      </>
+    );
+  else if (id === 'ability.mage.frost_nova')
+    shape = (
+      <>
+        <path
+          d="M24 4v40M7 14l34 20M7 34l34-20M18 8l6 6 6-6M18 40l6-6 6 6M7 21l8-2-2-8M41 27l-8 2 2 8M13 37l2-8-8-2M35 11l-2 8 8 2"
+          stroke="currentColor"
+          strokeWidth="3"
+        />
+        <circle cx="24" cy="24" r="5" fill="currentColor" />
+      </>
+    );
   else return <>{fallback}</>;
   return (
     <svg

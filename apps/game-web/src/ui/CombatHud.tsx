@@ -48,6 +48,7 @@ export function PlayerFrame() {
         {v?.inCombat && <span className="tag combat-tag">In combat</span>}
         {v?.dead && <span className="tag dead-tag">Dead</span>}
       </div>
+      <StatusTags entityId={state.myEntityId} />
       {v && <Bar value={v.health} max={v.maxHealth} kind="hp" testId="player-hp" />}
       {prog && (
         <Bar value={prog.xp} max={Math.max(1, prog.xpToNext)} kind="xp" testId="player-xp" />
@@ -86,6 +87,7 @@ export function TargetFrame() {
       {t.maxHealth !== undefined && (
         <Bar value={t.health ?? 0} max={t.maxHealth} kind="hp" testId="target-hp" />
       )}
+      <StatusTags entityId={t.id} />
       {t.attackCue && !t.dead && (
         <div className="attack-warning" role="status">
           {t.attackCue.cleave
@@ -157,6 +159,47 @@ export function DeathOverlay() {
       <button disabled={wait > 0} onClick={() => combat.respawn()} data-testid="respawn">
         {wait > 0 ? `Respawn in ${wait}s` : 'Respawn'}
       </button>
+    </div>
+  );
+}
+
+function StatusTags({ entityId }: { entityId: string | null }) {
+  const { state } = useGame();
+  const [now, setNow] = useState(Date.now());
+  const statuses = state.world.get(entityId ?? '')?.statuses ?? [];
+  const active = statuses.filter(
+    (s) => s.kind !== 'frost_nova' && s.expiresAtMs > now + state.serverOffsetMs,
+  );
+  const running = active.length > 0;
+  useEffect(() => {
+    if (!running) return;
+    const timer = setInterval(() => setNow(Date.now()), 100);
+    return () => clearInterval(timer);
+  }, [running]);
+  useEffect(() => setNow(Date.now()), [state.revision]);
+  if (!running) return null;
+  return (
+    <div className="combat-statuses">
+      {active.map((s) => (
+        <span
+          className={`combat-status status-${s.kind}`}
+          key={s.kind}
+          data-testid={`status-${s.kind}`}
+          title={
+            s.kind === 'guard'
+              ? 'Incoming damage reduced. Keep moving or attacking.'
+              : 'Cannot move, but can still attack nearby targets.'
+          }
+        >
+          {s.kind === 'guard' ? `Guard · −${Math.round(s.magnitude * 100)}% damage` : 'Rooted'}
+          {' · '}
+          {Math.min(
+            s.kind === 'guard' ? 4 : 3,
+            Math.max(0, (s.expiresAtMs - now - state.serverOffsetMs) / 1000),
+          ).toFixed(1)}
+          s
+        </span>
+      ))}
     </div>
   );
 }

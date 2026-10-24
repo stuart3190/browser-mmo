@@ -88,6 +88,7 @@ describe('server-authoritative abilities', () => {
       [ATTACK, true],
       [HS, true],
       [BS, false],
+      ['ability.warrior.guard', false],
     ]);
     const r = t.sim.useAbility(w, HS, t.now);
     t.drain();

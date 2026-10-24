@@ -26,6 +26,7 @@ import {
 import type { ServerMessage } from '@mmo/networking';
 import type {
   CombatRules,
+  CombatStatus,
   EnemyDefinition,
   SpawnGroup,
   SpawnPoint,
@@ -1028,6 +1029,63 @@ export class ZoneSimulation {
       throw new DomainError(ErrorCode.ON_COOLDOWN, `${ability.name} is not ready`, {
         remainingMs: remaining,
       });
+    if (ability.utility) {
+      const cd = startCooldown(this.rules, ability, nowMs);
+      p.cooldowns.set(abilityId, cd.readyAtMs);
+      p.globalReadyAtMs = cd.globalReadyAtMs;
+      const caster = this.entities.get(p.entityId)!;
+      if (ability.utility.kind === 'guard') {
+        this.setStatus(caster, {
+          kind: 'guard',
+          expiresAtMs: nowMs + ability.utility.durationMs,
+          magnitude: ability.utility.reduction,
+        });
+        this.sendAbilityState(p, nowMs);
+        return { outcome: 'hit', damage: 0 };
+      }
+      this.setStatus(caster, {
+        kind: 'frost_nova',
+        expiresAtMs: nowMs + 600,
+        magnitude: ability.rangeMeters,
+      });
+      let damage = 0;
+      for (const enemy of this.enemies.values()) {
+        const entity = this.entities.get(enemy.entityId);
+        if (
+          !entity ||
+          enemy.mode === 'dead' ||
+          enemy.mode === 'dying' ||
+          enemy.mode === 'returning' ||
+          distance2D(p.position, entity.position) > ability.rangeMeters ||
+          !this.hasLineOfSight(p.position, entity.position)
+        )
+          continue;
+        const hit = resolveAbility(
+          this.rules,
+          ability,
+          { level: p.level, stats: p.stats, weapon: p.weapon },
+          { level: enemy.def.level, armor: enemy.def.combat.armor },
+          this.rng,
+        );
+        this.hitEnemy(p, enemy, entity, hit.outcome, hit.damage, nowMs, abilityId);
+        damage += hit.damage;
+        p.lastCombatAtMs = nowMs;
+        // A root prevents movement, not attacks or committed encounter mechanics.
+        if (
+          hit.outcome !== 'miss' &&
+          enemy.health > 0 &&
+          !enemy.def.isBoss &&
+          !enemy.def.isWorldBoss
+        )
+          this.setStatus(entity, {
+            kind: 'root',
+            expiresAtMs: nowMs + ability.utility.durationMs,
+            magnitude: 0,
+          });
+      }
+      this.sendAbilityState(p, nowMs);
+      return { outcome: 'hit', damage };
+    }
     if (!p.targetId) throw new DomainError(ErrorCode.NO_TARGET, 'You have no target');
     const enemy = this.enemies.get(p.targetId);
     const entity = enemy && this.entities.get(enemy.entityId);
@@ -1140,6 +1198,13 @@ export class ZoneSimulation {
       this.syncParties();
       this.nextPartyUpdate = nowMs + 1000;
     }
+    for (const entity of this.entities.values()) {
+      if (entity.statuses?.some((status) => status.expiresAtMs <= nowMs))
+        this.replaceStatuses(
+          entity,
+          entity.statuses.filter((status) => status.expiresAtMs > nowMs),
+        );
+    }
     this.tickCount++;
     const dtMs =
       this.lastStepMs === null ? 0 : Math.min(1000, Math.max(0, nowMs - this.lastStepMs));
@@ -1211,6 +1276,18 @@ export class ZoneSimulation {
   // -------------------------------------------------------------------------
   // Internals
   // -------------------------------------------------------------------------
+
+  private replaceStatuses(entity: WorldEntity, statuses: CombatStatus[]): void {
+    entity.statuses = statuses;
+    this.toKnowers(entity.id, { t: 'entity.spawn', d: { entity: { ...entity } } });
+  }
+
+  private setStatus(entity: WorldEntity, status: CombatStatus): void {
+    this.replaceStatuses(entity, [
+      ...(entity.statuses ?? []).filter((s) => s.kind !== status.kind),
+      status,
+    ]);
+  }
 
   private newEntityId(): string {
     return this.zone.instanced
@@ -1490,6 +1567,8 @@ export class ZoneSimulation {
   /** Health hit 0: freeze the enemy and queue a write-ahead kill event for the host to persist. */
   private enemyDying(enemy: EnemyState, killer: PlayerState, nowMs: number): void {
     if (this.entities.get(enemy.entityId)?.attackCue) this.cue(enemy, null);
+    const dyingEntity = this.entities.get(enemy.entityId);
+    if (dyingEntity?.statuses?.length) this.replaceStatuses(dyingEntity, []);
     enemy.mode = 'dying';
     enemy.targetCharacterId = null;
     enemy.path = null;
@@ -1549,6 +1628,8 @@ export class ZoneSimulation {
   }
 
   private playerDies(p: PlayerState, killerEntityId: string | null, nowMs: number): void {
+    const entity = this.entities.get(p.entityId);
+    if (entity?.statuses?.length) this.replaceStatuses(entity, []);
     p.dead = true;
     p.health = 0;
     p.diedAtMs = nowMs;
@@ -1596,6 +1677,8 @@ export class ZoneSimulation {
   private disengage(e: EnemyState, nowMs: number = this.lastStepMs ?? 0): void {
     if (e.mode === 'dead' || e.mode === 'dying') return;
     if (this.entities.get(e.entityId)?.attackCue) this.cue(e, null);
+    const entity = this.entities.get(e.entityId);
+    if (entity?.statuses?.length) this.replaceStatuses(entity, []);
     e.mode = 'returning';
     e.targetCharacterId = null;
     e.path = null;
@@ -1620,6 +1703,10 @@ export class ZoneSimulation {
     const entity = this.entities.get(enemy.entityId)!;
     const pos = entity.position;
     const dist = distance2D(pos, goal);
+    if (entity.statuses?.some((status) => status.kind === 'root' && status.expiresAtMs > nowMs)) {
+      enemy.lastProgressAtMs = nowMs;
+      return dist;
+    }
     if (dist <= stopAt) return dist;
     let waypoint: XZ = goal;
     const direct = !this.collision.sweepBlocked(pos, goal, ENEMY_COLLISION_RADIUS * 0.9);
@@ -1837,7 +1924,14 @@ export class ZoneSimulation {
           this.rng,
         );
         victim.lastCombatAtMs = nowMs;
-        const { health, killed } = applyDamage(Math.round(victim.health), result.damage);
+        const guard = this.entities
+          .get(victim.entityId)
+          ?.statuses?.find((status) => status.kind === 'guard' && status.expiresAtMs > nowMs);
+        const damage =
+          guard && result.damage > 0
+            ? Math.max(1, Math.round(result.damage * (1 - guard.magnitude)))
+            : result.damage;
+        const { health, killed } = applyDamage(Math.round(victim.health), damage);
         victim.health = health;
         if (!killed) this.sendVitals(victim, nowMs);
         const te = this.entities.get(victim.entityId)!;
@@ -1848,7 +1942,7 @@ export class ZoneSimulation {
             sourceId: enemy.entityId,
             targetId: victim.entityId,
             outcome: result.outcome,
-            amount: result.damage,
+            amount: damage,
             targetHealth: health,
             targetMaxHealth: victim.maxHealth,
           },

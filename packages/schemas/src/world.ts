@@ -230,6 +230,13 @@ export type EntityKind = z.infer<typeof EntityKindSchema>;
  */
 export const EntityIdSchema = z.string().min(1).max(64);
 
+export const CombatStatusSchema = z.object({
+  kind: z.enum(['guard', 'root', 'frost_nova']),
+  expiresAtMs: z.number().finite(),
+  magnitude: z.number().min(0).max(10),
+});
+export type CombatStatus = z.infer<typeof CombatStatusSchema>;
+
 export const WorldEntitySchema = z.object({
   id: EntityIdSchema,
   kind: EntityKindSchema,
@@ -245,6 +252,7 @@ export const WorldEntitySchema = z.object({
   maxHealth: z.number().int().positive().optional(),
   dead: z.boolean().optional(),
   hostile: z.boolean().optional(),
+  statuses: z.array(CombatStatusSchema).max(3).optional(),
   /** Persistent attack cue; null clears it. Snapshots also carry active cues. */
   attackCue: z
     .object({

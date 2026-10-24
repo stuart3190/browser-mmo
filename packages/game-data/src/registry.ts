@@ -171,12 +171,16 @@ export class GameData {
     for (const a of this.raw.abilities) {
       if (a.classId) need(this.classes, a.classId, `ability ${a.id}`);
       if (a.placeholder) continue;
-      // What the runtime supports today: instant, hostile-target, cooldown-only abilities.
-      if (a.targeting !== 'enemy') errors.push(`ability ${a.id}: only 'enemy' targeting is live`);
       if (a.castTimeMs !== 0 || a.resourceCost !== 0)
         errors.push(`ability ${a.id}: cast times and resource costs are not supported yet`);
-      if (a.autoAttack === (a.damage !== null))
-        errors.push(`ability ${a.id}: needs exactly one of autoAttack or damage`);
+      const valid = a.autoAttack
+        ? a.targeting === 'enemy' && !a.damage && !a.utility
+        : a.utility?.kind === 'guard'
+          ? a.targeting === 'self' && !a.damage
+          : a.utility?.kind === 'root'
+            ? a.targeting === 'aoe_self' && !!a.damage && a.rangeMeters > 0 && a.rangeMeters <= 8
+            : a.targeting === 'enemy' && !!a.damage;
+      if (!valid) errors.push(`ability ${a.id}: unsupported targeting/damage/utility combination`);
       if (a.damage && a.damage.base.min > a.damage.base.max)
         errors.push(`ability ${a.id}: damage min > max`);
     }

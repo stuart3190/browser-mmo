@@ -75,7 +75,7 @@ it('holds a visible wind-up before damage, carries it through recovery, and hits
   t.step(100);
   expect(t.boss.attackCue).toMatchObject({ endsAtMs: 2900 });
   expect(t.sim.persistentState(t.id)!.health).toBe(200);
-  const recovered = new ZoneSimulation(t.gd, ARENA);
+  const recovered = new ZoneSimulation(t.gd, ARENA, { rng: { next: () => 0.5 } });
   recovered.restoreCheckpoint(t.sim.checkpoint());
   expect(recovered.listEntities().find((e) => e.id === t.boss.id)?.attackCue).toEqual(
     t.boss.attackCue,

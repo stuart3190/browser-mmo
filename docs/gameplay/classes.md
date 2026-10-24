@@ -22,7 +22,7 @@ A character stores `classId` (set at creation, never changed by gameplay; only c
 (`AbilityDefinition`, `SkillDefinition`). Ability `effects` stay opaque for a future effect grammar;
 live abilities use the `damage` block below. Decision record: `docs/adr/0019-class-abilities.md`.
 
-## Playable classes and abilities (2026-10-04)
+## Playable classes and abilities (2026-10-24)
 
 Only **Warrior** and **Mage** are playable. Ranger and Cleric (and every spec) remain placeholders.
 The bar is `baseAbilityIds` in slot order; `ability.common.attack` is shared.
@@ -32,6 +32,13 @@ The bar is `baseAbilityIds` in slot order; `ability.common.attack` is shared.
 | 1    | Attack — toggles weapon auto-attack (3.5 m)        | Attack — toggles weapon auto-attack (3.5 m)              |
 | 2    | Heavy Strike — 3.5 m, 6 s cooldown, physical       | Firebolt — 25 m, 4 s cooldown, magic, projectile         |
 | 3    | Battle Strike — **level 2**, 3.5 m, 12 s, physical | Flame Burst — **level 2**, 20 m, 10 s, magic, projectile |
+
+| 4 | Iron Guard — **level 3**, self, 20 s cooldown, 4 s at 50% damage reduction | Frost Nova — **level 3**, 6 m area, 20 s cooldown, 3 s root |
+
+Guard needs no target. Nova hits each living enemy in range and line of sight, with normal hit/crit
+rules; bosses take damage but resist its root. Rooted enemies can still attack in reach. Move away
+after Nova. An empty burst still consumes its cooldown. Effects have server expiry, visible status
+tags and world effects; reconnect/recovery cannot lengthen them.
 
 Every non-auto ability also starts a 1 s global cooldown (`combatRules.abilityGlobalCooldownMs`).
 No resources (mana/rage) yet: cooldowns alone pace combat (the class `resource` field stays data only).
@@ -51,6 +58,7 @@ final  = physical: raw × (1 − armour mitigation)   magic: raw (no resistances
 | Battle Strike | 14–18 | 1.5      | strength 1.0, attack_power 0.5 |
 | Firebolt      | 12–18 | 0        | intellect 0.8, spell_power 1.0 |
 | Flame Burst   | 22–30 | 0        | intellect 1.2, spell_power 1.2 |
+| Frost Nova    | 6–8   | 0        | intellect 0.2, spell_power 0.2 |
 
 Effective stats come from `getCharacterStats` (class base + level + gear); an equipment change
 refreshes the simulation's profile through the change feed, so the next ability use reflects it.

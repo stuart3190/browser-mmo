@@ -159,7 +159,12 @@ describe('class abilities over the realtime protocol', { timeout: 60_000 }, () =
     const p = await player('class.warrior', near);
     const c = await join(b, p);
     const st = c.all('ability.state').at(-1)!.d;
-    expect(st.abilities.map((a) => a.abilityId)).toEqual(['ability.common.attack', HS, BS]);
+    expect(st.abilities.map((a) => a.abilityId)).toEqual([
+      'ability.common.attack',
+      HS,
+      BS,
+      'ability.warrior.guard',
+    ]);
     c.send('target.set', { entityId: w });
     await c.waitFor('combat.state', (m) => m.d.targetId === w);
     // 5 identical requests sent back-to-back (simultaneous) + one replayed sequence number
@@ -205,7 +210,7 @@ describe('class abilities over the realtime protocol', { timeout: 60_000 }, () =
         .all('ability.state')
         .at(-1)!
         .d.abilities.map((a) => a.abilityId),
-    ).toEqual(['ability.common.attack', FB, 'ability.mage.flame_burst']);
+    ).toEqual(['ability.common.attack', FB, 'ability.mage.flame_burst', 'ability.mage.frost_nova']);
     c.send('target.set', { entityId: w });
     await c.waitFor('combat.state', (m) => m.d.targetId === w);
     expect(await c.error(c.send('ability.use', { abilityId: HS }))).toBe('ABILITY_NOT_AVAILABLE');
@@ -271,6 +276,51 @@ describe('class abilities over the realtime protocol', { timeout: 60_000 }, () =
     await c.waitFor('combat.state', (m) => m.d.targetId === w);
     expect(await c.error(c.send('ability.use', { abilityId: HS }))).toBe('ON_COOLDOWN');
     c.ws.close();
+  });
+
+  it('replicates tactical statuses and preserves guard cooldown through logout', async () => {
+    const b = await boot();
+    const guard = 'ability.warrior.guard';
+    const nova = 'ability.mage.frost_nova';
+    const warrior = await player('class.warrior', { x: -20, z: -20 });
+    const mage = await player('class.mage', { x: WOLF_HOME.x, z: WOLF_HOME.z - 5 });
+    for (const p of [warrior, mage])
+      await handle.db
+        .update(schema.characters)
+        .set({ level: 3 })
+        .where(eq(schema.characters.id, p.characterId));
+    let w = await join(b, warrior);
+    w.send('ability.use', { abilityId: guard });
+    await w.waitFor(
+      'entity.spawn',
+      (m) => m.d.entity.statuses?.some((s) => s.kind === 'guard') === true,
+    );
+    expect(await w.error(w.send('ability.use', { abilityId: guard }))).toBe('ON_COOLDOWN');
+    w.ws.close();
+    await sleep(400);
+    w = await join(b, warrior);
+    expect(
+      w
+        .all('ability.state')
+        .at(-1)!
+        .d.abilities.find((a) => a.abilityId === guard)!.readyAt,
+    ).toBeGreaterThan(Date.now());
+    expect(await w.error(w.send('ability.use', { abilityId: guard }))).toBe('ON_COOLDOWN');
+    const m = await join(b, mage);
+    m.send('ability.use', { abilityId: nova });
+    const hit = await m.waitFor('combat.damage', (event) => event.d.abilityId === nova);
+    expect(hit.d.amount).toBeGreaterThan(0);
+    await m.waitFor(
+      'entity.spawn',
+      (event) =>
+        event.d.entity.id === hit.d.targetId &&
+        event.d.entity.statuses?.some((s) => s.kind === 'root') === true,
+    );
+    const before = { ...b.zone().getEnemy(hit.d.targetId)!.position };
+    await sleep(600);
+    expect(b.zone().getEnemy(hit.d.targetId)!.position).toEqual(before);
+    w.ws.close();
+    m.ws.close();
   });
 
   it('a level-up unlocks Battle Strike live; it was rejected before', async () => {

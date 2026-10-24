@@ -66,7 +66,7 @@ export type AbilityDamage = z.infer<typeof AbilityDamageSchema>;
 
 /**
  * Ability definition. Live (non-placeholder) abilities are executed by the zone simulation:
- * `autoAttack` toggles the melee swing loop, otherwise `damage` is applied instantly to the target.
+ * `autoAttack` toggles the melee swing loop, otherwise typed `damage` / `utility` resolves on server-validated targets.
  * `effects` stays opaque for future effect grammar.
  */
 export const AbilityDefinitionSchema = z.object({
@@ -84,6 +84,18 @@ export const AbilityDefinitionSchema = z.object({
   /** Toggles the existing auto-attack swing loop instead of resolving damage itself. */
   autoAttack: z.boolean().default(false),
   damage: AbilityDamageSchema.nullable().default(null),
+  /** Typed tactical effects; the server owns targets, duration and strength. */
+  utility: z
+    .discriminatedUnion('kind', [
+      z.object({
+        kind: z.literal('guard'),
+        durationMs: z.number().int().min(500).max(10000),
+        reduction: z.number().positive().max(0.75),
+      }),
+      z.object({ kind: z.literal('root'), durationMs: z.number().int().min(500).max(5000) }),
+    ])
+    .nullable()
+    .optional(),
   /** Placeholder presentation (no final art): bar glyph/colour and the effect drawn on use. */
   icon: z
     .object({ glyph: z.string().min(1).max(3), color: z.string().regex(/^#[0-9a-fA-F]{6}$/) })

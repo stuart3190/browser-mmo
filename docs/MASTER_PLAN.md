@@ -422,3 +422,14 @@ Expansion should happen through:
 - social systems
 - mobile features
 - future live-service content
+
+
+## Owner gameplay priority — 2026-10-24
+
+Gameplay development takes priority over present-host release qualification. Complete enjoyable
+features, quests, exploration, encounters, class progression/balance, gear wear/repair, visuals,
+responsive UI, controls and onboarding through real gameplay functional tests. No further performance
+optimization, benchmarking, capacity testing, infrastructure investigation, staging or backup planning
+in this development phase. Existing release evidence and safeguards remain intact. Do not publish to
+production; a separate safety validation phase is required later. External release inputs do not block
+gameplay development. If one gameplay piece needs input, continue another useful gameplay milestone.

@@ -39,7 +39,13 @@ export function AbilityBar({ touch = false }: { touch?: boolean }) {
           ? 0
           : Math.max(0, (s?.readyAtLocal ?? 0) - now, state.globalReadyAtLocal - now);
         const onCooldown = unlocked && remaining > 0;
-        const active = a.autoAttack && state.target.attacking;
+        const active =
+          (a.autoAttack && state.target.attacking) ||
+          (a.utility?.kind === 'guard' &&
+            (state.world.get(state.myEntityId ?? '')?.statuses ?? []).some(
+              (status) =>
+                status.kind === 'guard' && status.expiresAtMs > now + state.serverOffsetMs,
+            ));
         const label = `${a.name}${unlocked ? '' : ` (level ${a.unlockLevel})`} — ${a.description}`;
         return (
           <AbilityButton

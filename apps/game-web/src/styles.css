@@ -1424,9 +1424,11 @@ body:has(.login) {
     bottom: 310px;
   }
   .fullscreen-return {
-    top: auto;
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px) + 58px);
-    left: 50%;
+    top: calc(26px + env(safe-area-inset-top, 0px));
+    bottom: auto;
+    left: auto;
+    right: 10px;
+    transform: none;
   }
 }
 @media (pointer: coarse) and (max-height: 540px) {
@@ -2356,6 +2358,36 @@ body:has(#ui .window, #ui .dialogue, #ui .details, #ui .has-invitation) .fullscr
     resize: none;
   }
   .window-guild:has(.guild-messages) .guild-form .small {
+    display: none;
+  }
+}
+
+.combat-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+}
+.combat-status {
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 11px;
+}
+.status-guard {
+  color: #ebc46b;
+  background: #382d17;
+}
+.status-root {
+  color: #83e6ff;
+  background: #12323c;
+}
+
+/* Combat takes priority over travel guidance on small touch screens. */
+@media (pointer: coarse) {
+  .ui-root.touch:has(.target-frame) .quest-guide,
+  .ui-root.touch:has(.target-frame) .first-steps,
+  body:has(.ui-root.touch .target-frame) .fullscreen-return {
     display: none;
   }
 }

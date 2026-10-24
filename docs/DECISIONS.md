@@ -1373,3 +1373,18 @@ zones would require stronger ownership of escaped mutable references. This conse
 retains the existing interfaces and sacrifices reuse after first admission for recovery correctness.
 Byte-for-byte legacy compatibility, late durable deaths/resources and real crash/fencing integration
 checks are required; benchmark improvements alone do not establish capacity.
+
+## 2026-10-24 — Tactical class abilities and replicated combat statuses
+
+Add Iron Guard and Frost Nova at level 3 through the existing data-driven ability bar. The server
+owns duration, damage reduction, area targets, line of sight, cooldowns and boss root immunity.
+Root prevents movement, not close-range attacks or committed encounter mechanics. Guard reduces
+incoming damage by 50% for four seconds; Nova roots ordinary hit enemies for three seconds in six
+metres and deals modest damage. Both have a twenty-second cooldown and the existing global cooldown.
+
+Use a small typed `utility` definition and optional entity `statuses` with absolute server expiry.
+Existing entity snapshots/updates and recovery images carry these effects; reconnect does not extend
+them. The client only draws the replicated state. Death/evade clears statuses. No generic scripting
+engine, protocol bypass or new persistence service is needed. Preserve the historical starter catalog
+and its exact hash by applying current tactical definitions after compilation; optional new schema
+fields do not rewrite old serialized content. Other specialisations remain unimplemented.

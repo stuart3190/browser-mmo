@@ -1,9 +1,17 @@
 # Broken Odyssey completion handoff
 
 Updated 2026-10-24 by Codex. The owner authorizes sustained completion without routine confirmation.
-Read AGENTS, MASTER_PLAN, PROGRESS and DECISIONS. The objective is not achieved. Release work is
-blocked on missing staging/backup targets and physical-device acceptance. Core gameplay is verified,
-but release capacity and off-host recovery remain unqualified. Do not call the game shippable or repeat unchanged load tests to seek a pass.
+Read AGENTS, MASTER_PLAN, PROGRESS and DECISIONS. Goal is ACTIVE under the owner's new gameplay-only
+priority. Earlier external-blocker conclusions are superseded: capacity, staging, off-host backup and
+physical-phone signoff are NOT blockers to gameplay development. Do not run performance/benchmark/
+capacity or infrastructure work. Keep production unchanged; release validation is a separate later phase.
+
+Completed this gameplay pass: level-3 Iron Guard / Frost Nova, status VFX/HUD and touch combat clarity.
+Proof: `gameplay/evidence/tactical-abilities-2026-10-24/` (both class victories; isolated level-3 fixtures).
+Active milestones:
+(1) persistent gear wear/repair, (2) meaningful specialisations and exploration/quest progression,
+(3) visual/control improvements from actual playthroughs. Verify functional behavior in the isolated
+local game, preserve existing earned actors, make incremental commits and continue across milestones.
 
 ## Source and live safety boundaries
 
@@ -12,7 +20,7 @@ but release capacity and off-host recovery remain unqualified. Do not call the g
 - Latest runtime merge: `9d1c769a1850505779c5cd012e8a47a036e18051`. Runtime feature commit
   `9567e0e946be6fbcad31d29fec8904b8d483fab6` passed hosted CI **40104670712**. Merge CI:
   **40105454236 PASSED**. Documentation head `d2da1bf` also passed CI **40105991245**.
-  Later changes are evidence/handoff only.
+  New gameplay implementation follows the owner priority recorded in MASTER_PLAN.
 - Latest prepared immutable candidate:
   `/srv/brokenodyssey/releases/9d1c769a1850505779c5cd012e8a47a036e18051`.
   Four production builds, all-chunk debug guard and Caddy validation pass. Manifest and bundle
@@ -87,21 +95,11 @@ specialisations and broader world art remain long-term incomplete; they are not 
   actual NPC picking/touch movement pass. No physical-device FPS claim. Startup failures have an
   explicit reload recovery path; no hidden automatic retries.
 
-## Remaining external gates and next action
+## Owner priority supersedes the prior release blocker
 
-The owner was asked asynchronously for an **existing staging host/SSH target and off-host backup
-destination**. No answer has arrived. Physical iOS/Android acceptance is also pending. Use supplied
-existing infrastructure for strict capacity/headroom and recovery qualification; no purchase is
-authorized. Preserve WAL flush, ownership fencing and publish-after-commit ordering. Do not fake
-catch-up ticks, weaken limits or publish the failed candidate.
+The prior release results above remain historical evidence, not a gameplay-development stop condition.
+Continue the ranked gameplay milestones. Do not publish, weaken data safeguards, repeat load tests or
+investigate infrastructure. Physical-device and deployment validation belong to a later release phase.
 
-The third consecutive blocker audit confirmed the same missing targets, with no new owner input.
-The previous turn made substantive progress: encoding improvements, full qualification, integration
-and immutable preparation. This turn revalidated repository state, the failed capacity evidence,
-unchanged live release and the terminal successful CI run `40105991245`. No independent required
-implementation or running qualification remains to finish before those external inputs arrive.
-
-Goal status: BLOCKED, not achieved. Resume when an existing staging/SSH target and off-host backup
-destination are supplied, with access arranged through the environment. Physical iOS/Android
-acceptance must also be completed. Preserve the earned actors and prepared artifacts; do not restart
-finished suites, publish the failed candidate or reinterpret the gates as passed.
+Wear/repair implementation is drafted in uncommitted `packages/{game-data,domain}/src/durability.ts`
+and tests. It is not integrated or verified yet. Continue this milestone; no release gate blocks it.
